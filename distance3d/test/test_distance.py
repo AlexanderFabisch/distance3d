@@ -1,5 +1,6 @@
 import numpy as np
-from distance3d.distance import point_to_line, line_to_line
+from distance3d.distance import (
+    point_to_line, point_to_line_segment, line_to_line)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -24,6 +25,37 @@ def test_point_to_line():
         point, line_point, line_direction)
     assert distance == 1.0
     assert_array_almost_equal(contact_point_line, np.array([1, 0, 0]))
+
+
+def test_point_to_line_segment():
+    segment_start = np.array([0, 0, 0])
+    segment_end = np.array([1, 0, 0])
+
+    distance, contact_point_line = point_to_line_segment(
+        0.5 * (segment_start + segment_end), segment_start, segment_end)
+    assert distance == 0.0
+    assert_array_almost_equal(
+        contact_point_line, 0.5 * (segment_start + segment_end))
+
+    distance, contact_point_line = point_to_line_segment(
+        segment_start, segment_start, segment_end)
+    assert distance == 0.0
+    assert_array_almost_equal(contact_point_line, segment_start)
+
+    distance, contact_point_line = point_to_line_segment(
+        segment_end, segment_start, segment_end)
+    assert distance == 0.0
+    assert_array_almost_equal(contact_point_line, segment_end)
+
+    distance, contact_point_line = point_to_line_segment(
+        np.array([-1, 0, 0]), segment_start, segment_end)
+    assert distance == 1.0
+    assert_array_almost_equal(contact_point_line, segment_start)
+
+    distance, contact_point_line = point_to_line_segment(
+        np.array([2, 0, 0]), segment_start, segment_end)
+    assert distance == 1.0
+    assert_array_almost_equal(contact_point_line, segment_end)
 
 
 def test_line_to_line():
