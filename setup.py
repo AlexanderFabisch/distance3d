@@ -24,4 +24,7 @@ if __name__ == "__main__":
           license="BSD-3-Clause",
           packages=["distance3d"],
           install_requires=["numpy", "scipy", "matplotlib", "pytransform3d",
-                            "open3d"])
+                            "open3d"],
+          extras_require={
+              "test": ["pytest", "pytest-cov"]
+          })
