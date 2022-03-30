@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from .utils import norm_vector
 
@@ -75,3 +76,76 @@ def point_to_line_segment(point, segment_start, segment_end):
     # Compute projected position from the clamped t
     contact_point = segment_start + t * segment_direction
     return np.linalg.norm(point - contact_point), contact_point
+
+
+def line_to_line(line_point1, line_direction1, line_point2, line_direction2,
+                 normalize_directions=False, epsilon=1e-6):
+    """Compute the shortest distance between two lines.
+
+    Parameters
+    ----------
+    line_point1 : array, shape (3,)
+        Point on the first line.
+
+    line_direction1 : array, shape (3,)
+        Direction of the first line. This is assumed to be of unit length.
+        Otherwise, it will only be normalized internally when you set
+        normalize_directions to True.
+
+    line_point2 : array, shape (3,)
+        Point on the second line.
+
+    line_direction2 : array, shape (3,)
+        Direction of the second line. This is assumed to be of unit length.
+        Otherwise, it will only be normalized internally when you set
+        normalize_directions to True.
+
+    normalize_directions : bool, optional (default: False)
+        Normalize directions internally.
+
+    epsilon : float, optional (default: 1e-6)
+        Values smaller than epsilon are considered to be 0.
+
+    Returns
+    -------
+    distance : float
+        The shortest distance between two lines.
+
+    contact_point_line1 : array, shape (3,)
+        Closest point on first line.
+
+    contact_point_line2 : array, shape (3,)
+        Closest point on second line.
+    """
+    if normalize_directions:
+        line_direction1 = norm_vector(line_direction1)
+        line_direction2 = norm_vector(line_direction2)
+    return _line_to_line(
+        line_point1, line_direction1, line_point2, line_direction2, epsilon)[:3]
+
+
+def _line_to_line(line_point1, line_direction1, line_point2, line_direction2,
+                  epsilon=1e-6):
+    diff = line_point1 - line_point2
+    a12 = -np.dot(line_direction1, line_direction2)
+    b1 = np.dot(line_direction1, diff)
+    c = np.dot(diff, diff)
+    det = 1.0 - a12 * a12
+
+    if abs(det) >= epsilon:
+        b2 = -np.dot(line_direction2, diff)
+        t1 = (a12 * b2 - b1) / det
+        t2 = (a12 * b1 - b2) / det
+        dist_squared = (
+            t1 * (t1 + a12 * t2 + 2.0 * b1)
+            + t2 * (a12 * t1 + t2 + 2.0 * b2) + c)
+        contact_point2 = line_point2 + t2 * line_direction2
+    else:  # parallel lines
+        t1 = -b1
+        t2 = 0.0
+        dist_squared = b1 * t1 + c
+        contact_point2 = line_point2
+
+    contact_point1 = line_point1 + t1 * line_direction1
+
+    return math.sqrt(abs(dist_squared)), contact_point1, contact_point2, t1, t2
