@@ -1,12 +1,35 @@
 import numpy as np
-from distance3d.distance import line_to_line
+from distance3d.distance import point_to_line, line_to_line
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
+
+
+def test_point_to_line():
+    line_point = np.array([0, 0, 0])
+    line_direction = np.array([1, 0, 0])
+
+    distance, contact_point_line = point_to_line(
+        line_point, line_point, line_direction)
+    assert distance == 0.0
+    assert_array_almost_equal(contact_point_line, line_point)
+
+    point = np.array([1, 1, 0])
+    distance, contact_point_line = point_to_line(
+        point, line_point, line_direction)
+    assert distance == 1.0
+    assert_array_almost_equal(contact_point_line, np.array([1, 0, 0]))
+
+    point = np.array([1, -1, 0])
+    distance, contact_point_line = point_to_line(
+        point, line_point, line_direction)
+    assert distance == 1.0
+    assert_array_almost_equal(contact_point_line, np.array([1, 0, 0]))
 
 
 def test_line_to_line():
     line_point1 = np.array([1.76405235, 0.40015721, 0.97873798])
     line_direction1 = np.array([0.72840603, 0.6070528, -0.31766579])
+
     line_point2 = np.array([0.95008842, -0.15135721, -0.10321885])
     line_direction2 = np.array([0.27049077, 0.09489186, 0.95803459])
     dist, contact_point1, contact_point2 = line_to_line(
