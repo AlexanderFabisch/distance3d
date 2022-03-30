@@ -3,7 +3,7 @@ import numpy as np
 from .utils import norm_vector
 
 
-def point_to_line(point, line_point, line_direction, normalize_direction=False):
+def point_to_line(point, line_point, line_direction):
     """Compute the shortest distance between point and line.
 
     Parameters
@@ -15,12 +15,7 @@ def point_to_line(point, line_point, line_direction, normalize_direction=False):
         Point on line.
 
     line_direction : array, shape (3,)
-        Direction of the line. This is assumed to be of unit length. Otherwise
-        it will only be normalized internally when you set normalize_direction
-        to True.
-
-    normalize_direction : bool, optional (default: False)
-        Normalize direction internally.
+        Direction of the line. This is assumed to be of unit length.
 
     Returns
     -------
@@ -30,8 +25,6 @@ def point_to_line(point, line_point, line_direction, normalize_direction=False):
     contact_point_line : array, shape (3,)
         Closest point on line.
     """
-    if normalize_direction:
-        line_direction = norm_vector(line_direction)
     return _point_to_line(point, line_point, line_direction)[:2]
 
 
@@ -79,7 +72,7 @@ def point_to_line_segment(point, segment_start, segment_end):
 
 
 def line_to_line(line_point1, line_direction1, line_point2, line_direction2,
-                 normalize_directions=False, epsilon=1e-6):
+                 epsilon=1e-6):
     """Compute the shortest distance between two lines.
 
     Parameters
@@ -100,9 +93,6 @@ def line_to_line(line_point1, line_direction1, line_point2, line_direction2,
         Otherwise, it will only be normalized internally when you set
         normalize_directions to True.
 
-    normalize_directions : bool, optional (default: False)
-        Normalize directions internally.
-
     epsilon : float, optional (default: 1e-6)
         Values smaller than epsilon are considered to be 0.
 
@@ -117,9 +107,6 @@ def line_to_line(line_point1, line_direction1, line_point2, line_direction2,
     contact_point_line2 : array, shape (3,)
         Closest point on second line.
     """
-    if normalize_directions:
-        line_direction1 = norm_vector(line_direction1)
-        line_direction2 = norm_vector(line_direction2)
     return _line_to_line(
         line_point1, line_direction1, line_point2, line_direction2, epsilon)[:3]
 
