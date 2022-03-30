@@ -1,5 +1,6 @@
 import numpy as np
 from .utils import norm_vector
+from .config import use_numba
 
 
 def point_to_line(point, line_point, line_direction, normalize_direction=False):
@@ -34,10 +35,21 @@ def point_to_line(point, line_point, line_direction, normalize_direction=False):
     return _point_to_line(point, line_point, line_direction)[:2]
 
 
-def _point_to_line(point, line_point, line_direction):
-    diff = point - line_point
-    t = np.dot(line_direction, diff)
-    direction_fraction = t * line_direction
-    diff -= direction_fraction
-    point_on_line = line_point + direction_fraction
-    return np.linalg.norm(diff), point_on_line, t
+if use_numba:
+    import numba
+    @numba.jit
+    def _point_to_line(point, line_point, line_direction):
+        diff = point - line_point
+        t = line_direction[0] * diff[0] + line_direction[1] * diff[1] + line_direction[2] * diff[2]
+        direction_fraction = t * line_direction
+        diff -= direction_fraction
+        point_on_line = line_point + direction_fraction
+        return np.linalg.norm(diff), point_on_line, t
+else:
+    def _point_to_line(point, line_point, line_direction):
+        diff = point - line_point
+        t = np.dot(line_direction, * diff)
+        direction_fraction = t * line_direction
+        diff -= direction_fraction
+        point_on_line = line_point + direction_fraction
+        return np.linalg.norm(diff), point_on_line, t
