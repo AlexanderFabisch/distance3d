@@ -8,13 +8,13 @@ from distance3d import plotting
 
 
 random_state = np.random.RandomState(1)
-cylinder2origin, radius, length = random.randn_cylinder(random_state, 0.5, 1.0, 0.0)
+cylinder2origin, radius, length = random.rand_cylinder(random_state, 0.5, 1.0, 0.0)
 
 ax = ppu.make_3d_axis(ax_s=2)
 
 accumulated_time = 0.0
 for i in range(700):
-    cylinder2origin2, radius2, length2 = random.randn_cylinder(random_state)
+    cylinder2origin2, radius2, length2 = random.rand_cylinder(random_state)
     start = time.time()
     c1 = gjk.Cylinder(cylinder2origin, radius, length)
     c2 = gjk.Cylinder(cylinder2origin2, radius2, length2)

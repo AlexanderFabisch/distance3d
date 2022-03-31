@@ -9,13 +9,13 @@ from distance3d import plotting
 
 
 random_state = np.random.RandomState(0)
-capsule2origin, radius, height = random.randn_capsule(random_state, 0.2, 0.4, 1.0)
+capsule2origin, radius, height = random.rand_capsule(random_state, 0.2, 0.4, 1.0)
 
 ax = ppu.make_3d_axis(ax_s=2)
 
 accumulated_time = 0.0
 for i in range(700):
-    capsule2origin2, radius2, height2 = random.randn_capsule(random_state, 1.0, 0.3, 1.0)
+    capsule2origin2, radius2, height2 = random.rand_capsule(random_state, 1.0, 0.3, 1.0)
     start = time.time()
     c1 = gjk.Capsule(capsule2origin, radius, height)
     c2 = gjk.Capsule(capsule2origin2, radius2, height2)
