@@ -222,3 +222,92 @@ def _line_to_line_segment(
     contact_point2 = segment_start + s * d
 
     return np.linalg.norm(contact_point2 - contact_point1), contact_point1, contact_point2, t, s
+
+
+def line_segment_to_line_segment(
+        segment_start1, segment_end1, segment_start2, segment_end2, epsilon=1e-6):
+    """Compute the shortest distance between two line segments.
+
+    Implementation according to Ericson: Real-Time Collision Detection (2005).
+
+    Parameters
+    ----------
+    segment_start1 : array, shape (3,)
+        Start point of segment 1.
+
+    segment_end1 : array, shape (3,)
+        End point of segment 1.
+
+    segment_start2 : array, shape (3,)
+        Start point of segment 2.
+
+    segment_end2 : array, shape (3,)
+        End point of segment 2.
+
+    epsilon : float, optional (default: 1e-6)
+        Values smaller than epsilon are considered to be 0.
+
+    Returns
+    -------
+    distance : float
+        The shortest distance between two line segments.
+
+    contact_point_segment1 : array, shape (3,)
+        Closest point on first line segment.
+
+    contact_point_segment2 : array, shape (3,)
+        Closest point on second line segment.
+    """
+    # Segment direction vectors
+    d1 = segment_end1 - segment_start1
+    d2 = segment_end2 - segment_start2
+
+    # Squared segment lengths, always nonnegative
+    a = np.dot(d1, d1)
+    e = np.dot(d2, d2)
+
+    if a < epsilon and e < epsilon:
+        # Both segments degenerate into points
+        return (np.linalg.norm(segment_start2 - segment_start1),
+                segment_start1, segment_start2)
+
+    r = segment_start1 - segment_start2
+    f = np.dot(d2, r)
+
+    if a < epsilon:
+        # First segment degenerates into a point
+        s = 0.0
+        t = min(max(f / e, 0.0), 1.0)
+    else:
+        c = np.dot(d1, r)
+        if e <= epsilon:
+            # Second segment degenerates into a point
+            t = 0.0
+            s = min(max(-c / a, 0.0), 1.0)
+        else:
+            # General nondegenerate case
+            b = np.dot(d1, d2)
+            denom = a * e - b * b  # always nonnegative
+
+            if denom != 0.0:
+                # If segements not parallel, compute closest point on line 1 to
+                # line 2 and clamp to segment 1.
+                s = min(max((b * f - c * e) / denom, 0.0), 1.0)
+            else:
+                # Parallel case: compute arbitrary s.
+                s = 0.0
+
+            t = (b * s + f) / e
+
+            # If t in [0, 1] done. Else clamp t, recompute s.
+            if t < 0.0:
+                t = 0.0
+                s = min(max(-c / a, 0.0), 1.0)
+            elif t > 1.0:
+                t = 1.0
+                s = min(max((b - c) / a, 0.0), 1.0)
+
+    contact_point1 = segment_start1 + s * d1
+    contact_point2 = segment_start2 + t * d2
+
+    return np.linalg.norm(contact_point2 - contact_point1), contact_point1, contact_point2
