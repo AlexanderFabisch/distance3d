@@ -22,7 +22,8 @@ for i in range(700):
     end = time.time()
     accumulated_time += end - start
     print(dist)
-    if i > 5: continue
+    if i > 5:
+        continue
     plotting.plot_segment(ax, contact_point_cylinder, contact_point_cylinder2)
     ppu.plot_cylinder(ax, A2B=cylinder2origin2, radius=radius2, length=length2,
                       wireframe=True)

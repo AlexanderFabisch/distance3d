@@ -133,7 +133,7 @@ def randn_triangle(random_state):
 
 
 def rand_capsule(random_state, center_scale=1.0, radius_scale=1.0,
-                  height_scale=1.0):
+                 height_scale=1.0):
     """Sample capsule.
 
     Parameters
@@ -169,7 +169,7 @@ def rand_capsule(random_state, center_scale=1.0, radius_scale=1.0,
 
 
 def rand_cylinder(random_state, center_scale=1.0, min_radius=0.0,
-                   min_length=0.0):
+                  min_length=0.0):
     """Sample cylinder.
 
     Parameters
@@ -202,3 +202,30 @@ def rand_cylinder(random_state, center_scale=1.0, min_radius=0.0,
     radius = min_radius + random_state.rand()
     length = min_length + random_state.rand()
     return cylinder2origin, radius, length
+
+
+def rand_sphere(random_state, center_scale=1.0, radius_scale=1.0):
+    """Sample sphere.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    center_scale : float, optional (default: 1)
+        Scaling factor for center.
+
+    radius_scale : float, optional (default: 1)
+        Scaling factor for radius.
+
+    Returns
+    -------
+    center : array, shape (3,)
+        Center of the sphere.
+
+    radius : float
+        Radius of the sphere.
+    """
+    center = random_state.randn(3) * center_scale
+    radius = random_state.rand() * radius_scale
+    return center, radius
