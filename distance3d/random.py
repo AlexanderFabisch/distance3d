@@ -139,3 +139,12 @@ def randn_capsule(random_state, origin_scale=1.0, radius_scale=1.0, height_scale
     radius = random_state.rand() * radius_scale
     height = random_state.rand() * height_scale
     return capsule2origin, radius, height
+
+
+def randn_cylinder(random_state, min_radius=0.0, min_lengths=0.0, center_scale=1.0):
+    """TODO"""
+    cylinder2origin = pt.random_transform(random_state)
+    cylinder2origin[:3, 3] *= center_scale
+    radius = min_radius + random_state.rand()
+    length = min_lengths + random_state.rand()
+    return cylinder2origin, radius, length
