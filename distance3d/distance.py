@@ -415,7 +415,7 @@ def line_to_rectangle(
     Returns
     -------
     dist : float
-        The shortest distance between two rectangles.
+        The shortest distance between line and rectangle.
 
     contact_point_line : array, shape (3,)
         Closest point on the line.
@@ -526,7 +526,7 @@ def line_segment_to_rectangle(
     Returns
     -------
     dist : float
-        The shortest distance between two rectangles.
+        The shortest distance between line segment and rectangle.
 
     contact_point_line_segment : array, shape (3,)
         Closest point on the line segment.
@@ -551,3 +551,85 @@ def line_segment_to_rectangle(
         contact_point_segment = segment_end
 
     return distance, contact_point_segment, contact_point_rectangle
+
+
+def rectangle_to_rectangle(
+        rectangle_center1, rectangle_axes1, rectangle_lengths1,
+        rectangle_center2, rectangle_axes2, rectangle_lengths2, epsilon=1e-6):
+    """Compute the shortest distance between two rectangles.
+
+    Parameters
+    ----------
+    rectangle_center1 : array, shape (3,)
+        Center point of the rectangle.
+
+    rectangle_axes1 : array, shape (2, 3)
+        Each row is a vector of unit length, indicating the direction of one
+        axis of the rectangle. Both vectors are orthogonal.
+
+    rectangle_lengths1 : array, shape (2,)
+        Lengths of the two sides of the rectangle.
+
+    rectangle_center2 : array, shape (3,)
+        Center point of the rectangle.
+
+    rectangle_axes2 : array, shape (2, 3)
+        Each row is a vector of unit length, indicating the direction of one
+        axis of the rectangle. Both vectors are orthogonal.
+
+    rectangle_lengths2 : array, shape (2,)
+        Lengths of the two sides of the rectangle.
+
+    epsilon : float, optional (default: 1e-6)
+        Values smaller than epsilon are considered to be 0.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between two rectangles.
+
+    contact_point_line_segment : array, shape (3,)
+        Closest point on the line segment.
+
+    contact_point_rectangle : array, shape (3,)
+        Closest point on the rectangle.
+    """
+    # compare edges of rectangle0 to the interior of rectangle1
+    best_dist = np.finfo(float).max
+
+    rectangle_half_lengths1 = 0.5 * rectangle_lengths1
+    rectangle_extents1 = rectangle_half_lengths1[:, np.newaxis] * rectangle_axes1
+    for i1 in range(2):
+        for i0 in range(2):
+            segment_end, segment_start = convert_rectangle_to_segment(
+                rectangle_center1, rectangle_extents1, i0, i1)
+
+            dist, contact_point_rectangle1, contact_point_rectangle2 = line_segment_to_rectangle(
+                segment_start, segment_end, rectangle_center2, rectangle_axes2, rectangle_lengths2)
+
+            if dist < best_dist:
+                best_contact_point_rectangle1 = contact_point_rectangle1
+                best_contact_point_rectangle2 = contact_point_rectangle2
+                best_dist = dist
+            if dist <= epsilon:
+                break
+
+    # compare edges of rectangle1 to the interior of rectangle0
+    rectangle_half_lengths2 = 0.5 * rectangle_lengths2
+    rectangle_extents2 = rectangle_half_lengths2[:, np.newaxis] * rectangle_axes2
+    for i1 in range(2):
+        for i0 in range(2):
+            segment_end, segment_start = convert_rectangle_to_segment(
+                rectangle_center2, rectangle_extents2, i0, i1)
+
+            dist, contact_point_rectangle2, contact_point_rectangle1 = line_segment_to_rectangle(
+                segment_start, segment_end, rectangle_center1, rectangle_axes1, rectangle_lengths1)
+
+            if dist < best_dist:
+                best_contact_point_rectangle1 = contact_point_rectangle1
+                best_contact_point_rectangle2 = contact_point_rectangle2
+                best_dist = dist
+            if dist <= epsilon:
+                break
+
+    return best_dist, best_contact_point_rectangle1, best_contact_point_rectangle2
