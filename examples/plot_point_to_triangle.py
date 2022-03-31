@@ -3,11 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.plot_utils as ppu
 from distance3d.distance import point_to_triangle
+from distance3d import random
 from distance3d import plotting
 
 
 random_state = np.random.RandomState(0)
-triangle_points = np.array([[0, 0, 0], [0, 1, 0], [1, 0, 0]])
+triangle_points = random.randn_triangle(random_state)
 
 ax = ppu.make_3d_axis(ax_s=1)
 
@@ -19,7 +20,8 @@ for i in range(40000):
     end = time.time()
     accumulated_time += end - start
     print(dist)
-    if i > 100: continue
+    if i > 100:
+        continue
     points = np.vstack((point, contact_point))
     ax.scatter(points[:, 0], points[:, 1], points[:, 2])
     ax.plot(points[:, 0], points[:, 1], points[:, 2])

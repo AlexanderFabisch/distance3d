@@ -112,3 +112,20 @@ def randn_rectangle(random_state, scale_center=1.0, length_scale=1.0):
     rectangle_lengths = random_state.rand(2) * length_scale
     rectangle_axes = np.vstack((rectangle_axis1, rectangle_axis2))
     return rectangle_center, rectangle_axes, rectangle_lengths
+
+
+def randn_triangle(random_state):
+    """Sample triangle.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    Returns
+    -------
+    triangle_points : array, shape (3, 3)
+        Each row contains a point of the triangle (A, B, C) sampled from a
+        standard normal distribution.
+    """
+    return random_state.randn(3, 3)
