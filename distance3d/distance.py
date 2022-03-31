@@ -136,3 +136,89 @@ def _line_to_line(line_point1, line_direction1, line_point2, line_direction2,
     contact_point1 = line_point1 + t1 * line_direction1
 
     return math.sqrt(abs(dist_squared)), contact_point1, contact_point2, t1, t2
+
+
+def line_to_line_segment(
+        line_point, line_direction, segment_start, segment_end, epsilon=1e-6):
+    """Compute the closest point between line and line segment.
+
+    Parameters
+    ----------
+    line_point : array, shape (3,)
+        Point on line.
+
+    line_direction : array, shape (3,)
+        Direction of the line. This is assumed to be of unit length.
+
+    segment_start : array, shape (3,)
+        Start point of segment.
+
+    segment_end : array, shape (3,)
+        End point of segment.
+
+    epsilon : float, optional (default: 1e-6)
+        Values smaller than epsilon are considered to be 0.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between line and line segment.
+
+    contact_point1 : array, shape (3,)
+        Contact point on line.
+
+    contact_point2 : array, shape (3,)
+        Contact point on line segment.
+    """
+    return _line_to_line_segment(
+        line_point, line_direction, segment_start, segment_end, epsilon)[:3]
+
+
+# modified version of line segment to line segment
+def _line_to_line_segment(
+        line_point, line_direction, segment_start, segment_end,
+        epsilon=1e-6):
+    # Segment direction vectors
+    d = segment_end - segment_start
+
+    # Squared segment lengths, always nonnegative
+    a = np.dot(d, d)
+    e = np.dot(line_direction, line_direction)
+
+    if a < epsilon and e < epsilon:
+        # Both segments degenerate into points
+        return (np.linalg.norm(line_point - segment_start),
+                segment_start, line_point)
+
+    r = segment_start - line_point
+    f = np.dot(line_direction, r)
+
+    if a < epsilon:
+        # First segment degenerates into a point
+        s = 0.0
+        t = f / e
+    else:
+        c = np.dot(d, r)
+        if e <= epsilon:
+            # Second segment degenerates into a point
+            t = 0.0
+            s = min(max(-c / a, 0.0), 1.0)
+        else:
+            # General nondegenerate case
+            b = np.dot(d, line_direction)
+            denom = a * e - b * b  # always nonnegative
+
+            if denom != 0.0:
+                # If segements not parallel, compute closest point on line 1 to
+                # line 2 and clamp to segment 1.
+                s = min(max((b * f - c * e) / denom, 0.0), 1.0)
+            else:
+                # Parallel case: compute arbitrary s.
+                s = 0.0
+
+            t = (b * s + f) / e
+
+    contact_point1 = line_point + t * line_direction
+    contact_point2 = segment_start + s * d
+
+    return np.linalg.norm(contact_point2 - contact_point1), contact_point1, contact_point2, t, s
