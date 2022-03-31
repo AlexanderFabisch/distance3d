@@ -6,7 +6,7 @@ from distance3d.distance import point_to_plane
 
 
 random_state = np.random.RandomState(0)
-# TODO move to geometry
+# TODO move to random
 plane_point = random_state.randn(3)
 plane_normal = pr.norm_vector(random_state.randn(3))
 
