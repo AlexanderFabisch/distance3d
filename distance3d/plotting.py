@@ -88,3 +88,25 @@ def plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths, show
     if show_axes:
         ppu.plot_vector(ax=ax, start=rectangle_center, direction=rectangle_axes[0], s=0.5 * rectangle_lengths[0], color="r")
         ppu.plot_vector(ax=ax, start=rectangle_center, direction=rectangle_axes[1], s=0.5 * rectangle_lengths[1], color="g")
+
+
+def plot_triangle(ax, triangle_points, surface_alpha=0.1):
+    """Plot triangle.
+
+    Parameters
+    ----------
+    ax : Matplotlib 3d axis
+        A matplotlib 3d axis.
+
+    triangle_points : array, shape (3, 3)
+        Each row contains a point of the triangle (A, B, C).
+
+    surface_alpha : float, optional (default: 0.1)
+        Alpha value of the rectangle surface.
+    """
+    triangle = mplot3d.art3d.Poly3DCollection(triangle_points)
+    triangle.set_alpha(surface_alpha)
+    ax.add_collection3d(triangle)
+
+    triangle_points = np.vstack((triangle_points, [triangle_points[0]]))
+    ax.plot(triangle_points[:, 0], triangle_points[:, 1], triangle_points[:, 2])
