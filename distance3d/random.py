@@ -1,5 +1,6 @@
 import numpy as np
 import pytransform3d.rotations as pr
+import pytransform3d.transformations as pt
 from .utils import norm_vector
 
 
@@ -129,3 +130,12 @@ def randn_triangle(random_state):
         standard normal distribution.
     """
     return random_state.randn(3, 3)
+
+
+def randn_capsule(random_state, origin_scale=1.0, radius_scale=1.0, height_scale=1.0):
+    """TODO"""
+    capsule2origin = pt.random_transform(random_state)
+    capsule2origin[:3, 3] *= origin_scale
+    radius = random_state.rand() * radius_scale
+    height = random_state.rand() * height_scale
+    return capsule2origin, radius, height
