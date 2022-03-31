@@ -1,5 +1,6 @@
 import numpy as np
 import pytransform3d.rotations as pr
+import pytransform3d.transformations as pt
 from .utils import norm_vector
 
 
@@ -129,3 +130,102 @@ def randn_triangle(random_state):
         standard normal distribution.
     """
     return random_state.randn(3, 3)
+
+
+def rand_capsule(random_state, center_scale=1.0, radius_scale=1.0,
+                 height_scale=1.0):
+    """Sample capsule.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    center_scale : float, optional (default: 1)
+        Scaling factor for center.
+
+    radius_scale : float, optional (default: 1)
+        Scaling factor for radius.
+
+    height_scale : float, optional (default: 1)
+        Scaling factor for height.
+
+    Returns
+    -------
+    capsule2origin : array, shape (4, 4)
+        Pose of the capsule.
+
+    radius : float
+        Radius of the capsule.
+
+    height : float
+        Height of the capsule.
+    """
+    capsule2origin = pt.random_transform(random_state)
+    capsule2origin[:3, 3] *= center_scale
+    radius = random_state.rand() * radius_scale
+    height = random_state.rand() * height_scale
+    return capsule2origin, radius, height
+
+
+def rand_cylinder(random_state, center_scale=1.0, min_radius=0.0,
+                  min_length=0.0):
+    """Sample cylinder.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    min_radius : float, optional (default: 0)
+        Minimum radius of cylinder.
+
+    min_length : float, optional (default: 0)
+        Minimum length of cylinder.
+
+    center_scale : float, optional (default: 1)
+        Scaling factor for center.
+
+    Returns
+    -------
+    cylinder2origin : array, shape (4, 4)
+        Pose of the cylinder.
+
+    radius : float
+        Radius of the cylinder.
+
+    length : float
+        Length of the cylinder.
+    """
+    cylinder2origin = pt.random_transform(random_state)
+    cylinder2origin[:3, 3] *= center_scale
+    radius = min_radius + random_state.rand()
+    length = min_length + random_state.rand()
+    return cylinder2origin, radius, length
+
+
+def rand_sphere(random_state, center_scale=1.0, radius_scale=1.0):
+    """Sample sphere.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    center_scale : float, optional (default: 1)
+        Scaling factor for center.
+
+    radius_scale : float, optional (default: 1)
+        Scaling factor for radius.
+
+    Returns
+    -------
+    center : array, shape (3,)
+        Center of the sphere.
+
+    radius : float
+        Radius of the sphere.
+    """
+    center = random_state.randn(3) * center_scale
+    radius = random_state.rand() * radius_scale
+    return center, radius
