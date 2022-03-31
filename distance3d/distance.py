@@ -1,7 +1,7 @@
 import math
 import numpy as np
 import pytransform3d.rotations as pr
-from .geometry import convert_rectangle_to_segment
+from .geometry import convert_rectangle_to_segment, convert_segment_to_line
 
 
 def point_to_line(point, line_point, line_direction):
@@ -495,3 +495,59 @@ def _line_intersects_rectangle(
             contact_point_rectangle = rectangle_center + s.dot(rectangle_axes)
             return True, (0.0, contact_point_line, contact_point_rectangle, line_parameter)
     return False, None
+
+
+def line_segment_to_rectangle(
+        segment_start, segment_end,
+        rectangle_center, rectangle_axes, rectangle_lengths, epsilon=1e-6):
+    """Compute the shortest distance between line segment and rectangle.
+
+    Parameters
+    ----------
+    segment_start : array, shape (3,)
+        Start point of segment.
+
+    segment_end : array, shape (3,)
+        End point of segment.
+
+    rectangle_center : array, shape (3,)
+        Center point of the rectangle.
+
+    rectangle_axes : array, shape (2, 3)
+        Each row is a vector of unit length, indicating the direction of one
+        axis of the rectangle. Both vectors are orthogonal.
+
+    rectangle_lengths : array, shape (2,)
+        Lengths of the two sides of the rectangle.
+
+    epsilon : float, optional (default: 1e-6)
+        Values smaller than epsilon are considered to be 0.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between two rectangles.
+
+    contact_point_line_segment : array, shape (3,)
+        Closest point on the line segment.
+
+    contact_point_rectangle : array, shape (3,)
+        Closest point on the rectangle.
+    """
+    segment_direction, segment_length = convert_segment_to_line(
+        segment_start, segment_end)
+
+    distance, contact_point_segment, contact_point_rectangle, t_closest = _line_to_rectangle(
+        segment_start, segment_direction,
+        rectangle_center, rectangle_axes, rectangle_lengths, epsilon)
+
+    if t_closest < 0:
+        distance, contact_point_rectangle = point_to_rectangle(
+            segment_start, rectangle_center, rectangle_axes, rectangle_lengths)
+        contact_point_segment = segment_start
+    elif t_closest > segment_length:
+        distance, contact_point_rectangle = point_to_rectangle(
+            segment_end, rectangle_center, rectangle_axes, rectangle_lengths)
+        contact_point_segment = segment_end
+
+    return distance, contact_point_segment, contact_point_rectangle
