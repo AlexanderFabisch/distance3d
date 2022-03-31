@@ -5,9 +5,7 @@ from .geometry import (
 
 
 def gjk(vertices1, vertices2):
-    """Gilbert-Johnson-Keerthi algorithm for distance calculation of convex shapes.
-
-    Based on http://realtimecollisiondetection.net/files/gilbert.c
+    """Gilbert-Johnson-Keerthi algorithm for distance calculation.
 
     Parameters
     ----------
@@ -129,9 +127,16 @@ class Sphere:
 
 
 def gjk_with_simplex(collider1, collider2):
-    """Gilbert-Johnson-Keerthi algorithm for distance calculation of convex shapes.
+    """Gilbert-Johnson-Keerthi algorithm for distance calculation.
 
-    Based on http://realtimecollisiondetection.net/files/gilbert.c
+    The GJK algorithm only works for convex shapes. Concave objects have to be
+    decomposed into convex shapes first.
+
+    Based on the translation to C of the original Fortran implementation:
+    Ruspini, Diego. gilbert.c, a C version of the original Fortran
+    implementation of the GJK algorithm.
+    ftp://labrea.stanford.edu/cs/robotics/sean/distance/gilbert.c,
+    also available from http://realtimecollisiondetection.net/files/gilbert.c
 
     Parameters
     ----------
@@ -254,7 +259,7 @@ def distance_subalgorithm(
     concerning the distance subalgorithm. Converted to C be Diego C. Ruspini
     3/25/93.
 
-    dsbp also determines an affinely independent subset of the
+    This function also determines an affinely independent subset of the
     points such that zsol= near point to the affine hull of the points
     in the subset. The variables nvs, y, ris, rjs and dell are modified
     so that, on output, they correspond to this subset of points.
