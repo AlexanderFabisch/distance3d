@@ -1,6 +1,7 @@
 import math
 import numpy as np
-from .geometry import capsule_extreme_along_direction, cylinder_extreme_along_direction
+from .geometry import (
+    capsule_extreme_along_direction, cylinder_extreme_along_direction)
 
 
 def gjk(vertices1, vertices2):
@@ -19,7 +20,7 @@ def gjk(vertices1, vertices2):
     Returns
     -------
     distance : float
-        Shortest distance between two convex shapes.
+        The shortest distance between two convex shapes.
 
     contact_point1 : array, shape (3,)
         Contact point on first convex shape.
@@ -31,6 +32,13 @@ def gjk(vertices1, vertices2):
 
 
 class Convex:
+    """Wraps convex hull of a set of vertices for GJK algorithm.
+
+    Parameters
+    ----------
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the convex shape.
+    """
     def __init__(self, vertices):
         self.vertices = vertices
 
@@ -46,6 +54,7 @@ class Convex:
 
 
 class Cylinder:
+    """Wraps cylinder for GJK algorithm."""
     def __init__(self, cylinder2origin, radius, length):
         self.cylinder2origin = cylinder2origin
         self.radius = radius
@@ -69,6 +78,7 @@ class Cylinder:
 
 
 class Capsule:
+    """Wraps capsule for GJK algorithm."""
     def __init__(self, capsule2origin, radius, height):
         self.capsule2origin = capsule2origin
         self.radius = radius
@@ -92,6 +102,7 @@ class Capsule:
 
 
 class Sphere:
+    """Wraps sphere for GJK algorithm."""
     # https://github.com/kevinmoran/GJK/blob/master/Collider.h#L33
     def __init__(self, center, radius):
         self.c = center
@@ -234,7 +245,7 @@ def distance_subalgorithm(
         backup):
     """Distance subalgorithm.
 
-    dsbp implements, in a very efficient way, the distance subalgorithm
+    Implements, in a very efficient way, the distance subalgorithm
     of finding the near point to the convex hull of four or less points
     in 3-D space. The procedure and its efficient FORTRAN implementation
     are both due to D.W. Johnson. Although this subroutine is quite long,
@@ -1151,4 +1162,19 @@ def _reorder_simplex(
 
 
 def minkowski_sum(vertices1, vertices2):
+    """Minkowski sum of two sets of vertices.
+
+    Parameters
+    ----------
+    vertices1 : array, shape (n_vertices1, 3)
+        First set of vertices.
+
+    vertices2 : array, shape (n_vertices2, 3)
+        Second set of vertices.
+
+    Returns
+    -------
+    ms : array, shape (n_vertices1 * n_vertices2, 3)
+        Sums of all pairs of vertices from first and second set.
+    """
     return np.array([v1 + v2 for v1 in vertices1 for v2 in vertices2])
