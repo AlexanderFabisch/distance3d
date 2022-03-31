@@ -344,3 +344,42 @@ def point_to_plane(point, plane_point, plane_normal, signed=False):
     if not signed:
         t = abs(t)
     return t, contact_point_plane
+
+
+def point_to_rectangle(point, rectangle_center, rectangle_axes,
+                       rectangle_lengths):
+    """Compute the shortest distance from point to rectangle.
+
+    Parameters
+    ----------
+    point : array, shape (3,)
+        3D point.
+
+    rectangle_center : array, shape (3,)
+        Center point of the rectangle.
+
+    rectangle_axes : array, shape (2, 3)
+        Each row is a vector of unit length, indicating the direction of one
+        axis of the rectangle. Both vectors are orthogonal.
+
+    rectangle_lengths : array, shape (2,)
+        Lengths of the two sides of the rectangle.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between the point and the rectangle.
+
+    contact_point_rectangle : array, shape (3,)
+        Closest point on the rectangle.
+    """
+    diff = rectangle_center - point
+    rectangle_coordinates = -rectangle_axes.dot(diff)
+
+    rectangle_half_lengths = 0.5 * rectangle_lengths
+    rectangle_coordinates = np.clip(
+        rectangle_coordinates, -rectangle_half_lengths, rectangle_half_lengths)
+
+    contact_point = rectangle_center + rectangle_coordinates.dot(rectangle_axes)
+
+    return np.linalg.norm(point - contact_point), contact_point
