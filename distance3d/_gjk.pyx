@@ -1,253 +1,21 @@
-import math
 import numpy as np
-from .geometry import (
-    capsule_extreme_along_direction, cylinder_extreme_along_direction)
+cimport numpy as np
+cimport cython
 
 
-def gjk(vertices1, vertices2):
-    """Gilbert-Johnson-Keerthi algorithm for distance calculation.
-
-    Parameters
-    ----------
-    vertices1 : array, shape (n_vertices1, 3)
-        Vertices of the first convex shape.
-
-    vertices2 : array, shape (n_vertices2, 3)
-        Vertices of the second convex shape.
-
-    Returns
-    -------
-    distance : float
-        The shortest distance between two convex shapes.
-
-    contact_point1 : array, shape (3,)
-        Contact point on first convex shape.
-
-    contact_point2 : array, shape (3,)
-        Contact point on second convex shape.
-    """
-    return gjk_with_simplex(Convex(vertices1), Convex(vertices2))[:3]
-
-
-class Convex:
-    """Wraps convex hull of a set of vertices for GJK algorithm.
-
-    Parameters
-    ----------
-    vertices : array, shape (n_vertices, 3)
-        Vertices of the convex shape.
-    """
-    def __init__(self, vertices):
-        self.vertices = vertices
-
-    def first_vertex(self):
-        return self.vertices[0]
-
-    def support_function(self, search_direction):
-        idx = np.argmax(self.vertices.dot(search_direction))
-        return idx, self.vertices[idx]
-
-    def compute_point(self, barycentric_coordinates, indices):
-        return np.dot(barycentric_coordinates, self.vertices[indices])
-
-
-class Cylinder:
-    """Wraps cylinder for GJK algorithm."""
-    def __init__(self, cylinder2origin, radius, length):
-        self.cylinder2origin = cylinder2origin
-        self.radius = radius
-        self.length = length
-        self.vertices = []
-
-    def first_vertex(self):
-        vertex = self.cylinder2origin[:3, 3] + 0.5 * self.length * self.cylinder2origin[:3, 2]
-        self.vertices.append(vertex)
-        return vertex
-
-    def support_function(self, search_direction):
-        vertex = cylinder_extreme_along_direction(
-            search_direction, self.cylinder2origin, self.radius, self.length)
-        vertex_idx = len(self.vertices)
-        self.vertices.append(vertex)
-        return vertex_idx, vertex
-
-    def compute_point(self, barycentric_coordinates, indices):
-        return np.dot(barycentric_coordinates, np.array([self.vertices[i] for i in indices]))
-
-
-class Capsule:
-    """Wraps capsule for GJK algorithm."""
-    def __init__(self, capsule2origin, radius, height):
-        self.capsule2origin = capsule2origin
-        self.radius = radius
-        self.height = height
-        self.vertices = []
-
-    def first_vertex(self):
-        vertex = self.capsule2origin[:3, 3] - (self.radius + 0.5 * self.height) * self.capsule2origin[:3, 2]
-        self.vertices.append(vertex)
-        return vertex
-
-    def support_function(self, search_direction):
-        vertex = capsule_extreme_along_direction(
-            search_direction, self.capsule2origin, self.radius, self.height)
-        vertex_idx = len(self.vertices)
-        self.vertices.append(vertex)
-        return vertex_idx, vertex
-
-    def compute_point(self, barycentric_coordinates, indices):
-        return np.dot(barycentric_coordinates, np.array([self.vertices[i] for i in indices]))
-
-
-class Sphere:
-    """Wraps sphere for GJK algorithm."""
-    # https://github.com/kevinmoran/GJK/blob/master/Collider.h#L33
-    def __init__(self, center, radius):
-        self.c = center
-        self.radius = radius
-        self.vertices = []
-
-    def first_vertex(self):
-        vertex = self.c + np.array([0, 0, self.radius])
-        self.vertices.append(vertex)
-        return vertex
-
-    def support_function(self, search_direction):
-        s_norm = np.linalg.norm(search_direction)
-        if s_norm == 0.0:
-            vertex = self.c + np.array([0, 0, self.radius])
-        else:
-            vertex = self.c + search_direction / s_norm * self.radius
-        vertex_idx = len(self.vertices)
-        self.vertices.append(vertex)
-        return vertex_idx, vertex
-
-    def compute_point(self, barycentric_coordinates, indices):
-        return np.dot(barycentric_coordinates, np.array([self.vertices[i] for i in indices]))
-
-
-def gjk_with_simplex(collider1, collider2):
-    """Gilbert-Johnson-Keerthi algorithm for distance calculation.
-
-    The GJK algorithm only works for convex shapes. Concave objects have to be
-    decomposed into convex shapes first.
-
-    Based on the translation to C of the original Fortran implementation:
-    Ruspini, Diego. gilbert.c, a C version of the original Fortran
-    implementation of the GJK algorithm.
-    ftp://labrea.stanford.edu/cs/robotics/sean/distance/gilbert.c,
-    also available from http://realtimecollisiondetection.net/files/gilbert.c
-
-    Parameters
-    ----------
-    collider1 : Collider
-        Convex collider 1.
-
-    collider2 : Collider
-        Convex collider 2.
-
-    Returns
-    -------
-    distance : float
-        The shortest distance between two convex shapes.
-
-    contact_point1 : array, shape (3,)
-        Contact point on first convex shape.
-
-    contact_point2 : array, shape (3,)
-        Contact point on second convex shape.
-
-    simplex : array, shape (4, 3)
-        Simplex defined by 4 points of the Minkowski difference between
-        vertices of the two colliders.
-    """
-    indices_polytope1 = np.array([0, 0, 0, 0], dtype=int)
-    indices_polytope2 = np.array([0, 0, 0, 0], dtype=int)
-
-    barycentric_coordinates = np.zeros(4, dtype=float)
-    simplex = np.zeros((4, 3), dtype=float)
-    old_simplex = np.zeros((4, 3), dtype=float)
-    dot_product_table = np.zeros((4, 4), dtype=float)
-    old_dot_product_table = np.zeros((4, 4), dtype=float)
-    old_indices_polytope1 = np.zeros(4, dtype=int)
-    old_indices_polytope2 = np.zeros(4, dtype=int)
-    iord = np.zeros(4, dtype=int)
-    search_direction = np.zeros(3, dtype=float)
-    backup = 0
-
-    # Initialize simplex to difference of first points of the objects
-    ncy = 0
-    n_simplex_points = 1
-    barycentric_coordinates[0] = 1.0
-
-    simplex[0] = collider1.first_vertex() - collider2.first_vertex()
-    dot_product_table[0, 0] = np.dot(simplex[0], simplex[0])
-
-    lastdstsq = dot_product_table[0, 0] + dot_product_table[0, 0] + 1.0
-    while True:
-        ncy += 1
-
-        # Compute point of minimum norm in the convex hull of the simplex
-        dstsq, n_simplex_points, backup = distance_subalgorithm(
-            n_simplex_points, indices_polytope1, indices_polytope2, simplex,
-            dot_product_table, search_direction, barycentric_coordinates, backup)
-
-        if dstsq >= lastdstsq or n_simplex_points == 4:
-            if backup:
-                closest_point1 = collider1.compute_point(
-                    barycentric_coordinates[:n_simplex_points],
-                    indices_polytope1[:n_simplex_points])
-                closest_point2 = collider2.compute_point(
-                    barycentric_coordinates[:n_simplex_points],
-                    indices_polytope2[:n_simplex_points])
-
-                # Make sure intersection has zero distance
-                if n_simplex_points == 4:
-                    closest_point1[:] = 0.5 * (closest_point1 + closest_point2)
-                    closest_point2[:] = closest_point1
-                    distance = 0.0
-                else:
-                    distance = math.sqrt(dstsq)
-
-                return distance, closest_point1, closest_point2, simplex
-
-            backup = 1
-            if ncy != 1:
-                n_simplex_points = _revert_to_old_simplex(
-                    dot_product_table, indices_polytope1, indices_polytope2,
-                    old_dot_product_table, old_indices_polytope1,
-                    old_indices_polytope2, old_simplex, n_old_simplex_points,
-                    simplex)
-            continue
-
-        lastdstsq = dstsq
-
-        # Find new supporting point in direction -search_direction:
-        # s_(A-B)(-search_direction) = s_A(-search_direction) - s_B(search_direction)
-        new_index1, new_vertex1 = collider1.support_function(-search_direction)
-        new_index2, new_vertex2 = collider2.support_function(search_direction)
-        new_simplex_point = new_vertex1 - new_vertex2
-
-        n_simplex_points = _add_new_point(
-            dot_product_table, indices_polytope1, indices_polytope2,
-            n_simplex_points, new_index1, new_index2, simplex,
-            new_simplex_point)
-        n_old_simplex_points = _save_old_simplex(
-            dot_product_table, indices_polytope1, indices_polytope2,
-            n_simplex_points, old_dot_product_table, old_indices_polytope1,
-            old_indices_polytope2, old_simplex, simplex)
-        _reorder_simplex(
-            dot_product_table, indices_polytope1, indices_polytope2, iord,
-            n_simplex_points, old_dot_product_table, old_indices_polytope1,
-            old_indices_polytope2, old_simplex, simplex)
-
-    raise RuntimeError("Solution should be found in loop.")
-
-
-def distance_subalgorithm(
-        n_simplex_points, old_indices_polytope1, old_indices_polytope2,
-        simplex, dot_product_table, search_direction, barycentric_coordinates,
-        backup):
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef distance_subalgorithm(
+        int n_simplex_points,
+        np.ndarray[long, ndim=1] old_indices_polytope1,
+        np.ndarray[long, ndim=1] old_indices_polytope2,
+        np.ndarray[double, ndim=2] simplex,
+        np.ndarray[double, ndim=2] dot_product_table,
+        np.ndarray[double, ndim=1] search_direction,
+        np.ndarray[double, ndim=1] barycentric_coordinates,
+        int backup):
     """Distance subalgorithm.
 
     Implements, in a very efficient way, the distance subalgorithm
@@ -305,17 +73,17 @@ def distance_subalgorithm(
     backup : int
         TODO
     """
-    risd = np.empty(4, dtype=int)
-    rjsd = np.empty(4, dtype=int)
-    iord = np.empty(4, dtype=int)
-    d1 = np.empty(15, dtype=float)
-    d2 = np.empty(15, dtype=float)
-    d3 = np.empty(15, dtype=float)
-    d4 = np.empty(15, dtype=float)
-    yd = np.empty((4, 3), dtype=float)
-    delld = np.empty((4, 4), dtype=float)
-    zsold = np.empty(3, dtype=float)
-    alsd = np.empty(4, dtype=float)
+    cdef np.ndarray[long, ndim=1] risd = np.empty(4, dtype=int)
+    cdef np.ndarray[long, ndim=1] rjsd = np.empty(4, dtype=int)
+    cdef np.ndarray[long, ndim=1] iord = np.empty(4, dtype=int)
+    cdef np.ndarray[double, ndim=1] d1 = np.empty(15, dtype=float)
+    cdef np.ndarray[double, ndim=1] d2 = np.empty(15, dtype=float)
+    cdef np.ndarray[double, ndim=1] d3 = np.empty(15, dtype=float)
+    cdef np.ndarray[double, ndim=1] d4 = np.empty(15, dtype=float)
+    cdef np.ndarray[double, ndim=2] yd = np.empty((4, 3), dtype=float)
+    cdef np.ndarray[double, ndim=2] delld = np.empty((4, 4), dtype=float)
+    cdef np.ndarray[double, ndim=1] zsold = np.empty(3, dtype=float)
+    cdef np.ndarray[double, ndim=1] alsd = np.empty(4, dtype=float)
 
     d1[0] = 1.0
     d2[1] = 1.0
@@ -1080,112 +848,3 @@ def distance_subalgorithm(
         dot_product_table[k, k] = delld[kk, kk]
     backup = 1
     return dstsq, n_simplex_points, backup
-
-
-try:
-    from ._gjk import distance_subalgorithm
-except ImportError:
-    pass  # use Python implementation
-
-
-def _revert_to_old_simplex(
-        dot_product_table, indices_polytope1, indices_polytope2,
-        old_dot_product_table, old_indices_polytope1, old_indices_polytope2,
-        old_simplex, n_old_simplex_points, simplex):
-    simplex[:n_old_simplex_points] = old_simplex[:n_old_simplex_points]
-    indices_polytope1[:n_old_simplex_points] = old_indices_polytope1[:n_old_simplex_points]
-    indices_polytope2[:n_old_simplex_points] = old_indices_polytope2[:n_old_simplex_points]
-    dot_product_table[:n_old_simplex_points] = old_dot_product_table[:n_old_simplex_points]
-    return n_old_simplex_points
-
-
-def _add_new_point(
-        dot_product_table, indices_polytope1, indices_polytope2,
-        n_simplex_points, new_index1, new_index2, simplex, new_simplex_point):
-    # Move first point to last spot
-    indices_polytope1[n_simplex_points] = indices_polytope1[0]
-    indices_polytope2[n_simplex_points] = indices_polytope2[0]
-    simplex[n_simplex_points] = simplex[0]
-    dot_product_table[n_simplex_points, :n_simplex_points] = dot_product_table[:n_simplex_points, 0]
-    dot_product_table[n_simplex_points, n_simplex_points] = dot_product_table[0, 0]
-    # Put new point in first spot
-    indices_polytope1[0] = new_index1
-    indices_polytope2[0] = new_index2
-    simplex[0] = new_simplex_point
-    # Update dot product table
-    n_simplex_points += 1
-    dot_product_table[:n_simplex_points, 0] = np.dot(simplex[:n_simplex_points], simplex[0])
-    return n_simplex_points
-
-
-def _save_old_simplex(
-        dot_product_table, indices_polytope1, indices_polytope2,
-        n_simplex_points, old_dot_product_table, old_indices_polytope1,
-        old_indices_polytope2, old_simplex, simplex):
-    # Save old values of n_simplex_points, indices_polytope1,
-    # indices_polytope2, simplex and dot_product_table
-    oldnvs = n_simplex_points
-    old_simplex[:n_simplex_points] = simplex[:n_simplex_points]
-    old_indices_polytope1[:n_simplex_points] = indices_polytope1[:n_simplex_points]
-    old_indices_polytope2[:n_simplex_points] = indices_polytope2[:n_simplex_points]
-    for k in range(n_simplex_points):
-        old_dot_product_table[k, :k + 1] = dot_product_table[k, :k + 1]
-    return oldnvs
-
-
-def _reorder_simplex(
-        dot_product_table, indices_polytope1, indices_polytope2, iord,
-        n_simplex_points, old_dot_product_table, old_indices_polytope1,
-        old_indices_polytope2, old_simplex, simplex):
-    # If n_simplex_points == 4, rearrange dot_product_table[1, 0],
-    # dot_product_table[2, 1] and dot_product_table[3, 0] in non decreasing
-    # order
-    if n_simplex_points == 4:
-        iord[:3] = 0, 1, 2
-        if dot_product_table[2, 0] < dot_product_table[1, 0]:
-            iord[1] = 2
-            iord[2] = 1
-        ii = iord[1]
-        if dot_product_table[3, 0] < dot_product_table[ii, 0]:
-            iord[3] = iord[2]
-            iord[2] = iord[1]
-            iord[1] = 3
-        else:
-            ii = iord[2]
-            if dot_product_table[3, 0] < dot_product_table[ii, 0]:
-                iord[3] = iord[2]
-                iord[2] = 3
-            else:
-                iord[3] = 3
-        # Reorder indices_polytope1, indices_polytope2 simplex and dot_product_table
-        for k in range(1, n_simplex_points):
-            kk = iord[k]
-            indices_polytope1[k] = old_indices_polytope1[kk]
-            indices_polytope2[k] = old_indices_polytope2[kk]
-            simplex[k] = old_simplex[kk]
-            for l in range(k):
-                ll = iord[l]
-                if kk >= ll:
-                    dot_product_table[k, l] = old_dot_product_table[kk, ll]
-                else:
-                    dot_product_table[k, l] = old_dot_product_table[ll, kk]
-            dot_product_table[k, k] = old_dot_product_table[kk, kk]
-
-
-def minkowski_sum(vertices1, vertices2):
-    """Minkowski sum of two sets of vertices.
-
-    Parameters
-    ----------
-    vertices1 : array, shape (n_vertices1, 3)
-        First set of vertices.
-
-    vertices2 : array, shape (n_vertices2, 3)
-        Second set of vertices.
-
-    Returns
-    -------
-    ms : array, shape (n_vertices1 * n_vertices2, 3)
-        Sums of all pairs of vertices from first and second set.
-    """
-    return np.array([v1 + v2 for v1 in vertices1 for v2 in vertices2])
