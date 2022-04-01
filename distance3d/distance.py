@@ -1109,3 +1109,94 @@ def point_to_triangle(point, triangle_points):
     contact_point = triangle_points[0] + ab * v + ac * w
 
     return np.linalg.norm(point - contact_point), contact_point
+
+
+def line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6):
+    """Compute the shortest distance between point and triangle.
+
+    Implementation according to Ericson: Real-Time Collision Detection (2005).
+
+    Parameters
+    ----------
+    line_point : array, shape (3,)
+        Point on line.
+
+    line_direction : array, shape (3,)
+        Direction of the line. This is assumed to be of unit length.
+
+    triangle_points : array, shape (3, 3)
+        Each row contains a point of the triangle (A, B, C).
+
+    epsilon : float, optional (default: 1e-6)
+        Values smaller than epsilon are considered to be 0.
+
+    Returns
+    -------
+    distance : float
+        The shortest distance between line and triangle.
+
+    contact_point_line : array, shape (3,)
+        Closest point on line.
+
+    contact_point_triangle : array, shape (3,)
+        Closest point on triangle.
+    """
+    return _line_to_triangle(line_point, line_direction, triangle_points, epsilon)[:3]
+
+
+def _line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6):
+    # Test if line intersects triangle. If so, the squared distance is zero.
+    edge = np.array([triangle_points[1] - triangle_points[0],
+                     triangle_points[2] - triangle_points[0]])
+    normal = pr.norm_vector(np.cross(edge[0], edge[1]))
+    if abs(normal.dot(line_direction)) > epsilon:
+        # The line and triangle are not parallel, so the line intersects
+        # the plane of the triangle.
+        diff = line_point - triangle_points[0]
+        u, v = pr.plane_basis_from_normal(line_direction)
+        ude = edge.dot(u)
+        vde = edge.dot(v)
+        uddiff = u.dot(diff)
+        vddiff = v.dot(diff)
+        det = ude[0] * vde[1] - ude[1] * vde[0]
+
+        # Barycentric coordinates for the point of intersection.
+        b = np.array([vde[1] * uddiff - ude[1] * vddiff,
+                      ude[0] * vddiff - vde[0] * uddiff])
+        if det != 0.0:
+            b /= det
+        b2 = 1.0 - b[0] - b[1]
+
+        if b2 >= 0.0 and b[0] >= 0.0 and b[1] >= 0.0:
+            # Line parameter for the point of intersection.
+            dde = edge.dot(line_direction)
+            dddiff = line_direction.dot(diff)
+            line_parameter = b.dot(dde) - dddiff
+
+            # The intersection point is inside or on the triangle.
+            best_contact_point_line = line_point + line_parameter * line_direction
+            best_contact_point_triangle = triangle_points[0] + b.dot(edge)
+            return 0.0, best_contact_point_line, best_contact_point_triangle, line_parameter
+
+    # Either (1) the line is not parallel to the triangle and the point of
+    # intersection of the line and the plane of the triangle is outside the
+    # triangle or (2) the line and triangle are parallel. Regardless, the
+    # closest point on the triangle is on an edge of the triangle. Compare
+    # the line to all three edges of the triangle.
+    best_distance = np.finfo(float).max
+    i0 = 2
+    i1 = 0
+    while i1 < 3:
+        distance, contact_point_line, contact_point_segment, t, _ = _line_to_line_segment(
+            line_point, line_direction, triangle_points[i0], triangle_points[i1],
+            epsilon=epsilon)
+
+        if distance < best_distance:
+            best_contact_point_line = contact_point_line
+            best_contact_point_triangle = contact_point_segment
+            best_distance = distance
+            best_line_parameter = t
+
+        i0 = i1
+        i1 += 1
+    return best_distance, best_contact_point_line, best_contact_point_triangle, best_line_parameter
