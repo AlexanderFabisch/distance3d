@@ -21,25 +21,31 @@ with open(filename, "r") as f:
     tm.load_urdf(robot_urdf, mesh_path=data_dir)
 joint_names = ["joint%d" % i for i in range(1, 7)]
 for joint_name in joint_names:
-    tm.set_joint(joint_name, 0.5)
+    tm.set_joint(joint_name, 0.7)
 
 geometries = robot.get_geometries(tm, "robot_arm")
 colls = robot.get_colliders(tm, "robot_arm")
 
 random_state = np.random.RandomState(5)
-box2origin, size = random.rand_box(random_state, center_scale=0.1)
-box = colliders.Convex.from_box(box2origin, size)
-
-start = time.time()
-for collider, geometry in zip(colls, geometries):
-    dist = gjk.gjk_with_simplex(collider, box)[0]
-    if dist < 1e-3:
-        geometry.paint_uniform_color((1, 0, 0))
-stop = time.time()
-print(stop - start)
 
 fig = pv.figure()
-fig.plot_box(size, box2origin, c=(1, 0, 0))
+
+for _ in range(15):
+    box2origin, size = random.rand_box(
+        random_state, center_scale=0.3, size_scale=0.3)
+    box2origin[:3, 3] += 0.2
+    box = colliders.Convex.from_box(box2origin, size)
+    color = random_state.rand(3)
+
+    start = time.time()
+    for collider, geometry in zip(colls, geometries):
+        dist = gjk.gjk_with_simplex(collider, box)[0]
+        if dist < 1e-3:
+            geometry.paint_uniform_color(color)
+    stop = time.time()
+    print(stop - start)
+    fig.plot_box(size, box2origin, c=color)
+
 for g in geometries:
     fig.add_geometry(g)
 fig.view_init()
