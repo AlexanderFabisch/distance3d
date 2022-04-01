@@ -1,6 +1,46 @@
 import warnings
 from pytransform3d import urdf
 import pytransform3d.visualizer as pv
+from .colliders import Cylinder, Sphere, Convex
+
+
+def get_colliders(tm, frame):
+    """Get colliders.
+
+    Parameters
+    ----------
+    tm : urdf.UrdfTransformManager
+        Kinematic tree of the robot.
+
+    frame : str
+        Base frame.
+
+    Returns
+    -------
+    TODO
+    """
+    if frame not in tm.nodes:
+        raise KeyError("Unknown frame '%s'" % frame)
+
+    colliders = []
+    for obj in tm.collision_objects:
+        A2B = tm.get_transform(obj.frame, frame)
+        try:
+            if isinstance(obj, urdf.Sphere):
+                collider = Sphere(center=A2B[:3, 3], radius=obj.radius)
+            elif isinstance(obj, urdf.Box):
+                collider = Convex.from_box(A2B, obj.size)
+            elif isinstance(obj, urdf.Cylinder):
+                collider = Cylinder(
+                    cylinder2origin=A2B, radius=obj.radius, length=obj.length)
+            else:
+                assert isinstance(obj, urdf.Mesh)
+                collider = Convex.from_mesh(obj.filename, A2B, obj.scale)
+            colliders.append(collider)
+        except RuntimeError as e:
+            warnings.warn(str(e))
+
+    return colliders
 
 
 def get_geometries(tm, frame):
@@ -13,6 +53,10 @@ def get_geometries(tm, frame):
 
     frame : str
         Base frame.
+
+    Returns
+    -------
+    TODO
     """
     if frame not in tm.nodes:
         raise KeyError("Unknown frame '%s'" % frame)

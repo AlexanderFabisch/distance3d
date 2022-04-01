@@ -2,7 +2,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.plot_utils as ppu
-from distance3d import gjk
+from distance3d import gjk, colliders
 from distance3d import random
 from distance3d import plotting
 
@@ -16,8 +16,8 @@ accumulated_time = 0.0
 for i in range(700):
     cylinder2origin2, radius2, length2 = random.rand_cylinder(random_state)
     start = time.time()
-    c1 = gjk.Cylinder(cylinder2origin, radius, length)
-    c2 = gjk.Cylinder(cylinder2origin2, radius2, length2)
+    c1 = colliders.Cylinder(cylinder2origin, radius, length)
+    c2 = colliders.Cylinder(cylinder2origin2, radius2, length2)
     dist, contact_point_cylinder, contact_point_cylinder2, _ = gjk.gjk_with_simplex(c1, c2)
     end = time.time()
     accumulated_time += end - start

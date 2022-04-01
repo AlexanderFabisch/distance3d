@@ -1,7 +1,9 @@
 import os
+import time
+import numpy as np
 from pytransform3d.urdf import UrdfTransformManager
 import pytransform3d.visualizer as pv
-from distance3d import robot
+from distance3d import robot, random, colliders, gjk
 
 
 BASE_DIR = "test/data/"
@@ -20,9 +22,24 @@ with open(filename, "r") as f:
 joint_names = ["joint%d" % i for i in range(1, 7)]
 for joint_name in joint_names:
     tm.set_joint(joint_name, 0.5)
+
 geometries = robot.get_geometries(tm, "robot_arm")
+colls = robot.get_colliders(tm, "robot_arm")
+
+random_state = np.random.RandomState(5)
+box2origin, size = random.rand_box(random_state, center_scale=0.1)
+box = colliders.Convex.from_box(box2origin, size)
+
+start = time.time()
+for collider, geometry in zip(colls, geometries):
+    dist = gjk.gjk_with_simplex(collider, box)[0]
+    if dist < 1e-3:
+        geometry.paint_uniform_color((1, 0, 0))
+stop = time.time()
+print(stop - start)
 
 fig = pv.figure()
+fig.plot_box(size, box2origin, c=(1, 0, 0))
 for g in geometries:
     fig.add_geometry(g)
 fig.view_init()

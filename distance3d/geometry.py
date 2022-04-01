@@ -60,6 +60,31 @@ def convert_segment_to_line(segment_start, segment_end):
     return segment_direction, segment_length
 
 
+def convert_box_to_vertices(box2origin, size):
+    """Convert box to vertices.
+
+    Parameters
+    ----------
+    box2origin : array, shape (4, 4)
+        Pose of the box.
+
+    size : array, shape (3,)
+        Size of the box along its axes.
+
+    Returns
+    -------
+    box_points : array, shape (8, 3)
+        Vertices of the box.
+    """
+    box_points = np.array([
+        box2origin[:3, 3]
+        + 0.5 * sign0 * box2origin[:3, 0] * size[0]
+        + 0.5 * sign1 * box2origin[:3, 1] * size[1]
+        + 0.5 * sign2 * box2origin[:3, 2] * size[2]
+        for sign0 in [-1, 1] for sign1 in [-1, 1] for sign2 in [-1, 1]])
+    return box_points
+
+
 def cylinder_extreme_along_direction(search_direction, cylinder2origin, radius, length):
     """Compute extreme point of cylinder along a direction.
 

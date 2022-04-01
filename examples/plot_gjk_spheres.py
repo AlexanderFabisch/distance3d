@@ -2,7 +2,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.plot_utils as ppu
-from distance3d import gjk
+from distance3d import gjk, colliders
 from distance3d import random
 from distance3d import plotting
 
@@ -16,8 +16,8 @@ accumulated_time = 0.0
 for i in range(1000):
     center2, radius2 = random.rand_sphere(random_state, 1.0, 1.0)
     start = time.time()
-    s1 = gjk.Sphere(center, radius)
-    s2 = gjk.Sphere(center2, radius2)
+    s1 = colliders.Sphere(center, radius)
+    s2 = colliders.Sphere(center2, radius2)
     dist, contact_point_sphere, contact_point_sphere2, _ = gjk.gjk_with_simplex(s1, s2)
     end = time.time()
     accumulated_time += end - start

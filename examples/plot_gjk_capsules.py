@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.plot_utils as ppu
 import pytransform3d.transformations as pt
-from distance3d import gjk
+from distance3d import gjk, colliders
 from distance3d import random
 from distance3d import plotting
 
@@ -17,8 +17,8 @@ accumulated_time = 0.0
 for i in range(700):
     capsule2origin2, radius2, height2 = random.rand_capsule(random_state, 1.0, 0.3, 1.0)
     start = time.time()
-    c1 = gjk.Capsule(capsule2origin, radius, height)
-    c2 = gjk.Capsule(capsule2origin2, radius2, height2)
+    c1 = colliders.Capsule(capsule2origin, radius, height)
+    c2 = colliders.Capsule(capsule2origin2, radius2, height2)
     dist, contact_point_capsule, contact_point_capsule2, _ = gjk.gjk_with_simplex(c1, c2)
     end = time.time()
     accumulated_time += end - start
