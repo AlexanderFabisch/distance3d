@@ -61,8 +61,32 @@ def convert_segment_to_line(segment_start, segment_end):
 
 
 def cylinder_extreme_along_direction(search_direction, cylinder2origin, radius, length):
-    # https://github.com/kevinmoran/GJK/blob/master/Collider.h#L42
-    # https://github.com/bulletphysics/bullet3/blob/master/src/BulletCollision/CollisionShapes/btConvexShape.cpp#L167
+    """Compute extreme point of cylinder along a direction.
+
+    You can find similar implementations here:
+
+    * https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L42
+    * https://github.com/bulletphysics/bullet3/blob/e306b274f1885f32b7e9d65062aa942b398805c2/src/BulletCollision/CollisionShapes/btConvexShape.cpp#L167
+
+    Parameters
+    ----------
+    search_direction : array, shape (3,)
+        Search direction.
+
+    cylinder2origin : array, shape (4, 4)
+        Pose of the cylinder.
+
+    radius : float
+        Radius of the cylinder.
+
+    length : float
+        Radius of the cylinder.
+
+    Returns
+    -------
+    extreme_point : array, shape (3,)
+        Extreme point along search direction.
+    """
     local_dir = np.dot(cylinder2origin[:3, :3].T, search_direction)
 
     s = math.sqrt(local_dir[0] ** 2 + local_dir[1] ** 2)
@@ -78,9 +102,34 @@ def cylinder_extreme_along_direction(search_direction, cylinder2origin, radius, 
     return np.dot(cylinder2origin[:3, :3], local_vertex) + cylinder2origin[:3, 3]
 
 
-def capsule_extreme_along_direction(search_direction, capsule2origin, radius, height):  # TODO error with axis-aligned capsules
-    # https://github.com/kevinmoran/GJK/blob/master/Collider.h#L42/kevinmoran/GJK/blob/master/Collider.h#L42
-    # https://github.com/bulletphysics/bullet3/blob/master/src/BulletCollision/CollisionShapes/btConvexShape.cpp#L228
+def capsule_extreme_along_direction(search_direction, capsule2origin, radius, height):
+    """Compute extreme point of cylinder along a direction.
+
+    You can find similar implementations here:
+
+    * https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L42/kevinmoran/GJK/blob/master/Collider.h#L42
+    * https://github.com/bulletphysics/bullet3/blob/e306b274f1885f32b7e9d65062aa942b398805c2/src/BulletCollision/CollisionShapes/btConvexShape.cpp#L228
+
+    Parameters
+    ----------
+    search_direction : array, shape (3,)
+        Search direction.
+
+    capsule2origin : array, shape (4, 4)
+        Pose of the capsule.
+
+    radius : float
+        Radius of the cylinder.
+
+    height : float
+        Height of the cylinder.
+
+    Returns
+    -------
+    extreme_point : array, shape (3,)
+        Extreme point along search direction.
+    """
+    # TODO error with axis-aligned capsules
     local_dir = np.dot(capsule2origin[:3, :3].T, search_direction)
 
     s = np.linalg.norm(local_dir)
