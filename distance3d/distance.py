@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import pytransform3d.rotations as pr
+import pytransform3d.transformations as pt
 from .geometry import convert_rectangle_to_segment, convert_segment_to_line
 
 
@@ -633,6 +634,41 @@ def rectangle_to_rectangle(
                 break
 
     return best_dist, best_contact_point_rectangle1, best_contact_point_rectangle2
+
+
+def point_to_box(point, box2origin, size, origin2box=None):
+    """Compute the shortest distance between point and box.
+
+    Parameters
+    ----------
+    point : array, shape (3,)
+        3D point.
+
+    box2origin : array, shape (4, 4)
+        Pose of the box.
+
+    size : array, shape (3,)
+        Size of the box along its axes.
+
+    origin2box : array, shape (4, 4), optional (default: None)
+        Transform from origin to box coordinates.
+
+    Returns
+    -------
+    dist : float
+        The shortest between point and box.
+
+    contact_point_box : array, shape (3,)
+        Closest point on box.
+    """
+    if origin2box is None:
+        origin2box = pt.invert_transform(box2origin)
+    point_in_box = origin2box[:3, 3] + origin2box[:3, :3].dot(point)
+    half_size = 0.5 * size
+    contact_point_in_box = np.clip(point_in_box, -half_size, half_size)
+    contact_point = pt.transform(
+        box2origin, pt.vector_to_point(contact_point_in_box))[:3]
+    return np.linalg.norm(point - contact_point), contact_point
 
 
 def point_to_triangle(point, triangle_points):

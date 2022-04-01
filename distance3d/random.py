@@ -132,6 +132,34 @@ def randn_triangle(random_state):
     return random_state.randn(3, 3)
 
 
+def rand_box(random_state, center_scale=1.0, size_scale=1.0):
+    """Sample box.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    center_scale : float, optional (default: 1)
+        Scaling factor for center.
+
+    size_scale : float, optional (default: 1)
+        Scaling factor for size.
+
+    Returns
+    -------
+    box2origin : array, shape (4, 4)
+        Pose of the box.
+
+    size : array, shape (3,)
+        Sizes of the box along its axes.
+    """
+    box2origin = pt.random_transform(random_state)
+    box2origin[:3, 3] *= center_scale
+    size = random_state.rand(3) * size_scale
+    return box2origin, size
+
+
 def rand_capsule(random_state, center_scale=1.0, radius_scale=1.0,
                  height_scale=1.0):
     """Sample capsule.
