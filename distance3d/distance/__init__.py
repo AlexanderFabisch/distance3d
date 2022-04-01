@@ -2,7 +2,7 @@ import math
 import numpy as np
 import pytransform3d.rotations as pr
 import pytransform3d.transformations as pt
-from .geometry import convert_rectangle_to_segment, convert_segment_to_line
+from ..geometry import convert_rectangle_to_segment, convert_segment_to_line
 
 
 def point_to_line(point, line_point, line_direction):

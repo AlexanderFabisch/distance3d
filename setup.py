@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import setup, find_packages
 import distance3d
 
 
@@ -22,7 +22,7 @@ if __name__ == "__main__":
               "Topic :: Scientific/Engineering :: Visualization",
           ],
           license="BSD-3-Clause",
-          packages=["distance3d"],
+          packages=find_packages(),
           install_requires=["numpy", "scipy", "matplotlib", "pytransform3d",
                             "open3d"],
           extras_require={
