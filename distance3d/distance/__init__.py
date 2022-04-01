@@ -920,3 +920,52 @@ def _line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6)
         i0 = i1
         i1 += 1
     return best_distance, best_contact_point_line, best_contact_point_triangle, best_line_parameter
+
+
+def line_segment_to_triangle(
+        segment_start, segment_end, triangle_points, epsilon=1e-6):
+    """Compute the shortest distance from line segment to triangle.
+
+    Implementation according to Ericson: Real-Time Collision Detection (2005).
+
+    Parameters
+    ----------
+    segment_start : array, shape (3,)
+        Start point of segment.
+
+    segment_end : array, shape (3,)
+        End point of segment.
+
+    triangle_points : array, shape (3, 3)
+        Each row contains a point of the triangle (A, B, C).
+
+    epsilon : float, optional (default: 1e-6)
+        Values smaller than epsilon are considered to be 0.
+
+    Returns
+    -------
+    distance : float
+        The shortest distance between line segment and triangle.
+
+    contact_point_line_segment : array, shape (3,)
+        Closest point on line segment.
+
+    contact_point_triangle : array, shape (3,)
+        Closest point on triangle.
+    """
+    segment_direction, segment_length = convert_segment_to_line(
+        segment_start, segment_end)
+
+    distance, contact_point_segment, contact_point_triangle, t_closest = _line_to_triangle(
+        segment_start, segment_direction, triangle_points, epsilon)
+
+    if t_closest < 0:
+        distance, contact_point_triangle = point_to_triangle(
+            segment_start, triangle_points)
+        contact_point_segment = segment_start
+    elif t_closest > segment_length:
+        distance, contact_point_triangle = point_to_triangle(
+            segment_end, triangle_points)
+        contact_point_segment = segment_end
+
+    return distance, contact_point_segment, contact_point_triangle
