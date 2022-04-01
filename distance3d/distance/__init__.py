@@ -969,3 +969,68 @@ def line_segment_to_triangle(
         contact_point_segment = segment_end
 
     return distance, contact_point_segment, contact_point_triangle
+
+
+def triangle_to_triangle(triangle_points1, triangle_points2, epsilon=1e-6):
+    """Compute the shortest distance between two triangles.
+
+    Parameters
+    ----------
+    triangle_points1 : array, shape (3, 3)
+        Each row contains a point of the first triangle.
+
+    triangle_points2 : array, shape (3, 3)
+        Each row contains a point of the second triangle.
+
+    epsilon : float, optional (default: 1e-6)
+        Values smaller than epsilon are considered to be 0.
+
+    Returns
+    -------
+    distance : float
+        Shortest distance.
+
+    contact_point_triangle1 : array, shape (3,)
+        Closest point on triangle 1.
+
+    contact_point_triangle2 : array, shape (3,)
+        Closest point on triangle 2.
+    """
+    # compare edges of triangle1 to the interior of triangle2
+    best_dist = np.finfo(float).max
+    i0 = 2
+    i1 = 0
+    while i1 < 3:
+        segment_start = triangle_points1[i0]
+        segment_end = triangle_points1[i1]
+        dist, contact_point_segment, contact_point_triangle = line_segment_to_triangle(
+            segment_start, segment_end, triangle_points2, epsilon)
+        if dist < best_dist:
+            best_contact_point_triangle1 = contact_point_segment
+            best_contact_point_triangle2 = contact_point_triangle
+            best_dist = dist
+
+            if best_dist <= epsilon:
+                return 0.0, best_contact_point_triangle1, best_contact_point_triangle2
+        i0 = i1
+        i1 += 1
+
+    # compare edges of triangle2 to the interior of triangle1
+    i0 = 2
+    i1 = 0
+    while i1 < 3:
+        segment_start = triangle_points2[i0]
+        segment_end = triangle_points2[i1]
+        dist, contact_point_segment, contact_point_triangle = line_segment_to_triangle(
+            segment_start, segment_end, triangle_points1, epsilon)
+        if dist < best_dist:
+            best_contact_point_triangle1 = contact_point_triangle
+            best_contact_point_triangle2 = contact_point_segment
+            best_dist = dist
+
+            if best_dist <= epsilon:
+                return 0.0, best_contact_point_triangle1, best_contact_point_triangle2
+        i0 = i1
+        i1 += 1
+
+    return best_dist, best_contact_point_triangle1, best_contact_point_triangle2
