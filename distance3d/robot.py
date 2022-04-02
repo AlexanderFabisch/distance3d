@@ -1,7 +1,7 @@
 import warnings
 from pytransform3d import urdf
 import pytransform3d.visualizer as pv
-from .colliders import Cylinder, Sphere, Box, Convex, Mesh
+from .colliders import Cylinder, Sphere, Box, Mesh, ColliderTree
 
 
 def get_colliders(tm, frame):
@@ -17,12 +17,13 @@ def get_colliders(tm, frame):
 
     Returns
     -------
-    TODO
+    colls : ColliderTree
+        Colliders.
     """
     if frame not in tm.nodes:
         raise KeyError("Unknown frame '%s'" % frame)
 
-    colliders = []
+    colliders = ColliderTree(tm, frame)
     for obj in tm.collision_objects:
         A2B = tm.get_transform(obj.frame, frame)
         try:
@@ -43,7 +44,7 @@ def get_colliders(tm, frame):
                 assert isinstance(obj, urdf.Mesh)
                 artist = pv.Mesh(filename=obj.filename, s=obj.scale, A2B=A2B)
                 collider = Mesh(obj.filename, A2B, obj.scale, artist=artist)
-            colliders.append(collider)
+            colliders.add_collider(obj.frame, collider)
         except RuntimeError as e:
             warnings.warn(str(e))
 

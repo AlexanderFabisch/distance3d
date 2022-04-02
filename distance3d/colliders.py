@@ -4,6 +4,29 @@ from .geometry import (
     convert_box_to_vertices)
 
 
+class ColliderTree:
+    """TODO document"""
+    def __init__(self, tm, base_frame):
+        self.tm = tm
+        self.base_frame = base_frame
+        self.colliders = {}
+
+    def add_collider(self, frame, collider):
+        self.colliders[frame] = collider
+
+    def update_collider_poses(self):
+        for frame in self.colliders:
+            A2B = self.tm.get_transform(frame, self.base_frame)
+            self.colliders[frame].update_pose(A2B)
+
+    def get_colliders(self):
+        return self.colliders.values()
+
+    def get_artists(self):
+        return [collider.artist for collider in self.colliders.values()
+                if collider.artist is not None]
+
+
 class Convex:
     """Wraps convex hull of a set of vertices for GJK algorithm.
 

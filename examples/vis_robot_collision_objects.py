@@ -6,12 +6,13 @@ import pytransform3d.visualizer as pv
 from distance3d import robot, random, colliders, gjk
 
 
-def animation_callback(step, n_frames, tm, graph, joint_names):
+def animation_callback(step, n_frames, tm, colls, graph, joint_names):
     angle = 0.5 * np.cos(2.0 * np.pi * (step / n_frames))
     for joint_name in joint_names:
         tm.set_joint(joint_name, angle)
+    colls.update_collider_poses()
     graph.set_data()
-    return graph
+    return [graph] + colls.get_artists()
 
 
 BASE_DIR = "test/data/"
@@ -46,7 +47,7 @@ for _ in range(15):
     box = colliders.Box(box2origin, size, artist=box_artist)
 
     start = time.time()
-    for collider in colls:
+    for collider in colls.get_colliders():
         dist = gjk.gjk_with_simplex(collider, box)[0]
         if dist < 1e-3:
             collider.artist.geometries[0].paint_uniform_color(color)
@@ -58,7 +59,7 @@ for _ in range(15):
 graph = fig.plot_graph(
     tm, "robot_arm", s=0.1, show_frames=True, show_collision_objects=True)
 
-for collider in colls:
+for collider in colls.get_colliders():
     if collider.artist is not None:
         collider.artist.add_artist(fig)
 fig.view_init()
@@ -66,7 +67,7 @@ fig.set_zoom(1.5)
 n_frames = 100
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
-                fargs=(n_frames, tm, graph, joint_names))
+                fargs=(n_frames, tm, colls, graph, joint_names))
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")
