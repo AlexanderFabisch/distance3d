@@ -1,6 +1,7 @@
 import numpy as np
 from mpl_toolkits import mplot3d
 import pytransform3d.plot_utils as ppu
+import pytransform3d.rotations as pr
 
 
 def plot_line(ax, line_point, line_direction, length=10):
@@ -123,3 +124,33 @@ def plot_triangle(ax, triangle_points, surface_alpha=0.1):
 
     triangle_points = np.vstack((triangle_points, [triangle_points[0]]))
     ax.plot(triangle_points[:, 0], triangle_points[:, 1], triangle_points[:, 2])
+
+
+def plot_circle(ax, center, radius, normal, show_normal=False):
+    """Plot circle.
+
+    Parameters
+    ----------
+    ax : Matplotlib 3d axis
+        A matplotlib 3d axis.
+
+    center : array, shape (3,)
+        Center of the circle.
+
+    radius : float
+        Radius of the circle.
+
+    normal : array, shape (3,)
+        Normal to the plane in which the circle lies.
+
+    show_normal : bool, optional (default: False)
+        Display normal of the circle plane.
+    """
+    ax.scatter(center[0], center[1], center[2])
+    u, v = pr.plane_basis_from_normal(normal)
+    R = np.column_stack((u, v, normal))
+    circle = np.array([center + R.dot(pr.matrix_from_angle(2, angle)).dot([radius, 0, 0])
+                       for angle in np.linspace(0, 2 * np.pi, 20)])
+    ax.plot(circle[:, 0], circle[:, 1], circle[:, 2])
+    if show_normal:
+        ppu.plot_vector(ax=ax, start=center, direction=normal, s=1.0)

@@ -11,3 +11,4 @@ from ._box import point_to_box, line_to_box, line_segment_to_box
 from ._plane import point_to_plane
 from ._cylinder import point_to_cylinder
 from ._ellipsoid import point_to_ellipsoid
+from ._circle import point_to_circle
