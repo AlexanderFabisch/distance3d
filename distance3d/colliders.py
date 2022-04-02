@@ -29,6 +29,10 @@ class Convex:
     def compute_point(self, barycentric_coordinates, indices):
         return np.dot(barycentric_coordinates, self.vertices[indices])
 
+    def update_pose(self, vertices):
+        self.vertices = vertices
+        # TODO how to update artist?
+
 
 class Box(Convex):
     """Wraps box for GJK algorithm."""
@@ -37,6 +41,11 @@ class Box(Convex):
             convert_box_to_vertices(box2origin, size), artist)
         self.box2origin = box2origin
         self.size = size
+
+    def update_pose(self, pose):
+        self.box2origin = pose
+        if self.artist is not None:
+            self.artist.set_data(pose)
 
 
 class Mesh(Convex):
@@ -47,6 +56,10 @@ class Mesh(Convex):
             artist = pv.Mesh(filename=filename, A2B=A2B, s=scale)
         vertices = np.asarray(artist.mesh.vertices)
         super(Mesh, self).__init__(vertices, artist)
+
+    def update_pose(self, pose):
+        self.artist.set_data(pose)
+        self.vertices = np.asarray(self.artist.mesh.vertices)
 
 
 class Cylinder:
@@ -73,6 +86,12 @@ class Cylinder:
     def compute_point(self, barycentric_coordinates, indices):
         return np.dot(barycentric_coordinates, np.array([self.vertices[i] for i in indices]))
 
+    def update_pose(self, pose):
+        self.cylinder2origin = pose
+        self.vertices = []
+        if self.artist is not None:
+            self.artist.set_data(pose)
+
 
 class Capsule:
     """Wraps capsule for GJK algorithm."""
@@ -97,6 +116,12 @@ class Capsule:
 
     def compute_point(self, barycentric_coordinates, indices):
         return np.dot(barycentric_coordinates, np.array([self.vertices[i] for i in indices]))
+
+    def update_pose(self, pose):
+        self.capsule2origin = pose
+        self.vertices = []
+        if self.artist is not None:
+            self.artist.set_data(pose)
 
 
 class Sphere:
@@ -125,3 +150,9 @@ class Sphere:
 
     def compute_point(self, barycentric_coordinates, indices):
         return np.dot(barycentric_coordinates, np.array([self.vertices[i] for i in indices]))
+
+    def update_pose(self, pose):
+        self.c = pose[:3, 3]
+        self.vertices = []
+        if self.artist is not None:
+            self.artist.set_data(pose)
