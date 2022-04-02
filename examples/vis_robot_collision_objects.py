@@ -19,11 +19,11 @@ def animation_callback(step, n_frames, tm, colls, boxes, joint_names):
             dist = gjk.gjk_with_simplex(collider, box)[0]
             if dist < 1e-3:
                 had_contact = True
+        stop = time.time()
         if had_contact:
             collider.artist.geometries[0].paint_uniform_color((1, 0, 0))
         else:
             collider.artist.geometries[0].paint_uniform_color((0.5, 0.5, 0.5))
-        stop = time.time()
         print(stop - start)
 
     return colls.get_artists()
