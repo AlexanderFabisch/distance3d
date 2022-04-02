@@ -19,22 +19,6 @@ class Convex:
         self.vertices = vertices
         self.artist = artist
 
-    @staticmethod
-    def from_box(box2origin, size, artist=None):
-        """TODO"""
-        vertices = convert_box_to_vertices(box2origin, size)
-        return Convex(vertices, artist=artist)
-
-    @staticmethod
-    def from_mesh(filename, A2B, scale=1.0, artist=None):
-        """TODO"""
-        import open3d as o3d
-        mesh = o3d.io.read_triangle_mesh(filename)
-        mesh.transform(A2B)
-        vertices = o3d.utility.Vector3dVector(
-            np.asarray(mesh.vertices) * scale)
-        return Convex(vertices, artist=artist)
-
     def first_vertex(self):
         return self.vertices[0]
 
@@ -53,6 +37,16 @@ class Box(Convex):
             convert_box_to_vertices(box2origin, size), artist)
         self.box2origin = box2origin
         self.size = size
+
+
+class Mesh(Convex):
+    """Wraps mesh for GJK algorithm (we assume a convex mesh)."""
+    def __init__(self, filename, A2B, scale=1.0, artist=None):
+        import pytransform3d.visualizer as pv
+        if artist is None:
+            artist = pv.Mesh(filename=filename, A2B=A2B, s=scale)
+        vertices = np.asarray(artist.mesh.vertices)
+        super(Mesh, self).__init__(vertices, artist)
 
 
 class Cylinder:

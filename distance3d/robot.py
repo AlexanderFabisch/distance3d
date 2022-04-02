@@ -1,7 +1,7 @@
 import warnings
 from pytransform3d import urdf
 import pytransform3d.visualizer as pv
-from .colliders import Cylinder, Sphere, Box, Convex
+from .colliders import Cylinder, Sphere, Box, Convex, Mesh
 
 
 def get_colliders(tm, frame):
@@ -42,8 +42,7 @@ def get_colliders(tm, frame):
             else:
                 assert isinstance(obj, urdf.Mesh)
                 artist = pv.Mesh(filename=obj.filename, s=obj.scale, A2B=A2B)
-                collider = Convex.from_mesh(
-                    obj.filename, A2B, obj.scale, artist=artist)
+                collider = Mesh(obj.filename, A2B, obj.scale, artist=artist)
             colliders.append(collider)
         except RuntimeError as e:
             warnings.warn(str(e))
