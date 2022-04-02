@@ -11,25 +11,29 @@ class Convex:
     ----------
     vertices : array, shape (n_vertices, 3)
         Vertices of the convex shape.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Artist for visualizer.
     """
-    def __init__(self, vertices):
+    def __init__(self, vertices, artist):
         self.vertices = vertices
+        self.artist = artist
 
     @staticmethod
-    def from_box(box2origin, size):
+    def from_box(box2origin, size, artist=None):
         """TODO"""
         vertices = convert_box_to_vertices(box2origin, size)
-        return Convex(vertices)
+        return Convex(vertices, artist=artist)
 
     @staticmethod
-    def from_mesh(filename, A2B, scale=1.0):
+    def from_mesh(filename, A2B, scale=1.0, artist=None):
         """TODO"""
         import open3d as o3d
         mesh = o3d.io.read_triangle_mesh(filename)
         mesh.transform(A2B)
         vertices = o3d.utility.Vector3dVector(
             np.asarray(mesh.vertices) * scale)
-        return Convex(vertices)
+        return Convex(vertices, artist=artist)
 
     def first_vertex(self):
         return self.vertices[0]
@@ -44,10 +48,11 @@ class Convex:
 
 class Cylinder:
     """Wraps cylinder for GJK algorithm."""
-    def __init__(self, cylinder2origin, radius, length):
+    def __init__(self, cylinder2origin, radius, length, artist=None):
         self.cylinder2origin = cylinder2origin
         self.radius = radius
         self.length = length
+        self.artist = artist
         self.vertices = []
 
     def first_vertex(self):
@@ -68,10 +73,11 @@ class Cylinder:
 
 class Capsule:
     """Wraps capsule for GJK algorithm."""
-    def __init__(self, capsule2origin, radius, height):
+    def __init__(self, capsule2origin, radius, height, artist=None):
         self.capsule2origin = capsule2origin
         self.radius = radius
         self.height = height
+        self.artist = artist
         self.vertices = []
 
     def first_vertex(self):
@@ -93,9 +99,10 @@ class Capsule:
 class Sphere:
     """Wraps sphere for GJK algorithm."""
     # TODO https://github.com/kevinmoran/GJK/blob/master/Collider.h#L33
-    def __init__(self, center, radius):
+    def __init__(self, center, radius, artist=None):
         self.c = center
         self.radius = radius
+        self.artist = artist
         self.vertices = []
 
     def first_vertex(self):

@@ -23,7 +23,6 @@ joint_names = ["joint%d" % i for i in range(1, 7)]
 for joint_name in joint_names:
     tm.set_joint(joint_name, 0.7)
 
-geometries = robot.get_geometries(tm, "robot_arm")
 colls = robot.get_colliders(tm, "robot_arm")
 
 random_state = np.random.RandomState(5)
@@ -38,16 +37,17 @@ for _ in range(15):
     color = random_state.rand(3)
 
     start = time.time()
-    for collider, geometry in zip(colls, geometries):
+    for collider in colls:
         dist = gjk.gjk_with_simplex(collider, box)[0]
         if dist < 1e-3:
-            geometry.paint_uniform_color(color)
+            collider.artist.geometries[0].paint_uniform_color(color)
     stop = time.time()
     print(stop - start)
     fig.plot_box(size, box2origin, c=color)
 
-for g in geometries:
-    fig.add_geometry(g)
+for collider in colls:
+    if collider.artist is not None:
+        collider.artist.add_artist(fig)
 fig.view_init()
 fig.set_zoom(1.5)
 if "__file__" in globals():
