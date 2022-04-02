@@ -12,3 +12,4 @@ from ._plane import point_to_plane
 from ._cylinder import point_to_cylinder
 from ._ellipsoid import point_to_ellipsoid
 from ._circle import point_to_circle
+from ._disk import point_to_disk
