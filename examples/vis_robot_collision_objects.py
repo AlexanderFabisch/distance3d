@@ -14,10 +14,15 @@ def animation_callback(step, n_frames, tm, colls, boxes, joint_names):
 
     for collider in colls.get_colliders():
         start = time.time()
+        had_contact = False
         for box in boxes:
             dist = gjk.gjk_with_simplex(collider, box)[0]
             if dist < 1e-3:
-                collider.artist.geometries[0].paint_uniform_color((1, 0, 0))
+                had_contact = True
+        if had_contact:
+            collider.artist.geometries[0].paint_uniform_color((1, 0, 0))
+        else:
+            collider.artist.geometries[0].paint_uniform_color((0.5, 0.5, 0.5))
         stop = time.time()
         print(stop - start)
 
