@@ -6,13 +6,22 @@ import pytransform3d.visualizer as pv
 from distance3d import robot, random, colliders, gjk
 
 
-def animation_callback(step, n_frames, tm, colls, graph, joint_names):
+def animation_callback(step, n_frames, tm, colls, boxes, joint_names):
     angle = 0.5 * np.cos(2.0 * np.pi * (step / n_frames))
     for joint_name in joint_names:
         tm.set_joint(joint_name, angle)
     colls.update_collider_poses()
-    graph.set_data()
-    return [graph] + colls.get_artists()
+
+    for collider in colls.get_colliders():
+        start = time.time()
+        for box in boxes:
+            dist = gjk.gjk_with_simplex(collider, box)[0]
+            if dist < 1e-3:
+                collider.artist.geometries[0].paint_uniform_color((1, 0, 0))
+        stop = time.time()
+        print(stop - start)
+
+    return colls.get_artists()
 
 
 BASE_DIR = "test/data/"
@@ -38,6 +47,7 @@ random_state = np.random.RandomState(5)
 
 fig = pv.figure()
 
+boxes = []
 for _ in range(15):
     box2origin, size = random.rand_box(
         random_state, center_scale=0.3, size_scale=0.3)
@@ -45,19 +55,8 @@ for _ in range(15):
     color = random_state.rand(3)
     box_artist = pv.Box(size=size, A2B=box2origin, c=color)
     box = colliders.Box(box2origin, size, artist=box_artist)
-
-    start = time.time()
-    for collider in colls.get_colliders():
-        dist = gjk.gjk_with_simplex(collider, box)[0]
-        if dist < 1e-3:
-            collider.artist.geometries[0].paint_uniform_color(color)
-    stop = time.time()
-    print(stop - start)
     box.artist.add_artist(fig)
-
-# TODO collider collection class
-graph = fig.plot_graph(
-    tm, "robot_arm", s=0.1, show_frames=True, show_collision_objects=True)
+    boxes.append(box)
 
 for collider in colls.get_colliders():
     if collider.artist is not None:
@@ -67,7 +66,7 @@ fig.set_zoom(1.5)
 n_frames = 100
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
-                fargs=(n_frames, tm, colls, graph, joint_names))
+                fargs=(n_frames, tm, colls, boxes, joint_names))
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")
