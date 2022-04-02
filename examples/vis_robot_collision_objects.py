@@ -6,6 +6,14 @@ import pytransform3d.visualizer as pv
 from distance3d import robot, random, colliders, gjk
 
 
+def animation_callback(step, n_frames, tm, graph, joint_names):
+    angle = 0.5 * np.cos(2.0 * np.pi * (step / n_frames))
+    for joint_name in joint_names:
+        tm.set_joint(joint_name, angle)
+    graph.set_data()
+    return graph
+
+
 BASE_DIR = "test/data/"
 data_dir = BASE_DIR
 search_path = "."
@@ -46,12 +54,19 @@ for _ in range(15):
     print(stop - start)
     box.artist.add_artist(fig)
 
+# TODO collider collection class
+graph = fig.plot_graph(
+    tm, "robot_arm", s=0.1, show_frames=True, show_collision_objects=True)
+
 for collider in colls:
     if collider.artist is not None:
         collider.artist.add_artist(fig)
 fig.view_init()
 fig.set_zoom(1.5)
+n_frames = 100
 if "__file__" in globals():
+    fig.animate(animation_callback, n_frames, loop=True,
+                fargs=(n_frames, tm, graph, joint_names))
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")
