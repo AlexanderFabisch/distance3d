@@ -1,7 +1,7 @@
 import warnings
 from pytransform3d import urdf
 import pytransform3d.visualizer as pv
-from .colliders import Cylinder, Sphere, Convex
+from .colliders import Cylinder, Sphere, Box, Convex
 
 
 def get_colliders(tm, frame):
@@ -27,26 +27,23 @@ def get_colliders(tm, frame):
         A2B = tm.get_transform(obj.frame, frame)
         try:
             if isinstance(obj, urdf.Sphere):
-                artist = pv.Sphere(radius=obj.radius)
-                artist.set_data(A2B)
-                collider = Sphere(center=A2B[:3, 3], radius=obj.radius,
-                                  artist=artist)
+                artist = pv.Sphere(radius=obj.radius, A2B=A2B)
+                collider = Sphere(
+                    center=A2B[:3, 3], radius=obj.radius, artist=artist)
             elif isinstance(obj, urdf.Box):
-                artist = pv.Box(obj.size)
-                artist.set_data(A2B)
-                collider = Convex.from_box(A2B, obj.size, artist=artist)
+                artist = pv.Box(size=obj.size, A2B=A2B)
+                collider = Box(A2B, obj.size, artist=artist)
             elif isinstance(obj, urdf.Cylinder):
-                artist = pv.Cylinder(obj.length, obj.radius)
-                artist.set_data(A2B)
+                artist = pv.Cylinder(
+                    length=obj.length, radius=obj.radius, A2B=A2B)
                 collider = Cylinder(
                     cylinder2origin=A2B, radius=obj.radius, length=obj.length,
                     artist=artist)
             else:
                 assert isinstance(obj, urdf.Mesh)
-                artist = pv.Mesh(obj.filename, s=obj.scale)
-                artist.set_data(A2B)
-                collider = Convex.from_mesh(obj.filename, A2B, obj.scale,
-                                            artist=artist)
+                artist = pv.Mesh(filename=obj.filename, s=obj.scale, A2B=A2B)
+                collider = Convex.from_mesh(
+                    obj.filename, A2B, obj.scale, artist=artist)
             colliders.append(collider)
         except RuntimeError as e:
             warnings.warn(str(e))

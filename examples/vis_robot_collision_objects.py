@@ -33,8 +33,9 @@ for _ in range(15):
     box2origin, size = random.rand_box(
         random_state, center_scale=0.3, size_scale=0.3)
     box2origin[:3, 3] += 0.2
-    box = colliders.Convex.from_box(box2origin, size)
     color = random_state.rand(3)
+    box_artist = pv.Box(size=size, A2B=box2origin, c=color)
+    box = colliders.Box(box2origin, size, artist=box_artist)
 
     start = time.time()
     for collider in colls:
@@ -43,7 +44,7 @@ for _ in range(15):
             collider.artist.geometries[0].paint_uniform_color(color)
     stop = time.time()
     print(stop - start)
-    fig.plot_box(size, box2origin, c=color)
+    box.artist.add_artist(fig)
 
 for collider in colls:
     if collider.artist is not None:

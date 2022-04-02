@@ -46,6 +46,15 @@ class Convex:
         return np.dot(barycentric_coordinates, self.vertices[indices])
 
 
+class Box(Convex):
+    """Wraps box for GJK algorithm."""
+    def __init__(self, box2origin, size, artist=None):
+        super(Box, self).__init__(
+            convert_box_to_vertices(box2origin, size), artist)
+        self.box2origin = box2origin
+        self.size = size
+
+
 class Cylinder:
     """Wraps cylinder for GJK algorithm."""
     def __init__(self, cylinder2origin, radius, length, artist=None):
