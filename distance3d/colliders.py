@@ -1,3 +1,4 @@
+import abc
 import numpy as np
 from .geometry import (
     capsule_extreme_along_direction, cylinder_extreme_along_direction,
@@ -5,29 +6,119 @@ from .geometry import (
 
 
 class ColliderTree:
-    """TODO document"""
+    """Wraps multiple colliders that are connected through transformations.
+
+    Parameters
+    ----------
+    tm : pytransform3d.transform_manager.TransformManager
+        Transform manager that stores the transformations.
+
+    base_frame : str
+        Name of the base frame in which colliders are represented.
+    """
     def __init__(self, tm, base_frame):
         self.tm = tm
         self.base_frame = base_frame
         self.colliders = {}
 
     def add_collider(self, frame, collider):
+        """Add collider.
+
+        Parameters
+        ----------
+        frame : str
+            Frame in which the collider is located.
+
+        collider : Collider
+            Collider.
+        """
         self.colliders[frame] = collider
 
     def update_collider_poses(self):
+        """Update poses of all colliders from transform manager."""
         for frame in self.colliders:
             A2B = self.tm.get_transform(frame, self.base_frame)
             self.colliders[frame].update_pose(A2B)
 
     def get_colliders(self):
+        """Get all colliders.
+
+        Returns
+        -------
+        colliders : list
+            List of colliders.
+        """
         return self.colliders.values()
 
     def get_artists(self):
+        """Get all artists.
+
+        Returns
+        -------
+        artists : list
+            List of artists.
+        """
         return [collider.artist for collider in self.colliders.values()
                 if collider.artist is not None]
 
 
-class Convex:
+class Collider(abc.ABC):
+    """Collider base class."""
+    @abc.abstractmethod
+    def first_vertex(self):
+        """Get any vertex from collider to initialize GJK algorithm.
+
+        Returns
+        -------
+        vertex : array, shape (3,)
+            Vertex from collider.
+        """
+
+    @abc.abstractmethod
+    def support_function(self, search_direction):
+        """Support function for collider.
+
+        Parameters
+        ----------
+        search_direction : array, shape (3,)
+            Direction in which we search for extreme point of the collider.
+
+        Returns
+        -------
+        extreme_point : array, shape (3,)
+            Extreme point along search direction.
+        """
+
+    @abc.abstractmethod
+    def compute_point(self, barycentric_coordinates, indices):
+        """Compute point from barycentric coordinates.
+
+        Parameters
+        ----------
+        barycentric_coordinates : array, shape (n_vertices,)
+            Barycentric coordinates of the point that we compute.
+
+        indices : array, shape (n_vertices,)
+            Vertex indices to which the barycentric coordinates apply.
+
+        Returns
+        -------
+        point : array, shape (3,)
+            Point that we compute from barycentric coordinates.
+        """
+
+    @abc.abstractmethod
+    def update_pose(self, pose):
+        """Update pose of collider.
+
+        Parameters
+        ----------
+        pose : array, shape (4, 4)
+            New pose of the collider.
+        """
+
+
+class Convex(Collider):
     """Wraps convex hull of a set of vertices for GJK algorithm.
 
     Parameters
@@ -85,7 +176,7 @@ class Mesh(Convex):
         self.vertices = np.asarray(self.artist.mesh.vertices)
 
 
-class Cylinder:
+class Cylinder(Collider):
     """Wraps cylinder for GJK algorithm."""
     def __init__(self, cylinder2origin, radius, length, artist=None):
         self.cylinder2origin = cylinder2origin
@@ -116,7 +207,7 @@ class Cylinder:
             self.artist.set_data(pose)
 
 
-class Capsule:
+class Capsule(Collider):
     """Wraps capsule for GJK algorithm."""
     def __init__(self, capsule2origin, radius, height, artist=None):
         self.capsule2origin = capsule2origin
@@ -147,7 +238,7 @@ class Capsule:
             self.artist.set_data(pose)
 
 
-class Sphere:
+class Sphere(Collider):
     """Wraps sphere for GJK algorithm."""
     # TODO https://github.com/kevinmoran/GJK/blob/master/Collider.h#L33
     def __init__(self, center, radius, artist=None):
