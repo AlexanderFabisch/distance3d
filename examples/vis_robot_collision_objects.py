@@ -1,46 +1,59 @@
 import os
 import time
 import numpy as np
+import open3d as o3d
 from pytransform3d.urdf import UrdfTransformManager
 import pytransform3d.visualizer as pv
 from distance3d import robot, random, colliders, gjk
 
 
-def animation_callback(
-        step, n_frames, tm, colls, boxes, joint_names):
-    angle = 0.5 * np.cos(2.0 * np.pi * (step / n_frames))
-    for joint_name in joint_names:
-        tm.set_joint(joint_name, angle)
-    colls.update_collider_poses()
+class AnimationCallback:
+    def __init__(self, with_aabb_tree=True):
+        self.with_aabb_tree = with_aabb_tree
 
-    total_time = 0.0
-    for box in boxes:
-        start = time.time()
-        for collider in colls.aabb_overlapping_colliders(box):
-            dist = gjk.gjk_with_simplex(collider, box)[0]
-        stop = time.time()
-        total_time += stop - start
-    print(f"With AABBTree: {total_time}")
+    def __call__(self, step, n_frames, tm, colls, boxes, joint_names):
+        angle = 0.5 * np.cos(2.0 * np.pi * (step / n_frames))
+        for joint_name in joint_names:
+            tm.set_joint(joint_name, angle)
+        colls.update_collider_poses()
 
-    total_time = 0.0
-    for idx, collider in enumerate(colls.get_colliders()):
-        start = time.time()
-        had_contact = False
-        for box in boxes:
-            dist = gjk.gjk_with_simplex(collider, box)[0]
-            if dist < 1e-6:
-                had_contact = True
-        stop = time.time()
-        total_time += stop - start
+        in_contact = {frame: False for frame in colls.get_collider_frames()}
+        in_aabb = {frame: False for frame in colls.get_collider_frames()}
 
-        geometry = collider.artist_.geometries[0]
-        if had_contact:
-            geometry.paint_uniform_color((1, 0, 0))
+        if self.with_aabb_tree:
+            total_time = 0.0
+            for box in boxes:
+                start = time.time()
+                overlapping_colls = colls.aabb_overlapping_colliders(
+                    box).items()
+                for frame, collider in overlapping_colls:
+                    dist = gjk.gjk_with_simplex(collider, box)[0]
+                    in_aabb[frame] |= True
+                    in_contact[frame] |= dist < 1e-6
+                stop = time.time()
+                total_time += stop - start
+            print(f"With AABBTree: {total_time}")
         else:
-            geometry.paint_uniform_color((0.5, 0.5, 0.5))
-    print(f"Without AABBTree: {total_time}")
+            total_time = 0.0
+            for frame, collider in colls.colliders.items():
+                start = time.time()
+                for box in boxes:
+                    dist = gjk.gjk_with_simplex(collider, box)[0]
+                    in_contact[frame] |= dist < 1e-6
+                stop = time.time()
+                total_time += stop - start
+            print(f"Without AABBTree: {total_time}")
 
-    return colls.get_artists()
+        for frame in in_contact:
+            geometry = colls.colliders[frame].artist_.geometries[0]
+            if in_contact[frame]:
+                geometry.paint_uniform_color((1, 0, 0))
+            elif in_aabb[frame]:
+                geometry.paint_uniform_color((1, 0.5, 0))
+            else:
+                geometry.paint_uniform_color((0.5, 0.5, 0.5))
+
+        return colls.get_artists()
 
 
 BASE_DIR = "test/data/"
@@ -77,11 +90,17 @@ for _ in range(15):
     box = colliders.Box(box2origin, size, artist=box_artist)
     boxes.append(box)
 
+    aabb = box.aabb()
+    aabb = o3d.geometry.AxisAlignedBoundingBox(aabb[:, 0], aabb[:, 1])
+    aabb.color = (1, 0, 0)
+    fig.add_geometry(aabb)
+
 for artist in colls.get_artists():
     artist.add_artist(fig)
 fig.view_init()
 fig.set_zoom(1.5)
 n_frames = 100
+animation_callback = AnimationCallback(with_aabb_tree=True)
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
                 fargs=(n_frames, tm, colls, boxes, joint_names))

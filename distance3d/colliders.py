@@ -26,6 +26,7 @@ class ColliderTree:
     def __init__(self, tm, base_frame):
         self.tm = tm
         self.base_frame = base_frame
+        self.collider_frames = set()
         self.aabbtree = AABBTree()
         self.colliders = {}
 
@@ -40,8 +41,9 @@ class ColliderTree:
         collider : ConvexCollider
             Collider.
         """
+        self.collider_frames.add(frame)
         self.colliders[frame] = collider
-        self.aabbtree.add(collider.aabb(), collider)
+        self.aabbtree.add(collider.aabb(), (frame, collider))
 
     def update_collider_poses(self):
         """Update poses of all colliders from transform manager."""
@@ -50,7 +52,7 @@ class ColliderTree:
             A2B = self.tm.get_transform(frame, self.base_frame)
             collider = self.colliders[frame]
             collider.update_pose(A2B)
-            self.aabbtree.add(collider.aabb(), collider)
+            self.aabbtree.add(collider.aabb(), (frame, collider))
 
     def get_colliders(self):
         """Get all colliders.
@@ -87,7 +89,17 @@ class ColliderTree:
             Colliders with overlapping AABB.
         """
         aabb = collider.aabb()
-        return self.aabbtree.overlap_values(aabb)
+        return dict(self.aabbtree.overlap_values(aabb))
+
+    def get_collider_frames(self):
+        """Get collider frames.
+
+        Returns
+        -------
+        collider_frames : set
+            Collider frames.
+        """
+        return self.collider_frames
 
 
 class ConvexCollider(abc.ABC):
