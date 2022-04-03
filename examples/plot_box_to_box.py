@@ -2,21 +2,23 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.plot_utils as ppu
-from distance3d import gjk, random, geometry, plotting
+from distance3d import gjk, random, geometry, plotting, colliders
 
 
 random_state = np.random.RandomState(0)
 box2origin, size = random.rand_box(random_state, 0.1, 3)
 vertices = geometry.convert_box_to_vertices(box2origin, size)
+box_collider = colliders.Box(box2origin, size)
 
 ax = ppu.make_3d_axis(ax_s=3)
 
 accumulated_time = 0.0
 for i in range(100):
     box2origin2, size2 = random.rand_box(random_state, 2, 1)
-    vertices2 = geometry.convert_box_to_vertices(box2origin2, size2)
+    box_collider2 = colliders.Box(box2origin2, size2)
     start = time.time()
-    dist, contact_point_box, contact_point_box2 = gjk.gjk(vertices, vertices2)
+    dist, contact_point_box, contact_point_box2, _ = gjk.gjk_with_simplex(
+        box_collider, box_collider2)
     end = time.time()
     accumulated_time += end - start
     print(dist)
