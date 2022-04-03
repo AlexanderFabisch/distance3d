@@ -12,19 +12,23 @@ def animation_callback(step, n_frames, tm, colls, boxes, joint_names):
         tm.set_joint(joint_name, angle)
     colls.update_collider_poses()
 
+    total_time = 0.0
     for collider in colls.get_colliders():
         start = time.time()
         had_contact = False
         for box in boxes:
             dist = gjk.gjk_with_simplex(collider, box)[0]
-            if dist < 1e-3:
+            if dist < 1e-6:
                 had_contact = True
         stop = time.time()
+        total_time += stop - start
+
+        geometry = collider.artist_.geometries[0]
         if had_contact:
-            collider.artist_.geometries[0].paint_uniform_color((1, 0, 0))
+            geometry.paint_uniform_color((1, 0, 0))
         else:
-            collider.artist_.geometries[0].paint_uniform_color((0.5, 0.5, 0.5))
-        print(stop - start)
+            geometry.paint_uniform_color((0.5, 0.5, 0.5))
+    print(total_time)
 
     return colls.get_artists()
 
@@ -59,13 +63,12 @@ for _ in range(15):
     box2origin[:3, 3] += 0.2
     color = random_state.rand(3)
     box_artist = pv.Box(size=size, A2B=box2origin, c=color)
+    box_artist.add_artist(fig)
     box = colliders.Box(box2origin, size, artist=box_artist)
-    box.artist_.add_artist(fig)
     boxes.append(box)
 
-for collider in colls.get_colliders():
-    if collider.artist_ is not None:
-        collider.artist_.add_artist(fig)
+for artist in colls.get_artists():
+    artist.add_artist(fig)
 fig.view_init()
 fig.set_zoom(1.5)
 n_frames = 100
