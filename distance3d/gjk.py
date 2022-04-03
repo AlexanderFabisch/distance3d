@@ -207,15 +207,11 @@ def distance_subalgorithm(
     backup : int
         TODO
     """
-    risd = np.empty(4, dtype=int)
-    rjsd = np.empty(4, dtype=int)
     iord = np.empty(4, dtype=int)
     d1 = np.empty(15, dtype=float)
     d2 = np.empty(15, dtype=float)
     d3 = np.empty(15, dtype=float)
     d4 = np.empty(15, dtype=float)
-    yd = np.empty((4, 3), dtype=float)
-    delld = np.empty((4, 4), dtype=float)
     zsold = np.empty(3, dtype=float)
     alsd = np.empty(4, dtype=float)
 
@@ -961,9 +957,13 @@ def distance_subalgorithm(
                 iord[1] = 1
                 iord[2] = 2
     # final reordering
+    risd = np.empty(4, dtype=int)
     risd[:n_simplex_points] = old_indices_polytope1[:n_simplex_points]
+    rjsd = np.empty(4, dtype=int)
     rjsd[:n_simplex_points] = old_indices_polytope2[:n_simplex_points]
+    yd = np.empty((4, 3), dtype=float)
     yd[:n_simplex_points] = simplex[:n_simplex_points]
+    delld = np.empty((4, 4), dtype=float)
     for k in range(n_simplex_points):
         delld[k, :k + 1] = dot_product_table[k, :k + 1]
 
