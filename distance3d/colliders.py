@@ -63,7 +63,16 @@ class ColliderTree:
 
 
 class Collider(abc.ABC):
-    """Collider base class."""
+    """Collider base class.
+
+    Parameters
+    ----------
+    vertices : iterable
+        Vertices of the convex collider.
+    """
+    def __init__(self, vertices):
+        self.vertices_ = vertices
+
     @abc.abstractmethod
     def first_vertex(self):
         """Get any vertex from collider to initialize GJK algorithm.
@@ -89,7 +98,6 @@ class Collider(abc.ABC):
             Extreme point along search direction.
         """
 
-    @abc.abstractmethod
     def compute_point(self, barycentric_coordinates, indices):
         """Compute point from barycentric coordinates.
 
@@ -106,6 +114,8 @@ class Collider(abc.ABC):
         point : array, shape (3,)
             Point that we compute from barycentric coordinates.
         """
+        return np.dot(barycentric_coordinates,
+                      np.array([self.vertices_[i] for i in indices]))
 
     @abc.abstractmethod
     def update_pose(self, pose):
@@ -130,21 +140,21 @@ class Convex(Collider):
         Artist for visualizer.
     """
     def __init__(self, vertices, artist):
-        self.vertices = vertices
+        super(Convex, self).__init__(vertices)
         self.artist = artist
 
     def first_vertex(self):
-        return self.vertices[0]
+        return self.vertices_[0]
 
     def support_function(self, search_direction):
-        idx = np.argmax(self.vertices.dot(search_direction))
-        return idx, self.vertices[idx]
+        idx = np.argmax(self.vertices_.dot(search_direction))
+        return idx, self.vertices_[idx]
 
     def compute_point(self, barycentric_coordinates, indices):
-        return np.dot(barycentric_coordinates, self.vertices[indices])
+        return np.dot(barycentric_coordinates, self.vertices_[indices])
 
     def update_pose(self, vertices):
-        self.vertices = vertices
+        self.vertices_ = vertices
         # TODO how to update artist?
 
 
@@ -158,6 +168,7 @@ class Box(Convex):
 
     def update_pose(self, pose):
         self.box2origin = pose
+        self.vertices_ = convert_box_to_vertices(pose, self.size)
         if self.artist is not None:
             self.artist.set_data(pose)
 
@@ -173,36 +184,33 @@ class Mesh(Convex):
 
     def update_pose(self, pose):
         self.artist.set_data(pose)
-        self.vertices = np.asarray(self.artist.mesh.vertices)
+        self.vertices_ = np.asarray(self.artist.mesh.vertices)
 
 
 class Cylinder(Collider):
     """Wraps cylinder for GJK algorithm."""
     def __init__(self, cylinder2origin, radius, length, artist=None):
+        super(Cylinder, self).__init__([])
         self.cylinder2origin = cylinder2origin
         self.radius = radius
         self.length = length
         self.artist = artist
-        self.vertices = []
 
     def first_vertex(self):
         vertex = self.cylinder2origin[:3, 3] + 0.5 * self.length * self.cylinder2origin[:3, 2]
-        self.vertices.append(vertex)
+        self.vertices_.append(vertex)
         return vertex
 
     def support_function(self, search_direction):
         vertex = cylinder_extreme_along_direction(
             search_direction, self.cylinder2origin, self.radius, self.length)
-        vertex_idx = len(self.vertices)
-        self.vertices.append(vertex)
+        vertex_idx = len(self.vertices_)
+        self.vertices_.append(vertex)
         return vertex_idx, vertex
-
-    def compute_point(self, barycentric_coordinates, indices):
-        return np.dot(barycentric_coordinates, np.array([self.vertices[i] for i in indices]))
 
     def update_pose(self, pose):
         self.cylinder2origin = pose
-        self.vertices = []
+        self.vertices_ = []
         if self.artist is not None:
             self.artist.set_data(pose)
 
@@ -210,30 +218,28 @@ class Cylinder(Collider):
 class Capsule(Collider):
     """Wraps capsule for GJK algorithm."""
     def __init__(self, capsule2origin, radius, height, artist=None):
+        super(Capsule, self).__init__([])
         self.capsule2origin = capsule2origin
         self.radius = radius
         self.height = height
         self.artist = artist
-        self.vertices = []
+        self.vertices_ = []
 
     def first_vertex(self):
         vertex = self.capsule2origin[:3, 3] - (self.radius + 0.5 * self.height) * self.capsule2origin[:3, 2]
-        self.vertices.append(vertex)
+        self.vertices_.append(vertex)
         return vertex
 
     def support_function(self, search_direction):
         vertex = capsule_extreme_along_direction(
             search_direction, self.capsule2origin, self.radius, self.height)
-        vertex_idx = len(self.vertices)
-        self.vertices.append(vertex)
+        vertex_idx = len(self.vertices_)
+        self.vertices_.append(vertex)
         return vertex_idx, vertex
-
-    def compute_point(self, barycentric_coordinates, indices):
-        return np.dot(barycentric_coordinates, np.array([self.vertices[i] for i in indices]))
 
     def update_pose(self, pose):
         self.capsule2origin = pose
-        self.vertices = []
+        self.vertices_ = []
         if self.artist is not None:
             self.artist.set_data(pose)
 
@@ -242,14 +248,15 @@ class Sphere(Collider):
     """Wraps sphere for GJK algorithm."""
     # TODO https://github.com/kevinmoran/GJK/blob/master/Collider.h#L33
     def __init__(self, center, radius, artist=None):
+        super(Sphere, self).__init__([])
         self.c = center
         self.radius = radius
         self.artist = artist
-        self.vertices = []
+        self.vertices_ = []
 
     def first_vertex(self):
         vertex = self.c + np.array([0, 0, self.radius])
-        self.vertices.append(vertex)
+        self.vertices_.append(vertex)
         return vertex
 
     def support_function(self, search_direction):
@@ -258,15 +265,12 @@ class Sphere(Collider):
             vertex = self.c + np.array([0, 0, self.radius])
         else:
             vertex = self.c + search_direction / s_norm * self.radius
-        vertex_idx = len(self.vertices)
-        self.vertices.append(vertex)
+        vertex_idx = len(self.vertices_)
+        self.vertices_.append(vertex)
         return vertex_idx, vertex
-
-    def compute_point(self, barycentric_coordinates, indices):
-        return np.dot(barycentric_coordinates, np.array([self.vertices[i] for i in indices]))
 
     def update_pose(self, pose):
         self.c = pose[:3, 3]
-        self.vertices = []
+        self.vertices_ = []
         if self.artist is not None:
             self.artist.set_data(pose)

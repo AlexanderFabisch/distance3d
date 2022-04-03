@@ -26,9 +26,9 @@ for i in range(700):
     if i > 5:
         continue
     if i == 0:
-        vertices1 = np.array(c1.vertices)
+        vertices1 = np.array(c1.vertices_)
         ax.scatter(vertices1[:, 0], vertices1[:, 1], vertices1[:, 2], color="r")
-        vertices2 = np.array(c2.vertices)
+        vertices2 = np.array(c2.vertices_)
         ax.scatter(vertices2[:, 0], vertices2[:, 1], vertices2[:, 2], color="g")
     plotting.plot_segment(ax, contact_point_capsule, contact_point_capsule2)
     pt.plot_transform(ax=ax, A2B=capsule2origin2, s=0.1)

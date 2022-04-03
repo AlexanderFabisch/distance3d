@@ -25,9 +25,9 @@ for i in range(1000):
     if i > 5:
         continue
     if i == 0:
-        vertices1 = np.array(s1.vertices)
+        vertices1 = np.array(s1.vertices_)
         ax.scatter(vertices1[:, 0], vertices1[:, 1], vertices1[:, 2], color="r")
-        vertices2 = np.array(s2.vertices)
+        vertices2 = np.array(s2.vertices_)
         ax.scatter(vertices2[:, 0], vertices2[:, 1], vertices2[:, 2], color="g")
     plotting.plot_segment(ax, contact_point_sphere, contact_point_sphere2)
     ppu.plot_sphere(ax, p=center2, radius=radius2)
