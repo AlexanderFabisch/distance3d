@@ -42,10 +42,10 @@ def gjk_with_simplex(collider1, collider2):
 
     Parameters
     ----------
-    collider1 : Collider
+    collider1 : ConvexCollider
         Convex collider 1.
 
-    collider2 : Collider
+    collider2 : ConvexCollider
         Convex collider 2.
 
     Returns

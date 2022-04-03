@@ -29,7 +29,7 @@ class ColliderTree:
         frame : str
             Frame in which the collider is located.
 
-        collider : Collider
+        collider : ConvexCollider
             Collider.
         """
         self.colliders[frame] = collider
@@ -62,12 +62,17 @@ class ColliderTree:
                 if collider.artist is not None]
 
 
-class Collider(abc.ABC):
-    """Collider base class.
+class ConvexCollider(abc.ABC):
+    """Convex collider base class.
 
     Parameters
     ----------
     vertices : iterable
+        Vertices of the convex collider.
+
+    Attributes
+    ----------
+    vertices_ : iterable
         Vertices of the convex collider.
     """
     def __init__(self, vertices):
@@ -128,7 +133,7 @@ class Collider(abc.ABC):
         """
 
 
-class Convex(Collider):
+class Convex(ConvexCollider):
     """Wraps convex hull of a set of vertices for GJK algorithm.
 
     Parameters
@@ -187,7 +192,7 @@ class Mesh(Convex):
         self.vertices_ = np.asarray(self.artist.mesh.vertices)
 
 
-class Cylinder(Collider):
+class Cylinder(ConvexCollider):
     """Wraps cylinder for GJK algorithm."""
     def __init__(self, cylinder2origin, radius, length, artist=None):
         super(Cylinder, self).__init__([])
@@ -215,7 +220,7 @@ class Cylinder(Collider):
             self.artist.set_data(pose)
 
 
-class Capsule(Collider):
+class Capsule(ConvexCollider):
     """Wraps capsule for GJK algorithm."""
     def __init__(self, capsule2origin, radius, height, artist=None):
         super(Capsule, self).__init__([])
@@ -244,7 +249,7 @@ class Capsule(Collider):
             self.artist.set_data(pose)
 
 
-class Sphere(Collider):
+class Sphere(ConvexCollider):
     """Wraps sphere for GJK algorithm."""
     # TODO https://github.com/kevinmoran/GJK/blob/master/Collider.h#L33
     def __init__(self, center, radius, artist=None):
