@@ -16,7 +16,7 @@ def animation_callback(
     total_time = 0.0
     for box in boxes:
         start = time.time()
-        for collider in colls.overlapping_colliders(box):
+        for collider in colls.aabb_overlapping_colliders(box):
             dist = gjk.gjk_with_simplex(collider, box)[0]
         stop = time.time()
         total_time += stop - start

@@ -70,8 +70,19 @@ class ColliderTree:
         return [collider.artist_ for collider in self.colliders.values()
                 if collider.artist_ is not None]
 
-    def overlapping_colliders(self, collider):
-        """TODO"""
+    def aabb_overlapping_colliders(self, collider):
+        """Get colliders with an overlapping AABB.
+
+        Parameters
+        ----------
+        collider : ConvexCollider
+            Collider.
+
+        Returns
+        -------
+        colliders : list
+            Colliders with overlapping AABB.
+        """
         aabb = collider.aabb()
         return self.aabbtree.overlap_values(aabb)
 
