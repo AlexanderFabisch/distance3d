@@ -21,9 +21,9 @@ def animation_callback(step, n_frames, tm, colls, boxes, joint_names):
                 had_contact = True
         stop = time.time()
         if had_contact:
-            collider.artist.geometries[0].paint_uniform_color((1, 0, 0))
+            collider.artist_.geometries[0].paint_uniform_color((1, 0, 0))
         else:
-            collider.artist.geometries[0].paint_uniform_color((0.5, 0.5, 0.5))
+            collider.artist_.geometries[0].paint_uniform_color((0.5, 0.5, 0.5))
         print(stop - start)
 
     return colls.get_artists()
@@ -60,12 +60,12 @@ for _ in range(15):
     color = random_state.rand(3)
     box_artist = pv.Box(size=size, A2B=box2origin, c=color)
     box = colliders.Box(box2origin, size, artist=box_artist)
-    box.artist.add_artist(fig)
+    box.artist_.add_artist(fig)
     boxes.append(box)
 
 for collider in colls.get_colliders():
-    if collider.artist is not None:
-        collider.artist.add_artist(fig)
+    if collider.artist_ is not None:
+        collider.artist_.add_artist(fig)
 fig.view_init()
 fig.set_zoom(1.5)
 n_frames = 100

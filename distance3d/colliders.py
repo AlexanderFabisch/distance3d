@@ -58,8 +58,8 @@ class ColliderTree:
         artists : list
             List of artists.
         """
-        return [collider.artist for collider in self.colliders.values()
-                if collider.artist is not None]
+        return [collider.artist_ for collider in self.colliders.values()
+                if collider.artist_ is not None]
 
 
 class ConvexCollider(abc.ABC):
@@ -70,13 +70,20 @@ class ConvexCollider(abc.ABC):
     vertices : iterable
         Vertices of the convex collider.
 
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+
     Attributes
     ----------
     vertices_ : iterable
         Vertices of the convex collider.
+
+    artist_ : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
     """
-    def __init__(self, vertices):
+    def __init__(self, vertices, artist=None):
         self.vertices_ = vertices
+        self.artist_ = artist
 
     @abc.abstractmethod
     def first_vertex(self):
@@ -145,8 +152,7 @@ class Convex(ConvexCollider):
         Artist for visualizer.
     """
     def __init__(self, vertices, artist):
-        super(Convex, self).__init__(vertices)
-        self.artist = artist
+        super(Convex, self).__init__(vertices, artist)
 
     def first_vertex(self):
         return self.vertices_[0]
@@ -174,8 +180,8 @@ class Box(Convex):
     def update_pose(self, pose):
         self.box2origin = pose
         self.vertices_ = convert_box_to_vertices(pose, self.size)
-        if self.artist is not None:
-            self.artist.set_data(pose)
+        if self.artist_ is not None:
+            self.artist_.set_data(pose)
 
 
 class Mesh(Convex):
@@ -188,18 +194,17 @@ class Mesh(Convex):
         super(Mesh, self).__init__(vertices, artist)
 
     def update_pose(self, pose):
-        self.artist.set_data(pose)
-        self.vertices_ = np.asarray(self.artist.mesh.vertices)
+        self.artist_.set_data(pose)
+        self.vertices_ = np.asarray(self.artist_.mesh.vertices)
 
 
 class Cylinder(ConvexCollider):
     """Wraps cylinder for GJK algorithm."""
     def __init__(self, cylinder2origin, radius, length, artist=None):
-        super(Cylinder, self).__init__([])
+        super(Cylinder, self).__init__([], artist)
         self.cylinder2origin = cylinder2origin
         self.radius = radius
         self.length = length
-        self.artist = artist
 
     def first_vertex(self):
         vertex = self.cylinder2origin[:3, 3] + 0.5 * self.length * self.cylinder2origin[:3, 2]
@@ -216,18 +221,17 @@ class Cylinder(ConvexCollider):
     def update_pose(self, pose):
         self.cylinder2origin = pose
         self.vertices_ = []
-        if self.artist is not None:
-            self.artist.set_data(pose)
+        if self.artist_ is not None:
+            self.artist_.set_data(pose)
 
 
 class Capsule(ConvexCollider):
     """Wraps capsule for GJK algorithm."""
     def __init__(self, capsule2origin, radius, height, artist=None):
-        super(Capsule, self).__init__([])
+        super(Capsule, self).__init__([], artist)
         self.capsule2origin = capsule2origin
         self.radius = radius
         self.height = height
-        self.artist = artist
         self.vertices_ = []
 
     def first_vertex(self):
@@ -245,18 +249,17 @@ class Capsule(ConvexCollider):
     def update_pose(self, pose):
         self.capsule2origin = pose
         self.vertices_ = []
-        if self.artist is not None:
-            self.artist.set_data(pose)
+        if self.artist_ is not None:
+            self.artist_.set_data(pose)
 
 
 class Sphere(ConvexCollider):
     """Wraps sphere for GJK algorithm."""
     # TODO https://github.com/kevinmoran/GJK/blob/master/Collider.h#L33
     def __init__(self, center, radius, artist=None):
-        super(Sphere, self).__init__([])
+        super(Sphere, self).__init__([], artist)
         self.c = center
         self.radius = radius
-        self.artist = artist
         self.vertices_ = []
 
     def first_vertex(self):
@@ -277,5 +280,5 @@ class Sphere(ConvexCollider):
     def update_pose(self, pose):
         self.c = pose[:3, 3]
         self.vertices_ = []
-        if self.artist is not None:
-            self.artist.set_data(pose)
+        if self.artist_ is not None:
+            self.artist_.set_data(pose)
