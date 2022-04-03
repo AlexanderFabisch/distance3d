@@ -1,6 +1,8 @@
 """Class definitions and methods for the AABB and AABBTree.
 
 Source: https://github.com/kip-hart/AABBTree
+
+TODO license or do we really need to put this here?
 """
 
 from collections import deque
