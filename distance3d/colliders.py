@@ -12,6 +12,9 @@ from .aabbtree import AABB, AABBTree
 class ColliderTree:
     """Wraps multiple colliders that are connected through transformations.
 
+    In addition, these colliders are stored in an AABB tree for broad phase
+    collision detection.
+
     Parameters
     ----------
     tm : pytransform3d.transform_manager.TransformManager
