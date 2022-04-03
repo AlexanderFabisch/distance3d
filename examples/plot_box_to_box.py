@@ -13,7 +13,7 @@ box_collider = colliders.Box(box2origin, size)
 ax = ppu.make_3d_axis(ax_s=3)
 
 accumulated_time = 0.0
-for i in range(100):
+for i in range(3000):
     box2origin2, size2 = random.rand_box(random_state, 2, 1)
     box_collider2 = colliders.Box(box2origin2, size2)
     start = time.time()
