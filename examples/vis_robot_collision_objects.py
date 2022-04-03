@@ -7,11 +7,20 @@ from distance3d import robot, random, colliders, gjk
 
 
 def animation_callback(
-        step, n_frames, tm, colls, in_contact, boxes, joint_names):
+        step, n_frames, tm, colls, boxes, joint_names):
     angle = 0.5 * np.cos(2.0 * np.pi * (step / n_frames))
     for joint_name in joint_names:
         tm.set_joint(joint_name, angle)
     colls.update_collider_poses()
+
+    total_time = 0.0
+    for box in boxes:
+        start = time.time()
+        for collider in colls.overlapping_colliders(box):
+            dist = gjk.gjk_with_simplex(collider, box)[0]
+        stop = time.time()
+        total_time += stop - start
+    print(f"With AABBTree: {total_time}")
 
     total_time = 0.0
     for idx, collider in enumerate(colls.get_colliders()):
@@ -25,13 +34,11 @@ def animation_callback(
         total_time += stop - start
 
         geometry = collider.artist_.geometries[0]
-        if in_contact[idx] != had_contact:
-            if had_contact:
-                geometry.paint_uniform_color((1, 0, 0))
-            else:
-                geometry.paint_uniform_color((0.5, 0.5, 0.5))
-            in_contact[idx] = had_contact
-    print(total_time)
+        if had_contact:
+            geometry.paint_uniform_color((1, 0, 0))
+        else:
+            geometry.paint_uniform_color((0.5, 0.5, 0.5))
+    print(f"Without AABBTree: {total_time}")
 
     return colls.get_artists()
 
@@ -54,7 +61,6 @@ for joint_name in joint_names:
     tm.set_joint(joint_name, 0.7)
 
 colls = robot.get_colliders(tm, "robot_arm")
-in_contact = [False for _ in colls.get_colliders()]
 
 random_state = np.random.RandomState(5)
 
@@ -78,7 +84,7 @@ fig.set_zoom(1.5)
 n_frames = 100
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
-                fargs=(n_frames, tm, colls, in_contact, boxes, joint_names))
+                fargs=(n_frames, tm, colls, boxes, joint_names))
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")
