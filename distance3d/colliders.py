@@ -170,7 +170,19 @@ class Convex(ConvexCollider):
 
 
 class Box(Convex):
-    """Wraps box for GJK algorithm."""
+    """Wraps box for GJK algorithm.
+
+    Parameters
+    ----------
+    box2origin : array, shape (4, 4)
+        Pose of the box.
+
+    size : array, shape (3,)
+        Sizes of the box along its axes.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
     def __init__(self, box2origin, size, artist=None):
         super(Box, self).__init__(
             convert_box_to_vertices(box2origin, size), artist)
@@ -185,7 +197,22 @@ class Box(Convex):
 
 
 class Mesh(Convex):
-    """Wraps mesh for GJK algorithm (we assume a convex mesh)."""
+    """Wraps mesh for GJK algorithm (we assume a convex mesh).
+
+    Parameters
+    ----------
+    filename : str
+        Path to mesh file.
+
+    A2B : array, shape (4, 4)
+        Center of the mesh.
+
+    scale : float, optional (default: 1)
+        Scaling of the mesh.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
     def __init__(self, filename, A2B, scale=1.0, artist=None):
         import pytransform3d.visualizer as pv
         if artist is None:
@@ -199,7 +226,22 @@ class Mesh(Convex):
 
 
 class Cylinder(ConvexCollider):
-    """Wraps cylinder for GJK algorithm."""
+    """Wraps cylinder for GJK algorithm.
+
+    Parameters
+    ----------
+    cylinder2origin : array, shape (4, 4)
+        Pose of the cylinder.
+
+    radius : float
+        Radius of the cylinder.
+
+    length : float
+        Length of the cylinder.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
     def __init__(self, cylinder2origin, radius, length, artist=None):
         super(Cylinder, self).__init__([], artist)
         self.cylinder2origin = cylinder2origin
@@ -226,7 +268,22 @@ class Cylinder(ConvexCollider):
 
 
 class Capsule(ConvexCollider):
-    """Wraps capsule for GJK algorithm."""
+    """Wraps capsule for GJK algorithm.
+
+    Parameters
+    ----------
+    capsule2origin : array, shape (4, 4)
+        Pose of the capsule.
+
+    radius : float
+        Radius of the capsule.
+
+    height : float
+        Height of the capsule.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
     def __init__(self, capsule2origin, radius, height, artist=None):
         super(Capsule, self).__init__([], artist)
         self.capsule2origin = capsule2origin
@@ -254,8 +311,19 @@ class Capsule(ConvexCollider):
 
 
 class Sphere(ConvexCollider):
-    """Wraps sphere for GJK algorithm."""
-    # TODO https://github.com/kevinmoran/GJK/blob/master/Collider.h#L33
+    """Wraps sphere for GJK algorithm.
+
+    Parameters
+    ----------
+    center : array, shape (3,)
+        Center of the sphere.
+
+    radius : float
+        Radius of the sphere.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
     def __init__(self, center, radius, artist=None):
         super(Sphere, self).__init__([], artist)
         self.c = center
@@ -268,6 +336,8 @@ class Sphere(ConvexCollider):
         return vertex
 
     def support_function(self, search_direction):
+        # Similar implementation:
+        # https://github.com/kevinmoran/GJK/blob/master/Collider.h#L33
         s_norm = np.linalg.norm(search_direction)
         if s_norm == 0.0:
             vertex = self.c + np.array([0, 0, self.radius])
