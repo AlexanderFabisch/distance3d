@@ -1,5 +1,8 @@
 import abc
+import warnings
 import numpy as np
+from pytransform3d import urdf
+import pytransform3d.visualizer as pv
 from .geometry import (
     capsule_extreme_along_direction, cylinder_extreme_along_direction,
     convert_box_to_vertices)
@@ -29,6 +32,38 @@ class ColliderTree:
         self.collider_frames = set()
         self.aabbtree = AABBTree()
         self.colliders = {}
+
+    def fill_tree_with_colliders(self, tm):
+        """Fill tree with colliders from URDF transform manager.
+
+        Parameters
+        ----------
+        tm : pytransform3d.urdf.UrdfTransformManager
+            Transform manager that has colliders.
+        """
+        for obj in tm.collision_objects:
+            A2B = tm.get_transform(obj.frame, self.base_frame)
+            try:
+                if isinstance(obj, urdf.Sphere):
+                    artist = pv.Sphere(radius=obj.radius, A2B=A2B)
+                    collider = Sphere(
+                        center=A2B[:3, 3], radius=obj.radius, artist=artist)
+                elif isinstance(obj, urdf.Box):
+                    artist = pv.Box(size=obj.size, A2B=A2B)
+                    collider = Box(A2B, obj.size, artist=artist)
+                elif isinstance(obj, urdf.Cylinder):
+                    artist = pv.Cylinder(
+                        length=obj.length, radius=obj.radius, A2B=A2B)
+                    collider = Cylinder(
+                        cylinder2origin=A2B, radius=obj.radius, length=obj.length,
+                        artist=artist)
+                else:
+                    assert isinstance(obj, urdf.Mesh)
+                    artist = pv.Mesh(filename=obj.filename, s=obj.scale, A2B=A2B)
+                    collider = Mesh(obj.filename, A2B, obj.scale, artist=artist)
+                self.add_collider(obj.frame, collider)
+            except RuntimeError as e:
+                warnings.warn(str(e))
 
     def add_collider(self, frame, collider):
         """Add collider.

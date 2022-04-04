@@ -4,7 +4,7 @@ import numpy as np
 import open3d as o3d
 from pytransform3d.urdf import UrdfTransformManager
 import pytransform3d.visualizer as pv
-from distance3d import robot, random, colliders, gjk
+from distance3d import random, colliders, gjk
 
 
 class AnimationCallback:
@@ -73,7 +73,8 @@ joint_names = ["joint%d" % i for i in range(1, 7)]
 for joint_name in joint_names:
     tm.set_joint(joint_name, 0.7)
 
-colls = robot.get_colliders(tm, "robot_arm")
+colls = colliders.ColliderTree(tm, "robot_arm")
+colls.fill_tree_with_colliders(tm)
 
 random_state = np.random.RandomState(5)
 
