@@ -6,7 +6,7 @@ from .geometry import (
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb)
-from .aabbtree import AABB, AABBTree
+from aabbtree import AABB, AABBTree
 
 
 class ColliderTree:
