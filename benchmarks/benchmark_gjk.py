@@ -1,3 +1,5 @@
+# python -m cProfile -s tottime benchmarks/benchmark_gjk.py > profile
+# python -m cProfile -o program.prof benchmarks/benchmark_gjk.py
 import timeit
 from functools import partial
 import numpy as np
