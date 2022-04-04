@@ -8,10 +8,15 @@ from distance3d import random, colliders, gjk
 
 
 class AnimationCallback:
-    def __init__(self, with_aabb_tree=True):
+    def __init__(self, with_aabb_tree=True, n_frames=100):
         self.with_aabb_tree = with_aabb_tree
+        self.n_frames = n_frames
+        self.total_time = 0.0
 
     def __call__(self, step, n_frames, tm, colls, boxes, joint_names):
+        if step == 0:
+            self.total_time = 0.0
+
         angle = 0.5 * np.cos(2.0 * np.pi * (step / n_frames))
         for joint_name in joint_names:
             tm.set_joint(joint_name, angle)
@@ -20,8 +25,8 @@ class AnimationCallback:
         in_contact = {frame: False for frame in colls.get_collider_frames()}
         in_aabb = {frame: False for frame in colls.get_collider_frames()}
 
+        total_time = 0.0
         if self.with_aabb_tree:
-            total_time = 0.0
             for box in boxes:
                 start = time.time()
                 overlapping_colls = colls.aabb_overlapping_colliders(
@@ -34,7 +39,6 @@ class AnimationCallback:
                 total_time += stop - start
             print(f"With AABBTree: {total_time}")
         else:
-            total_time = 0.0
             for frame, collider in colls.colliders.items():
                 start = time.time()
                 for box in boxes:
@@ -44,6 +48,8 @@ class AnimationCallback:
                 total_time += stop - start
             print(f"Without AABBTree: {total_time}")
 
+        self.total_time += total_time
+
         for frame in in_contact:
             geometry = colls.colliders[frame].artist_.geometries[0]
             if in_contact[frame]:
@@ -52,6 +58,9 @@ class AnimationCallback:
                 geometry.paint_uniform_color((1, 0.5, 0))
             else:
                 geometry.paint_uniform_color((0.5, 0.5, 0.5))
+
+        if step == self.n_frames - 1:
+            print(f"Total time: {self.total_time}")
 
         return colls.get_artists()
 
@@ -101,7 +110,7 @@ for artist in colls.get_artists():
 fig.view_init()
 fig.set_zoom(1.5)
 n_frames = 100
-animation_callback = AnimationCallback(with_aabb_tree=True)
+animation_callback = AnimationCallback(with_aabb_tree=True, n_frames=n_frames)
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
                 fargs=(n_frames, tm, colls, boxes, joint_names))
