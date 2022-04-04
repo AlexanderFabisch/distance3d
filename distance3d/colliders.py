@@ -236,7 +236,7 @@ class Convex(ConvexCollider):
     artist : pytransform3d.visualizer.Artist, optional (default: None)
         Artist for visualizer.
     """
-    def __init__(self, vertices, artist):
+    def __init__(self, vertices, artist=None):
         super(Convex, self).__init__(vertices, artist)
 
     def first_vertex(self):
