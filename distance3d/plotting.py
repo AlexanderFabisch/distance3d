@@ -154,3 +154,29 @@ def plot_circle(ax, center, radius, normal, show_normal=False):
     ax.plot(circle[:, 0], circle[:, 1], circle[:, 2])
     if show_normal:
         ppu.plot_vector(ax=ax, start=center, direction=normal, s=1.0)
+
+
+def plot_aabb(ax, mins, maxs, alpha=1.0, color="r"):
+    """Plot axis-aligned bounding box.
+
+    Parameters
+    ----------
+    ax : Matplotlib 3d axis
+        A matplotlib 3d axis.
+
+    mins : array, shape (3,)
+        Minimum values along axes.
+
+    maxs : array, shape (3,)
+        Maximum values along axes.
+
+    alpha : float, optional (default: 1)
+        Alpha value of edges.
+
+    color : str
+        Color of edges.
+    """
+    box2origin = np.eye(4)
+    box2origin[:3, 3] = 0.5 * (mins + maxs)
+    size = maxs - mins
+    ppu.plot_box(ax=ax, A2B=box2origin, size=size, wireframe=True, alpha=alpha, color=color)

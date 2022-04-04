@@ -3,10 +3,17 @@ import numpy as np
 from .geometry import (
     capsule_extreme_along_direction, cylinder_extreme_along_direction,
     convert_box_to_vertices)
+from .containment import (
+    axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
+    capsule_aabb)
+from aabbtree import AABB, AABBTree
 
 
 class ColliderTree:
     """Wraps multiple colliders that are connected through transformations.
+
+    In addition, these colliders are stored in an AABB tree for broad phase
+    collision detection.
 
     Parameters
     ----------
@@ -19,6 +26,8 @@ class ColliderTree:
     def __init__(self, tm, base_frame):
         self.tm = tm
         self.base_frame = base_frame
+        self.collider_frames = set()
+        self.aabbtree = AABBTree()
         self.colliders = {}
 
     def add_collider(self, frame, collider):
@@ -32,13 +41,18 @@ class ColliderTree:
         collider : ConvexCollider
             Collider.
         """
+        self.collider_frames.add(frame)
         self.colliders[frame] = collider
+        self.aabbtree.add(collider.aabb(), (frame, collider))
 
     def update_collider_poses(self):
         """Update poses of all colliders from transform manager."""
+        self.aabbtree = AABBTree()
         for frame in self.colliders:
             A2B = self.tm.get_transform(frame, self.base_frame)
-            self.colliders[frame].update_pose(A2B)
+            collider = self.colliders[frame]
+            collider.update_pose(A2B)
+            self.aabbtree.add(collider.aabb(), (frame, collider))
 
     def get_colliders(self):
         """Get all colliders.
@@ -60,6 +74,32 @@ class ColliderTree:
         """
         return [collider.artist_ for collider in self.colliders.values()
                 if collider.artist_ is not None]
+
+    def aabb_overlapping_colliders(self, collider):
+        """Get colliders with an overlapping AABB.
+
+        Parameters
+        ----------
+        collider : ConvexCollider
+            Collider.
+
+        Returns
+        -------
+        colliders : list
+            Colliders with overlapping AABB.
+        """
+        aabb = collider.aabb()
+        return dict(self.aabbtree.overlap_values(aabb))
+
+    def get_collider_frames(self):
+        """Get collider frames.
+
+        Returns
+        -------
+        collider_frames : set
+            Collider frames.
+        """
+        return self.collider_frames
 
 
 class ConvexCollider(abc.ABC):
@@ -139,6 +179,16 @@ class ConvexCollider(abc.ABC):
             New pose of the collider.
         """
 
+    @abc.abstractmethod
+    def aabb(self):
+        """Get axis-aligned bounding box.
+
+        Returns
+        -------
+        aabb : AABB
+            Axis-aligned bounding box.
+        """
+
 
 class Convex(ConvexCollider):
     """Wraps convex hull of a set of vertices for GJK algorithm.
@@ -168,6 +218,10 @@ class Convex(ConvexCollider):
         self.vertices_ = vertices
         # TODO how to update artist?
 
+    def aabb(self):
+        mins, maxs = axis_aligned_bounding_box(self.vertices_)
+        return AABB(np.array([mins, maxs]).T)
+
 
 class Box(Convex):
     """Wraps box for GJK algorithm.
@@ -194,6 +248,10 @@ class Box(Convex):
         self.vertices_ = convert_box_to_vertices(pose, self.size)
         if self.artist_ is not None:
             self.artist_.set_data(pose)
+
+    def aabb(self):
+        mins, maxs = box_aabb(self.box2origin, self.size)
+        return AABB(np.array([mins, maxs]).T)
 
 
 class Mesh(Convex):
@@ -223,6 +281,10 @@ class Mesh(Convex):
     def update_pose(self, pose):
         self.artist_.set_data(pose)
         self.vertices_ = np.asarray(self.artist_.mesh.vertices)
+
+    def aabb(self):
+        mins, maxs = axis_aligned_bounding_box(self.vertices_)
+        return AABB(np.array([mins, maxs]).T)
 
 
 class Cylinder(ConvexCollider):
@@ -265,6 +327,11 @@ class Cylinder(ConvexCollider):
         self.vertices_ = []
         if self.artist_ is not None:
             self.artist_.set_data(pose)
+
+    def aabb(self):
+        mins, maxs = cylinder_aabb(
+            self.cylinder2origin, self.radius, self.length)
+        return AABB(np.array([mins, maxs]).T)
 
 
 class Capsule(ConvexCollider):
@@ -309,6 +376,11 @@ class Capsule(ConvexCollider):
         if self.artist_ is not None:
             self.artist_.set_data(pose)
 
+    def aabb(self):
+        mins, maxs = capsule_aabb(
+            self.capsule2origin, self.radius, self.height)
+        return AABB(np.array([mins, maxs]).T)
+
 
 class Sphere(ConvexCollider):
     """Wraps sphere for GJK algorithm.
@@ -352,3 +424,7 @@ class Sphere(ConvexCollider):
         self.vertices_ = []
         if self.artist_ is not None:
             self.artist_.set_data(pose)
+
+    def aabb(self):
+        mins, maxs = sphere_aabb(self.c, self.radius)
+        return AABB(np.array([mins, maxs]).T)
