@@ -27,6 +27,8 @@ These implementations are mostly based on
 * Christer Ericson: Real-Time Collision Detection, CRC Press, 2004.
 * David H. Eberly: 3D Game Engine Design, CRC Press, 2006.
 
+and accompanying implementations. These are marked as such.
+
 The GJK algorithm is a translation to Python of the translation to C of the
 original Fortran implementation. The C implementation is from Diego Ruspini.
 It is available from http://realtimecollisiondetection.net/files/gilbert.c
