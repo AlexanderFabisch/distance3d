@@ -34,6 +34,72 @@ def convert_rectangle_to_segment(rectangle_center, rectangle_extents, i0, i1):
     return segment_end, segment_start
 
 
+def convert_rectangle_to_vertices(
+        rectangle_center, rectangle_axes, rectangle_lengths):
+    """Convert rectangle to vertices.
+
+    Parameters
+    ----------
+    rectangle_center : array, shape (3,)
+        Center point of the rectangle.
+
+    rectangle_axes : array, shape (2, 3)
+        Each row is a vector of unit length, indicating the direction of one
+        axis of the rectangle. Both vectors are orthogonal.
+
+    rectangle_lengths : array, shape (2,)
+        Lengths of the two sides of the rectangle.
+
+    Returns
+    -------
+    rectangle_points : array, shape (4, 3)
+        Vertices of the rectangle.
+    """
+    return np.array([
+        rectangle_center
+        + 0.5 * a * rectangle_axes[0] * rectangle_lengths[0]
+        + 0.5 * b * rectangle_axes[1] * rectangle_lengths[1]
+        for a in [-1, 1] for b in [-1, 1]
+    ])
+
+
+def convert_box_to_face(box2origin, size, i, sign):
+    """Convert box to face.
+
+    Parameters
+    ----------
+    box2origin : array, shape (4, 4)
+        Pose of the box.
+
+    size : array, shape (3,)
+        Size of the box along its axes.
+
+    i : int
+        Index of the axis along which we select the face.
+
+    sign : int
+        Indicate the direction along the axis.
+
+    Returns
+    -------
+    face_center : array, shape (3,)
+        Center point of the rectangle.
+
+    face_axes : array, shape (2, 3)
+        Each row is a vector of unit length, indicating the direction of one
+        axis of the rectangle. Both vectors are orthogonal.
+
+    face_lengths : array, shape (2,)
+        Lengths of the two sides of the rectangle.
+    """
+    other_indices = [0, 1, 2]
+    other_indices.remove(i)
+    face_center = box2origin[:3, 3] + sign * 0.5 * size[i] * box2origin[:3, i]
+    face_axes = np.array([box2origin[:3, j] for j in other_indices])
+    face_lengths = np.array([size[j] for j in other_indices])
+    return face_center, face_axes, face_lengths
+
+
 def convert_segment_to_line(segment_start, segment_end):
     """Convert line segment to line.
 

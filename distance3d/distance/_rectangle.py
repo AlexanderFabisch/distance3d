@@ -1,5 +1,6 @@
 import numpy as np
-from ..geometry import convert_rectangle_to_segment, convert_segment_to_line
+from ..geometry import (
+    convert_rectangle_to_segment, convert_segment_to_line)
 from ._line import _line_to_line_segment
 import pytransform3d.rotations as pr
 

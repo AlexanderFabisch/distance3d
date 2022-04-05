@@ -1,7 +1,10 @@
 import numpy as np
 import pytransform3d.transformations as pt
-from ..geometry import convert_segment_to_line
+from ..geometry import (
+    convert_segment_to_line, convert_rectangle_to_vertices,
+    convert_box_to_face)
 from ._line_to_box import _line_to_box
+from ._rectangle import rectangle_to_rectangle
 
 
 def point_to_box(point, box2origin, size, origin2box=None):
@@ -117,3 +120,84 @@ def line_segment_to_box(segment_start, segment_end, box2origin, size, origin2box
         contact_point_segment = segment_end
 
     return distance, contact_point_segment, contact_point_box
+
+
+def rectangle_to_box(rectangle_center, rectangle_axes, rectangle_lengths,
+                     box2origin, size, epsilon=1e-6, origin2box=None):
+    """Compute the shortest distance from rectangle to box.
+
+    Parameters
+    ----------
+    rectangle_center : array, shape (3,)
+        Center point of the rectangle.
+
+    rectangle_axes : array, shape (2, 3)
+        Each row is a vector of unit length, indicating the direction of one
+        axis of the rectangle. Both vectors are orthogonal.
+
+    rectangle_lengths : array, shape (2,)
+        Lengths of the two sides of the rectangle.
+
+    box2origin : array, shape (4, 4)
+        Pose of the box.
+
+    size : array, shape (3,)
+        Size of the box along its axes.
+
+    epsilon : float, optional (default: 1e-6)
+        Values smaller than epsilon are considered to be 0.
+
+    origin2box : array, shape (4, 4), optional (default: None)
+        Transform from origin to box coordinates.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between rectangle and box.
+
+    contact_point_rectangle : array, shape (3,)
+        Closest point on the rectangle.
+
+    contact_point_box : array, shape (3,)
+        Closest point on the box.
+    """
+    overlap, result = _rectangle_points_in_box(
+        rectangle_center, rectangle_axes, rectangle_lengths,
+        box2origin, size, epsilon=epsilon, origin2box=origin2box)
+    if overlap:
+        return result
+    return _rectangle_to_box_faces(
+        rectangle_center, rectangle_axes, rectangle_lengths, box2origin, size,
+        epsilon)
+
+
+def _rectangle_points_in_box(
+        rectangle_center, rectangle_axes, rectangle_lengths, box2origin, size,
+        epsilon=1e-6, origin2box=None):
+    rectangle_points = convert_rectangle_to_vertices(
+        rectangle_center, rectangle_axes, rectangle_lengths)
+    for i in range(len(rectangle_points)):
+        dist, contact_point_box = point_to_box(
+            rectangle_points[i], box2origin, size, origin2box=origin2box)
+        if dist <= epsilon:
+            return True, (dist, rectangle_points[i], contact_point_box)
+    return False, None
+
+
+def _rectangle_to_box_faces(rectangle_center, rectangle_axes, rectangle_lengths, box2origin, size, epsilon):
+    best_distance = np.finfo(float).max
+    for sign in [-1, 1]:
+        for i in range(3):
+            face_center, face_axes, face_lengths = convert_box_to_face(
+                box2origin, size, i, sign)
+            dist, contact_point_rectangle, contact_point_face = rectangle_to_rectangle(
+                rectangle_center, rectangle_axes, rectangle_lengths,
+                face_center, face_axes, face_lengths, epsilon)
+            if dist < best_distance:
+                best_distance = dist
+                best_contact_point_rectangle = contact_point_rectangle
+                best_contact_point_box = contact_point_face
+
+                if best_distance <= epsilon:
+                    break
+    return best_distance, best_contact_point_rectangle, best_contact_point_box
