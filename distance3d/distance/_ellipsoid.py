@@ -29,7 +29,7 @@ def point_to_ellipsoid(
     radii : array, shape (3,)
         Radii of the ellipsoid.
 
-    epsilon : float, optional (default: 1e-6)
+    epsilon : float, optional (default: 1e-16)
         Values smaller than epsilon are considered to be 0.
 
     max_iter : int, optional (default: 64)
@@ -63,22 +63,22 @@ def point_to_ellipsoid(
     for i in range(max_iter):
         pqr = t + radii2
         pqr2 = pqr ** 2
-        fS = (pqr2[0] * pqr2[1] * pqr2[2]
-              - radii2point2[0] * pqr2[1] * pqr2[2]
-              - radii2point2[1] * pqr2[0] * pqr2[2]
-              - radii2point2[2] * pqr2[0] * pqr2[1])
-        if abs(fS) < epsilon:
+        s = (pqr2[0] * pqr2[1] * pqr2[2]
+             - radii2point2[0] * pqr2[1] * pqr2[2]
+             - radii2point2[1] * pqr2[0] * pqr2[2]
+             - radii2point2[2] * pqr2[0] * pqr2[1])
+        if abs(s) < epsilon:
             break
 
-        fPQ = pqr[0] * pqr[1]
-        fPR = pqr[0] * pqr[2]
-        fQR = pqr[1] * pqr[2]
-        fPQR = pqr[0] * pqr[1] * pqr[2]
-        fDS = 2.0 * (fPQR * (fQR + fPR + fPQ)
-                     - radii2point2[0] * fQR * (pqr[1] + pqr[2])
-                     - radii2point2[1] * fPR * (pqr[0] + pqr[2])
-                     - radii2point2[2] * fPQ * (pqr[0] + pqr[1]))
-        t -= fS / fDS
+        pq = pqr[0] * pqr[1]
+        pr = pqr[0] * pqr[2]
+        qr = pqr[1] * pqr[2]
+        pqr_ = pqr[0] * pqr[1] * pqr[2]
+        ds = 2.0 * (pqr_ * (qr + pr + pq)
+                    - radii2point2[0] * qr * (pqr[1] + pqr[2])
+                    - radii2point2[1] * pr * (pqr[0] + pqr[2])
+                    - radii2point2[2] * pq * (pqr[0] + pqr[1]))
+        t -= s / ds
 
     contact_point_in_ellipsoid = radii2 * point_in_ellipsoid / pqr
     diff = contact_point_in_ellipsoid - point_in_ellipsoid
