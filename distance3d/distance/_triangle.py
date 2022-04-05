@@ -1,8 +1,9 @@
 import numpy as np
 import pytransform3d.rotations as pr
 from ..utils import norm_vector
-from ..geometry import convert_segment_to_line
+from ..geometry import convert_segment_to_line, convert_rectangle_to_segment
 from ._line import _line_to_line_segment
+from ._rectangle import line_segment_to_rectangle
 
 
 def point_to_triangle(point, triangle_points):
@@ -286,3 +287,65 @@ def triangle_to_triangle(triangle_points1, triangle_points2, epsilon=1e-6):
         i1 += 1
 
     return best_dist, best_contact_point_triangle1, best_contact_point_triangle2
+
+
+def triangle_to_rectangle(
+        triangle_points, rectangle_center, rectangle_axes, rectangle_lengths):
+    """Compute the shortest distance between triangle and rectangle.
+
+    Parameters
+    ----------
+    triangle_points : array, shape (3, 3)
+        Each row contains a point of the triangle.
+
+    rectangle_center : array, shape (3,)
+        Center point of the rectangle.
+
+    rectangle_axes : array, shape (2, 3)
+        Each row is a vector of unit length, indicating the direction of one
+        axis of the rectangle. Both vectors are orthogonal.
+
+    rectangle_lengths : array, shape (2,)
+        Lengths of the two sides of the rectangle.
+
+    Returns
+    -------
+    distance : float
+        Shortest distance.
+
+    contact_point_triangle : array, shape (3,)
+        Closest point on triangle.
+
+    contact_point_rectangle : array, shape (3,)
+        Closest point on rectangle.
+    """
+    # compare edges of triangle to the interior of rectangle
+    best_dist = np.finfo(float).max
+    i0 = 2
+    i1 = 0
+    while i1 < 3:
+        segment_start = triangle_points[i0]
+        segment_end = triangle_points[i1]
+        dist, contact_point_triangle, contact_point_rectangle = line_segment_to_rectangle(
+            segment_start, segment_end, rectangle_center, rectangle_axes, rectangle_lengths)
+        if dist < best_dist:
+            best_contact_point_triangle = contact_point_triangle
+            best_contact_point_rectangle = contact_point_rectangle
+            best_dist = dist
+        i0 = i1
+        i1 += 1
+
+    # compare edges of rectangle to the interior of triangle
+    rectangle_extents = 0.5 * rectangle_lengths[:, np.newaxis] * rectangle_axes
+    for i1 in range(2):
+        for i0 in range(2):
+            segment_end, segment_start = convert_rectangle_to_segment(
+                rectangle_center, rectangle_extents, i0, i1)
+            dist, contact_point_rectangle, contact_point_triangle = line_segment_to_triangle(
+                segment_start, segment_end, triangle_points)
+            if dist < best_dist:
+                best_contact_point_triangle = contact_point_triangle
+                best_contact_point_rectangle = contact_point_rectangle
+                best_dist = dist
+
+    return best_dist, best_contact_point_triangle, best_contact_point_rectangle
