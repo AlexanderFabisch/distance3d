@@ -8,9 +8,10 @@ from distance3d import random, colliders, gjk
 
 
 class AnimationCallback:
-    def __init__(self, with_aabb_tree=True, n_frames=100):
+    def __init__(self, with_aabb_tree=True, n_frames=100, verbose=0):
         self.with_aabb_tree = with_aabb_tree
         self.n_frames = n_frames
+        self.verbose = verbose
         self.total_time = 0.0
 
     def __call__(self, step, n_frames, tm, colls, boxes, joint_names):
@@ -37,7 +38,8 @@ class AnimationCallback:
                     in_contact[frame] |= dist < 1e-6
                 stop = time.time()
                 total_time += stop - start
-            print(f"With AABBTree: {total_time}")
+            if self.verbose:
+                print(f"With AABBTree: {total_time}")
         else:
             for frame, collider in colls.colliders.items():
                 start = time.time()
@@ -46,7 +48,8 @@ class AnimationCallback:
                     in_contact[frame] |= dist < 1e-6
                 stop = time.time()
                 total_time += stop - start
-            print(f"Without AABBTree: {total_time}")
+            if self.verbose:
+                print(f"Without AABBTree: {total_time}")
 
         self.total_time += total_time
 
@@ -110,7 +113,8 @@ for artist in colls.get_artists():
 fig.view_init()
 fig.set_zoom(1.5)
 n_frames = 100
-animation_callback = AnimationCallback(with_aabb_tree=True, n_frames=n_frames)
+animation_callback = AnimationCallback(
+    with_aabb_tree=True, n_frames=n_frames, verbose=0)
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
                 fargs=(n_frames, tm, colls, boxes, joint_names))
