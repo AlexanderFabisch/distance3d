@@ -9,7 +9,9 @@ from ._rectangle import line_segment_to_rectangle
 def point_to_triangle(point, triangle_points):
     """Compute the shortest distance between point and triangle.
 
-    Implementation according to Ericson: Real-Time Collision Detection (2005).
+    Implementation adapted from Real-Time Collision Detection by Christer
+    Ericson published by Morgan Kaufmann Publishers, Copyright 2005 Elsevier
+    Inc.
 
     Parameters
     ----------
@@ -87,7 +89,9 @@ def point_to_triangle(point, triangle_points):
 def line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6):
     """Compute the shortest distance between point and triangle.
 
-    Implementation according to Ericson: Real-Time Collision Detection (2005).
+    Implementation adapted from Real-Time Collision Detection by Christer
+    Ericson published by Morgan Kaufmann Publishers, Copyright 2005 Elsevier
+    Inc.
 
     Parameters
     ----------
@@ -179,7 +183,9 @@ def line_segment_to_triangle(
         segment_start, segment_end, triangle_points, epsilon=1e-6):
     """Compute the shortest distance from line segment to triangle.
 
-    Implementation according to Ericson: Real-Time Collision Detection (2005).
+    Implementation adapted from Real-Time Collision Detection by Christer
+    Ericson published by Morgan Kaufmann Publishers, Copyright 2005 Elsevier
+    Inc.
 
     Parameters
     ----------
