@@ -180,3 +180,32 @@ def plot_aabb(ax, mins, maxs, alpha=1.0, color="r"):
     box2origin[:3, 3] = 0.5 * (mins + maxs)
     size = maxs - mins
     ppu.plot_box(ax=ax, A2B=box2origin, size=size, wireframe=True, alpha=alpha, color=color)
+
+
+def plot_convex(ax, vertices, faces, alpha=0.5, color="b"):
+    """Plot convex mesh.
+
+    Parameters
+    ----------
+    ax : Matplotlib 3d axis
+        A matplotlib 3d axis.
+
+    vertices : array, shape (n_convex_points, 3)
+        Vertices of the convex mesh.
+
+    faces : array, shape (n_triangles, 3, 3)
+        Vertices organized as triangles.
+
+    alpha : float, optional (default: 0.5)
+        Alpha value of faces.
+
+    color : str
+        Color of faces.
+    """
+    ax.scatter(vertices[:, 0], vertices[:, 1], vertices[:, 2], color="red")
+    surface = mplot3d.art3d.Poly3DCollection(faces)
+    surface.set_facecolor(color)
+    surface.set_alpha(alpha)
+    ax.add_collection3d(surface)
+    wireframe = mplot3d.art3d.Line3DCollection(faces)
+    ax.add_collection3d(wireframe)

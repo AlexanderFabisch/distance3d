@@ -1,6 +1,7 @@
 import numpy as np
 import pytransform3d.rotations as pr
 import pytransform3d.transformations as pt
+from scipy.spatial import ConvexHull
 from .utils import norm_vector
 
 
@@ -257,3 +258,45 @@ def rand_sphere(random_state, center_scale=1.0, radius_scale=1.0):
     center = random_state.randn(3) * center_scale
     radius = random_state.rand() * radius_scale
     return center, radius
+
+
+def randn_convex(random_state, n_points=10, center_scale=1.0, std=1.0, return_indices=False):
+    """Sample convex mesh.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    n_points : int
+        Number of points to sample from normal distribution.
+
+    center_scale : float, optional (default: 1)
+        Scaling factor for center.
+
+    std : float, optional (default: 1)
+        Standard deviation of normal distribution.
+
+    return_indices : bool, optional (default: False)
+        Return indices of vertices in faces.
+
+    Returns
+    -------
+    vertices : array, shape (n_convex_points, 3)
+        Vertices of the convex mesh.
+
+    faces : array, shape (n_triangles, 3, 3)
+        Vertices organized as triangles.
+
+    indices : array, shape (n_triangles, 3)
+        Indices of points forming the simplical facets of the convex hull.
+    """
+    points = random_state.randn(n_points, 3) * std
+    points += random_state.randn(1, 3) * center_scale
+    ch = ConvexHull(points)
+    vertices = points[ch.vertices]
+    faces = np.array([points[[i, j, k]] for i, j, k in ch.simplices])
+    ret = [vertices, faces]
+    if return_indices:
+        ret.extend([ch.points, ch.simplices])
+    return ret
