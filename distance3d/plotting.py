@@ -209,3 +209,28 @@ def plot_convex(ax, vertices, faces, alpha=0.5, color="b"):
     ax.add_collection3d(surface)
     wireframe = mplot3d.art3d.Line3DCollection(faces)
     ax.add_collection3d(wireframe)
+
+
+def plot_tetrahedron(ax, vertices, show_triangles=False):
+    """Plot tetrahedron.
+
+    Parameters
+    ----------
+    ax : Matplotlib 3d axis
+        A matplotlib 3d axis.
+
+    vertices : array, shape (4, 3)
+        Vertices of the tetrahedron.
+    """
+    line = np.array([
+        vertices[0], vertices[1], vertices[2], vertices[0],
+        vertices[0], vertices[1], vertices[3], vertices[0],
+        vertices[0], vertices[2], vertices[3], vertices[0],
+        vertices[1], vertices[2], vertices[3], vertices[1],
+    ])
+    ax.plot(line[:, 0], line[:, 1], line[:, 2])
+    if show_triangles:
+        for triangle_index in range(0, len(line), 4):
+            for vertex_index, c in zip(range(3), "rgb"):
+                s = slice(triangle_index + vertex_index, triangle_index + vertex_index + 2)
+                ax.plot(line[s][:, 0], line[s][:, 1], line[s][:, 2], c=c)
