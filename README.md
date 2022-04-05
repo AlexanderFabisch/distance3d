@@ -20,7 +20,7 @@ Run unit tests with
 
 You will find the coverage report in `htmlcov/index.html`.
 
-## Literature and Original Implementations
+## Licenses
 
 These implementations are mostly based on
 
@@ -40,3 +40,6 @@ marked as such in the source code.
 The EPA algorithm is adapted from
 [Kevin Moran's GJK implementation](https://github.com/kevinmoran/GJK)
 (MIT License or Unlicense).
+
+The translation to Python has been done by Alexander Fabisch and the glue
+code around it is licensed under the 3-clause BSD license.
