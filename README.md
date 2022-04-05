@@ -20,12 +20,16 @@ Run unit tests with
 
 You will find the coverage report in `htmlcov/index.html`.
 
-## Literature
+## Literature and Original Implementations
 
 These implementations are mostly based on
 
 * Christer Ericson: Real-Time Collision Detection, CRC Press, 2004.
 * David H. Eberly: 3D Game Engine Design, CRC Press, 2006.
+
+The GJK algorithm is a translation to Python of the translation to C of the
+original Fortran implementation. The C implementation is from Diego Ruspini.
+It is available from http://realtimecollisiondetection.net/files/gilbert.c
 
 Some features related to the GJK algorithm have been inspired by
 [Bullet](https://github.com/bulletphysics/bullet3/) (zlib license) and are
