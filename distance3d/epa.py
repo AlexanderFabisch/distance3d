@@ -47,7 +47,7 @@ def epa(simplex, collider1, collider2, max_iter=64, max_loose_edges=32, max_face
 
     Parameters
     ----------
-    simplex : array-like, shape (4, 3)
+    simplex : array, shape (4, 3)
         Simplex of Minkowski distances obtained by GJK.
 
     collider1 : Collider
@@ -119,19 +119,13 @@ def _simplex_to_faces(simplex, faces):
     faces[0, :3] = simplex[:3]
     faces[0, 3] = norm_vector(np.cross(simplex[1] - simplex[0], simplex[2] - simplex[0]))
     # ACD
-    faces[1, 0] = simplex[0]
-    faces[1, 1] = simplex[2]
-    faces[1, 2] = simplex[3]
+    faces[1, :3] = simplex[np.array((0, 2, 3), dtype=int)]
     faces[1, 3] = norm_vector(np.cross(simplex[2] - simplex[0], simplex[3] - simplex[0]))
     # ADB
-    faces[2, 0] = simplex[0]
-    faces[2, 1] = simplex[3]
-    faces[2, 2] = simplex[1]
+    faces[2, :3] = simplex[np.array((0, 3, 1), dtype=int)]
     faces[2, 3] = norm_vector(np.cross(simplex[3] - simplex[0], simplex[1] - simplex[0]))
     # BDC
-    faces[3, 0] = simplex[1]
-    faces[3, 1] = simplex[3]
-    faces[3, 2] = simplex[2]
+    faces[3, :3] = simplex[np.array((1, 3, 2), dtype=int)]
     faces[3, 3] = norm_vector(np.cross(simplex[3] - simplex[1], simplex[2] - simplex[1]))
     return 4
 
