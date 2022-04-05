@@ -29,25 +29,38 @@ def point_to_rectangle(point, rectangle_center, rectangle_axes,
     dist : float
         The shortest distance between the point and the rectangle.
 
-    contact_point_rectangle : array, shape (3,)
+    closest_point_rectangle : array, shape (3,)
         Closest point on the rectangle.
     """
-    diff = rectangle_center - point
-    rectangle_coordinates = -rectangle_axes.dot(diff)
+    rectangle_coordinates = rectangle_axes.dot(point - rectangle_center)
 
     rectangle_half_lengths = 0.5 * rectangle_lengths
     rectangle_coordinates = np.clip(
         rectangle_coordinates, -rectangle_half_lengths, rectangle_half_lengths)
 
-    contact_point = rectangle_center + rectangle_coordinates.dot(rectangle_axes)
+    closest_point_rectangle = (
+        rectangle_center + rectangle_coordinates.dot(rectangle_axes))
 
-    return np.linalg.norm(point - contact_point), contact_point
+    return (np.linalg.norm(point - closest_point_rectangle),
+            closest_point_rectangle)
 
 
 def line_to_rectangle(
         line_point, line_direction,
         rectangle_center, rectangle_axes, rectangle_lengths, epsilon=1e-6):
     """Compute the shortest distance between line and rectangle.
+
+    Implementation adapted from 3D Game Engine Design by David H. Eberly.
+
+    Geometric Tools, Inc.
+    http://www.geometrictools.com
+    Copyright (c) 1998-2006.  All Rights Reserved
+
+    The Wild Magic Version 4 Foundation Library source code is supplied
+    under the terms of the license agreement
+        http://www.geometrictools.com/License/Wm4FoundationLicense.pdf
+    and may not be copied or disclosed except in accordance with the terms
+    of that agreement.
 
     Parameters
     ----------
@@ -186,35 +199,48 @@ def line_segment_to_rectangle(
     dist : float
         The shortest distance between line segment and rectangle.
 
-    contact_point_line_segment : array, shape (3,)
+    closest_point_line_segment : array, shape (3,)
         Closest point on the line segment.
 
-    contact_point_rectangle : array, shape (3,)
+    closest_point_rectangle : array, shape (3,)
         Closest point on the rectangle.
     """
     segment_direction, segment_length = convert_segment_to_line(
         segment_start, segment_end)
 
-    distance, contact_point_segment, contact_point_rectangle, t_closest = _line_to_rectangle(
-        segment_start, segment_direction,
-        rectangle_center, rectangle_axes, rectangle_lengths, epsilon)
+    distance, closest_point_line_segment, closest_point_rectangle, t = \
+        _line_to_rectangle(
+            segment_start, segment_direction,
+            rectangle_center, rectangle_axes, rectangle_lengths, epsilon)
 
-    if t_closest < 0:
-        distance, contact_point_rectangle = point_to_rectangle(
+    if t < 0:
+        distance, closest_point_rectangle = point_to_rectangle(
             segment_start, rectangle_center, rectangle_axes, rectangle_lengths)
-        contact_point_segment = segment_start
-    elif t_closest > segment_length:
-        distance, contact_point_rectangle = point_to_rectangle(
+        closest_point_line_segment = segment_start
+    elif t > segment_length:
+        distance, closest_point_rectangle = point_to_rectangle(
             segment_end, rectangle_center, rectangle_axes, rectangle_lengths)
-        contact_point_segment = segment_end
+        closest_point_line_segment = segment_end
 
-    return distance, contact_point_segment, contact_point_rectangle
+    return distance, closest_point_line_segment, closest_point_rectangle
 
 
 def rectangle_to_rectangle(
         rectangle_center1, rectangle_axes1, rectangle_lengths1,
         rectangle_center2, rectangle_axes2, rectangle_lengths2, epsilon=1e-6):
     """Compute the shortest distance between two rectangles.
+
+    Implementation adapted from 3D Game Engine Design by David H. Eberly.
+
+    Geometric Tools, Inc.
+    http://www.geometrictools.com
+    Copyright (c) 1998-2006.  All Rights Reserved
+
+    The Wild Magic Version 4 Foundation Library source code is supplied
+    under the terms of the license agreement
+        http://www.geometrictools.com/License/Wm4FoundationLicense.pdf
+    and may not be copied or disclosed except in accordance with the terms
+    of that agreement.
 
     Parameters
     ----------
@@ -246,10 +272,10 @@ def rectangle_to_rectangle(
     dist : float
         The shortest distance between two rectangles.
 
-    contact_point_line_segment : array, shape (3,)
+    closest_point_line_segment : array, shape (3,)
         Closest point on the line segment.
 
-    contact_point_rectangle : array, shape (3,)
+    closest_point_rectangle : array, shape (3,)
         Closest point on the rectangle.
     """
     # compare edges of rectangle0 to the interior of rectangle1
