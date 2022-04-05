@@ -151,13 +151,16 @@ def convert_box_to_vertices(box2origin, size):
     return box_points
 
 
-def cylinder_extreme_along_direction(search_direction, cylinder2origin, radius, length):
+def cylinder_extreme_along_direction(
+        search_direction, cylinder2origin, radius, length):
     """Compute extreme point of cylinder along a direction.
 
     You can find similar implementations here:
 
     * https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L42
+      (Copyright (c) 2017 Kevin Moran, MIT License or Unlicense)
     * https://github.com/bulletphysics/bullet3/blob/e306b274f1885f32b7e9d65062aa942b398805c2/src/BulletCollision/CollisionShapes/btConvexShape.cpp#L167
+      (Copyright (c) 2003-2009 Erwin Coumans, zlib license)
 
     Parameters
     ----------
@@ -193,13 +196,16 @@ def cylinder_extreme_along_direction(search_direction, cylinder2origin, radius, 
     return np.dot(cylinder2origin[:3, :3], local_vertex) + cylinder2origin[:3, 3]
 
 
-def capsule_extreme_along_direction(search_direction, capsule2origin, radius, height):
+def capsule_extreme_along_direction(
+        search_direction, capsule2origin, radius, height):
     """Compute extreme point of cylinder along a direction.
 
     You can find similar implementations here:
 
     * https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L42/kevinmoran/GJK/blob/master/Collider.h#L42
+      (Copyright (c) 2017 Kevin Moran, MIT License or Unlicense)
     * https://github.com/bulletphysics/bullet3/blob/e306b274f1885f32b7e9d65062aa942b398805c2/src/BulletCollision/CollisionShapes/btConvexShape.cpp#L228
+      (Copyright (c) 2003-2009 Erwin Coumans, zlib license)
 
     Parameters
     ----------

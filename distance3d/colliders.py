@@ -444,7 +444,8 @@ class Sphere(ConvexCollider):
 
     def support_function(self, search_direction):
         # Similar implementation:
-        # https://github.com/kevinmoran/GJK/blob/master/Collider.h#L33
+        # https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L33
+        # (Copyright (c) 2017 Kevin Moran, MIT License or Unlicense)
         s_norm = np.linalg.norm(search_direction)
         if s_norm == 0.0:
             vertex = self.c + np.array([0, 0, self.radius])

@@ -10,7 +10,6 @@ def epa_vertices(simplex, vertices1, vertices2, epsilon=1e-8):
     """Expanding Polytope Algorithm (EPA).
 
     Find minimum translation vector to resolve collision.
-    Based on https://github.com/kevinmoran/GJK/blob/master/GJK.h
 
     Parameters
     ----------
@@ -41,7 +40,10 @@ def epa(simplex, collider1, collider2, max_iter=64, max_loose_edges=32, max_face
     """Expanding Polytope Algorithm (EPA).
 
     Find minimum translation vector to resolve collision.
-    Based on https://github.com/kevinmoran/GJK/blob/master/GJK.h
+
+    Based on Kevin Moran's implementation:
+        https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/GJK.h
+    (MIT License or Unlicense)
 
     Parameters
     ----------
