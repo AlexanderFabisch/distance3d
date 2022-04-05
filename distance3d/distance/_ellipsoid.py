@@ -6,6 +6,18 @@ def point_to_ellipsoid(
         point, ellipsoid2origin, radii, epsilon=1e-16, max_iter=64):
     """Compute the shortest distance between point and ellipsoid.
 
+    Implementation adapted from 3D Game Engine Design by David H. Eberly.
+
+    Geometric Tools, Inc.
+    http://www.geometrictools.com
+    Copyright (c) 1998-2006.  All Rights Reserved
+
+    The Wild Magic Version 4 Foundation Library source code is supplied
+    under the terms of the license agreement
+        http://www.geometrictools.com/License/Wm4FoundationLicense.pdf
+    and may not be copied or disclosed except in accordance with the terms
+    of that agreement.
+
     Parameters
     ----------
     point : array, shape (3,)
@@ -28,7 +40,7 @@ def point_to_ellipsoid(
     dist : float
         Shortest distance.
 
-    contact_point_ellipsoid : array, shape (3,)
+    closest_point_ellipsoid : array, shape (3,)
         Closest point on ellipsoid.
     """
     # compute coordinates of point in ellipsoid coordinate system
@@ -51,7 +63,10 @@ def point_to_ellipsoid(
     for i in range(max_iter):
         pqr = t + radii2
         pqr2 = pqr ** 2
-        fS = pqr2[0] * pqr2[1] * pqr2[2] - radii2point2[0] * pqr2[1] * pqr2[2] - radii2point2[1] * pqr2[0] * pqr2[2] - radii2point2[2] * pqr2[0] * pqr2[1]
+        fS = (pqr2[0] * pqr2[1] * pqr2[2]
+              - radii2point2[0] * pqr2[1] * pqr2[2]
+              - radii2point2[1] * pqr2[0] * pqr2[2]
+              - radii2point2[2] * pqr2[0] * pqr2[1])
         if abs(fS) < epsilon:
             break
 
@@ -59,12 +74,16 @@ def point_to_ellipsoid(
         fPR = pqr[0] * pqr[2]
         fQR = pqr[1] * pqr[2]
         fPQR = pqr[0] * pqr[1] * pqr[2]
-        fDS = 2.0 * (fPQR * (fQR + fPR + fPQ) - radii2point2[0] * fQR * (pqr[1] + pqr[2]) - radii2point2[1] * fPR * (pqr[0] + pqr[2]) - radii2point2[2] * fPQ * (pqr[0] + pqr[1]))
+        fDS = 2.0 * (fPQR * (fQR + fPR + fPQ)
+                     - radii2point2[0] * fQR * (pqr[1] + pqr[2])
+                     - radii2point2[1] * fPR * (pqr[0] + pqr[2])
+                     - radii2point2[2] * fPQ * (pqr[0] + pqr[1]))
         t -= fS / fDS
 
     contact_point_in_ellipsoid = radii2 * point_in_ellipsoid / pqr
     diff = contact_point_in_ellipsoid - point_in_ellipsoid
 
-    contact_point = pt.transform(ellipsoid2origin, pt.vector_to_point(contact_point_in_ellipsoid))[:3]
+    closest_point_ellipsoid = pt.transform(
+        ellipsoid2origin, pt.vector_to_point(contact_point_in_ellipsoid))[:3]
 
-    return np.linalg.norm(diff), contact_point
+    return np.linalg.norm(diff), closest_point_ellipsoid
