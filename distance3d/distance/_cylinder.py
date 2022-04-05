@@ -24,7 +24,7 @@ def point_to_cylinder(point, cylinder2origin, radius, length):
     distance : float
         The shortest distance between point and triangle.
 
-    contact_point : array, shape (3,)
+    closest_point_cylinder : array, shape (3,)
         Closest point on cylinder.
     """
     # signed distance from point to plane of disk
@@ -35,11 +35,10 @@ def point_to_cylinder(point, cylinder2origin, radius, length):
     diff_in_plane = diff - dist_to_plane * cylinder2origin[:3, 2]
     sqr_len = diff_in_plane.dot(diff_in_plane)
 
-    contact_point = (
+    closest_point_cylinder = (
         cylinder2origin[:3, 3]
         + min(1.0, (radius / math.sqrt(sqr_len))) * diff_in_plane
         + np.clip(dist_to_plane, -0.5 * length, 0.5 * length) * cylinder2origin[:3, 2])
-    contact_point_to_point = point - contact_point
-    sqr_dist = contact_point_to_point.dot(contact_point_to_point)
 
-    return math.sqrt(sqr_dist), contact_point
+    return (np.linalg.norm(point - closest_point_cylinder),
+            closest_point_cylinder)
