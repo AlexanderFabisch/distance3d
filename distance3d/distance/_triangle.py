@@ -233,6 +233,18 @@ def line_segment_to_triangle(
 def triangle_to_triangle(triangle_points1, triangle_points2, epsilon=1e-6):
     """Compute the shortest distance between two triangles.
 
+    Implementation adapted from 3D Game Engine Design by David H. Eberly.
+
+    Geometric Tools, Inc.
+    http://www.geometrictools.com
+    Copyright (c) 1998-2006.  All Rights Reserved
+
+    The Wild Magic Version 4 Foundation Library source code is supplied
+    under the terms of the license agreement
+        http://www.geometrictools.com/License/Wm4FoundationLicense.pdf
+    and may not be copied or disclosed except in accordance with the terms
+    of that agreement.
+
     Parameters
     ----------
     triangle_points1 : array, shape (3, 3)

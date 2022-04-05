@@ -155,10 +155,10 @@ def rectangle_to_box(rectangle_center, rectangle_axes, rectangle_lengths,
     dist : float
         The shortest distance between rectangle and box.
 
-    contact_point_rectangle : array, shape (3,)
+    closest_point_rectangle : array, shape (3,)
         Closest point on the rectangle.
 
-    contact_point_box : array, shape (3,)
+    closest_point_box : array, shape (3,)
         Closest point on the box.
     """
     overlap, result = _rectangle_points_in_box(
@@ -184,20 +184,22 @@ def _rectangle_points_in_box(
     return False, None
 
 
-def _rectangle_to_box_faces(rectangle_center, rectangle_axes, rectangle_lengths, box2origin, size, epsilon):
+def _rectangle_to_box_faces(
+        rectangle_center, rectangle_axes, rectangle_lengths, box2origin, size,
+        epsilon):
     best_distance = np.finfo(float).max
     for sign in [-1, 1]:
         for i in range(3):
             face_center, face_axes, face_lengths = convert_box_to_face(
                 box2origin, size, i, sign)
-            dist, contact_point_rectangle, contact_point_face = rectangle_to_rectangle(
+            dist, closest_point_rectangle, closest_point_face = rectangle_to_rectangle(
                 rectangle_center, rectangle_axes, rectangle_lengths,
                 face_center, face_axes, face_lengths, epsilon)
             if dist < best_distance:
                 best_distance = dist
-                best_contact_point_rectangle = contact_point_rectangle
-                best_contact_point_box = contact_point_face
+                best_closest_point_rectangle = closest_point_rectangle
+                best_closest_point_box = closest_point_face
 
                 if best_distance <= epsilon:
                     break
-    return best_distance, best_contact_point_rectangle, best_contact_point_box
+    return best_distance, best_closest_point_rectangle, best_closest_point_box
