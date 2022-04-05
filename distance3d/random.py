@@ -78,7 +78,7 @@ def randn_line_segment(random_state):
     return randn_point(random_state), randn_point(random_state)
 
 
-def randn_rectangle(random_state, scale_center=1.0, length_scale=1.0):
+def randn_rectangle(random_state, center_scale=1.0, length_scale=1.0):
     """Sample rectangle.
 
     Parameters
@@ -86,7 +86,7 @@ def randn_rectangle(random_state, scale_center=1.0, length_scale=1.0):
     random_state : np.random.RandomState
         Random number generator.
 
-    scale_center : float, optional (default: 1)
+    center_scale : float, optional (default: 1)
         Scale the center point by this factor.
 
     length_scale : float, optional (default: 1)
@@ -96,7 +96,7 @@ def randn_rectangle(random_state, scale_center=1.0, length_scale=1.0):
     -------
     rectangle_center : array, shape (3,)
         Center point of the rectangle sampled from a normal distribution with
-        standard deviation 'scale_center'.
+        standard deviation 'center_scale'.
 
     rectangle_axes : array, shape (2, 3)
         Each row is a vector of unit length, indicating the direction of one
@@ -108,7 +108,7 @@ def randn_rectangle(random_state, scale_center=1.0, length_scale=1.0):
         Lengths of the two sides of the rectangle sampled from a uniform
         distribution on the interval [0, length_scale).
     """
-    rectangle_center = scale_center * randn_point(random_state)
+    rectangle_center = center_scale * randn_point(random_state)
     rectangle_axis1 = randn_direction(random_state)
     rectangle_axis2 = norm_vector(pr.perpendicular_to_vector(rectangle_axis1))
     rectangle_lengths = random_state.rand(2) * length_scale

@@ -9,7 +9,7 @@ from distance3d import plotting
 
 random_state = np.random.RandomState(6)
 rectangle_center, rectangle_axes, rectangle_lengths = random.randn_rectangle(
-    random_state, scale_center=0.3, length_scale=2.0)
+    random_state, center_scale=0.3, length_scale=2.0)
 
 ax = ppu.make_3d_axis(ax_s=2)
 
