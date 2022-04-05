@@ -221,6 +221,9 @@ def plot_tetrahedron(ax, vertices, show_triangles=False):
 
     vertices : array, shape (4, 3)
         Vertices of the tetrahedron.
+
+    show_triangles : bool, optional (default: False)
+        Show edges of triangles in different color.
     """
     line = np.array([
         vertices[0], vertices[1], vertices[2], vertices[0],
