@@ -1,6 +1,6 @@
 import numpy as np
 import pytransform3d.rotations as pr
-from ..utils import norm_vector
+from ..utils import norm_vector, MAX_FLOAT
 from ..geometry import convert_segment_to_line, convert_rectangle_to_segment
 from ._line import _line_to_line_segment
 from ._rectangle import line_segment_to_rectangle
@@ -160,7 +160,7 @@ def _line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6)
     # triangle or (2) the line and triangle are parallel. Regardless, the
     # closest point on the triangle is on an edge of the triangle. Compare
     # the line to all three edges of the triangle.
-    best_distance = np.finfo(float).max
+    best_distance = MAX_FLOAT
     i0 = 2
     i1 = 0
     while i1 < 3:
@@ -268,7 +268,7 @@ def triangle_to_triangle(triangle_points1, triangle_points2, epsilon=1e-6):
         Closest point on triangle 2.
     """
     # compare edges of triangle1 to the interior of triangle2
-    best_dist = np.finfo(float).max
+    best_dist = MAX_FLOAT
     i0 = 2
     i1 = 0
     while i1 < 3:
@@ -338,7 +338,7 @@ def triangle_to_rectangle(
         Closest point on rectangle.
     """
     # compare edges of triangle to the interior of rectangle
-    best_dist = np.finfo(float).max
+    best_dist = MAX_FLOAT
     i0 = 2
     i1 = 0
     while i1 < 3:

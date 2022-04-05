@@ -1,6 +1,9 @@
 import numpy as np
 
 
+MAX_FLOAT = np.finfo(float).max
+
+
 def norm_vector(v):
     """Normalize vector.
 
