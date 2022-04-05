@@ -90,7 +90,7 @@ random_state = np.random.RandomState(5)
 fig = pv.figure()
 
 boxes = []
-for _ in range(15):
+for _ in range(100):
     box2origin, size = random.rand_box(
         random_state, center_scale=0.3, size_scale=0.3)
     box2origin[:3, 3] += 0.2
