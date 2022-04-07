@@ -1,3 +1,4 @@
+"""Distance calculation of specific geometric shapes."""
 from ._line import (
     point_to_line, line_to_line, point_to_line_segment, line_to_line_segment,
     line_segment_to_line_segment, _line_to_line_segment)
