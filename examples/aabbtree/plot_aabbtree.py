@@ -1,3 +1,4 @@
+"""Plot AABB Tree."""
 from collections import deque
 import numpy as np
 import pytransform3d.plot_utils as ppu

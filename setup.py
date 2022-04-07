@@ -26,5 +26,6 @@ if __name__ == "__main__":
           install_requires=["numpy", "scipy", "matplotlib", "pytransform3d",
                             "open3d", "aabbtree"],
           extras_require={
-              "test": ["pytest", "pytest-cov"]
+              "test": ["pytest", "pytest-cov"],
+              "doc": ["sphinx", "sphinx-gallery", "numpydoc"],
           })

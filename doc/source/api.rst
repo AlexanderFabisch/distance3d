@@ -1,0 +1,211 @@
+=============
+API Reference
+=============
+
+:mod:`distance3d`
+==========================
+
+.. automodule:: distance3d
+    :no-members:
+    :no-inherited-members:
+
+:mod:`distance3d.distance`
+--------------------------
+
+.. automodule:: distance3d.distance
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.distance
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.distance.point_to_line
+   ~distance3d.distance.point_to_line_segment
+   ~distance3d.distance.point_to_plane
+   ~distance3d.distance.point_to_triangle
+   ~distance3d.distance.point_to_rectangle
+   ~distance3d.distance.point_to_box
+   ~distance3d.distance.point_to_cylinder
+   ~distance3d.distance.point_to_ellipsoid
+   ~distance3d.distance.point_to_circle
+   ~distance3d.distance.point_to_disk
+   ~distance3d.distance.line_to_line
+   ~distance3d.distance.line_to_line_segment
+   ~distance3d.distance.line_to_triangle
+   ~distance3d.distance.line_to_rectangle
+   ~distance3d.distance.line_to_box
+   ~distance3d.distance.line_segment_to_line_segment
+   ~distance3d.distance.line_segment_to_triangle
+   ~distance3d.distance.line_segment_to_rectangle
+   ~distance3d.distance.line_segment_to_box
+   ~distance3d.distance.triangle_to_triangle
+   ~distance3d.distance.triangle_to_rectangle
+   ~distance3d.distance.rectangle_to_rectangle
+   ~distance3d.distance.rectangle_to_box
+
+
+:mod:`distance3d.colliders`
+---------------------------
+
+.. automodule:: distance3d.colliders
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.colliders
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.colliders.ColliderTree
+   ~distance3d.colliders.ConvexCollider
+   ~distance3d.colliders.Convex
+   ~distance3d.colliders.Box
+   ~distance3d.colliders.Mesh
+   ~distance3d.colliders.Cylinder
+   ~distance3d.colliders.Capsule
+   ~distance3d.colliders.Sphere
+
+
+:mod:`distance3d.containment`
+-----------------------------
+
+.. automodule:: distance3d.containment
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.containment
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.containment.axis_aligned_bounding_box
+   ~distance3d.containment.sphere_aabb
+   ~distance3d.containment.box_aabb
+   ~distance3d.containment.cylinder_aabb
+   ~distance3d.containment.capsule_aabb
+
+
+:mod:`distance3d.epa`
+---------------------
+
+.. automodule:: distance3d.epa
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.epa
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.epa.epa_vertices
+   ~distance3d.epa.epa
+
+
+:mod:`distance3d.gjk`
+---------------------
+
+.. automodule:: distance3d.gjk
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.gjk
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.gjk.gjk
+   ~distance3d.gjk.gjk_with_simplex
+
+
+:mod:`distance3d.geometry`
+--------------------------
+
+.. automodule:: distance3d.geometry
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.geometry
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.geometry.convert_rectangle_to_segment
+   ~distance3d.geometry.convert_rectangle_to_vertices
+   ~distance3d.geometry.convert_box_to_face
+   ~distance3d.geometry.convert_segment_to_line
+   ~distance3d.geometry.convert_box_to_vertices
+   ~distance3d.geometry.cylinder_extreme_along_direction
+   ~distance3d.geometry.capsule_extreme_along_direction
+
+
+:mod:`distance3d.plotting`
+--------------------------
+
+.. automodule:: distance3d.plotting
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.plotting
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.plotting.plot_line
+   ~distance3d.plotting.plot_segment
+   ~distance3d.plotting.plot_triangle
+   ~distance3d.plotting.plot_rectangle
+   ~distance3d.plotting.plot_circle
+   ~distance3d.plotting.plot_aabb
+   ~distance3d.plotting.plot_convex
+   ~distance3d.plotting.plot_tetrahedron
+
+
+:mod:`distance3d.random`
+------------------------
+
+.. automodule:: distance3d.random
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.random
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.random.randn_point
+   ~distance3d.random.randn_direction
+   ~distance3d.random.randn_line
+   ~distance3d.random.randn_line_segment
+   ~distance3d.random.randn_rectangle
+   ~distance3d.random.randn_triangle
+   ~distance3d.random.rand_box
+   ~distance3d.random.rand_capsule
+   ~distance3d.random.rand_cylinder
+   ~distance3d.random.rand_sphere
+   ~distance3d.random.randn_convex
+
+
+:mod:`distance3d.utils`
+-----------------------
+
+.. automodule:: distance3d.utils
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.utils
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.utils.norm_vector
