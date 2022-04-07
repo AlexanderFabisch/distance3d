@@ -15,6 +15,7 @@ import sys
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath(".."))
 import distance3d
+from sphinx_gallery.sorting import ExplicitOrder
 
 
 # -- Project information -----------------------------------------------------
@@ -43,6 +44,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "matplotlib.sphinxext.plot_directive",
     "numpydoc",
+    "sphinx_gallery.gen_gallery",
 ]
 
 autodoc_default_options = {"member-order": "bysource"}
@@ -71,3 +73,19 @@ html_theme = "alabaster"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+
+sphinx_gallery_conf = {
+    "examples_dirs": "../../examples",
+    "gallery_dirs": "_auto_examples",
+    "subsection_order": ExplicitOrder([
+        "../../examples/aabbtree",
+        "../../examples/distance",
+        "../../examples/gjk",
+        "../../examples/visualizations"]),
+    "reference_url": {"distance3d": None},
+    "filename_pattern": "/(?:plot|animate)_",
+    "image_scrapers": ("matplotlib",),
+    "backreferences_dir": "_auto_examples/backreferences",
+    "doc_module": "distance3d",
+}

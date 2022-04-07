@@ -27,5 +27,5 @@ if __name__ == "__main__":
                             "open3d", "aabbtree"],
           extras_require={
               "test": ["pytest", "pytest-cov"],
-              "doc": ["sphinx", "numpydoc"],
+              "doc": ["sphinx", "sphinx-gallery", "numpydoc"],
           })

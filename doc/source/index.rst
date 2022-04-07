@@ -7,10 +7,11 @@ Welcome to distance3d's documentation!
 ======================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    api
+   _auto_examples/index
 
 
 Indices and tables

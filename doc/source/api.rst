@@ -2,8 +2,15 @@
 API Reference
 =============
 
-:mod:`distance3d.distance`
+:mod:`distance3d`
 ==========================
+
+.. automodule:: distance3d
+    :no-members:
+    :no-inherited-members:
+
+:mod:`distance3d.distance`
+--------------------------
 
 .. automodule:: distance3d.distance
     :no-members:
@@ -41,7 +48,7 @@ API Reference
 
 
 :mod:`distance3d.colliders`
-===========================
+---------------------------
 
 .. automodule:: distance3d.colliders
     :no-members:
@@ -64,7 +71,7 @@ API Reference
 
 
 :mod:`distance3d.containment`
-=============================
+-----------------------------
 
 .. automodule:: distance3d.containment
     :no-members:
@@ -84,7 +91,7 @@ API Reference
 
 
 :mod:`distance3d.epa`
-=====================
+---------------------
 
 .. automodule:: distance3d.epa
     :no-members:
@@ -101,7 +108,7 @@ API Reference
 
 
 :mod:`distance3d.gjk`
-=====================
+---------------------
 
 .. automodule:: distance3d.gjk
     :no-members:
@@ -118,7 +125,7 @@ API Reference
 
 
 :mod:`distance3d.geometry`
-==========================
+--------------------------
 
 .. automodule:: distance3d.geometry
     :no-members:
@@ -140,7 +147,7 @@ API Reference
 
 
 :mod:`distance3d.plotting`
-==========================
+--------------------------
 
 .. automodule:: distance3d.plotting
     :no-members:
@@ -163,7 +170,7 @@ API Reference
 
 
 :mod:`distance3d.random`
-========================
+------------------------
 
 .. automodule:: distance3d.random
     :no-members:
@@ -189,7 +196,7 @@ API Reference
 
 
 :mod:`distance3d.utils`
-=======================
+-----------------------
 
 .. automodule:: distance3d.utils
     :no-members:
