@@ -281,8 +281,8 @@ class Box(Convex):
         self.box2origin = box2origin
         self.size = size
 
-    def make_artist(self):
-        self.artist_ = pv.Box(size=self.size, A2B=self.box2origin)
+    def make_artist(self, c=None):
+        self.artist_ = pv.Box(size=self.size, A2B=self.box2origin, c=c)
 
     def update_pose(self, pose):
         self.box2origin = pose
