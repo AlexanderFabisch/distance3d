@@ -45,22 +45,17 @@ class ColliderTree:
             A2B = tm.get_transform(obj.frame, self.base_frame)
             try:
                 if isinstance(obj, urdf.Sphere):
-                    artist = pv.Sphere(radius=obj.radius, A2B=A2B)
-                    collider = Sphere(
-                        center=A2B[:3, 3], radius=obj.radius, artist=artist)
+                    collider = Sphere(center=A2B[:3, 3], radius=obj.radius)
                 elif isinstance(obj, urdf.Box):
-                    artist = pv.Box(size=obj.size, A2B=A2B)
-                    collider = Box(A2B, obj.size, artist=artist)
+                    collider = Box(A2B, obj.size)
                 elif isinstance(obj, urdf.Cylinder):
-                    artist = pv.Cylinder(
-                        length=obj.length, radius=obj.radius, A2B=A2B)
                     collider = Cylinder(
-                        cylinder2origin=A2B, radius=obj.radius, length=obj.length,
-                        artist=artist)
+                        cylinder2origin=A2B, radius=obj.radius,
+                        length=obj.length)
                 else:
                     assert isinstance(obj, urdf.Mesh)
-                    artist = pv.Mesh(filename=obj.filename, s=obj.scale, A2B=A2B)
-                    collider = Mesh(obj.filename, A2B, obj.scale, artist=artist)
+                    collider = Mesh(obj.filename, A2B, obj.scale)
+                collider.make_artist()
                 self.add_collider(obj.frame, collider)
             except RuntimeError as e:
                 warnings.warn(str(e))
@@ -161,6 +156,10 @@ class ConvexCollider(abc.ABC):
         self.artist_ = artist
 
     @abc.abstractmethod
+    def make_artist(self):
+        """Make artist that represents this collider."""
+
+    @abc.abstractmethod
     def first_vertex(self):
         """Get any vertex from collider to initialize GJK algorithm.
 
@@ -239,6 +238,9 @@ class Convex(ConvexCollider):
     def __init__(self, vertices, artist=None):
         super(Convex, self).__init__(vertices, artist)
 
+    def make_artist(self):
+        self.artist_ = pv.PointCollection3D(self.vertices_, s=0.005)
+
     def first_vertex(self):
         return self.vertices_[0]
 
@@ -251,7 +253,8 @@ class Convex(ConvexCollider):
 
     def update_pose(self, vertices):
         self.vertices_ = vertices
-        # TODO how to update artist?
+        if self.artist_ is not None:
+            self.artist_.set_data(self.vertices_)
 
     def aabb(self):
         mins, maxs = axis_aligned_bounding_box(self.vertices_)
@@ -277,6 +280,9 @@ class Box(Convex):
             convert_box_to_vertices(box2origin, size), artist)
         self.box2origin = box2origin
         self.size = size
+
+    def make_artist(self):
+        self.artist_ = pv.Box(size=self.size, A2B=self.box2origin)
 
     def update_pose(self, pose):
         self.box2origin = pose
@@ -313,6 +319,9 @@ class Mesh(Convex):
         vertices = np.asarray(artist.mesh.vertices)
         super(Mesh, self).__init__(vertices, artist)
 
+    def make_artist(self):
+        assert self.artist_ is not None
+
     def update_pose(self, pose):
         self.artist_.set_data(pose)
         self.vertices_ = np.asarray(self.artist_.mesh.vertices)
@@ -344,6 +353,10 @@ class Cylinder(ConvexCollider):
         self.cylinder2origin = cylinder2origin
         self.radius = radius
         self.length = length
+
+    def make_artist(self):
+        self.artist_ = pv.Cylinder(
+            length=self.length, radius=self.radius, A2B=self.cylinder2origin)
 
     def first_vertex(self):
         vertex = self.cylinder2origin[:3, 3] + 0.5 * self.length * self.cylinder2origin[:3, 2]
@@ -393,6 +406,10 @@ class Capsule(ConvexCollider):
         self.height = height
         self.vertices_ = []
 
+    def make_artist(self):
+        self.artist_ = pv.Capsule(
+            height=self.height, radius=self.radius, A2B=self.capsule2origin)
+
     def first_vertex(self):
         vertex = self.capsule2origin[:3, 3] - (self.radius + 0.5 * self.height) * self.capsule2origin[:3, 2]
         self.vertices_.append(vertex)
@@ -436,6 +453,11 @@ class Sphere(ConvexCollider):
         self.c = center
         self.radius = radius
         self.vertices_ = []
+
+    def make_artist(self):
+        sphere2origin = np.eye(4)
+        sphere2origin[:3, 3] = self.c
+        self.artist_ = pv.Sphere(radius=self.radius, A2B=sphere2origin)
 
     def first_vertex(self):
         vertex = self.c + np.array([0, 0, self.radius])
