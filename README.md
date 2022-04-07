@@ -20,6 +20,19 @@ Run unit tests with
 
 You will find the coverage report in `htmlcov/index.html`.
 
+## API Documentation
+
+Install dependencies with
+
+    pip install -e .[doc]
+
+Build API documentation with
+
+    cd doc
+    make html
+
+You will find the documentation in `doc/build/html/index.html`.
+
 ## Licenses
 
 These implementations are mostly based on
