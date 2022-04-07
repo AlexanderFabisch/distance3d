@@ -1,3 +1,4 @@
+"""Plotting functions for geometric shapes."""
 import numpy as np
 from mpl_toolkits import mplot3d
 import pytransform3d.plot_utils as ppu

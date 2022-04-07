@@ -1,3 +1,4 @@
+"""Gilbert-Johnson-Keerthi (GJK) for distance calculation of convex shapes."""
 import math
 import numpy as np
 from .colliders import Convex

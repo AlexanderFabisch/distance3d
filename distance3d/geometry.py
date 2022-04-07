@@ -1,3 +1,4 @@
+"""Tools for geometric computations."""
 import math
 import numpy as np
 

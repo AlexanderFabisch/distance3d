@@ -1,3 +1,4 @@
+"""Colliders used for collision detection with GJK algorithm."""
 import abc
 import warnings
 import numpy as np
@@ -107,6 +108,10 @@ class ColliderTree:
 
     def aabb_overlapping_colliders(self, collider):
         """Get colliders with an overlapping AABB.
+
+        This function performs broad phase collision detection with a bounding
+        volume hierarchy, where the bounding volumes are axies-aligned bounding
+        boxes.
 
         Parameters
         ----------

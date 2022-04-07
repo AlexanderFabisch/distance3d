@@ -1,3 +1,4 @@
+"""Expanding polytope algorithm (EPA) for collision resolution after GJK."""
 import numpy as np
 from .colliders import Convex
 from .utils import norm_vector

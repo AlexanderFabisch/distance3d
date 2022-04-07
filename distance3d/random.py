@@ -1,3 +1,4 @@
+"""Sample geometric shapes."""
 import numpy as np
 import pytransform3d.rotations as pr
 import pytransform3d.transformations as pt

@@ -1,3 +1,4 @@
+"""Containment methods compute bounding volumes."""
 import numpy as np
 from .geometry import (
     convert_box_to_vertices, cylinder_extreme_along_direction,
@@ -24,10 +25,46 @@ def axis_aligned_bounding_box(P):
 
 
 def sphere_aabb(center, radius):
+    """Compute axis-aligned bounding box of sphere.
+
+    Parameters
+    ----------
+    center : array, shape (3,)
+        Center of the sphere.
+
+    radius : float
+        Radius of the sphere.
+
+    Returns
+    -------
+    mins : array, shape (3,)
+        Minimum coordinates.
+
+    maxs : array, shape (3,)
+        Maximum coordinates.
+    """
     return center - radius, center + radius
 
 
 def box_aabb(box2origin, size):
+    """Compute axis-aligned bounding box of an oriented box.
+
+    Parameters
+    ----------
+    box2origin : array, shape (4, 4)
+        Pose of the box.
+
+    size : array, shape (3,)
+        Size of the box.
+
+    Returns
+    -------
+    mins : array, shape (3,)
+        Minimum coordinates.
+
+    maxs : array, shape (3,)
+        Maximum coordinates.
+    """
     vertices = convert_box_to_vertices(box2origin, size)
     return axis_aligned_bounding_box(vertices)
 
@@ -41,6 +78,27 @@ ZP = np.array([0.0, 0.0, 1.0])
 
 
 def cylinder_aabb(cylinder2origin, radius, length):
+    """Compute axis-aligned bounding box of cylinder.
+
+    Parameters
+    ----------
+    cylinder2origin : array, shape (4, 4)
+        Pose of the cylinder.
+
+    radius : float
+        Radius of the cylinder.
+
+    length : float
+        Length of the cylinder.
+
+    Returns
+    -------
+    mins : array, shape (3,)
+        Minimum coordinates.
+
+    maxs : array, shape (3,)
+        Maximum coordinates.
+    """
     negative_vertices = np.vstack((
         cylinder_extreme_along_direction(XM, cylinder2origin, radius, length),
         cylinder_extreme_along_direction(YM, cylinder2origin, radius, length),
@@ -57,6 +115,27 @@ def cylinder_aabb(cylinder2origin, radius, length):
 
 
 def capsule_aabb(capsule2origin, radius, height):
+    """Compute axis-aligned bounding box of a capsule.
+
+    Parameters
+    ----------
+    capsule2origin : array, shape (4, 4)
+        Pose of the capsule.
+
+    radius : float
+        Radius of the capsule.
+
+    height : float
+        Height of the capsule.
+
+    Returns
+    -------
+    mins : array, shape (3,)
+        Minimum coordinates.
+
+    maxs : array, shape (3,)
+        Maximum coordinates.
+    """
     negative_vertices = np.vstack((
         capsule_extreme_along_direction(XM, capsule2origin, radius, height),
         capsule_extreme_along_direction(YM, capsule2origin, radius, height),
