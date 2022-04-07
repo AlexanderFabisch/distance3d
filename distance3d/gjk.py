@@ -30,7 +30,7 @@ def gjk(vertices1, vertices2):
 
 
 def gjk_with_simplex(collider1, collider2):
-    """Gilbert-Johnson-Keerthi algorithm for distance calculation.
+    """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
 
     The GJK algorithm only works for convex shapes. Concave objects have to be
     decomposed into convex shapes first.
