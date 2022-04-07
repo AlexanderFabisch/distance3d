@@ -1,4 +1,11 @@
-"""Plot AABB Tree."""
+"""
+=========
+AABB Tree
+=========
+
+Plot AABB Tree.
+"""
+print(__doc__)
 from collections import deque
 import numpy as np
 import pytransform3d.plot_utils as ppu
