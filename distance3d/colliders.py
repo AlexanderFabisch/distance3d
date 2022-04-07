@@ -156,8 +156,14 @@ class ConvexCollider(abc.ABC):
         self.artist_ = artist
 
     @abc.abstractmethod
-    def make_artist(self):
-        """Make artist that represents this collider."""
+    def make_artist(self, c=None):
+        """Make artist that represents this collider.
+
+        Parameters
+        ----------
+        c : array-like, shape (3,), optional (default: None)
+            Color of artist.
+        """
 
     @abc.abstractmethod
     def first_vertex(self):
@@ -238,8 +244,8 @@ class Convex(ConvexCollider):
     def __init__(self, vertices, artist=None):
         super(Convex, self).__init__(vertices, artist)
 
-    def make_artist(self):
-        self.artist_ = pv.PointCollection3D(self.vertices_, s=0.005)
+    def make_artist(self, c=None):
+        self.artist_ = pv.PointCollection3D(self.vertices_, s=0.005, c=c)
 
     def first_vertex(self):
         return self.vertices_[0]
@@ -319,7 +325,7 @@ class Mesh(Convex):
         vertices = np.asarray(artist.mesh.vertices)
         super(Mesh, self).__init__(vertices, artist)
 
-    def make_artist(self):
+    def make_artist(self, c=None):
         assert self.artist_ is not None
 
     def update_pose(self, pose):
@@ -354,9 +360,10 @@ class Cylinder(ConvexCollider):
         self.radius = radius
         self.length = length
 
-    def make_artist(self):
+    def make_artist(self, c=None):
         self.artist_ = pv.Cylinder(
-            length=self.length, radius=self.radius, A2B=self.cylinder2origin)
+            length=self.length, radius=self.radius, A2B=self.cylinder2origin,
+            c=c)
 
     def first_vertex(self):
         vertex = self.cylinder2origin[:3, 3] + 0.5 * self.length * self.cylinder2origin[:3, 2]
@@ -406,9 +413,10 @@ class Capsule(ConvexCollider):
         self.height = height
         self.vertices_ = []
 
-    def make_artist(self):
+    def make_artist(self, c=None):
         self.artist_ = pv.Capsule(
-            height=self.height, radius=self.radius, A2B=self.capsule2origin)
+            height=self.height, radius=self.radius, A2B=self.capsule2origin,
+            c=c)
 
     def first_vertex(self):
         vertex = self.capsule2origin[:3, 3] - (self.radius + 0.5 * self.height) * self.capsule2origin[:3, 2]
@@ -454,10 +462,10 @@ class Sphere(ConvexCollider):
         self.radius = radius
         self.vertices_ = []
 
-    def make_artist(self):
+    def make_artist(self, c=None):
         sphere2origin = np.eye(4)
         sphere2origin[:3, 3] = self.c
-        self.artist_ = pv.Sphere(radius=self.radius, A2B=sphere2origin)
+        self.artist_ = pv.Sphere(radius=self.radius, A2B=sphere2origin, c=c)
 
     def first_vertex(self):
         vertex = self.c + np.array([0, 0, self.radius])
