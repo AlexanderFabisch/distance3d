@@ -2,6 +2,8 @@
 
 Distance computation in 3D.
 
+<img src="doc/source/_static/robotrobot_collision_detection.png" width=50% />
+
 ## Installation
 
 Install the package with
