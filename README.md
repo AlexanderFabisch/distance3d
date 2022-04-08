@@ -1,6 +1,6 @@
 # distance3d
 
-Distance computation in 3D.
+Distance computation and collision detection in 3D.
 
 <img src="doc/source/_static/robot_collision_detection.png" width=50% />
 

@@ -11,7 +11,7 @@ if __name__ == "__main__":
           author="Alexander Fabisch",
           author_email="alexander.fabisch@dfki.de",
           url="https://github.com/AlexanderFabisch/distance3d",
-          description="Distance computation in 3D.",
+          description="Distance computation and collision detection in 3D.",
           long_description=long_description,
           long_description_content_type="text/markdown",
           classifiers=[

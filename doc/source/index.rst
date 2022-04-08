@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to distance3d's documentation!
-======================================
+distance3d
+==========
 
 .. toctree::
    :maxdepth: 3
