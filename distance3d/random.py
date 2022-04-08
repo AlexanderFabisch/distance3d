@@ -6,7 +6,7 @@ from scipy.spatial import ConvexHull
 from .utils import norm_vector
 
 
-def randn_point(random_state):
+def randn_point(random_state, scale=1.0):
     """Sample 3D point from standard normal distribution.
 
     Parameters
@@ -14,12 +14,15 @@ def randn_point(random_state):
     random_state : np.random.RandomState
         Random number generator.
 
+    scale : float, optional (default: 1)
+        Scale of point sampled from normal distribution.
+
     Returns
     -------
     point : array, shape (3,)
         3D Point sampled from standard normal distribution.
     """
-    return random_state.randn(3)
+    return scale * random_state.randn(3)
 
 
 def randn_direction(random_state):
@@ -38,7 +41,7 @@ def randn_direction(random_state):
     return norm_vector(random_state.randn(3))
 
 
-def randn_line(random_state):
+def randn_line(random_state, scale=1.0):
     """Sample 3D line.
 
     Parameters
@@ -46,15 +49,18 @@ def randn_line(random_state):
     random_state : np.random.RandomState
         Random number generator.
 
+    scale : float, optional (default: 1)
+        Scale of point sampled from normal distribution.
+
     Returns
     -------
     line_point : array, shape (3,)
-        3D Point sampled from standard normal distribution.
+        3D Point sampled from normal distribution.
 
     line_direction : array, shape (3,)
         3D direction: 3D vector of unit length.
     """
-    line_point = randn_point(random_state)
+    line_point = randn_point(random_state, scale=scale)
     line_direction = randn_direction(random_state)
     return line_point, line_direction
 
@@ -79,7 +85,8 @@ def randn_line_segment(random_state, scale=1.0):
     segment_end : array, shape (3,)
         End point of segment sampled from a normal distribution.
     """
-    return scale * randn_point(random_state), scale * randn_point(random_state)
+    return (randn_point(random_state, scale=scale),
+            randn_point(random_state, scale=scale))
 
 
 def randn_rectangle(random_state, center_scale=1.0, length_scale=1.0):
