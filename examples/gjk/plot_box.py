@@ -32,8 +32,10 @@ for i in range(3000):
         continue
     plotting.plot_segment(
         ax, contact_point_box, contact_point_box2, c="k", lw=1)
-    ppu.plot_box(ax=ax, A2B=box2origin2, size=size2, wireframe=False, alpha=0.5)
+    ppu.plot_box(ax=ax, A2B=box2origin2, size=size2, wireframe=False, alpha=0.2)
 print(f"{accumulated_time=}")
 
-ppu.plot_box(ax=ax, A2B=box2origin, size=size, wireframe=False, alpha=0.5)
+ppu.plot_box(
+    ax=ax, A2B=box2origin, size=size, wireframe=False, alpha=0.5,
+    color="yellow")
 plt.show()
