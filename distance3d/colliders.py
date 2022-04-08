@@ -120,7 +120,7 @@ class ColliderTree:
 
         Returns
         -------
-        colliders : list
+        colliders : dict
             Colliders with overlapping AABB.
         """
         aabb = collider.aabb()
