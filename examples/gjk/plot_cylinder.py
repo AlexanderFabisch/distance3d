@@ -30,11 +30,12 @@ for i in range(700):
     print(dist)
     if i > 5:
         continue
-    plotting.plot_segment(ax, contact_point_cylinder, contact_point_cylinder2)
+    plotting.plot_segment(
+        ax, contact_point_cylinder, contact_point_cylinder2, c="k", lw=1)
     ppu.plot_cylinder(ax, A2B=cylinder2origin2, radius=radius2, length=length2,
-                      wireframe=True)
+                      wireframe=False, color="b", alpha=0.2)
 print(f"{accumulated_time=}")
 
 ppu.plot_cylinder(ax, A2B=cylinder2origin, radius=radius, length=length,
-                  wireframe=True)
+                  wireframe=False, alpha=0.5)
 plt.show()

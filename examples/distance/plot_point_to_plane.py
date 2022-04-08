@@ -30,7 +30,7 @@ for i in range(150000):
     print(dist)
     if i > 10:
         continue
-    plotting.plot_segment(ax, point, contact_point)
+    plotting.plot_segment(ax, point, contact_point, c="k", lw=1)
 print(f"{accumulated_time=}")
 
 # TODO how to plot a plane? part of pytransform3d?

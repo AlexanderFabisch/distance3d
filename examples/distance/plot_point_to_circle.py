@@ -31,9 +31,7 @@ for i in range(65000):
     print(f"{distance}")
     if i > 25:
         continue
-    points = np.vstack((point, contact_point))
-    ax.scatter(points[:, 0], points[:, 1], points[:, 2])
-    ax.plot(points[:, 0], points[:, 1], points[:, 2])
+    plotting.plot_segment(ax, point, contact_point, c="k", lw=1)
 print(f"{accumulated_time=}")
 
 ax.scatter(center[0], center[1], center[2])

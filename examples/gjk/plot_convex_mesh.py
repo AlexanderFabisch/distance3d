@@ -27,8 +27,8 @@ for i in range(4000):
     print(dist)
     if i > 20:
         continue
+    plotting.plot_segment(ax, p1, p2, c="k", lw=1)
     plotting.plot_convex(ax, vertices2, faces2)
-    plotting.plot_segment(ax, p1, p2)
 print(f"{accumulated_time=}")
 
 plotting.plot_convex(ax, vertices, faces)

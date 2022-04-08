@@ -32,7 +32,8 @@ for i in range(90):
     print(dist)
     if i > 10:
         continue
-    plotting.plot_segment(ax, contact_point_rectangle, contact_point_box)
+    plotting.plot_segment(
+        ax, contact_point_rectangle, contact_point_box, c="k", lw=1)
     plotting.plot_rectangle(
         ax, rectangle_center, rectangle_axes, rectangle_lengths,
         show_axes=False)

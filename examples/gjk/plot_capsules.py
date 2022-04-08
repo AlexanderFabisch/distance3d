@@ -36,11 +36,16 @@ for i in range(700):
         ax.scatter(vertices1[:, 0], vertices1[:, 1], vertices1[:, 2], color="r")
         vertices2 = np.array(c2.vertices_)
         ax.scatter(vertices2[:, 0], vertices2[:, 1], vertices2[:, 2], color="g")
-    plotting.plot_segment(ax, contact_point_capsule, contact_point_capsule2)
+    plotting.plot_segment(
+        ax, contact_point_capsule, contact_point_capsule2, c="k", lw=1)
     pt.plot_transform(ax=ax, A2B=capsule2origin2, s=0.1)
-    ppu.plot_capsule(ax=ax, A2B=capsule2origin2, radius=radius2, height=height2, wireframe=False, alpha=0.5)
+    ppu.plot_capsule(
+        ax=ax, A2B=capsule2origin2, radius=radius2, height=height2,
+        wireframe=False, alpha=0.5)
 print(f"{accumulated_time=}")
 
 pt.plot_transform(ax=ax, A2B=capsule2origin, s=0.1)
-ppu.plot_capsule(ax=ax, A2B=capsule2origin, radius=radius, height=height, wireframe=False, alpha=0.5, color="red")
+ppu.plot_capsule(
+    ax=ax, A2B=capsule2origin, radius=radius, height=height, wireframe=False,
+    alpha=0.5, color="yellow")
 plt.show()

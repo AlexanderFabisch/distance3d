@@ -28,7 +28,8 @@ for i in range(7500):
     print(dist)
     if i > 3:
         continue
-    plotting.plot_segment(ax, contact_point_line, contact_point_triangle)
+    plotting.plot_segment(
+        ax, contact_point_line, contact_point_triangle, c="k", lw=1)
     plotting.plot_line(ax, line_point, line_direction)
 print(f"{accumulated_time=}")
 

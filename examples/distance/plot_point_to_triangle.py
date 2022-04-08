@@ -27,9 +27,7 @@ for i in range(40000):
     print(dist)
     if i > 30:
         continue
-    points = np.vstack((point, contact_point))
-    ax.scatter(points[:, 0], points[:, 1], points[:, 2])
-    ax.plot(points[:, 0], points[:, 1], points[:, 2])
+    plotting.plot_segment(ax, point, contact_point, c="k", lw=1)
 print(f"{accumulated_time=}")
 
 plotting.plot_triangle(ax, triangle_points)

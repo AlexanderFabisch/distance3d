@@ -36,7 +36,8 @@ for i in range(18000):
     print(dist)
     if i > 10:
         continue
-    plotting.plot_segment(ax, contact_point_line, contact_point_box)
+    plotting.plot_segment(
+        ax, contact_point_line, contact_point_box, c="k", lw=1)
     plotting.plot_line(ax, line_point, line_direction)
 print(f"{accumulated_time=}")
 

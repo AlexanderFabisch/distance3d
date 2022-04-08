@@ -30,7 +30,8 @@ for i in range(3000):
     print(dist)
     if i > 10:
         continue
-    plotting.plot_segment(ax, contact_point_box, contact_point_box2)
+    plotting.plot_segment(
+        ax, contact_point_box, contact_point_box2, c="k", lw=1)
     ppu.plot_box(ax=ax, A2B=box2origin2, size=size2, wireframe=False, alpha=0.5)
 print(f"{accumulated_time=}")
 

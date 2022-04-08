@@ -29,7 +29,7 @@ def plot_line(ax, line_point, line_direction, length=10):
     ax.plot(line[:, 0], line[:, 1], line[:, 2])
 
 
-def plot_segment(ax, segment_start, segment_end):
+def plot_segment(ax, segment_start, segment_end, alpha=1.0, c=None, lw=2):
     """Plot line.
 
     Parameters
@@ -42,10 +42,20 @@ def plot_segment(ax, segment_start, segment_end):
 
     segment_end : array, shape (3,)
         End point of segment.
+
+    alpha : float, optional (default: 1)
+        Alpha for line and points.
+
+    c : str, optional (default: None)
+        Color.
+
+    lw : int
+        Line width.
     """
     points = np.vstack((segment_start, segment_end))
-    ax.scatter(points[:, 0], points[:, 1], points[:, 2])
-    ax.plot(points[:, 0], points[:, 1], points[:, 2])
+    ax.scatter(
+        points[:, 0], points[:, 1], points[:, 2], alpha=alpha, c=c, lw=lw)
+    ax.plot(points[:, 0], points[:, 1], points[:, 2], alpha=alpha, c=c, lw=lw)
 
 
 def plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths, show_axes=True, surface_alpha=0.1):

@@ -28,7 +28,7 @@ for i in range(25000):
     print(dist)
     if i > 50:
         continue
-    plotting.plot_segment(ax, point, contact_point)
+    plotting.plot_segment(ax, point, contact_point, c="k", lw=1)
 print(f"{accumulated_time=}")
 
 ppu.plot_cylinder(ax=ax, A2B=cylinder2origin, radius=radius, length=length, wireframe=False, alpha=0.5)

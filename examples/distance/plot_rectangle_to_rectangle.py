@@ -31,7 +31,8 @@ for i in range(500):
     print(dist)
     if i > 7:
         continue
-    plotting.plot_segment(ax, contact_point_rectangle, contact_point_rectangle2)
+    plotting.plot_segment(
+        ax, contact_point_rectangle, contact_point_rectangle2, c="k", lw=1)
     plotting.plot_rectangle(ax, rectangle_center2, rectangle_axes2, rectangle_lengths2, show_axes=False)
 print(f"{accumulated_time=}")
 
