@@ -14,13 +14,13 @@ from distance3d import random, plotting
 
 
 random_state = np.random.RandomState(2)
-box2origin, size = random.rand_box(random_state, size_scale=5.0)
+box2origin, size = random.rand_box(random_state, center_scale=0.1, size_scale=4.0)
 
-ax = ppu.make_3d_axis(ax_s=2)
+ax = ppu.make_3d_axis(ax_s=3)
 
 accumulated_time = 0.0
 for i in range(3500):
-    point = random.randn_point(random_state)
+    point = random.randn_point(random_state) * 2
     start = time.time()
     dist, contact_point = point_to_box(point, box2origin, size)
     end = time.time()
