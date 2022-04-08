@@ -30,7 +30,7 @@ for i in range(1500):
     print(dist)
     if i > 50:
         continue
-    plotting.plot_segment(ax, point, contact_point, c="k", lw=1)
+    plotting.plot_segment(ax, point, contact_point, lw=1)
 print(f"{accumulated_time=}")
 
 ppu.plot_ellipsoid(ax=ax, A2B=ellipsoid2origin, radii=radii, wireframe=False, alpha=0.5)

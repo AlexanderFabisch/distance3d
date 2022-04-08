@@ -31,7 +31,7 @@ for i in range(62000):
     print(f"{distance}")
     if i > 25:
         continue
-    plotting.plot_segment(ax, point, contact_point, c="k", lw=1)
+    plotting.plot_segment(ax, point, contact_point, lw=1)
 print(f"{accumulated_time=}")
 
 ax.scatter(center[0], center[1], center[2])

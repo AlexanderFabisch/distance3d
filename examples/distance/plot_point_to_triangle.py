@@ -27,7 +27,7 @@ for i in range(40000):
     print(dist)
     if i > 30:
         continue
-    plotting.plot_segment(ax, point, contact_point, c="k", lw=1)
+    plotting.plot_segment(ax, point, contact_point, lw=1)
 print(f"{accumulated_time=}")
 
 plotting.plot_triangle(ax, triangle_points)
