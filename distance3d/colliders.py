@@ -121,7 +121,7 @@ class ColliderTree:
         Returns
         -------
         colliders : dict
-            Colliders with overlapping AABB.
+            Maps frame names to colliders with overlapping AABB.
         """
         aabb = collider.aabb()
         return dict(self.aabbtree.overlap_values(aabb))
