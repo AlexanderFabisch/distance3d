@@ -15,11 +15,11 @@ from distance3d import plotting
 
 random_state = np.random.RandomState(0)
 point = np.array([-0.2, -0.6, -0.4])
-center = np.array([0.3, 0.4, 0.5])
+center = np.array([0.0, 0.0, 0.3])
 radius = 0.5
-normal = pr.norm_vector(np.array([0.5, -0.3, -0.4]))
+normal = pr.norm_vector(np.array([0.5, -0.3, 0.4]))
 
-ax = ppu.make_3d_axis(ax_s=1)
+ax = ppu.make_3d_axis(ax_s=1.5)
 
 accumulated_time = 0.0
 for i in range(65000):
