@@ -9,7 +9,7 @@ if __name__ == "__main__":
     setup(name="distance3d",
           version=distance3d.__version__,
           author="Alexander Fabisch",
-          author_email="alexander.fabisch@dfki.de",
+          author_email="afabisch@googlemail.com",
           url="https://github.com/AlexanderFabisch/distance3d",
           description="Distance computation and collision detection in 3D.",
           long_description=long_description,
