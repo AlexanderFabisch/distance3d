@@ -1,4 +1,9 @@
-"""TODO"""
+"""
+========================================
+Collisions between robot and environment
+========================================
+"""
+print(__doc__)
 import os
 import time
 import numpy as np

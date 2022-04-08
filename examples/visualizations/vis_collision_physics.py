@@ -1,4 +1,9 @@
-"""TODO"""
+"""
+============================================
+Physical simulation with collision detection
+============================================
+"""
+print(__doc__)
 import numpy as np
 import open3d as o3d
 import pytransform3d.transformations as pt

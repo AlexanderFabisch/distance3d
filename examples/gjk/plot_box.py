@@ -1,4 +1,9 @@
-"""TODO"""
+"""
+===============================
+Distance between boxes with GJK
+===============================
+"""
+print(__doc__)
 import time
 import numpy as np
 import matplotlib.pyplot as plt

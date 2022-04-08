@@ -1,4 +1,9 @@
-"""TODO"""
+"""
+==================================
+Distance from line to line segment
+==================================
+"""
+print(__doc__)
 import time
 import numpy as np
 import matplotlib.pyplot as plt

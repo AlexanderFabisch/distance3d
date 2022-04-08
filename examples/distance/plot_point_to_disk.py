@@ -1,4 +1,9 @@
-"""TODO"""
+"""
+===========================
+Distance from point to disk
+===========================
+"""
+print(__doc__)
 import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.rotations as pr

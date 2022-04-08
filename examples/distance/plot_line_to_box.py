@@ -1,4 +1,9 @@
-"""Distance from line to box."""
+"""
+=========================
+Distance from line to box
+=========================
+"""
+print(__doc__)
 import time
 import numpy as np
 import matplotlib.pyplot as plt
