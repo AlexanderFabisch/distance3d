@@ -9,8 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.plot_utils as ppu
 from distance3d.distance import point_to_line_segment
-from distance3d import random
-from distance3d import plotting
+from distance3d import random, plotting
 
 
 random_state = np.random.RandomState(0)
