@@ -59,7 +59,7 @@ def randn_line(random_state):
     return line_point, line_direction
 
 
-def randn_line_segment(random_state):
+def randn_line_segment(random_state, scale=1.0):
     """Sample 3D line segment.
 
     Parameters
@@ -67,16 +67,19 @@ def randn_line_segment(random_state):
     random_state : np.random.RandomState
         Random number generator.
 
+    scale : float, optional (default: 1)
+        Scale of points sampled from normal distribution.
+
     Returns
     -------
 
     segment_start : array, shape (3,)
-        Start point of segment sampled from a standard normal distribution.
+        Start point of segment sampled from a normal distribution.
 
     segment_end : array, shape (3,)
-        End point of segment sampled from a standard normal distribution.
+        End point of segment sampled from a normal distribution.
     """
-    return randn_point(random_state), randn_point(random_state)
+    return scale * randn_point(random_state), scale * randn_point(random_state)
 
 
 def randn_rectangle(random_state, center_scale=1.0, length_scale=1.0):

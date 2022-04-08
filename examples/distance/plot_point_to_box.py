@@ -20,7 +20,7 @@ ax = ppu.make_3d_axis(ax_s=2)
 
 accumulated_time = 0.0
 for i in range(3500):
-    point = random_state.randn(3)
+    point = random.randn_point(random_state)
     start = time.time()
     dist, contact_point = point_to_box(point, box2origin, size)
     end = time.time()

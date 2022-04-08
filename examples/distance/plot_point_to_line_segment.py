@@ -12,10 +12,10 @@ from distance3d.distance import point_to_line_segment
 from distance3d import random, plotting
 
 
-random_state = np.random.RandomState(0)
-segment_start, segment_end = random.randn_line_segment(random_state)
+random_state = np.random.RandomState(3)
+segment_start, segment_end = random.randn_line_segment(random_state, scale=2)
 
-ax = ppu.make_3d_axis(ax_s=3)
+ax = ppu.make_3d_axis(ax_s=5)
 
 accumulated_time = 0.0
 for i in range(50000):
@@ -25,7 +25,7 @@ for i in range(50000):
     end = time.time()
     accumulated_time += end - start
     print(dist)
-    if i > 15:
+    if i > 25:
         continue
     plotting.plot_segment(ax, point, contact_point_line)
 print(f"{accumulated_time=}")
