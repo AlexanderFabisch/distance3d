@@ -60,7 +60,7 @@ API Reference
    :nosignatures:
    :toctree: _autosummary/
 
-   ~distance3d.colliders.ColliderTree
+   ~distance3d.colliders.BoundingVolumeHierarchy
    ~distance3d.colliders.ConvexCollider
    ~distance3d.colliders.Convex
    ~distance3d.colliders.Box

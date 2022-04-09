@@ -13,9 +13,10 @@ from .containment import (
 from aabbtree import AABB, AABBTree
 
 
-class ColliderTree:
-    """Wraps multiple colliders that are connected through transformations.
+class BoundingVolumeHierarchy:
+    """Bounding volume hierarchy (BVH) for broad phase collision detection.
 
+    Wraps multiple colliders that are connected through transformations.
     In addition, these colliders are stored in an AABB tree for broad phase
     collision detection.
 
@@ -114,7 +115,7 @@ class ColliderTree:
         """Get colliders with an overlapping AABB.
 
         This function performs broad phase collision detection with a bounding
-        volume hierarchy, where the bounding volumes are axies-aligned bounding
+        volume hierarchy, where the bounding volumes are axis-aligned bounding
         boxes.
 
         Parameters
@@ -139,6 +140,10 @@ class ColliderTree:
             Collider frames.
         """
         return self.collider_frames
+
+
+# for backwards compatibility:
+ColliderTree = BoundingVolumeHierarchy
 
 
 class ConvexCollider(abc.ABC):
