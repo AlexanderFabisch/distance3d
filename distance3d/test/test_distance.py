@@ -1,6 +1,6 @@
 import numpy as np
 from distance3d.distance import (
-    point_to_line, point_to_line_segment, line_to_line)
+    point_to_line, point_to_line_segment, line_to_line, line_to_box)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -111,3 +111,55 @@ def test_line_to_line():
         contact_point1, [0.47748201, -0.67206913, 1.53982529])
     assert_array_almost_equal(
         contact_point2, [-0.34791215, 0.15634897, 1.23029068])
+
+
+def test_line_to_box():
+    line_point = np.array([0, 1, 0])
+    line_direction = np.array([1, 0, 0])
+    box2origin = np.eye(4)
+    size = np.array([1, 1, 1])
+
+    dist, closest_point_line, closest_point_box = line_to_box(
+        line_point, line_direction, box2origin, size)
+
+    assert approx(dist) == 0.5
+    # multiple solutions, this is a regression test
+    assert_array_almost_equal(closest_point_line, np.array([0.5, 1, 0]))
+    assert_array_almost_equal(closest_point_box, np.array([0.5, 0.5, 0]))
+
+    line_point = np.array([1, 0, 0])
+    line_direction = np.array([1, 0, 0])
+    box2origin = np.eye(4)
+    size = np.array([1, 1, 1])
+
+    dist, closest_point_line, closest_point_box = line_to_box(
+        line_point, line_direction, box2origin, size)
+
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point_line, np.array([0.5, 0, 0]))
+    assert_array_almost_equal(closest_point_box, np.array([0.5, 0, 0]))
+
+    line_point = np.array([1, 0, 0])
+    line_direction = np.array([0, 1, 0])
+    box2origin = np.eye(4)
+    size = np.array([1, 1, 1])
+
+    dist, closest_point_line, closest_point_box = line_to_box(
+        line_point, line_direction, box2origin, size)
+
+    assert approx(dist) == 0.5
+    # multiple solutions, this is a regression test
+    assert_array_almost_equal(closest_point_line, np.array([1, 0.5, 0]))
+    assert_array_almost_equal(closest_point_box, np.array([0.5, 0.5, 0]))
+
+    line_point = np.array([1, 1, 0])
+    line_direction = np.array([-1, 1, 0])
+    box2origin = np.eye(4)
+    size = np.array([1, 1, 1])
+
+    dist, closest_point_line, closest_point_box = line_to_box(
+        line_point, line_direction, box2origin, size)
+
+    assert approx(dist) == np.sqrt(0.5)
+    assert_array_almost_equal(closest_point_line, np.array([1, 1, 0]))
+    assert_array_almost_equal(closest_point_box, np.array([0.5, 0.5, 0]))
