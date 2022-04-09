@@ -10,6 +10,10 @@ Install the package with
 
     pip install -e .
 
+or from PyPI with
+
+    pip install distance3d
+
 ## Unit Tests
 
 Install dependencies with
