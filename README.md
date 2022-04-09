@@ -2,7 +2,7 @@
 
 Distance computation and collision detection in 3D.
 
-<img src="doc/source/_static/robot_collision_detection.png" width=50% />
+<img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/robot_collision_detection.png" width=50% />
 
 ## Installation
 
