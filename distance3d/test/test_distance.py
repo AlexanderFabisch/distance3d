@@ -28,32 +28,6 @@ def test_point_to_line():
     assert_array_almost_equal(contact_point_line, np.array([1, 0, 0]))
 
 
-def test_point_to_plane():
-    point = np.array([0, 0, 0])
-    plane_point = np.array([0, 0, 0])
-    plane_normal = np.array([0, 0, 1])
-    dist, closest_point_on_plane = point_to_plane(
-        point, plane_point, plane_normal)
-    assert approx(dist) == 0
-    assert_array_almost_equal(closest_point_on_plane, np.array([0, 0, 0]))
-
-    point = np.array([0, 0, 1])
-    plane_point = np.array([0, 0, 0])
-    plane_normal = np.array([0, 0, 1])
-    dist, closest_point_on_plane = point_to_plane(
-        point, plane_point, plane_normal)
-    assert approx(dist) == 1
-    assert_array_almost_equal(closest_point_on_plane, np.array([0, 0, 0]))
-
-    point = np.array([0, 0, -1])
-    plane_point = np.array([0, 0, 0])
-    plane_normal = np.array([0, 0, 1])
-    dist, closest_point_on_plane = point_to_plane(
-        point, plane_point, plane_normal)
-    assert approx(dist) == 1
-    assert_array_almost_equal(closest_point_on_plane, np.array([0, 0, 0]))
-
-
 def test_point_to_line_segment():
     segment_start = np.array([0, 0, 0])
     segment_end = np.array([1, 0, 0])
@@ -83,6 +57,32 @@ def test_point_to_line_segment():
         np.array([2, 0, 0]), segment_start, segment_end)
     assert distance == 1.0
     assert_array_almost_equal(contact_point_line, segment_end)
+
+
+def test_point_to_plane():
+    point = np.array([0, 0, 0])
+    plane_point = np.array([0, 0, 0])
+    plane_normal = np.array([0, 0, 1])
+    dist, closest_point_on_plane = point_to_plane(
+        point, plane_point, plane_normal)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point_on_plane, np.array([0, 0, 0]))
+
+    point = np.array([0, 0, 1])
+    plane_point = np.array([0, 0, 0])
+    plane_normal = np.array([0, 0, 1])
+    dist, closest_point_on_plane = point_to_plane(
+        point, plane_point, plane_normal)
+    assert approx(dist) == 1
+    assert_array_almost_equal(closest_point_on_plane, np.array([0, 0, 0]))
+
+    point = np.array([0, 0, -1])
+    plane_point = np.array([0, 0, 0])
+    plane_normal = np.array([0, 0, 1])
+    dist, closest_point_on_plane = point_to_plane(
+        point, plane_point, plane_normal)
+    assert approx(dist) == 1
+    assert_array_almost_equal(closest_point_on_plane, np.array([0, 0, 0]))
 
 
 def test_line_to_line():
