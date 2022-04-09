@@ -92,7 +92,7 @@ for joint_name in joint_names:
     tm.set_joint(joint_name, 0.7)
 
 colls = colliders.ColliderTree(tm, "robot_arm")
-colls.fill_tree_with_colliders(tm)
+colls.fill_tree_with_colliders(tm, make_artists=True)
 
 random_state = np.random.RandomState(5)
 

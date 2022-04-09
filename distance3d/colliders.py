@@ -34,13 +34,16 @@ class ColliderTree:
         self.aabbtree = AABBTree()
         self.colliders = {}
 
-    def fill_tree_with_colliders(self, tm):
+    def fill_tree_with_colliders(self, tm, make_artists=False):
         """Fill tree with colliders from URDF transform manager.
 
         Parameters
         ----------
         tm : pytransform3d.urdf.UrdfTransformManager
             Transform manager that has colliders.
+
+        make_artists : bool, optional (default: False)
+            Create artist for visualization for each collision object.
         """
         for obj in tm.collision_objects:
             A2B = tm.get_transform(obj.frame, self.base_frame)
@@ -56,7 +59,8 @@ class ColliderTree:
                 else:
                     assert isinstance(obj, urdf.Mesh)
                     collider = Mesh(obj.filename, A2B, obj.scale)
-                collider.make_artist()
+                if make_artists:
+                    collider.make_artist()
                 self.add_collider(obj.frame, collider)
             except RuntimeError as e:
                 warnings.warn(str(e))
