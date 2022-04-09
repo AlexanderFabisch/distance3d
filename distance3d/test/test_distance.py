@@ -1,7 +1,7 @@
 import numpy as np
 from distance3d.distance import (
-    point_to_line, point_to_plane, point_to_line_segment, line_to_line,
-    line_to_box)
+    point_to_line, point_to_line_segment, point_to_plane, point_to_triangle,
+    line_to_line, line_to_box, line_segment_to_triangle)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -83,6 +83,26 @@ def test_point_to_plane():
         point, plane_point, plane_normal)
     assert approx(dist) == 1
     assert_array_almost_equal(closest_point_on_plane, np.array([0, 0, 0]))
+
+
+def test_point_to_triangle():
+    triangle_points = np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]])
+    point = np.array([0, 0, 0])
+    dist, contact_point = point_to_triangle(point, triangle_points)
+    assert_array_almost_equal(contact_point, np.array([0, 0.5, 0.5]))
+    assert_array_almost_equal(dist, np.sqrt(0.5))
+
+    triangle_points = np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]])
+    point = np.array([0, 0.5, 0.5])
+    dist, contact_point = point_to_triangle(point, triangle_points)
+    assert_array_almost_equal(contact_point, np.array([0, 0.5, 0.5]))
+    assert_array_almost_equal(dist, 0.0)
+
+    triangle_points = np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]])
+    point = np.sqrt(np.array([0, 0.5, 0.5]))
+    dist, contact_point = point_to_triangle(point, triangle_points)
+    assert_array_almost_equal(contact_point, np.sqrt(np.array([0, 0.5, 0.5])))
+    assert_array_almost_equal(dist, 0.0)
 
 
 def test_line_to_line():
@@ -190,3 +210,16 @@ def test_line_to_box():
     assert approx(dist) == np.sqrt(0.5)
     assert_array_almost_equal(closest_point_line, np.array([1, 1, 0]))
     assert_array_almost_equal(closest_point_box, np.array([0.5, 0.5, 0]))
+
+
+def test_line_segment_to_triangle():
+    triangle_points = np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]], dtype=float)
+    segment_start = np.array([1, 0, 0], dtype=float)
+    segment_end = np.array([1, 1, 0], dtype=float)
+    dist, contact_point_segment, contact_point_triangle = \
+        line_segment_to_triangle(segment_start, segment_end, triangle_points)
+    assert_array_almost_equal(
+        contact_point_segment, np.array([1, 1, 0]))
+    assert_array_almost_equal(
+        contact_point_triangle, np.array([0, 1, 0]))
+    assert dist == 1.0
