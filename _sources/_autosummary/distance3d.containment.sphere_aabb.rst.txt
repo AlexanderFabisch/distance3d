@@ -1,0 +1,6 @@
+﻿distance3d.containment.sphere\_aabb
+===================================
+
+.. currentmodule:: distance3d.containment
+
+.. autofunction:: sphere_aabb

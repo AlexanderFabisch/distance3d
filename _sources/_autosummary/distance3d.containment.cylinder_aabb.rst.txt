@@ -1,0 +1,6 @@
+﻿distance3d.containment.cylinder\_aabb
+=====================================
+
+.. currentmodule:: distance3d.containment
+
+.. autofunction:: cylinder_aabb

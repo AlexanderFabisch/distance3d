@@ -1,0 +1,6 @@
+﻿distance3d.distance.point\_to\_line
+===================================
+
+.. currentmodule:: distance3d.distance
+
+.. autofunction:: point_to_line

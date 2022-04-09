@@ -1,0 +1,6 @@
+﻿distance3d.containment.box\_aabb
+================================
+
+.. currentmodule:: distance3d.containment
+
+.. autofunction:: box_aabb

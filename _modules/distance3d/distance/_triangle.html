@@ -1,0 +1,476 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.distance._triangle &#8212; distance3d 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distance3d.distance._triangle</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pytransform3d.rotations</span> <span class="k">as</span> <span class="nn">pr</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">norm_vector</span><span class="p">,</span> <span class="n">MAX_FLOAT</span>
+<span class="kn">from</span> <span class="nn">..geometry</span> <span class="kn">import</span> <span class="n">convert_segment_to_line</span><span class="p">,</span> <span class="n">convert_rectangle_to_segment</span>
+<span class="kn">from</span> <span class="nn">._line</span> <span class="kn">import</span> <span class="n">_line_to_line_segment</span>
+<span class="kn">from</span> <span class="nn">._rectangle</span> <span class="kn">import</span> <span class="n">line_segment_to_rectangle</span>
+
+
+<div class="viewcode-block" id="point_to_triangle"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.point_to_triangle.html#distance3d.distance.point_to_triangle">[docs]</a><span class="k">def</span> <span class="nf">point_to_triangle</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between point and triangle.</span>
+
+<span class="sd">    Implementation adapted from Real-Time Collision Detection by Christer</span>
+<span class="sd">    Ericson published by Morgan Kaufmann Publishers, Copyright 2005 Elsevier</span>
+<span class="sd">    Inc.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    point : array, shape (3,)</span>
+<span class="sd">        3D point.</span>
+
+<span class="sd">    triangle_points : array, shape (3, 3)</span>
+<span class="sd">        Each row contains a point of the triangle (A, B, C).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    distance : float</span>
+<span class="sd">        The shortest distance between point and triangle.</span>
+
+<span class="sd">    contact_point : array, shape (3,)</span>
+<span class="sd">        Closest point on triangle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ab</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ac</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Check if point in vertex region outside A</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">point</span> <span class="o">-</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ab</span><span class="p">,</span> <span class="n">ap</span><span class="p">)</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ac</span><span class="p">,</span> <span class="n">ap</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">d1</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">d2</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">contact_point</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">contact_point</span><span class="p">),</span> <span class="n">contact_point</span>
+
+    <span class="c1"># Check if point in vertex region outside B</span>
+    <span class="n">bp</span> <span class="o">=</span> <span class="n">point</span> <span class="o">-</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">d3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ab</span><span class="p">,</span> <span class="n">bp</span><span class="p">)</span>
+    <span class="n">d4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ac</span><span class="p">,</span> <span class="n">bp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">d3</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">d4</span> <span class="o">&lt;=</span> <span class="n">d3</span><span class="p">:</span>
+        <span class="n">contact_point</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">contact_point</span><span class="p">),</span> <span class="n">contact_point</span>
+
+    <span class="c1"># Check if point in edge region of AB</span>
+    <span class="n">vc</span> <span class="o">=</span> <span class="n">d1</span> <span class="o">*</span> <span class="n">d4</span> <span class="o">-</span> <span class="n">d3</span> <span class="o">*</span> <span class="n">d2</span>
+    <span class="k">if</span> <span class="n">vc</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">d1</span> <span class="ow">and</span> <span class="n">d3</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">d1</span> <span class="o">/</span> <span class="p">(</span><span class="n">d1</span> <span class="o">-</span> <span class="n">d3</span><span class="p">)</span>
+        <span class="n">contact_point</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="n">ab</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">contact_point</span><span class="p">),</span> <span class="n">contact_point</span>
+
+    <span class="c1"># Check if point in vertex region outside C</span>
+    <span class="n">cp</span> <span class="o">=</span> <span class="n">point</span> <span class="o">-</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">d5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ab</span><span class="p">,</span> <span class="n">cp</span><span class="p">)</span>
+    <span class="n">d6</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ac</span><span class="p">,</span> <span class="n">cp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">d6</span> <span class="o">&gt;=</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">d5</span> <span class="o">&lt;=</span> <span class="n">d6</span><span class="p">:</span>
+        <span class="n">contact_point</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">contact_point</span><span class="p">),</span> <span class="n">contact_point</span>
+
+    <span class="c1"># Check if point in edge region of AC</span>
+    <span class="n">vb</span> <span class="o">=</span> <span class="n">d5</span> <span class="o">*</span> <span class="n">d2</span> <span class="o">-</span> <span class="n">d1</span> <span class="o">*</span> <span class="n">d6</span>
+    <span class="k">if</span> <span class="n">vb</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">d2</span> <span class="ow">and</span> <span class="n">d6</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">d2</span> <span class="o">/</span> <span class="p">(</span><span class="n">d2</span> <span class="o">-</span> <span class="n">d6</span><span class="p">)</span>
+        <span class="n">contact_point</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span> <span class="o">*</span> <span class="n">ac</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">contact_point</span><span class="p">),</span> <span class="n">contact_point</span>
+
+    <span class="c1"># Check if point in edge region of BC</span>
+    <span class="n">va</span> <span class="o">=</span> <span class="n">d3</span> <span class="o">*</span> <span class="n">d6</span> <span class="o">-</span> <span class="n">d5</span> <span class="o">*</span> <span class="n">d4</span>
+    <span class="k">if</span> <span class="n">va</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">d4</span> <span class="o">-</span> <span class="n">d3</span> <span class="ow">and</span> <span class="n">d5</span> <span class="o">-</span> <span class="n">d6</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="n">d4</span> <span class="o">-</span> <span class="n">d3</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="n">d4</span> <span class="o">-</span> <span class="n">d3</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">d5</span> <span class="o">-</span> <span class="n">d6</span><span class="p">))</span>
+        <span class="n">contact_point</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">triangle_points</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">contact_point</span><span class="p">),</span> <span class="n">contact_point</span>
+
+    <span class="c1"># Point inside face region</span>
+    <span class="n">denom</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">va</span> <span class="o">+</span> <span class="n">vb</span> <span class="o">+</span> <span class="n">vc</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">vb</span> <span class="o">*</span> <span class="n">denom</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">vc</span> <span class="o">*</span> <span class="n">denom</span>
+    <span class="n">contact_point</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">ab</span> <span class="o">*</span> <span class="n">v</span> <span class="o">+</span> <span class="n">ac</span> <span class="o">*</span> <span class="n">w</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">contact_point</span><span class="p">),</span> <span class="n">contact_point</span></div>
+
+
+<div class="viewcode-block" id="line_to_triangle"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.line_to_triangle.html#distance3d.distance.line_to_triangle">[docs]</a><span class="k">def</span> <span class="nf">line_to_triangle</span><span class="p">(</span><span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between point and triangle.</span>
+
+<span class="sd">    Implementation adapted from Real-Time Collision Detection by Christer</span>
+<span class="sd">    Ericson published by Morgan Kaufmann Publishers, Copyright 2005 Elsevier</span>
+<span class="sd">    Inc.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    line_point : array, shape (3,)</span>
+<span class="sd">        Point on line.</span>
+
+<span class="sd">    line_direction : array, shape (3,)</span>
+<span class="sd">        Direction of the line. This is assumed to be of unit length.</span>
+
+<span class="sd">    triangle_points : array, shape (3, 3)</span>
+<span class="sd">        Each row contains a point of the triangle (A, B, C).</span>
+
+<span class="sd">    epsilon : float, optional (default: 1e-6)</span>
+<span class="sd">        Values smaller than epsilon are considered to be 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    distance : float</span>
+<span class="sd">        The shortest distance between line and triangle.</span>
+
+<span class="sd">    contact_point_line : array, shape (3,)</span>
+<span class="sd">        Closest point on line.</span>
+
+<span class="sd">    contact_point_triangle : array, shape (3,)</span>
+<span class="sd">        Closest point on triangle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_line_to_triangle</span><span class="p">(</span><span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)[:</span><span class="mi">3</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_line_to_triangle</span><span class="p">(</span><span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="c1"># Test if line intersects triangle. If so, the squared distance is zero.</span>
+    <span class="n">edge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">triangle_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                     <span class="n">triangle_points</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">normal</span> <span class="o">=</span> <span class="n">norm_vector</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">normal</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">epsilon</span><span class="p">:</span>
+        <span class="c1"># The line and triangle are not parallel, so the line intersects</span>
+        <span class="c1"># the plane of the triangle.</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">line_point</span> <span class="o">-</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">plane_basis_from_normal</span><span class="p">(</span><span class="n">line_direction</span><span class="p">)</span>
+        <span class="n">ude</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="n">vde</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">uddiff</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+        <span class="n">vddiff</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+        <span class="n">det</span> <span class="o">=</span> <span class="n">ude</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">vde</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ude</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">vde</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Barycentric coordinates for the point of intersection.</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">vde</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">uddiff</span> <span class="o">-</span> <span class="n">ude</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">vddiff</span><span class="p">,</span>
+                      <span class="n">ude</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">vddiff</span> <span class="o">-</span> <span class="n">vde</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">uddiff</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">det</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">/=</span> <span class="n">det</span>
+        <span class="n">b2</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">b2</span> <span class="o">&gt;=</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="c1"># Line parameter for the point of intersection.</span>
+            <span class="n">dde</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction</span><span class="p">)</span>
+            <span class="n">dddiff</span> <span class="o">=</span> <span class="n">line_direction</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+            <span class="n">line_parameter</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dde</span><span class="p">)</span> <span class="o">-</span> <span class="n">dddiff</span>
+
+            <span class="c1"># The intersection point is inside or on the triangle.</span>
+            <span class="n">best_contact_point_line</span> <span class="o">=</span> <span class="n">line_point</span> <span class="o">+</span> <span class="n">line_parameter</span> <span class="o">*</span> <span class="n">line_direction</span>
+            <span class="n">best_contact_point_triangle</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">best_contact_point_line</span><span class="p">,</span> <span class="n">best_contact_point_triangle</span><span class="p">,</span> <span class="n">line_parameter</span>
+
+    <span class="c1"># Either (1) the line is not parallel to the triangle and the point of</span>
+    <span class="c1"># intersection of the line and the plane of the triangle is outside the</span>
+    <span class="c1"># triangle or (2) the line and triangle are parallel. Regardless, the</span>
+    <span class="c1"># closest point on the triangle is on an edge of the triangle. Compare</span>
+    <span class="c1"># the line to all three edges of the triangle.</span>
+    <span class="n">best_distance</span> <span class="o">=</span> <span class="n">MAX_FLOAT</span>
+    <span class="n">i0</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">i1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i1</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">distance</span><span class="p">,</span> <span class="n">contact_point_line</span><span class="p">,</span> <span class="n">contact_point_segment</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_line_to_line_segment</span><span class="p">(</span>
+            <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">[</span><span class="n">i0</span><span class="p">],</span> <span class="n">triangle_points</span><span class="p">[</span><span class="n">i1</span><span class="p">],</span>
+            <span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">best_distance</span><span class="p">:</span>
+            <span class="n">best_contact_point_line</span> <span class="o">=</span> <span class="n">contact_point_line</span>
+            <span class="n">best_contact_point_triangle</span> <span class="o">=</span> <span class="n">contact_point_segment</span>
+            <span class="n">best_distance</span> <span class="o">=</span> <span class="n">distance</span>
+            <span class="n">best_line_parameter</span> <span class="o">=</span> <span class="n">t</span>
+
+        <span class="n">i0</span> <span class="o">=</span> <span class="n">i1</span>
+        <span class="n">i1</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">best_distance</span><span class="p">,</span> <span class="n">best_contact_point_line</span><span class="p">,</span> <span class="n">best_contact_point_triangle</span><span class="p">,</span> <span class="n">best_line_parameter</span>
+
+
+<div class="viewcode-block" id="line_segment_to_triangle"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.line_segment_to_triangle.html#distance3d.distance.line_segment_to_triangle">[docs]</a><span class="k">def</span> <span class="nf">line_segment_to_triangle</span><span class="p">(</span>
+        <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance from line segment to triangle.</span>
+
+<span class="sd">    Implementation adapted from Real-Time Collision Detection by Christer</span>
+<span class="sd">    Ericson published by Morgan Kaufmann Publishers, Copyright 2005 Elsevier</span>
+<span class="sd">    Inc.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    segment_start : array, shape (3,)</span>
+<span class="sd">        Start point of segment.</span>
+
+<span class="sd">    segment_end : array, shape (3,)</span>
+<span class="sd">        End point of segment.</span>
+
+<span class="sd">    triangle_points : array, shape (3, 3)</span>
+<span class="sd">        Each row contains a point of the triangle (A, B, C).</span>
+
+<span class="sd">    epsilon : float, optional (default: 1e-6)</span>
+<span class="sd">        Values smaller than epsilon are considered to be 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    distance : float</span>
+<span class="sd">        The shortest distance between line segment and triangle.</span>
+
+<span class="sd">    contact_point_line_segment : array, shape (3,)</span>
+<span class="sd">        Closest point on line segment.</span>
+
+<span class="sd">    contact_point_triangle : array, shape (3,)</span>
+<span class="sd">        Closest point on triangle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">segment_direction</span><span class="p">,</span> <span class="n">segment_length</span> <span class="o">=</span> <span class="n">convert_segment_to_line</span><span class="p">(</span>
+        <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">)</span>
+
+    <span class="n">distance</span><span class="p">,</span> <span class="n">contact_point_segment</span><span class="p">,</span> <span class="n">contact_point_triangle</span><span class="p">,</span> <span class="n">t_closest</span> <span class="o">=</span> <span class="n">_line_to_triangle</span><span class="p">(</span>
+        <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_direction</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">t_closest</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">distance</span><span class="p">,</span> <span class="n">contact_point_triangle</span> <span class="o">=</span> <span class="n">point_to_triangle</span><span class="p">(</span>
+            <span class="n">segment_start</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">)</span>
+        <span class="n">contact_point_segment</span> <span class="o">=</span> <span class="n">segment_start</span>
+    <span class="k">elif</span> <span class="n">t_closest</span> <span class="o">&gt;</span> <span class="n">segment_length</span><span class="p">:</span>
+        <span class="n">distance</span><span class="p">,</span> <span class="n">contact_point_triangle</span> <span class="o">=</span> <span class="n">point_to_triangle</span><span class="p">(</span>
+            <span class="n">segment_end</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">)</span>
+        <span class="n">contact_point_segment</span> <span class="o">=</span> <span class="n">segment_end</span>
+
+    <span class="k">return</span> <span class="n">distance</span><span class="p">,</span> <span class="n">contact_point_segment</span><span class="p">,</span> <span class="n">contact_point_triangle</span></div>
+
+
+<div class="viewcode-block" id="triangle_to_triangle"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.triangle_to_triangle.html#distance3d.distance.triangle_to_triangle">[docs]</a><span class="k">def</span> <span class="nf">triangle_to_triangle</span><span class="p">(</span><span class="n">triangle_points1</span><span class="p">,</span> <span class="n">triangle_points2</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between two triangles.</span>
+
+<span class="sd">    Implementation adapted from 3D Game Engine Design by David H. Eberly.</span>
+
+<span class="sd">    Geometric Tools, Inc.</span>
+<span class="sd">    http://www.geometrictools.com</span>
+<span class="sd">    Copyright (c) 1998-2006.  All Rights Reserved</span>
+
+<span class="sd">    The Wild Magic Version 4 Foundation Library source code is supplied</span>
+<span class="sd">    under the terms of the license agreement</span>
+<span class="sd">        http://www.geometrictools.com/License/Wm4FoundationLicense.pdf</span>
+<span class="sd">    and may not be copied or disclosed except in accordance with the terms</span>
+<span class="sd">    of that agreement.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    triangle_points1 : array, shape (3, 3)</span>
+<span class="sd">        Each row contains a point of the first triangle.</span>
+
+<span class="sd">    triangle_points2 : array, shape (3, 3)</span>
+<span class="sd">        Each row contains a point of the second triangle.</span>
+
+<span class="sd">    epsilon : float, optional (default: 1e-6)</span>
+<span class="sd">        Values smaller than epsilon are considered to be 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    distance : float</span>
+<span class="sd">        Shortest distance.</span>
+
+<span class="sd">    contact_point_triangle1 : array, shape (3,)</span>
+<span class="sd">        Closest point on triangle 1.</span>
+
+<span class="sd">    contact_point_triangle2 : array, shape (3,)</span>
+<span class="sd">        Closest point on triangle 2.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># compare edges of triangle1 to the interior of triangle2</span>
+    <span class="n">best_dist</span> <span class="o">=</span> <span class="n">MAX_FLOAT</span>
+    <span class="n">i0</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">i1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i1</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">segment_start</span> <span class="o">=</span> <span class="n">triangle_points1</span><span class="p">[</span><span class="n">i0</span><span class="p">]</span>
+        <span class="n">segment_end</span> <span class="o">=</span> <span class="n">triangle_points1</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+        <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point_segment</span><span class="p">,</span> <span class="n">contact_point_triangle</span> <span class="o">=</span> <span class="n">line_segment_to_triangle</span><span class="p">(</span>
+            <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">triangle_points2</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">best_dist</span><span class="p">:</span>
+            <span class="n">best_contact_point_triangle1</span> <span class="o">=</span> <span class="n">contact_point_segment</span>
+            <span class="n">best_contact_point_triangle2</span> <span class="o">=</span> <span class="n">contact_point_triangle</span>
+            <span class="n">best_dist</span> <span class="o">=</span> <span class="n">dist</span>
+
+            <span class="k">if</span> <span class="n">best_dist</span> <span class="o">&lt;=</span> <span class="n">epsilon</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">best_contact_point_triangle1</span><span class="p">,</span> <span class="n">best_contact_point_triangle2</span>
+        <span class="n">i0</span> <span class="o">=</span> <span class="n">i1</span>
+        <span class="n">i1</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># compare edges of triangle2 to the interior of triangle1</span>
+    <span class="n">i0</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">i1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i1</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">segment_start</span> <span class="o">=</span> <span class="n">triangle_points2</span><span class="p">[</span><span class="n">i0</span><span class="p">]</span>
+        <span class="n">segment_end</span> <span class="o">=</span> <span class="n">triangle_points2</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+        <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point_segment</span><span class="p">,</span> <span class="n">contact_point_triangle</span> <span class="o">=</span> <span class="n">line_segment_to_triangle</span><span class="p">(</span>
+            <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">triangle_points1</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">best_dist</span><span class="p">:</span>
+            <span class="n">best_contact_point_triangle1</span> <span class="o">=</span> <span class="n">contact_point_triangle</span>
+            <span class="n">best_contact_point_triangle2</span> <span class="o">=</span> <span class="n">contact_point_segment</span>
+            <span class="n">best_dist</span> <span class="o">=</span> <span class="n">dist</span>
+
+            <span class="k">if</span> <span class="n">best_dist</span> <span class="o">&lt;=</span> <span class="n">epsilon</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">best_contact_point_triangle1</span><span class="p">,</span> <span class="n">best_contact_point_triangle2</span>
+        <span class="n">i0</span> <span class="o">=</span> <span class="n">i1</span>
+        <span class="n">i1</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">best_dist</span><span class="p">,</span> <span class="n">best_contact_point_triangle1</span><span class="p">,</span> <span class="n">best_contact_point_triangle2</span></div>
+
+
+<div class="viewcode-block" id="triangle_to_rectangle"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.triangle_to_rectangle.html#distance3d.distance.triangle_to_rectangle">[docs]</a><span class="k">def</span> <span class="nf">triangle_to_rectangle</span><span class="p">(</span>
+        <span class="n">triangle_points</span><span class="p">,</span> <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span> <span class="n">rectangle_lengths</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between triangle and rectangle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    triangle_points : array, shape (3, 3)</span>
+<span class="sd">        Each row contains a point of the triangle.</span>
+
+<span class="sd">    rectangle_center : array, shape (3,)</span>
+<span class="sd">        Center point of the rectangle.</span>
+
+<span class="sd">    rectangle_axes : array, shape (2, 3)</span>
+<span class="sd">        Each row is a vector of unit length, indicating the direction of one</span>
+<span class="sd">        axis of the rectangle. Both vectors are orthogonal.</span>
+
+<span class="sd">    rectangle_lengths : array, shape (2,)</span>
+<span class="sd">        Lengths of the two sides of the rectangle.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    distance : float</span>
+<span class="sd">        Shortest distance.</span>
+
+<span class="sd">    contact_point_triangle : array, shape (3,)</span>
+<span class="sd">        Closest point on triangle.</span>
+
+<span class="sd">    contact_point_rectangle : array, shape (3,)</span>
+<span class="sd">        Closest point on rectangle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># compare edges of triangle to the interior of rectangle</span>
+    <span class="n">best_dist</span> <span class="o">=</span> <span class="n">MAX_FLOAT</span>
+    <span class="n">i0</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">i1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i1</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">segment_start</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="n">i0</span><span class="p">]</span>
+        <span class="n">segment_end</span> <span class="o">=</span> <span class="n">triangle_points</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span>
+        <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point_triangle</span><span class="p">,</span> <span class="n">contact_point_rectangle</span> <span class="o">=</span> <span class="n">line_segment_to_rectangle</span><span class="p">(</span>
+            <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span> <span class="n">rectangle_lengths</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">best_dist</span><span class="p">:</span>
+            <span class="n">best_contact_point_triangle</span> <span class="o">=</span> <span class="n">contact_point_triangle</span>
+            <span class="n">best_contact_point_rectangle</span> <span class="o">=</span> <span class="n">contact_point_rectangle</span>
+            <span class="n">best_dist</span> <span class="o">=</span> <span class="n">dist</span>
+        <span class="n">i0</span> <span class="o">=</span> <span class="n">i1</span>
+        <span class="n">i1</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># compare edges of rectangle to the interior of triangle</span>
+    <span class="n">rectangle_extents</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">rectangle_lengths</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">rectangle_axes</span>
+    <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i0</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">segment_end</span><span class="p">,</span> <span class="n">segment_start</span> <span class="o">=</span> <span class="n">convert_rectangle_to_segment</span><span class="p">(</span>
+                <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_extents</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">)</span>
+            <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point_rectangle</span><span class="p">,</span> <span class="n">contact_point_triangle</span> <span class="o">=</span> <span class="n">line_segment_to_triangle</span><span class="p">(</span>
+                <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">best_dist</span><span class="p">:</span>
+                <span class="n">best_contact_point_triangle</span> <span class="o">=</span> <span class="n">contact_point_triangle</span>
+                <span class="n">best_contact_point_rectangle</span> <span class="o">=</span> <span class="n">contact_point_rectangle</span>
+                <span class="n">best_dist</span> <span class="o">=</span> <span class="n">dist</span>
+
+    <span class="k">return</span> <span class="n">best_dist</span><span class="p">,</span> <span class="n">best_contact_point_triangle</span><span class="p">,</span> <span class="n">best_contact_point_rectangle</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

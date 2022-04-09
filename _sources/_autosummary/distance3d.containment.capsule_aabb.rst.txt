@@ -1,0 +1,6 @@
+﻿distance3d.containment.capsule\_aabb
+====================================
+
+.. currentmodule:: distance3d.containment
+
+.. autofunction:: capsule_aabb

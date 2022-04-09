@@ -1,0 +1,6 @@
+﻿distance3d.gjk.gjk\_with\_simplex
+=================================
+
+.. currentmodule:: distance3d.gjk
+
+.. autofunction:: gjk_with_simplex

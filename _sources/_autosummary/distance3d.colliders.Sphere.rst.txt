@@ -1,0 +1,28 @@
+﻿distance3d.colliders.Sphere
+===========================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: Sphere
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Sphere.__init__
+      ~Sphere.aabb
+      ~Sphere.compute_point
+      ~Sphere.first_vertex
+      ~Sphere.make_artist
+      ~Sphere.support_function
+      ~Sphere.update_pose
+   
+   
+
+   
+   
+   

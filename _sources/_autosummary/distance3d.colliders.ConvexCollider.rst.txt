@@ -1,0 +1,28 @@
+﻿distance3d.colliders.ConvexCollider
+===================================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: ConvexCollider
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ConvexCollider.__init__
+      ~ConvexCollider.aabb
+      ~ConvexCollider.compute_point
+      ~ConvexCollider.first_vertex
+      ~ConvexCollider.make_artist
+      ~ConvexCollider.support_function
+      ~ConvexCollider.update_pose
+   
+   
+
+   
+   
+   

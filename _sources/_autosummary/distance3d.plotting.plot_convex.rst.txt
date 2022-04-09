@@ -1,0 +1,6 @@
+﻿distance3d.plotting.plot\_convex
+================================
+
+.. currentmodule:: distance3d.plotting
+
+.. autofunction:: plot_convex

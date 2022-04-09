@@ -1,0 +1,28 @@
+﻿distance3d.colliders.Cylinder
+=============================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: Cylinder
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Cylinder.__init__
+      ~Cylinder.aabb
+      ~Cylinder.compute_point
+      ~Cylinder.first_vertex
+      ~Cylinder.make_artist
+      ~Cylinder.support_function
+      ~Cylinder.update_pose
+   
+   
+
+   
+   
+   

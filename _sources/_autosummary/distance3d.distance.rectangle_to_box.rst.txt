@@ -1,0 +1,6 @@
+﻿distance3d.distance.rectangle\_to\_box
+======================================
+
+.. currentmodule:: distance3d.distance
+
+.. autofunction:: rectangle_to_box

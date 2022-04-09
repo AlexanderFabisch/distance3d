@@ -1,0 +1,6 @@
+﻿distance3d.random.randn\_line
+=============================
+
+.. currentmodule:: distance3d.random
+
+.. autofunction:: randn_line

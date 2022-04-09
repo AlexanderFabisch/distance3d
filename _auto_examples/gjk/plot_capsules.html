@@ -1,0 +1,900 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Distance between capsules with GJK &#8212; distance3d 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Physical simulation with collision detection" href="../visualizations/vis_collision_physics.html" />
+    <link rel="prev" title="Collision resolution with EPA after GJK" href="plot_collision_resolution_epa.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-gjk-plot-capsules-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="distance-between-capsules-with-gjk">
+<span id="sphx-glr-auto-examples-gjk-plot-capsules-py"></span><h1>Distance between capsules with GJK<a class="headerlink" href="#distance-between-capsules-with-gjk" title="Permalink to this headline">¶</a></h1>
+<img src="../../_images/sphx_glr_plot_capsules_001.png" srcset="../../_images/sphx_glr_plot_capsules_001.png" alt="plot capsules" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0.0
+2.5264712483186833
+0.5275037031067408
+0.7163607727589122
+1.0320382827203856
+0.12297141609788033
+1.433300817908957
+0.23540276182293057
+0.506150562498583
+0.784252044949437
+0.7505275995402192
+1.8973159903566126
+0.5728851528249567
+0.9781604490892472
+0.05205897736320819
+1.0848997329585863
+0.9000857291895553
+0.5926953855041524
+0.7746694810345752
+0.0
+0.5229861715885303
+0.9974717155223897
+0.545797970909954
+0.4869340460500474
+0.5907614851658521
+1.5072685021842178
+0.0
+1.6644369459832773
+1.9659940866030314
+0.6387181959343251
+0.9480070552879318
+1.0685736428366015
+0.5295682928042987
+1.6182982139208242
+1.25239508583036
+0.0
+0.1457224399916186
+1.9577004320983253
+0.910754745449223
+0.19132922682134101
+0.5385095512064016
+0.31112470405457676
+0.9963683719781659
+2.4118683143598085
+0.20485113436452584
+1.2442582843553724
+0.46135301246795474
+0.9290624040772554
+1.225698395112384
+0.9849256565938094
+0.5435526990479794
+1.0995408365877715
+2.3401933184556936
+2.3174326450320564
+1.393018748425472
+1.1775751439335878
+0.0
+0.8599307864326271
+1.5913930367845035
+0.2611295852500518
+0.9682899615084096
+1.2321649749167645
+0.5811034475673286
+0.39664682781206095
+1.7867688288534815
+0.45092764615434017
+0.5401314674482814
+2.0426227673458133
+2.840516411197385
+1.3811277767597814
+1.441280296900739
+0.39157730280231434
+1.6597558817465938
+0.720016657968562
+0.9792773475465757
+1.5273969095533366
+0.921887925527841
+0.09023394740874102
+2.015430132461319
+1.0031594674236162
+2.233080209385289
+0.1913887972045035
+1.053100790801897
+0.7104951406637505
+1.0682437744741022
+1.616951983578299
+1.0728852796799262
+1.583849286680292
+0.9052068127108294
+0.0
+0.08677284601345477
+0.646705809572799
+0.0
+0.19385426268478168
+0.25273771650420496
+0.03686476193281286
+0.25289239795390717
+0.5022969938088881
+0.2579721990704837
+0.29705724280742374
+1.061118155457881
+0.19750654905647008
+1.3050164941419418
+0.10047917715598327
+0.321628026068026
+2.0815751778114193
+1.0864924760939882
+1.0249595075269806
+1.5863986709981521
+0.6647435357062547
+0.8360895495075723
+0.2906296457476589
+2.2970172266073186
+0.025831154561216523
+1.9878474449845684
+0.00065107118538907
+0.776767279446611
+0.6116560869322238
+1.3114939754056747
+0.20811222665808737
+1.9492940884629815
+0.25494804140695004
+0.3887783320936205
+0.40088772886556384
+1.1647587414005796
+0.7197366568338274
+0.9908996173301994
+0.775127370916388
+0.9880531274821238
+1.5379769215440084
+0.0
+0.6645338625944702
+0.5589365046487943
+0.0
+1.1046046711906972
+0.6507457519316768
+1.557949913816829
+0.0
+0.0352134373273136
+0.633180890692042
+1.4911727826816994
+1.5918887453264727
+0.07384196196543558
+0.9973227455942182
+0.0
+1.749234200812991
+0.0
+0.8652709010963701
+0.5119147701697773
+2.779485672900316
+0.9183249661816979
+0.8264209038118318
+0.7448562263676615
+1.1984751147323363
+0.521629709917631
+0.6637503898626771
+0.9777642570655638
+0.054363946121979104
+1.1129515857008636
+2.32371137532391
+1.0112342925631264
+0.6225327419625155
+0.5754450693918179
+1.1260798094411495
+0.7715482318368576
+1.2487647521411207
+2.1962743449378883
+2.8752443729416157
+0.23286580015882685
+0.853922396817791
+0.2517195815702731
+0.3020292747085894
+0.3465550145326508
+0.0
+0.5186454951197148
+1.8922379360962476
+0.3364823834924127
+0.051466055024428886
+1.4130397187568386
+0.37094951203505516
+0.9379197168499338
+0.9968442952945094
+0.0
+1.158274531917762
+0.0
+1.555254862823293
+0.6795155109948476
+0.7830463894312721
+1.1937316845264812
+0.35549164645269143
+0.8005272905987558
+0.0
+0.4080164296626274
+0.7460113995930957
+1.0193565499190456
+0.8442537751396653
+0.18899650480531566
+1.6309402735541758
+1.0466000502187016
+2.33807868608256
+0.769803162046649
+1.7191678858204573
+1.1084054895087192
+0.5544934841012541
+1.5222316464335612
+1.0199391728897818
+1.3297480608858652
+1.2123034674209228
+1.1193186145375809
+0.6436704147838571
+1.3542202763860653
+0.16018163803257632
+0.9527790365458304
+2.1246258730949426
+0.703525613364694
+0.4831881327102208
+1.4889404812629354
+1.3104880473647833
+0.0
+0.0
+1.6126558721673516
+1.4125578838837392
+0.7437205743304964
+5.5429776423915534e-17
+2.1042768376661356
+0.5358838214501588
+1.33267109639109
+0.5435666352445393
+1.3467041084522353
+0.24512354244847087
+1.9718118573527088
+0.07163069377721508
+0.3963319585013109
+0.43672214383771674
+2.117113502140111
+0.30165873884225153
+2.1514562437769924
+0.1786194812626543
+1.2683681755620744
+1.1072805091841562
+0.9640254872300003
+2.1930773775466568
+0.8113542941672431
+0.99701187423643
+1.5507459732442392
+0.9668952898825931
+1.5390419026697058
+2.5472660406153578
+0.749676652907777
+1.535568538074335
+0.07155487072644916
+0.6101985517454844
+1.4289266620881174
+1.1482002283014812
+1.5694602257534587
+1.8252698221597414
+0.7319393414800792
+1.0143463012635792
+0.9725062266484835
+1.631002950681292
+1.2132171703319492
+1.32632031219101
+0.021034042997173003
+1.9250655907774252
+0.09174993190838202
+0.9682413670203661
+0.0
+0.5699564545389071
+0.6447808708782862
+1.5711766640342486
+0.2643175347826285
+0.32096785644981796
+0.8462498392709777
+0.47862113400650047
+0.3098195612084811
+1.0242152465763779
+0.1462517275746382
+0.8349175749604227
+0.9469325917349158
+1.2963681398483815
+0.9005230235859996
+0.0
+0.3717112413079129
+0.4831094638143445
+0.0
+0.8004043040238912
+0.6608937637024773
+1.0502623468920593
+2.343996993447388
+2.5506644298718193
+1.2519131557724612
+0.20881175879713862
+0.9515314019027794
+2.5737298750456827
+0.55542728577713
+0.7341062853890207
+0.770211289722013
+0.5127495853922261
+1.1477339530213162
+0.3492179159922411
+0.23949629138546807
+1.0637972701784124
+0.03010808277127304
+0.8000940482720914
+1.8589324834567196
+0.6501604844335167
+0.834189075444176
+0.4005577719311736
+0.5595119356946255
+1.1362682048745643
+0.5755866566188972
+0.9915753334963885
+1.1747904745241706
+0.743175420261233
+0.04501077498039895
+0.0
+0.0
+0.8906573936572435
+0.10821880279123657
+0.3394494087869733
+1.5215264209303367
+1.6838704998206504
+0.7529864327003973
+1.3339406862539593
+0.5248167196754311
+0.4692386801746946
+1.2198965353251299
+1.5663527984729997
+1.6516783242419408
+1.0388262322214064
+0.06214831519322438
+1.4554248870753548
+0.5246901411010567
+0.0
+2.080128258034981
+0.7915007191170188
+0.9667991131898365
+0.6029249418587751
+1.3099804247270286
+1.1714248079410747
+0.5624112348744165
+1.3213049865636943
+0.3406917211783888
+1.293340384450606
+1.398674965901809
+1.0978277994349075
+0.0
+0.5622130322294686
+0.4015628050126173
+1.3271935901132965
+1.2826438688443837
+0.8617850781381718
+1.0283674903535343
+2.3542049748233937
+0.5997145462140957
+1.5270344035829682
+1.3271276277488027
+1.265152612127217
+0.0
+0.9154490322323643
+2.0785534401162415
+0.27072720735942307
+1.1567919412838086
+0.252045268036063
+1.895679361075554
+0.2349521029193219
+1.1829769111381965
+0.0
+0.0
+1.5227313879247892
+0.7096162506989139
+0.7145343419121885
+1.086783649022904
+0.22610052998369637
+0.3157085566848623
+0.5646643347790968
+0.9486177589611648
+2.231236201820245
+0.634045913129167
+0.9235006049311192
+0.9131381582345149
+1.5581769716327496
+0.8503094631519318
+1.3083521533359337
+0.8454913014959443
+1.4224742463225748
+0.7823444613507564
+1.7443675444832574
+1.5916448045527867
+0.5960258288782421
+0.3959687120992678
+0.8057822517513661
+1.008459071538282
+2.4076939456277304
+1.4609280555073934
+0.9861436556640878
+0.2043332150764516
+1.5447918444907398
+1.359185705650494
+0.5259308061084438
+1.2368638592415058
+2.1005202197655684
+0.6522761098398846
+0.13510926926381273
+1.0433646933748342
+1.854624215181217
+0.4680890625543019
+1.3656343991330937
+0.7612745942923433
+1.4118947363086156
+0.33327060581510815
+1.4006473424400647
+0.30234784935892933
+0.9466905184156312
+0.34082800666545465
+0.38558160215287923
+1.648980750980419
+0.08089050127624638
+1.1564240216630106
+1.4688863157904817
+0.5172947959506197
+0.0
+1.2584359198833006
+0.0
+0.918864842434297
+1.1253952026344358
+2.0599419124952454
+1.0299773943758068
+0.7122378295887853
+3.020911521888026
+0.2486498727742162
+0.793990568368469
+0.3001264279600559
+1.871563826544102
+0.6934302649799976
+1.076633368112354
+0.5563150718077529
+0.6627134462511455
+1.0067950059352668
+0.7013771938857245
+0.8430105574308592
+0.7103404722348475
+1.187599184134025
+1.5514221760551952
+1.4035951005805307
+1.3178507837718443
+0.6012555803954599
+0.0
+1.2762481558571586
+0.0
+1.1552816129252506
+0.6982717527816723
+0.3178294509011496
+0.0
+0.31178124161012294
+0.0008729852392028512
+1.479839958280007
+1.9330665168308407
+1.4130196321057518
+0.7760412838027294
+0.7238054041843671
+0.4452216240931694
+0.8671469798601092
+1.8268259569939185
+1.0330687755824377
+1.1894486699676172
+1.2140578406514126
+0.5901254793163381
+0.7105111300279578
+1.5470643045756356
+1.260095281575005
+1.1264013786497542
+0.3438292376453643
+0.7013343379204465
+0.44948292395864287
+1.0561741506640252
+2.2635064371353137
+0.41017041909010343
+1.3816957908264063
+2.627647187569557
+1.299939752500048
+1.9330150937387944
+0.0
+1.9055619756067281
+0.5331933859035957
+1.5811251980456047
+1.0969703344417496
+0.6998005541785649
+0.7194744937765299
+1.037219748914918
+0.874729982967397
+0.24064510839452027
+0.8961093186427772
+0.8079537067372289
+1.222506332848611
+1.5754536710116813
+0.5654249010159068
+1.4004780184315666
+0.4730029274477802
+1.2926835714990546
+0.0
+1.1905006542779535
+0.9015051218922486
+0.5158182618367536
+0.9687169753580478
+0.24409978816975425
+1.146944418097007
+0.0671657198290397
+1.3685452748604976
+1.5794805083700545
+0.6306049304632327
+1.2375866427433089
+1.0891470594495716
+0.45374196032146846
+0.7656562671496762
+0.7354147458042162
+0.2336260929889223
+0.7739210035624977
+1.2491404333592415
+0.015743426699184184
+1.787861032445428
+2.5073024032451006
+0.3053344537628746
+0.14661701304796507
+0.967713299256838
+0.9744474538402866
+1.1273110492360363
+0.8189927440523876
+1.2772273296546783
+0.7030615082347332
+0.8079817158393534
+3.2701528373532813
+0.9591612198200717
+0.7758609227788434
+1.117292363030113
+1.3539799187828931
+1.4365537076612331
+0.5251912440219131
+0.9354227619820437
+0.5742827300766097
+0.16733375937689857
+1.5603938006122648
+1.7161105247636397
+1.228862736474254
+0.8755363448969116
+1.7261235204134158
+0.6031167505802548
+0.7862808206755443
+0.04663669229702467
+2.051348328758299
+0.13750836119388707
+0.7120696571621935
+1.9537306757215607
+0.9978510420921085
+0.0
+2.456628886221318
+0.7222932456724516
+0.6400540682295323
+1.0029790286260114
+0.730666052054935
+0.5695073621614021
+0.3216221351348404
+1.6500272581986042
+1.1574525196683074
+1.6872144810446161
+0.17567942355680755
+0.7560315712053275
+0.9925576304117845
+0.9149418113251552
+1.255568978419563
+0.45117988671355586
+1.0415610036088467
+2.447201408696979
+1.4081614375316522
+0.11430207144644104
+0.0
+0.0
+1.0686018311929169
+1.8617557926337573
+1.4064344963898572
+1.1787363383865954
+0.974881634956537
+0.17050629249662122
+1.0426206517163696
+0.9198890945360035
+1.0008503482871174
+0.0
+0.6032864431540346
+1.0240716997676065
+0.9154722306335173
+2.455821155627584
+0.5573154816930992
+0.5729362695663686
+0.3917348637536812
+0.996794360556502
+0.9495330975665764
+1.1132293613858717
+1.4913815136511672
+1.0696962845877775
+0.6272158040198594
+0.2659712736497503
+1.2593179113912605
+1.3350334672944482
+0.9706913977060184
+1.1530673640468412
+1.2070158117880936
+1.3554870970456925
+1.7745486867601725
+0.7503403145459185
+0.2305125610879052
+2.103789933252978
+1.0002500380835426
+0.5599502282875065
+0.5143207930002839
+0.7986158212303953
+0.43885117404247326
+0.5175854632468582
+0.5592158238149513
+0.9170370673839578
+1.358978774088731
+1.5207134579217594
+1.4009596288025943
+0.3108416008773447
+2.412672679552738
+0.3631761262688261
+0.6513590417816724
+0.5424470918438101
+2.0398173710294034
+0.3960045745256278
+0.0988052556672668
+0.24202347908196656
+0.7570120752820717
+0.9338618690837347
+0.9426977742719762
+0.31347080128708743
+0.8806091676222393
+2.4300528118865605
+2.3971605577028376
+1.1981066016777184
+0.9102054100602648
+1.2467299740126345
+1.0482197526063624
+0.9402008420665819
+1.1992168300950148
+1.8433274634654662
+0.8345133992424311
+1.8040570834854972
+1.737447180161219
+0.5867596188756778
+0.6675192693473445
+1.0601269962296238
+2.0009643297550515
+0.0
+0.5660783674986135
+1.138163242331737
+0.8392798541329688
+1.461816186595368
+0.6695891737195141
+0.02108389479369265
+2.1430346106476046
+1.641845526019709
+1.85593882524425
+1.6623340781251599
+0.9916981764737034
+1.4027674090181041
+0.5012734412853176
+0.8438525989605636
+0.0
+0.0
+1.5370075091008524
+1.9339276966220809
+1.0318753076999465
+0.8506788425760049
+2.4551874509154996
+0.6536604518805751
+1.8388157538211194
+0.5622427070190525
+2.158942215843558
+1.0033097911883553
+1.485257244102427
+0.0
+0.8121020208812564
+0.0
+0.0
+2.2028056153988027
+1.9071527157407557
+0.0
+0.09206391254419438
+0.0
+0.49527520763388755
+1.18204639754898
+1.1893850361638838
+0.0
+1.1802712622322629
+2.2952600909138523
+1.6932194648356649
+0.9988232635820216
+0.3268964763386715
+1.0181455187925457
+0.6717642654512905
+accumulated_time=1.0147464275360107
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pytransform3d.plot_utils</span> <span class="k">as</span> <span class="nn">ppu</span>
+<span class="kn">import</span> <span class="nn">pytransform3d.transformations</span> <span class="k">as</span> <span class="nn">pt</span>
+<span class="kn">from</span> <span class="nn">distance3d</span> <span class="kn">import</span> <span class="n">gjk</span><span class="p">,</span> <span class="n">colliders</span>
+<span class="kn">from</span> <span class="nn">distance3d</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">distance3d</span> <span class="kn">import</span> <span class="n">plotting</span>
+
+
+<span class="n">random_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">capsule2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.random.rand_capsule.html#distance3d.random.rand_capsule" title="distance3d.random.rand_capsule" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><span class="n">random</span><span class="o">.</span><span class="n">rand_capsule</span></a><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">ppu</span><span class="o">.</span><span class="n">make_3d_axis</span><span class="p">(</span><span class="n">ax_s</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">accumulated_time</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">700</span><span class="p">):</span>
+    <span class="n">capsule2origin2</span><span class="p">,</span> <span class="n">radius2</span><span class="p">,</span> <span class="n">height2</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.random.rand_capsule.html#distance3d.random.rand_capsule" title="distance3d.random.rand_capsule" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><span class="n">random</span><span class="o">.</span><span class="n">rand_capsule</span></a><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <a href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule" title="distance3d.colliders.Capsule" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">c1</span></a> <span class="o">=</span> <a href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule" title="distance3d.colliders.Capsule" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class"><span class="n">colliders</span><span class="o">.</span><span class="n">Capsule</span></a><span class="p">(</span><span class="n">capsule2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+    <a href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule" title="distance3d.colliders.Capsule" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">c2</span></a> <span class="o">=</span> <a href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule" title="distance3d.colliders.Capsule" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class"><span class="n">colliders</span><span class="o">.</span><span class="n">Capsule</span></a><span class="p">(</span><span class="n">capsule2origin2</span><span class="p">,</span> <span class="n">radius2</span><span class="p">,</span> <span class="n">height2</span><span class="p">)</span>
+    <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point_capsule</span><span class="p">,</span> <span class="n">contact_point_capsule2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.gjk.gjk_with_simplex.html#distance3d.gjk.gjk_with_simplex" title="distance3d.gjk.gjk_with_simplex" class="sphx-glr-backref-module-distance3d-gjk sphx-glr-backref-type-py-function"><span class="n">gjk</span><span class="o">.</span><span class="n">gjk_with_simplex</span></a><span class="p">(</span><a href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule" title="distance3d.colliders.Capsule" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">c1</span></a><span class="p">,</span> <a href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule" title="distance3d.colliders.Capsule" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">c2</span></a><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">accumulated_time</span> <span class="o">+=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">vertices1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><a href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule" title="distance3d.colliders.Capsule" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">c1</span></a><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">vertices1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">vertices1</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">vertices2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><a href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule" title="distance3d.colliders.Capsule" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">c2</span></a><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">vertices2</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices2</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">vertices2</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">)</span>
+    <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a><span class="p">(</span>
+        <span class="n">ax</span><span class="p">,</span> <span class="n">contact_point_capsule</span><span class="p">,</span> <span class="n">contact_point_capsule2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">plot_transform</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="n">capsule2origin2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">ppu</span><span class="o">.</span><span class="n">plot_capsule</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="n">capsule2origin2</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height2</span><span class="p">,</span>
+        <span class="n">wireframe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">accumulated_time</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">pt</span><span class="o">.</span><span class="n">plot_transform</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="n">capsule2origin</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">ppu</span><span class="o">.</span><span class="n">plot_capsule</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="n">capsule2origin</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">wireframe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;yellow&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.258 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-gjk-plot-capsules-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/ca3380abaca02a34cbe0a997152ada85/plot_capsules.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_capsules.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/089f4d34c846f8b5acbdc00ddde81c08/plot_capsules.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_capsules.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#aabb-tree">AABB Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#distance">Distance</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#gjk">GJK</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="plot_convex_mesh.html">Distance between convex meshes with GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_box.html">Distance between boxes with GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_cylinder.html">Distance between cylinders with GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_spheres.html">Distance between spheres with GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_collision_resolution_epa.html">Collision resolution with EPA after GJK</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Distance between capsules with GJK</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#visualizations">Visualizations</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Examples</a><ul>
+      <li>Previous: <a href="plot_collision_resolution_epa.html" title="previous chapter">Collision resolution with EPA after GJK</a></li>
+      <li>Next: <a href="../visualizations/vis_collision_physics.html" title="next chapter">Physical simulation with collision detection</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/_auto_examples/gjk/plot_capsules.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

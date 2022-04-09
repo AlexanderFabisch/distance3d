@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.distance._line &#8212; distance3d 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distance3d.distance._line</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="point_to_line"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.point_to_line.html#distance3d.distance.point_to_line">[docs]</a><span class="k">def</span> <span class="nf">point_to_line</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between point and line.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    point : array, shape (3,)</span>
+<span class="sd">        3D point.</span>
+
+<span class="sd">    line_point : array, shape (3,)</span>
+<span class="sd">        Point on line.</span>
+
+<span class="sd">    line_direction : array, shape (3,)</span>
+<span class="sd">        Direction of the line. This is assumed to be of unit length.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    distance : float</span>
+<span class="sd">        The shortest distance between point and line.</span>
+
+<span class="sd">    closest_point_line : array, shape (3,)</span>
+<span class="sd">        Closest point on line.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_point_to_line</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_point_to_line</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">):</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">point</span> <span class="o">-</span> <span class="n">line_point</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
+    <span class="n">direction_fraction</span> <span class="o">=</span> <span class="n">t</span> <span class="o">*</span> <span class="n">line_direction</span>
+    <span class="n">diff</span> <span class="o">-=</span> <span class="n">direction_fraction</span>
+    <span class="n">closest_point_line</span> <span class="o">=</span> <span class="n">line_point</span> <span class="o">+</span> <span class="n">direction_fraction</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">diff</span><span class="p">),</span> <span class="n">closest_point_line</span><span class="p">,</span> <span class="n">t</span>
+
+
+<div class="viewcode-block" id="point_to_line_segment"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.point_to_line_segment.html#distance3d.distance.point_to_line_segment">[docs]</a><span class="k">def</span> <span class="nf">point_to_line_segment</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between point and line segment.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    point : array, shape (3,)</span>
+<span class="sd">        3D point.</span>
+
+<span class="sd">    segment_start : array, shape (3,)</span>
+<span class="sd">        Start point of segment.</span>
+
+<span class="sd">    segment_end : array, shape (3,)</span>
+<span class="sd">        End point of segment.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    distance : float</span>
+<span class="sd">        The shortest distance between point and line segment.</span>
+
+<span class="sd">    closest_point_line_segment : array, shape (3,)</span>
+<span class="sd">        Closest point on line segment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">segment_direction</span> <span class="o">=</span> <span class="n">segment_end</span> <span class="o">-</span> <span class="n">segment_start</span>
+    <span class="c1"># Project point onto segment, computing parameterized position</span>
+    <span class="c1"># s(t) = segment_start + t * (segment_end - segment_start)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_direction</span><span class="p">)</span> <span class="o">/</span>
+         <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">segment_direction</span><span class="p">,</span> <span class="n">segment_direction</span><span class="p">))</span>
+    <span class="c1"># If outside segment, clamp t to the closest endpoint</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="c1"># Compute projected position from the clamped t</span>
+    <span class="n">closest_point_line_segment</span> <span class="o">=</span> <span class="n">segment_start</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="n">segment_direction</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">closest_point_line_segment</span><span class="p">),</span>
+            <span class="n">closest_point_line_segment</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="line_to_line"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.line_to_line.html#distance3d.distance.line_to_line">[docs]</a><span class="k">def</span> <span class="nf">line_to_line</span><span class="p">(</span><span class="n">line_point1</span><span class="p">,</span> <span class="n">line_direction1</span><span class="p">,</span> <span class="n">line_point2</span><span class="p">,</span> <span class="n">line_direction2</span><span class="p">,</span>
+                 <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between two lines.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    line_point1 : array, shape (3,)</span>
+<span class="sd">        Point on the first line.</span>
+
+<span class="sd">    line_direction1 : array, shape (3,)</span>
+<span class="sd">        Direction of the first line. This is assumed to be of unit length.</span>
+
+<span class="sd">    line_point2 : array, shape (3,)</span>
+<span class="sd">        Point on the second line.</span>
+
+<span class="sd">    line_direction2 : array, shape (3,)</span>
+<span class="sd">        Direction of the second line. This is assumed to be of unit length.</span>
+
+<span class="sd">    epsilon : float, optional (default: 1e-6)</span>
+<span class="sd">        Values smaller than epsilon are considered to be 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    distance : float</span>
+<span class="sd">        The shortest distance between two lines.</span>
+
+<span class="sd">    closest_point_line1 : array, shape (3,)</span>
+<span class="sd">        Closest point on first line.</span>
+
+<span class="sd">    closest_point_line2 : array, shape (3,)</span>
+<span class="sd">        Closest point on second line.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_line_to_line</span><span class="p">(</span>
+        <span class="n">line_point1</span><span class="p">,</span> <span class="n">line_direction1</span><span class="p">,</span> <span class="n">line_point2</span><span class="p">,</span> <span class="n">line_direction2</span><span class="p">,</span>
+        <span class="n">epsilon</span><span class="p">)[:</span><span class="mi">3</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_line_to_line</span><span class="p">(</span><span class="n">line_point1</span><span class="p">,</span> <span class="n">line_direction1</span><span class="p">,</span> <span class="n">line_point2</span><span class="p">,</span> <span class="n">line_direction2</span><span class="p">,</span>
+                  <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">line_point1</span> <span class="o">-</span> <span class="n">line_point2</span>
+    <span class="n">a12</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction1</span><span class="p">,</span> <span class="n">line_direction2</span><span class="p">)</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction1</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
+    <span class="n">det</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">a12</span> <span class="o">*</span> <span class="n">a12</span>
+
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">det</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">epsilon</span><span class="p">:</span>
+        <span class="n">b2</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction2</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="p">(</span><span class="n">a12</span> <span class="o">*</span> <span class="n">b2</span> <span class="o">-</span> <span class="n">b1</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+        <span class="n">t2</span> <span class="o">=</span> <span class="p">(</span><span class="n">a12</span> <span class="o">*</span> <span class="n">b1</span> <span class="o">-</span> <span class="n">b2</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+        <span class="n">dist_squared</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">t1</span> <span class="o">*</span> <span class="p">(</span><span class="n">t1</span> <span class="o">+</span> <span class="n">a12</span> <span class="o">*</span> <span class="n">t2</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">b1</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">t2</span> <span class="o">*</span> <span class="p">(</span><span class="n">a12</span> <span class="o">*</span> <span class="n">t1</span> <span class="o">+</span> <span class="n">t2</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">b2</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="p">)</span>
+        <span class="n">closest_point_line2</span> <span class="o">=</span> <span class="n">line_point2</span> <span class="o">+</span> <span class="n">t2</span> <span class="o">*</span> <span class="n">line_direction2</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># parallel lines</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="o">-</span><span class="n">b1</span>
+        <span class="n">t2</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">dist_squared</span> <span class="o">=</span> <span class="n">b1</span> <span class="o">*</span> <span class="n">t1</span> <span class="o">+</span> <span class="n">c</span>
+        <span class="n">closest_point_line2</span> <span class="o">=</span> <span class="n">line_point2</span>
+
+    <span class="n">closest_point_line1</span> <span class="o">=</span> <span class="n">line_point1</span> <span class="o">+</span> <span class="n">t1</span> <span class="o">*</span> <span class="n">line_direction1</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">dist_squared</span><span class="p">)),</span> <span class="n">closest_point_line1</span><span class="p">,</span>
+            <span class="n">closest_point_line2</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="line_to_line_segment"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.line_to_line_segment.html#distance3d.distance.line_to_line_segment">[docs]</a><span class="k">def</span> <span class="nf">line_to_line_segment</span><span class="p">(</span>
+        <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between line and line segment.</span>
+
+<span class="sd">    Implementation adapted from Real-Time Collision Detection by Christer</span>
+<span class="sd">    Ericson published by Morgan Kaufmann Publishers, Copyright 2005 Elsevier</span>
+<span class="sd">    Inc.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    line_point : array, shape (3,)</span>
+<span class="sd">        Point on line.</span>
+
+<span class="sd">    line_direction : array, shape (3,)</span>
+<span class="sd">        Direction of the line. This is assumed to be of unit length.</span>
+
+<span class="sd">    segment_start : array, shape (3,)</span>
+<span class="sd">        Start point of segment.</span>
+
+<span class="sd">    segment_end : array, shape (3,)</span>
+<span class="sd">        End point of segment.</span>
+
+<span class="sd">    epsilon : float, optional (default: 1e-6)</span>
+<span class="sd">        Values smaller than epsilon are considered to be 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dist : float</span>
+<span class="sd">        The shortest distance between line and line segment.</span>
+
+<span class="sd">    closest_point1 : array, shape (3,)</span>
+<span class="sd">        Closest point on line.</span>
+
+<span class="sd">    closest_point2 : array, shape (3,)</span>
+<span class="sd">        Closest point on line segment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_line_to_line_segment</span><span class="p">(</span>
+        <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)[:</span><span class="mi">3</span><span class="p">]</span></div>
+
+
+<span class="c1"># modified version of line segment to line segment</span>
+<span class="k">def</span> <span class="nf">_line_to_line_segment</span><span class="p">(</span>
+        <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span>
+        <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="c1"># Segment direction vectors</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">segment_end</span> <span class="o">-</span> <span class="n">segment_start</span>
+
+    <span class="c1"># Squared segment lengths, always nonnegative</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">epsilon</span> <span class="ow">and</span> <span class="n">e</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
+        <span class="c1"># Both segments degenerate into points</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">line_point</span> <span class="o">-</span> <span class="n">segment_start</span><span class="p">),</span>
+                <span class="n">segment_start</span><span class="p">,</span> <span class="n">line_point</span><span class="p">)</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">segment_start</span> <span class="o">-</span> <span class="n">line_point</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
+        <span class="c1"># First segment degenerates into a point</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">e</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">e</span> <span class="o">&lt;=</span> <span class="n">epsilon</span><span class="p">:</span>
+            <span class="c1"># Second segment degenerates into a point</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># General nondegenerate case</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">)</span>
+            <span class="n">denom</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">e</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="n">b</span>  <span class="c1"># always nonnegative</span>
+
+            <span class="k">if</span> <span class="n">denom</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="c1"># If segements not parallel, compute closest point on line 1 to</span>
+                <span class="c1"># line 2 and clamp to segment 1.</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">((</span><span class="n">b</span> <span class="o">*</span> <span class="n">f</span> <span class="o">-</span> <span class="n">c</span> <span class="o">*</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Parallel case: compute arbitrary s.</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="n">s</span> <span class="o">+</span> <span class="n">f</span><span class="p">)</span> <span class="o">/</span> <span class="n">e</span>
+
+    <span class="n">contact_point1</span> <span class="o">=</span> <span class="n">line_point</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="n">line_direction</span>
+    <span class="n">contact_point2</span> <span class="o">=</span> <span class="n">segment_start</span> <span class="o">+</span> <span class="n">s</span> <span class="o">*</span> <span class="n">d</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">contact_point2</span> <span class="o">-</span> <span class="n">contact_point1</span><span class="p">),</span> <span class="n">contact_point1</span><span class="p">,</span> <span class="n">contact_point2</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">s</span>
+
+
+<div class="viewcode-block" id="line_segment_to_line_segment"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.line_segment_to_line_segment.html#distance3d.distance.line_segment_to_line_segment">[docs]</a><span class="k">def</span> <span class="nf">line_segment_to_line_segment</span><span class="p">(</span>
+        <span class="n">segment_start1</span><span class="p">,</span> <span class="n">segment_end1</span><span class="p">,</span> <span class="n">segment_start2</span><span class="p">,</span> <span class="n">segment_end2</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between two line segments.</span>
+
+<span class="sd">    Implementation adapted from Real-Time Collision Detection by Christer</span>
+<span class="sd">    Ericson published by Morgan Kaufmann Publishers, Copyright 2005 Elsevier</span>
+<span class="sd">    Inc.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    segment_start1 : array, shape (3,)</span>
+<span class="sd">        Start point of segment 1.</span>
+
+<span class="sd">    segment_end1 : array, shape (3,)</span>
+<span class="sd">        End point of segment 1.</span>
+
+<span class="sd">    segment_start2 : array, shape (3,)</span>
+<span class="sd">        Start point of segment 2.</span>
+
+<span class="sd">    segment_end2 : array, shape (3,)</span>
+<span class="sd">        End point of segment 2.</span>
+
+<span class="sd">    epsilon : float, optional (default: 1e-6)</span>
+<span class="sd">        Values smaller than epsilon are considered to be 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    distance : float</span>
+<span class="sd">        The shortest distance between two line segments.</span>
+
+<span class="sd">    contact_point_segment1 : array, shape (3,)</span>
+<span class="sd">        Closest point on first line segment.</span>
+
+<span class="sd">    contact_point_segment2 : array, shape (3,)</span>
+<span class="sd">        Closest point on second line segment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Segment direction vectors</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">segment_end1</span> <span class="o">-</span> <span class="n">segment_start1</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">segment_end2</span> <span class="o">-</span> <span class="n">segment_start2</span>
+
+    <span class="c1"># Squared segment lengths, always nonnegative</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d2</span><span class="p">,</span> <span class="n">d2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">epsilon</span> <span class="ow">and</span> <span class="n">e</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
+        <span class="c1"># Both segments degenerate into points</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">segment_start2</span> <span class="o">-</span> <span class="n">segment_start1</span><span class="p">),</span>
+                <span class="n">segment_start1</span><span class="p">,</span> <span class="n">segment_start2</span><span class="p">)</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">segment_start1</span> <span class="o">-</span> <span class="n">segment_start2</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d2</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
+        <span class="c1"># First segment degenerates into a point</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">f</span> <span class="o">/</span> <span class="n">e</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">e</span> <span class="o">&lt;=</span> <span class="n">epsilon</span><span class="p">:</span>
+            <span class="c1"># Second segment degenerates into a point</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># General nondegenerate case</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">)</span>
+            <span class="n">denom</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">e</span> <span class="o">-</span> <span class="n">b</span> <span class="o">*</span> <span class="n">b</span>  <span class="c1"># always nonnegative</span>
+
+            <span class="k">if</span> <span class="n">denom</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="c1"># If segements not parallel, compute closest point on line 1 to</span>
+                <span class="c1"># line 2 and clamp to segment 1.</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">((</span><span class="n">b</span> <span class="o">*</span> <span class="n">f</span> <span class="o">-</span> <span class="n">c</span> <span class="o">*</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Parallel case: compute arbitrary s.</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="n">s</span> <span class="o">+</span> <span class="n">f</span><span class="p">)</span> <span class="o">/</span> <span class="n">e</span>
+
+            <span class="c1"># If t in [0, 1] done. Else clamp t, recompute s.</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">((</span><span class="n">b</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="n">contact_point1</span> <span class="o">=</span> <span class="n">segment_start1</span> <span class="o">+</span> <span class="n">s</span> <span class="o">*</span> <span class="n">d1</span>
+    <span class="n">contact_point2</span> <span class="o">=</span> <span class="n">segment_start2</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="n">d2</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">contact_point2</span> <span class="o">-</span> <span class="n">contact_point1</span><span class="p">),</span> <span class="n">contact_point1</span><span class="p">,</span> <span class="n">contact_point2</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

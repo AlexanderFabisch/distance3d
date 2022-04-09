@@ -1,0 +1,6 @@
+﻿distance3d.gjk.gjk
+==================
+
+.. currentmodule:: distance3d.gjk
+
+.. autofunction:: gjk

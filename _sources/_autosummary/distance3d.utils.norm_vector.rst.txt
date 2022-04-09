@@ -1,0 +1,6 @@
+﻿distance3d.utils.norm\_vector
+=============================
+
+.. currentmodule:: distance3d.utils
+
+.. autofunction:: norm_vector

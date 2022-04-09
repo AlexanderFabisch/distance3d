@@ -1,0 +1,6 @@
+﻿distance3d.containment.axis\_aligned\_bounding\_box
+===================================================
+
+.. currentmodule:: distance3d.containment
+
+.. autofunction:: axis_aligned_bounding_box

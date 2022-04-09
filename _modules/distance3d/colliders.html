@@ -1,0 +1,608 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.colliders &#8212; distance3d 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distance3d.colliders</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Colliders used for collision detection with GJK algorithm.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pytransform3d</span> <span class="kn">import</span> <span class="n">urdf</span>
+<span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
+<span class="kn">from</span> <span class="nn">.geometry</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">capsule_extreme_along_direction</span><span class="p">,</span> <span class="n">cylinder_extreme_along_direction</span><span class="p">,</span>
+    <span class="n">convert_box_to_vertices</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.containment</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">axis_aligned_bounding_box</span><span class="p">,</span> <span class="n">sphere_aabb</span><span class="p">,</span> <span class="n">box_aabb</span><span class="p">,</span> <span class="n">cylinder_aabb</span><span class="p">,</span>
+    <span class="n">capsule_aabb</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">aabbtree</span> <span class="kn">import</span> <span class="n">AABB</span><span class="p">,</span> <span class="n">AABBTree</span>
+
+
+<div class="viewcode-block" id="ColliderTree"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ColliderTree.html#distance3d.colliders.ColliderTree">[docs]</a><span class="k">class</span> <span class="nc">ColliderTree</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Wraps multiple colliders that are connected through transformations.</span>
+
+<span class="sd">    In addition, these colliders are stored in an AABB tree for broad phase</span>
+<span class="sd">    collision detection.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tm : pytransform3d.transform_manager.TransformManager</span>
+<span class="sd">        Transform manager that stores the transformations.</span>
+
+<span class="sd">    base_frame : str</span>
+<span class="sd">        Name of the base frame in which colliders are represented.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ColliderTree.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ColliderTree.html#distance3d.colliders.ColliderTree.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">base_frame</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tm</span> <span class="o">=</span> <span class="n">tm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_frame</span> <span class="o">=</span> <span class="n">base_frame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collider_frames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aabbtree</span> <span class="o">=</span> <span class="n">AABBTree</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colliders</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+    <span class="k">def</span> <span class="nf">fill_tree_with_colliders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tm</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fill tree with colliders from URDF transform manager.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tm : pytransform3d.urdf.UrdfTransformManager</span>
+<span class="sd">            Transform manager that has colliders.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tm</span><span class="o">.</span><span class="n">collision_objects</span><span class="p">:</span>
+            <span class="n">A2B</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">get_transform</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_frame</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">urdf</span><span class="o">.</span><span class="n">Sphere</span><span class="p">):</span>
+                    <span class="n">collider</span> <span class="o">=</span> <span class="n">Sphere</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">A2B</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">radius</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">urdf</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
+                    <span class="n">collider</span> <span class="o">=</span> <span class="n">Box</span><span class="p">(</span><span class="n">A2B</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">urdf</span><span class="o">.</span><span class="n">Cylinder</span><span class="p">):</span>
+                    <span class="n">collider</span> <span class="o">=</span> <span class="n">Cylinder</span><span class="p">(</span>
+                        <span class="n">cylinder2origin</span><span class="o">=</span><span class="n">A2B</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span>
+                        <span class="n">length</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">urdf</span><span class="o">.</span><span class="n">Mesh</span><span class="p">)</span>
+                    <span class="n">collider</span> <span class="o">=</span> <span class="n">Mesh</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">A2B</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+                <span class="n">collider</span><span class="o">.</span><span class="n">make_artist</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_collider</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">collider</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">add_collider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">collider</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add collider.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frame : str</span>
+<span class="sd">            Frame in which the collider is located.</span>
+
+<span class="sd">        collider : ConvexCollider</span>
+<span class="sd">            Collider.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collider_frames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colliders</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span> <span class="o">=</span> <span class="n">collider</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aabbtree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">collider</span><span class="o">.</span><span class="n">aabb</span><span class="p">(),</span> <span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">collider</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">update_collider_poses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update poses of all colliders from transform manager.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aabbtree</span> <span class="o">=</span> <span class="n">AABBTree</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colliders</span><span class="p">:</span>
+            <span class="n">A2B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">get_transform</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_frame</span><span class="p">)</span>
+            <span class="n">collider</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colliders</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
+            <span class="n">collider</span><span class="o">.</span><span class="n">update_pose</span><span class="p">(</span><span class="n">A2B</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aabbtree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">collider</span><span class="o">.</span><span class="n">aabb</span><span class="p">(),</span> <span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">collider</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">get_colliders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all colliders.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        colliders : list</span>
+<span class="sd">            List of colliders.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">colliders</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_artists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all artists.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        artists : list</span>
+<span class="sd">            List of artists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">collider</span><span class="o">.</span><span class="n">artist_</span> <span class="k">for</span> <span class="n">collider</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colliders</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">collider</span><span class="o">.</span><span class="n">artist_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">aabb_overlapping_colliders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collider</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get colliders with an overlapping AABB.</span>
+
+<span class="sd">        This function performs broad phase collision detection with a bounding</span>
+<span class="sd">        volume hierarchy, where the bounding volumes are axies-aligned bounding</span>
+<span class="sd">        boxes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        collider : ConvexCollider</span>
+<span class="sd">            Collider.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        colliders : dict</span>
+<span class="sd">            Maps frame names to colliders with overlapping AABB.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">aabb</span> <span class="o">=</span> <span class="n">collider</span><span class="o">.</span><span class="n">aabb</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aabbtree</span><span class="o">.</span><span class="n">overlap_values</span><span class="p">(</span><span class="n">aabb</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">get_collider_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get collider frames.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        collider_frames : set</span>
+<span class="sd">            Collider frames.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">collider_frames</span></div>
+
+
+<div class="viewcode-block" id="ConvexCollider"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ConvexCollider.html#distance3d.colliders.ConvexCollider">[docs]</a><span class="k">class</span> <span class="nc">ConvexCollider</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convex collider base class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vertices : iterable</span>
+<span class="sd">        Vertices of the convex collider.</span>
+
+<span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
+<span class="sd">        Corresponding artist for visualizer.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vertices_ : iterable</span>
+<span class="sd">        Vertices of the convex collider.</span>
+
+<span class="sd">    artist_ : pytransform3d.visualizer.Artist, optional (default: None)</span>
+<span class="sd">        Corresponding artist for visualizer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ConvexCollider.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ConvexCollider.html#distance3d.colliders.ConvexCollider.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="n">vertices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">artist</span></div>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make artist that represents this collider.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c : array-like, shape (3,), optional (default: None)</span>
+<span class="sd">            Color of artist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">first_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get any vertex from collider to initialize GJK algorithm.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        vertex : array, shape (3,)</span>
+<span class="sd">            Vertex from collider.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">support_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Support function for collider.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        search_direction : array, shape (3,)</span>
+<span class="sd">            Direction in which we search for extreme point of the collider.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        extreme_point : array, shape (3,)</span>
+<span class="sd">            Extreme point along search direction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">compute_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">barycentric_coordinates</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute point from barycentric coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        barycentric_coordinates : array, shape (n_vertices,)</span>
+<span class="sd">            Barycentric coordinates of the point that we compute.</span>
+
+<span class="sd">        indices : array, shape (n_vertices,)</span>
+<span class="sd">            Vertex indices to which the barycentric coordinates apply.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        point : array, shape (3,)</span>
+<span class="sd">            Point that we compute from barycentric coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">barycentric_coordinates</span><span class="p">,</span>
+                      <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]))</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">update_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update pose of collider.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pose : array, shape (4, 4)</span>
+<span class="sd">            New pose of the collider.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get axis-aligned bounding box.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        aabb : AABB</span>
+<span class="sd">            Axis-aligned bounding box.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Convex"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Convex.html#distance3d.colliders.Convex">[docs]</a><span class="k">class</span> <span class="nc">Convex</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wraps convex hull of a set of vertices for GJK algorithm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vertices : array, shape (n_vertices, 3)</span>
+<span class="sd">        Vertices of the convex shape.</span>
+
+<span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
+<span class="sd">        Artist for visualizer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Convex.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Convex.html#distance3d.colliders.Convex.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Convex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">artist</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">PointCollection3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">first_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">support_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">search_direction</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">compute_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">barycentric_coordinates</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">barycentric_coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">[</span><span class="n">indices</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">update_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="n">vertices</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span> <span class="o">=</span> <span class="n">axis_aligned_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AABB</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Box"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box">[docs]</a><span class="k">class</span> <span class="nc">Box</span><span class="p">(</span><span class="n">Convex</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wraps box for GJK algorithm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    box2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the box.</span>
+
+<span class="sd">    size : array, shape (3,)</span>
+<span class="sd">        Sizes of the box along its axes.</span>
+
+<span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
+<span class="sd">        Corresponding artist for visualizer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Box.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Box</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">convert_box_to_vertices</span><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="n">artist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box2origin</span> <span class="o">=</span> <span class="n">box2origin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span></div>
+
+    <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box2origin</span> <span class="o">=</span> <span class="n">pose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="n">convert_box_to_vertices</span><span class="p">(</span><span class="n">pose</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span> <span class="o">=</span> <span class="n">box_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AABB</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Mesh"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Mesh.html#distance3d.colliders.Mesh">[docs]</a><span class="k">class</span> <span class="nc">Mesh</span><span class="p">(</span><span class="n">Convex</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wraps mesh for GJK algorithm (we assume a convex mesh).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Path to mesh file.</span>
+
+<span class="sd">    A2B : array, shape (4, 4)</span>
+<span class="sd">        Center of the mesh.</span>
+
+<span class="sd">    scale : float, optional (default: 1)</span>
+<span class="sd">        Scaling of the mesh.</span>
+
+<span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
+<span class="sd">        Corresponding artist for visualizer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Mesh.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Mesh.html#distance3d.colliders.Mesh.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">A2B</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
+        <span class="k">if</span> <span class="n">artist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">artist</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="n">A2B</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">artist</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Mesh</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">artist</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">update_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span> <span class="o">=</span> <span class="n">axis_aligned_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AABB</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Cylinder"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Cylinder.html#distance3d.colliders.Cylinder">[docs]</a><span class="k">class</span> <span class="nc">Cylinder</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wraps cylinder for GJK algorithm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cylinder2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the cylinder.</span>
+
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the cylinder.</span>
+
+<span class="sd">    length : float</span>
+<span class="sd">        Length of the cylinder.</span>
+
+<span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
+<span class="sd">        Corresponding artist for visualizer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Cylinder.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Cylinder.html#distance3d.colliders.Cylinder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cylinder2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Cylinder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([],</span> <span class="n">artist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span> <span class="o">=</span> <span class="n">cylinder2origin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span></div>
+
+    <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Cylinder</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span><span class="p">,</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">first_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vertex</span>
+
+    <span class="k">def</span> <span class="nf">support_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">):</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">cylinder_extreme_along_direction</span><span class="p">(</span>
+            <span class="n">search_direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+        <span class="n">vertex_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vertex_idx</span><span class="p">,</span> <span class="n">vertex</span>
+
+    <span class="k">def</span> <span class="nf">update_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span> <span class="o">=</span> <span class="n">pose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span> <span class="o">=</span> <span class="n">cylinder_aabb</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AABB</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Capsule"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule">[docs]</a><span class="k">class</span> <span class="nc">Capsule</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wraps capsule for GJK algorithm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    capsule2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the capsule.</span>
+
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the capsule.</span>
+
+<span class="sd">    height : float</span>
+<span class="sd">        Height of the capsule.</span>
+
+<span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
+<span class="sd">        Corresponding artist for visualizer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Capsule.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capsule2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Capsule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([],</span> <span class="n">artist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span> <span class="o">=</span> <span class="n">capsule2origin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+    <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Capsule</span><span class="p">(</span>
+            <span class="n">height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span><span class="p">,</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">first_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vertex</span>
+
+    <span class="k">def</span> <span class="nf">support_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">):</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">capsule_extreme_along_direction</span><span class="p">(</span>
+            <span class="n">search_direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+        <span class="n">vertex_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vertex_idx</span><span class="p">,</span> <span class="n">vertex</span>
+
+    <span class="k">def</span> <span class="nf">update_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span> <span class="o">=</span> <span class="n">pose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span> <span class="o">=</span> <span class="n">capsule_aabb</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AABB</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sphere"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere">[docs]</a><span class="k">class</span> <span class="nc">Sphere</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wraps sphere for GJK algorithm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    center : array, shape (3,)</span>
+<span class="sd">        Center of the sphere.</span>
+
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the sphere.</span>
+
+<span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
+<span class="sd">        Corresponding artist for visualizer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Sphere.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Sphere</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([],</span> <span class="n">artist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+    <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">sphere2origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">sphere2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Sphere</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="n">sphere2origin</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">first_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vertex</span>
+
+    <span class="k">def</span> <span class="nf">support_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">):</span>
+        <span class="c1"># Similar implementation:</span>
+        <span class="c1"># https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L33</span>
+        <span class="c1"># (Copyright (c) 2017 Kevin Moran, MIT License or Unlicense)</span>
+        <span class="n">s_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">search_direction</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">s_norm</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">+</span> <span class="n">search_direction</span> <span class="o">/</span> <span class="n">s_norm</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
+        <span class="n">vertex_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vertex_idx</span><span class="p">,</span> <span class="n">vertex</span>
+
+    <span class="k">def</span> <span class="nf">update_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span> <span class="o">=</span> <span class="n">sphere_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AABB</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

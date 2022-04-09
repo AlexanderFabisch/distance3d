@@ -1,0 +1,6 @@
+﻿distance3d.distance.triangle\_to\_rectangle
+===========================================
+
+.. currentmodule:: distance3d.distance
+
+.. autofunction:: triangle_to_rectangle

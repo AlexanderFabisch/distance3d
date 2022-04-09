@@ -1,0 +1,29 @@
+﻿distance3d.colliders.ColliderTree
+=================================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: ColliderTree
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ColliderTree.__init__
+      ~ColliderTree.aabb_overlapping_colliders
+      ~ColliderTree.add_collider
+      ~ColliderTree.fill_tree_with_colliders
+      ~ColliderTree.get_artists
+      ~ColliderTree.get_collider_frames
+      ~ColliderTree.get_colliders
+      ~ColliderTree.update_collider_poses
+   
+   
+
+   
+   
+   

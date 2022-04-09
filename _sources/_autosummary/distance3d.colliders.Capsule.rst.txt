@@ -1,0 +1,28 @@
+﻿distance3d.colliders.Capsule
+============================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: Capsule
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Capsule.__init__
+      ~Capsule.aabb
+      ~Capsule.compute_point
+      ~Capsule.first_vertex
+      ~Capsule.make_artist
+      ~Capsule.support_function
+      ~Capsule.update_pose
+   
+   
+
+   
+   
+   

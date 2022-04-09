@@ -1,0 +1,6 @@
+﻿distance3d.random.rand\_capsule
+===============================
+
+.. currentmodule:: distance3d.random
+
+.. autofunction:: rand_capsule

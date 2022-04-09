@@ -1,0 +1,6 @@
+﻿distance3d.random.rand\_box
+===========================
+
+.. currentmodule:: distance3d.random
+
+.. autofunction:: rand_box

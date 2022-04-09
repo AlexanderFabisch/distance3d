@@ -1,0 +1,6 @@
+﻿distance3d.geometry.convert\_segment\_to\_line
+==============================================
+
+.. currentmodule:: distance3d.geometry
+
+.. autofunction:: convert_segment_to_line

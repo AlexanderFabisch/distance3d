@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.epa &#8212; distance3d 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distance3d.epa</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Expanding polytope algorithm (EPA) for collision resolution after GJK.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.colliders</span> <span class="kn">import</span> <span class="n">Convex</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">norm_vector</span>
+
+
+<span class="n">EDGES_PER_FACE</span> <span class="o">=</span> <span class="mi">3</span>
+
+
+<div class="viewcode-block" id="epa_vertices"><a class="viewcode-back" href="../../_autosummary/distance3d.epa.epa_vertices.html#distance3d.epa.epa_vertices">[docs]</a><span class="k">def</span> <span class="nf">epa_vertices</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">vertices1</span><span class="p">,</span> <span class="n">vertices2</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Expanding Polytope Algorithm (EPA).</span>
+
+<span class="sd">    Find minimum translation vector to resolve collision.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    simplex : array-like, shape (4, 3)</span>
+<span class="sd">        Simplex of Minkowski distances obtained by GJK.</span>
+
+<span class="sd">    vertices1 : array, shape (n_vertices1, 3)</span>
+<span class="sd">        Vertices of the first convex shape.</span>
+
+<span class="sd">    vertices2 : array, shape (n_vertices2, 3)</span>
+<span class="sd">        Vertices of the second convex shape.</span>
+
+<span class="sd">    epsilon : float, optional (default: 1e-8)</span>
+<span class="sd">        Floating point tolerance</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mtv : array, shape (3,)</span>
+<span class="sd">        Minimum translation vector to be added to the second set of vertices</span>
+<span class="sd">        or subtracted from the first set of vertices to resolve the collision.</span>
+<span class="sd">        The norm of this vector is the penetration depth and the direction is</span>
+<span class="sd">        the contact normal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">epa</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">Convex</span><span class="p">(</span><span class="n">vertices1</span><span class="p">),</span> <span class="n">Convex</span><span class="p">(</span><span class="n">vertices2</span><span class="p">),</span> <span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="epa"><a class="viewcode-back" href="../../_autosummary/distance3d.epa.epa.html#distance3d.epa.epa">[docs]</a><span class="k">def</span> <span class="nf">epa</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">collider1</span><span class="p">,</span> <span class="n">collider2</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">max_loose_edges</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">max_faces</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Expanding Polytope Algorithm (EPA).</span>
+
+<span class="sd">    Find minimum translation vector to resolve collision.</span>
+
+<span class="sd">    Based on Kevin Moran&#39;s implementation:</span>
+<span class="sd">        https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/GJK.h</span>
+<span class="sd">    (MIT License or Unlicense)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    simplex : array, shape (4, 3)</span>
+<span class="sd">        Simplex of Minkowski distances obtained by GJK.</span>
+
+<span class="sd">    collider1 : Collider</span>
+<span class="sd">        Convex collider 1.</span>
+
+<span class="sd">    collider2 : Collider</span>
+<span class="sd">        Convex collider 2.</span>
+
+<span class="sd">    max_iter : int, optional (default: 64)</span>
+<span class="sd">        Maximum number of iterations.</span>
+
+<span class="sd">    max_loose_edges : int, optional (default: 32)</span>
+<span class="sd">        Maximum number of loose edges per iteration.</span>
+
+<span class="sd">    max_faces : int, optional (default: 64)</span>
+<span class="sd">        Maximum number of faces in polytope.</span>
+
+<span class="sd">    epsilon : float, optional (default: 1e-8)</span>
+<span class="sd">        Floating point tolerance.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mtv : array, shape (3,)</span>
+<span class="sd">        Minimum translation vector to be added to the second set of vertices</span>
+<span class="sd">        or subtracted from the first set of vertices to resolve the collision.</span>
+<span class="sd">        The norm of this vector is the penetration depth and the direction is</span>
+<span class="sd">        the contact normal.</span>
+
+<span class="sd">    faces : array, shape (n_faces, 4, 3)</span>
+<span class="sd">        Faces in Minkowski difference space, defined by 3 points and its</span>
+<span class="sd">        normal.</span>
+
+<span class="sd">    success : bool</span>
+<span class="sd">        EPA converged before maximum number of iterations was reached.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Array of faces, each with 3 vertices and a normal</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">max_faces</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="c1"># Keep track of edges we need to fix after removing faces</span>
+    <span class="n">loose_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">max_loose_edges</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="n">n_faces</span> <span class="o">=</span> <span class="n">_simplex_to_faces</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">iteration</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
+        <span class="n">min_dist</span><span class="p">,</span> <span class="n">closest_face</span> <span class="o">=</span> <span class="n">_face_closest_to_origin</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">n_faces</span><span class="p">)</span>
+
+        <span class="c1"># Search normal to face that is closest to origin</span>
+        <span class="n">search_direction</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">closest_face</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">new_vertex1</span> <span class="o">=</span> <span class="n">collider1</span><span class="o">.</span><span class="n">support_function</span><span class="p">(</span><span class="n">search_direction</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">new_vertex2</span> <span class="o">=</span> <span class="n">collider2</span><span class="o">.</span><span class="n">support_function</span><span class="p">(</span><span class="o">-</span><span class="n">search_direction</span><span class="p">)</span>
+        <span class="n">new_point</span> <span class="o">=</span> <span class="n">new_vertex1</span> <span class="o">-</span> <span class="n">new_vertex2</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new_point</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">)</span> <span class="o">-</span> <span class="n">min_dist</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
+            <span class="c1"># Convergence: new point is not significantly further from origin.</span>
+            <span class="c1"># Dot product vertex with normal to resolve collision along normal.</span>
+            <span class="n">mtv</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">closest_face</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">new_point</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">mtv</span><span class="p">,</span> <span class="n">faces</span><span class="p">[:</span><span class="n">n_faces</span><span class="p">],</span> <span class="kc">True</span>
+
+        <span class="n">n_faces</span><span class="p">,</span> <span class="n">n_loose_edges</span> <span class="o">=</span> <span class="n">_find_loose_edges</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">loose_edges</span><span class="p">,</span> <span class="n">n_faces</span><span class="p">,</span> <span class="n">new_point</span><span class="p">,</span> <span class="n">max_loose_edges</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">n_faces</span> <span class="o">=</span> <span class="n">_extend_polytope</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">loose_edges</span><span class="p">,</span> <span class="n">n_faces</span><span class="p">,</span> <span class="n">n_loose_edges</span><span class="p">,</span> <span class="n">new_point</span><span class="p">,</span> <span class="n">max_faces</span><span class="p">)</span>
+
+    <span class="c1"># Return most recent closest point</span>
+    <span class="n">mtv</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">closest_face</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">closest_face</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">faces</span><span class="p">[</span><span class="n">closest_face</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">mtv</span><span class="p">,</span> <span class="n">faces</span><span class="p">[:</span><span class="n">n_faces</span><span class="p">],</span> <span class="kc">False</span></div>
+
+
+<span class="k">def</span> <span class="nf">_simplex_to_faces</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">faces</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize with final simplex from GJK.&quot;&quot;&quot;</span>
+    <span class="c1"># ABC</span>
+    <span class="n">faces</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">simplex</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">faces</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_vector</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">simplex</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="c1"># ACD</span>
+    <span class="n">faces</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">simplex</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)]</span>
+    <span class="n">faces</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_vector</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">simplex</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="c1"># ADB</span>
+    <span class="n">faces</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">simplex</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)]</span>
+    <span class="n">faces</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_vector</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">simplex</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="c1"># BDC</span>
+    <span class="n">faces</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">simplex</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)]</span>
+    <span class="n">faces</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_vector</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">simplex</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="mi">4</span>
+
+
+<span class="k">def</span> <span class="nf">_face_closest_to_origin</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">n_faces</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find face that is closest to origin.&quot;&quot;&quot;</span>
+    <span class="n">dists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">faces</span><span class="p">[:</span><span class="n">n_faces</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">faces</span><span class="p">[:</span><span class="n">n_faces</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">closest_face</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dists</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dists</span><span class="p">[</span><span class="n">closest_face</span><span class="p">],</span> <span class="n">closest_face</span>
+
+
+<span class="k">def</span> <span class="nf">_find_loose_edges</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">loose_edges</span><span class="p">,</span> <span class="n">n_faces</span><span class="p">,</span> <span class="n">new_points</span><span class="p">,</span> <span class="n">max_loose_edges</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find all triangles that are facing p and store loose edges.&quot;&quot;&quot;</span>
+    <span class="n">n_loose_edges</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_faces</span><span class="p">:</span>
+        <span class="n">triangle_i_faces_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">new_points</span> <span class="o">-</span> <span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">epsilon</span>
+        <span class="k">if</span> <span class="n">triangle_i_faces_p</span><span class="p">:</span>  <span class="c1"># Remove it</span>
+            <span class="c1"># Add removed triangle&#39;s edges to loose edge list.</span>
+            <span class="c1"># If it is already there, remove it (both triangles it belonged to are gone)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">EDGES_PER_FACE</span><span class="p">):</span>
+                <span class="n">current_edge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span>
+                                          <span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span><span class="p">]])</span>
+                <span class="n">found_edge</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">n_loose_edges</span><span class="p">:</span>  <span class="c1"># Check if current edge is already in list</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">loose_edges</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">current_edge</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">epsilon</span> <span class="ow">and</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">loose_edges</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">current_edge</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">):</span>
+                        <span class="c1"># Edge is already in the list, remove it</span>
+                        <span class="c1"># THIS ASSUMES EDGE CAN ONLY BE SHARED BY 2 TRIANGLES (which should be true)</span>
+                        <span class="c1"># THIS ALSO ASSUMES SHARED EDGE WILL BE REVERSED IN THE TRIANGLES (which</span>
+                        <span class="c1"># should be true provided every triangle is wound CCW)</span>
+                        <span class="c1"># Overwrite current edge with last edge in list</span>
+                        <span class="n">loose_edges</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">loose_edges</span><span class="p">[</span><span class="n">n_loose_edges</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                        <span class="n">n_loose_edges</span> <span class="o">-=</span> <span class="mi">1</span>
+                        <span class="n">found_edge</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="c1"># Exit loop because edge can only be shared once</span>
+                        <span class="k">break</span>
+                    <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">found_edge</span><span class="p">:</span>  <span class="c1"># Add current edge to list</span>
+                    <span class="k">assert</span> <span class="n">n_loose_edges</span> <span class="o">&lt;</span> <span class="n">max_loose_edges</span>
+                    <span class="k">if</span> <span class="n">n_loose_edges</span> <span class="o">&gt;=</span> <span class="n">max_loose_edges</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="n">loose_edges</span><span class="p">[</span><span class="n">n_loose_edges</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_edge</span>
+                    <span class="n">n_loose_edges</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># Remove triangle i from list</span>
+            <span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">n_faces</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">n_faces</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">n_faces</span><span class="p">,</span> <span class="n">n_loose_edges</span>
+
+
+<span class="k">def</span> <span class="nf">_extend_polytope</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">loose_edges</span><span class="p">,</span> <span class="n">n_faces</span><span class="p">,</span> <span class="n">n_loose_edges</span><span class="p">,</span> <span class="n">new_points</span><span class="p">,</span> <span class="n">max_faces</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reconstruct polytope with p added.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_loose_edges</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">n_faces</span> <span class="o">&lt;</span> <span class="n">max_faces</span>
+        <span class="k">if</span> <span class="n">n_faces</span> <span class="o">&gt;=</span> <span class="n">max_faces</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">faces</span><span class="p">[</span><span class="n">n_faces</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">loose_edges</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">faces</span><span class="p">[</span><span class="n">n_faces</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_points</span>
+        <span class="n">faces</span><span class="p">[</span><span class="n">n_faces</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_vector</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">n_faces</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">faces</span><span class="p">[</span><span class="n">n_faces</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                     <span class="n">faces</span><span class="p">[</span><span class="n">n_faces</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">faces</span><span class="p">[</span><span class="n">n_faces</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">n_faces</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>  <span class="c1"># TODO is this the right solution?</span>
+            <span class="k">continue</span>
+        <span class="n">_fix_ccw_normal_direction</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">n_faces</span><span class="p">)</span>
+        <span class="n">n_faces</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">n_faces</span>
+
+
+<span class="k">def</span> <span class="nf">_fix_ccw_normal_direction</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">face_idx</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Correct wrong normal direction to maintain CCW winding.&quot;&quot;&quot;</span>
+    <span class="c1"># Use bias in case dot result is only slightly &lt; 0 (because origin is on face)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="n">bias</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
+        <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

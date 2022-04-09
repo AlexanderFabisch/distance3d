@@ -1,0 +1,6 @@
+﻿distance3d.plotting.plot\_triangle
+==================================
+
+.. currentmodule:: distance3d.plotting
+
+.. autofunction:: plot_triangle

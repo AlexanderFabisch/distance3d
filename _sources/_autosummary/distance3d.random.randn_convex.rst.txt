@@ -1,0 +1,6 @@
+﻿distance3d.random.randn\_convex
+===============================
+
+.. currentmodule:: distance3d.random
+
+.. autofunction:: randn_convex

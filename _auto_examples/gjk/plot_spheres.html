@@ -1,0 +1,1194 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Distance between spheres with GJK &#8212; distance3d 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Collision resolution with EPA after GJK" href="plot_collision_resolution_epa.html" />
+    <link rel="prev" title="Distance between cylinders with GJK" href="plot_cylinder.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-gjk-plot-spheres-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="distance-between-spheres-with-gjk">
+<span id="sphx-glr-auto-examples-gjk-plot-spheres-py"></span><h1>Distance between spheres with GJK<a class="headerlink" href="#distance-between-spheres-with-gjk" title="Permalink to this headline">¶</a></h1>
+<img src="../../_images/sphx_glr_plot_spheres_001.png" srcset="../../_images/sphx_glr_plot_spheres_001.png" alt="plot spheres" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.4348517490579566
+6.206335383118183e-17
+4.779910843468613e-16
+0.6151895284923661
+0.4631607091968138
+1.8465012401800627
+1.5997605806866284
+0.01979964225032454
+1.3322503706641524
+0.5035683866668393
+1.269526928634861
+0.8737101586013298
+0.5403303139163838
+0.22217921223967596
+0.5591933997628582
+0.6455402677390144
+0.0
+1.3016011175407594
+0.0
+0.30320715606162485
+0.28555153204810046
+1.425858316080528
+0.3332360308157878
+0.5213683339816113
+0.13075381242249712
+0.8936971018598375
+3.555125210177728e-17
+1.7430150443116055
+1.5476570270318377
+0.7031506118254334
+1.5647123260595235
+0.352616920089983
+0.501451055492522
+0.09838931038718257
+1.61039135820318
+0.5534512224987824
+2.6930150290767383e-17
+0.6973682925211757
+1.170900090128602
+1.617766288523098
+1.1665813448148663
+0.4725627798579403
+0.7074010206157835
+1.0970448720970434
+0.5432413633506155
+0.43395501764549155
+1.113606002252634e-16
+0.8703559133670525
+1.7179787480015123
+1.0028420866139127
+1.9097972099672271
+0.1596593716095312
+0.10494594598902095
+1.8349032983401674
+8.384297404680616e-17
+0.3340020312349155
+0.0
+3.1031676915590914e-17
+2.7700185283064567
+0.5911527155077492
+1.1631705747361534e-16
+0.00014837855786853715
+0.5205384898182219
+0.8119613843993971
+0.0
+0.4615739806696731
+0.9406814179008146
+1.4835033045964208
+0.21091683096669797
+1.7487606609583652
+1.1610334913084834
+1.2458210334401723
+1.6653345369377348e-16
+1.0236268010027034
+0.1476596694227085
+0.0458888743380419
+1.0465406959026082
+0.291611732325609
+9.057599115250635e-17
+2.5438405243138006e-16
+0.48720419949554333
+0.5536015363777697
+0.07540739639140946
+5.419449386414209e-17
+1.3254561698099763
+0.0
+0.5515274608721209
+0.6048430093506147
+0.23738435277079445
+0.8025525948374131
+1.5941980210718303
+1.5305705118726889
+0.38393819849052147
+2.0885955386424364e-16
+0.0
+0.6550766061417701
+0.6962468733698604
+2.220446049250313e-16
+1.3877787807814457e-17
+2.2215299868541707e-17
+0.3794327531285859
+1.779931110609903e-16
+3.3107778123195866e-17
+2.5387866468215203
+1.6739023340557089
+0.0642112514156537
+0.4440532969556572
+1.1023235275915295
+0.5756033649667563
+1.713703412996162
+1.1857187100668868e-16
+1.0020310997286637
+0.16218175266824073
+1.2087026777670993
+0.8096100458659437
+2.3292653183222054
+0.9303690535874549
+0.5180519744757998
+0.0
+0.0
+0.8139826514271556
+5.721958498152797e-17
+1.5880069409292068
+0.47966057480571955
+1.2807500113323471
+2.0555149066670544
+1.2457322425740518
+0.25248141063768403
+1.3018518929051675e-16
+0.31674208047119223
+2.0369241390302455
+0.18788515052867416
+0.5707448570966358
+1.215788005368445
+0.7120458326737489
+0.3673428062301976
+1.1512481163859678
+1.257581827424088
+2.060056691527988
+0.44873536058096986
+2.1078917885928994
+1.0385185452638061e-16
+0.428432544499768
+2.010805970019208
+0.0
+1.2432050435751766e-16
+1.4176610606956699
+1.7344671030035932
+1.3947004136484323e-16
+2.227870469920776
+0.8395151340633589
+0.7790724514454377
+1.0311428623188796
+0.057795841265047
+0.3265149202234539
+2.12438220829596
+1.1927076804572647
+1.2412670766236366e-16
+1.359312954491115
+1.1621180704699738
+1.1102230246251565e-16
+0.9711752286315556
+0.35165148538032653
+7.850462293418876e-17
+0.38131358992229814
+0.0
+3.163716717342638
+2.0316270848915396e-16
+0.9758385295773547
+0.05382717605773089
+0.0
+0.6623074622671232
+1.4425694971668281
+5.815852873680767e-17
+0.47083484096074557
+1.305369802649905
+0.0
+1.6319323998293267
+1.2016023319811582
+0.7939075956367753
+0.25673113849815543
+2.588886643438054
+1.1766181907502296
+2.0894961482728935
+0.9488173663593126
+0.7476189269392738
+1.4471654815860742
+0.07443478031970117
+1.1775693440128312e-16
+0.8654226184472522
+0.06194256463378463
+0.12755310714296364
+0.9669702777110581
+0.3765010255830905
+1.6919647833740281
+0.667075025269855
+1.4239280129446885
+3.445075221571561e-16
+0.9236597153357243
+0.4632749422742486
+0.4299142838044537
+1.594436429147036e-16
+0.8640769783135329
+0.37434440485012827
+0.4593553251373879
+0.9500264732810866
+2.88465847480365
+0.22500179475628093
+1.3644552190625248
+0.8857776106956721
+0.3612637154034296
+1.2578904500118735
+0.8786728263273675
+0.6451788171831636
+0.3628699622905707
+1.4420649162479913
+0.9139502745065616
+4.416464246242184e-16
+0.0
+1.8821515498999617
+7.664258822861523e-17
+0.16329955277322683
+1.1102230246251565e-16
+1.3877787807814457e-17
+1.0910213001220699
+2.449085749198843
+1.5479694619763649
+1.311148471285487e-16
+0.0
+2.9772752309252e-17
+1.6603018579393363
+0.4632570071728828
+0.6202453629428517
+1.7614026788131611
+1.2486057376047832
+2.8441001681421824e-16
+0.49358245695394914
+1.907062904232845
+0.7871503841837927
+0.8877791734682314
+0.7327163460525279
+0.9158284547146378
+1.870745334243397
+1.1775693440128312e-16
+0.15989942026080634
+0.39827396708483304
+1.1531767245227622
+0.6808110980113673
+1.8485333132415138
+0.3163642426908141
+0.25520330477946107
+0.370531241297957
+0.08897407727890329
+5.551115123125783e-17
+0.0
+0.2699632412996786
+0.3318937306276942
+0.4493231705127181
+3.0531133177191805e-16
+0.5140636886584571
+0.0
+0.6081575564370382
+8.469999434971913e-17
+0.03160867406769188
+0.21178343719012335
+0.6029273438494814
+8.326672684688674e-17
+0.8335464230269716
+0.5558196253572364
+0.38406571237673975
+0.8282771266677478
+1.349236144416582
+0.984909726260795
+1.890930959031975e-16
+0.49300930014698374
+0.9897341580222929
+0.09773660130406218
+0.6499502243564905
+1.1649708191093961
+2.1009696438224066
+0.2186347354497699
+0.0
+0.5359207532304526
+0.6491497822912863
+0.46922451715288277
+1.2167820859741844e-16
+1.1666641269955549
+0.4686352986987419
+1.5273383937986182
+0.290790977261811
+1.0925147834255609
+0.0
+0.15579389617282063
+0.0
+1.390189037580688e-16
+1.473831077300113
+0.35864944469194243
+0.535069717420606
+0.9171066000787474
+1.4194434902060296
+2.0026854743534788e-16
+1.1786995591342269
+1.0812985334166656
+0.5253654923535104
+0.0
+0.8610408875853454
+0.5384900723245604
+0.9952058119867414
+1.507937754760001e-17
+0.0
+0.6692633642874625
+1.6653345369377348e-16
+0.46102885285391115
+1.488285096155841
+3.1031676915590914e-17
+1.2197462367390768e-16
+2.2890463418088597e-16
+1.8399593152346703
+0.7704548150545759
+1.459801870357421
+0.8741409895612345
+1.1443916996305594e-16
+1.6653345369377348e-16
+0.7777302624591917
+0.2828497944100216
+0.0
+0.9467843108365718
+0.44977482590473267
+1.4352431142371191
+1.4363279140699072
+1.962615573354719e-17
+1.9229626863835638e-16
+1.0582207032329713
+2.1118574993643735
+0.16368280574476787
+1.1038900492313943
+1.6580577020276532
+2.62512277823612
+0.075361308908382
+1.9795082051935313
+0.7558388013660723
+0.5343048600961632
+0.3861835752954787
+0.11084354931678288
+0.1785289179702119
+1.8933507987450047
+0.05260780530837418
+0.3550216533460792
+2.2929868617541516e-16
+0.5190629951096587
+4.163336342344337e-17
+0.38237197993924743
+1.8726830042425208e-16
+2.242025235105681e-16
+0.7150451473084576
+1.0153346350652839
+0.9425745359312636
+0.25785047064603156
+0.0
+0.23490433061946348
+2.6537835776352297
+1.7209777655511134
+0.20448340918260513
+0.7892742067062857
+3.222105849667643e-17
+2.3551386880256624e-16
+1.5967932590864855
+0.062370827037159626
+1.1295700899707568e-16
+0.18021747571698724
+0.042602225195852585
+0.27212809835405416
+1.1000492578900904
+0.6025576812332714
+0.6211878548241713
+0.40463603047444235
+0.5588975636348715
+0.0
+1.5290687186094134
+2.6153774081937486
+0.7856117050792889
+1.1911821125057114
+2.5098058983817197
+0.10243525617470241
+0.4725673668614925
+0.8258940192917109
+0.0
+2.454282973873355
+1.2417518519112547e-16
+0.7305734441861534
+1.3581839110598328
+0.4785101848679407
+0.13827328855455592
+0.2611502929677878
+1.7837514833619759
+3.925231146709438e-17
+2.642764534987562e-16
+2.2517366275759017
+1.3947004136484323e-16
+0.7784103537970278
+0.7072777797798243
+0.9191971004605018
+0.731027189972896
+1.2412670766236366e-16
+1.73902539044599
+0.048174948100275845
+0.7208058128636687
+0.5625797934974982
+3.1953231467543977
+1.9311571427774097
+1.9661212896462579
+1.1492549738987767
+0.42656400443124837
+0.0
+1.0226693952243047
+1.249000902703301e-16
+2.116844783178361
+0.7606504289558492
+0.9853375793206223
+0.7798006429083996
+1.3068434711459767
+0.5039001213192843
+0.8017970053118251
+0.3693097469370258
+1.9120497457230177
+5.114083155965932e-16
+0.9218758592913757
+1.1381612266211358
+1.1384649299035432
+0.066723015317507
+0.7612819849987068
+1.4094904158582378
+0.9178533751522193
+1.4401279568715035
+0.6335370699062893
+1.0031639345442604
+0.3755739526940618
+0.8934579234792311
+1.2196538961962335
+0.6929610882994685
+5.355212468067087e-17
+1.6540623285539025
+0.7772937258949912
+0.4985798532430643
+1.2721042018569073
+2.2247786310271853e-16
+0.1305587340012277
+0.5552809077466374
+8.326672684688674e-17
+1.8169251399008082
+0.3138421099299645
+1.7279782019410954
+1.615200569317507
+1.1729298454984651
+0.5646308180895181
+1.2707942587262984
+0.2986775170972288
+0.2562407211005894
+1.1058286392470584
+0.9018102223316568
+1.3382340598891322
+1.193812447098184e-16
+1.600594800373761
+0.9433560481344883
+0.8823526542008114
+1.6459544319665342
+1.1679396656935481
+0.5435501388803627
+1.434117699400393
+0.5081964580555686
+0.2452441561770907
+0.7593037684920823
+0.8206985864141877
+0.274485065229138
+0.4733850197208704
+0.7239469628616378
+0.15934051757410592
+1.1079623875005606
+0.9918795666656889
+0.0
+0.27857612560402495
+0.8410195653558277
+6.206335383118183e-17
+1.350940160102517
+1.8060441819762203
+1.3272601848210874
+0.08155104733637197
+0.8292665536096152
+0.5158047404219793
+0.6237726998494241
+0.17407632960845407
+1.5522383561574284
+0.7574029243246212
+0.21596011875683327
+1.0595312087602118
+0.673691118899555
+0.37676540959965676
+0.18305888128246245
+1.249000902703301e-16
+0.5289629066713294
+1.1066107467265636
+0.0
+2.0128016454197932
+1.469379406228214
+0.4212085782299617
+1.09060373414986
+1.2146697873831465
+0.9589825394361129
+1.1049301829908893
+1.4183491271075008
+0.44561670557383554
+0.0978452373697557
+1.87595882581322
+1.27993912314e-16
+0.7986770559193795
+0.25631833251302294
+0.4379153338651131
+1.178846396057143e-16
+1.8991015741721649
+2.1481525403247175
+0.8004407353658751
+0.9944905085960705
+0.6068556008469163
+0.266308124223072
+6.437203310421897e-17
+0.0
+0.0
+0.5137441075723883
+1.5612221622000577
+1.1313436264447625
+0.023134719877848636
+0.8773783515692394
+1.0218732011849065
+0.11034624642673631
+0.14162860004784145
+1.249000902703301e-16
+0.45693013543184424
+1.85012247051762
+0.46432738842117444
+1.2412670766236366e-16
+1.3882055610978898
+0.8781682554098195
+0.9356819458061928
+2.498001805406602e-16
+1.5616690776283662
+0.986106117316303
+0.8379236628761474
+2.0416258102592497
+1.5332328271059852
+1.247134158391997
+0.2626258849810023
+1.1443916996305594e-16
+0.051748176310152355
+0.593251455064278
+1.9069742845762216
+0.5624092966938238
+0.8879017487528824
+7.131907932511517e-17
+0.5974103241166471
+1.5073473567552043
+0.7120419636506338
+2.250766269368183
+1.5396864976165816
+1.7404602616247811e-16
+1.451104590451617
+0.3530917262383222
+0.30530442337247676
+1.852827602846592e-16
+0.013507132239529169
+1.4771150044337018
+1.1501457995527122
+1.88735530400375
+1.4308018064697805
+1.0139202055206065
+0.46111375321523634
+0.22412732775146801
+0.25653299524750417
+0.9740955949968123
+0.7004060526131423
+2.0919518257339798
+1.3428707140028593
+0.4167430861736846
+0.6806660138821662
+0.22824791913286813
+1.4375763881683201
+0.9802454917141784
+3.841697789400207e-16
+0.013721899790744976
+0.5215282308423994
+0.5173428564383626
+1.4203492389963073
+0.7907904266454395
+0.7460043578315474
+0.53211481775257
+0.9687165527343595
+1.367885035934614
+0.5030248925433518
+1.2870537546360077
+0.5945310842502889
+0.29286259182184166
+0.5145625639030837
+1.6653345369377348e-16
+1.3314464009711726
+0.9045544196065157
+0.0
+0.3446269979228901
+1.1407455542276552
+0.5833256313399441
+1.1156720153241864
+0.0
+0.0
+1.5238779971295928
+0.44237691137057344
+0.07300791512030072
+1.1443916996305594e-16
+0.1526890266095295
+0.06598510584330844
+1.1443916996305594e-16
+0.16021412903350976
+0.7155791469614513
+0.14614289324972107
+0.576343596205984
+1.9402689031512632
+0.3711543436920982
+0.8302849481002716
+0.9985280404582769
+0.4465086393662878
+1.7105815433902487
+1.8803838400533743
+0.4326746070194817
+1.8335729606300017
+1.2039784683562524
+0.6020073273057316
+1.1761962988819978
+2.2922713137143984
+0.18599483706528783
+0.21975719729917637
+0.8145625506976123
+0.0
+2.2982303784612184e-16
+1.268620913860817
+1.1102230246251565e-16
+1.0184299274104769
+0.515083637538157
+0.6354065785722187
+6.206335383118183e-17
+0.8955857599807022
+0.8908815596457768
+2.352511498269766e-16
+3.3334800370851454e-16
+1.304673407166313
+1.0603386112425632
+0.3695090595482292
+0.07629940230113744
+0.7931652207623677
+1.0011756443198736
+0.6777580135134611
+1.3859653535027299
+0.5285954940750796
+0.7175678301656306
+4.308404988536619e-16
+0.4291695833585416
+0.6553242039996278
+1.2654283603708143
+0.10116442123386409
+2.3376028504501356
+0.20341158971292042
+1.1449120255995264
+0.17559401918162074
+0.7725159087184978
+0.11537545142043416
+7.769797026032606e-17
+1.1260844650168937
+8.3524098155533035e-16
+1.9306361225954796
+1.1005531662959824
+0.6943790048941781
+1.3093488298861788
+0.5003348287070614
+0.24575137011450746
+1.2417518519112547e-16
+0.08772701096791724
+0.21165823755652693
+0.8685282697830983
+1.1188630228279524e-16
+0.9604319439261245
+1.6774714982784276
+0.8356612279013571
+0.7663567191332703
+0.41369616667749043
+1.2621801619619293
+6.664589960562512e-17
+2.3647089059498705
+0.9507793607881642
+0.049898754000787214
+0.5577362513449735
+1.0280124203544436
+0.8765261898831778
+0.5242225156047159
+8.355534721610419e-17
+6.628369094757308e-17
+1.3383253895372864e-16
+0.9944965573316034
+1.4669467610610405
+0.575297198473371
+0.0
+0.6650659910847899
+2.897767167584095e-16
+5.551115123125783e-17
+1.140059243430765
+1.1967581406714405
+0.7887501781730576
+0.7262972075986229
+1.1128123589191357
+0.013306835321399948
+1.7416660665299089
+0.25700305439104315
+2.3896154970513512
+0.5988445750544493
+1.2412670766236366e-16
+0.6235884067158195
+0.7275971664025944
+1.8757002015404782
+0.9478043809018496
+0.653030708735233
+0.0
+0.9801271304293392
+0.5192425619508119
+1.1691058780237125
+0.3871103362411066
+2.581676403174271
+5.553824967135427e-17
+0.0
+1.3968987360402094
+0.29025244622390967
+1.1399717405168024
+1.0686955064497057
+0.0
+0.5092432770613672
+0.8574694835303237
+1.160712927167149
+0.44527478111932534
+0.576559136039577
+0.17359811900627997
+0.7746559812555724
+3.3450938666784586e-16
+0.5885932103731776
+1.2042811297443787
+0.41230718211689626
+0.2938354946070551
+0.8953015204184063
+0.6908361249923471
+1.0485215194176518
+1.2552356053224836
+1.3301992771962363
+1.7086145645388158e-16
+0.7478445281304523
+2.031330821370476e-16
+0.25545949074172475
+0.3016766489827498
+1.5285898996847709
+1.5977520846420707
+0.9448191354475325
+0.5343753864033243
+0.569314004206375
+0.5873159740302052
+1.813054804628639
+0.1273067612642577
+0.8544871473868747
+1.426352997654351
+2.0264885437204603
+0.9061254220474934
+1.6760195854890247
+1.187669314676124
+1.112074952608667
+1.2008501865561492
+0.4343185169581855
+0.0498094094688733
+0.862536600816135
+0.1245861569065914
+0.3960788052484424
+1.0389400093797323
+1.0030198704766697
+1.6637282525999533
+1.1102230246251565e-16
+0.6773715841519824
+1.6816376009449645
+9.412373634839028e-17
+0.30010963935180524
+0.35972737928696824
+1.1188630228279524e-16
+1.3123368139031735
+0.2072493815656174
+1.775354392169802
+0.742037871191283
+0.4837444839333109
+2.148082733031356
+0.7343987361144046
+1.3891985197570071
+1.2037419517829613
+2.8229468384171766e-17
+1.6028496977532707
+1.22614398128331e-16
+2.5099295824460275
+0.5192557751324257
+0.664376949720144
+0.0
+1.201105630481593
+0.7123476537550611
+1.0308744434439432
+1.03472196776806
+0.8876778454516642
+1.1443916996305594e-16
+0.8081947167481285
+1.6410810105022222
+0.12439528709244327
+1.2626104971828038
+0.7440616178592313
+1.3168017858017222
+2.230114047507415
+1.9236554655799436
+7.473417450352271e-17
+0.31887932318817763
+0.4128516526870476
+0.5449657293548257
+1.0688967380563705
+0.4492353798759205
+0.8951904001676702
+2.2270093249357855e-16
+0.8339150225662042
+1.8862896840498768
+0.2700350232928832
+0.39517350594638906
+0.18766506432982513
+0.8169539380064506
+0.7376468568283985
+0.7973229000655793
+0.8104164393466853
+0.4970182838270711
+0.9451523724005716
+0.9224869895330483
+2.0221919003302995
+1.7304207169714063
+0.13948423493898157
+0.9968434882321159
+1.7497195604890734
+1.4145024579499867
+1.1794076311757022
+1.777554151792945
+2.0935008786784324
+6.206941440966717e-17
+1.074058744462948
+0.8878468571609287
+0.9258275173851133
+0.8877477425491296
+0.17814486914153502
+1.0629602888933332
+8.610940881164415e-17
+0.0
+0.48108921349464295
+0.7479882212925425
+1.7558778218972457
+2.5957047045430506
+0.21393135960274537
+0.6735079267751932
+1.2389890797729677
+1.8878693443424375
+0.10831443236077017
+0.9754478224856112
+1.1553831367574147e-16
+2.3258371857252884
+1.2540823332466258
+0.45503519270049886
+0.9251766236709639
+1.7594323846315454
+3.925231146709438e-17
+1.0222213915179477
+1.1948063439559302
+1.4913188886874116
+1.5011122659325205e-16
+1.2434091421101874
+1.343086560797079
+3.819701956298234e-16
+0.7612244026666593
+0.0
+1.2719202621569003e-16
+0.27977554294459195
+0.3475214498998205
+3.2133645371805376e-16
+0.9376153590380306
+8.889928919540585e-17
+1.1871304363169382
+1.7256551693642086
+2.8441001681421824e-16
+0.6270683451971715
+0.5253215019392166
+1.2602028804516594
+0.7960002812578001
+0.7251941621016089
+1.2252495717997047
+0.9280637284823223
+1.1299865541021195
+0.45965187614108965
+0.45692221725544196
+2.220446049250313e-16
+0.0
+0.7086981867319204
+0.6695315859093269
+0.07471579265716549
+1.1499321514169172
+0.29790833635352765
+1.5300238297955446
+0.3378660483970639
+2.710376471837835
+0.8963404118855095
+1.6628901708630621
+0.005507020790871004
+2.968278759327618
+1.2412670766236366e-16
+1.7361048153396286
+0.2564056876434933
+0.1872413216701104
+0.08776477337522708
+0.26043396506812516
+1.2906964951324267
+0.8222619577518543
+0.7125809727215776
+0.21900326614219193
+0.3385654959222449
+0.7234752843822342
+0.8119300492275183
+1.1110084621918819
+1.4881354951745815
+0.6517429292906125
+1.3455014484288012e-16
+1.2067256826568207
+1.2254921064666422
+0.2145032248248301
+0.4407562433265204
+1.258455685533233
+0.43055914585653016
+2.3676437252270857
+1.1102230246251565e-16
+0.0
+4.163336342344337e-17
+1.230028947164518
+0.5779864874050289
+0.37055569139387035
+0.2853376798244802
+1.3179836653666326
+1.5671551609388166
+0.16276682572926315
+1.0637502259754146
+1.3975502535607252
+1.0195298515972473
+0.6165783233552801
+0.5129578757140272
+0.03229669652288377
+1.0851124894941138
+0.5713783622493449
+0.8788404248641452
+1.3578896409553336
+0.30468153739186343
+2.0398139075397688
+0.04544579405862575
+0.6937291851887631
+0.8268632863499122
+1.1102230246251565e-16
+1.9229626863835638e-16
+0.0
+0.08186462805404127
+0.35221238737532484
+1.1449174941446927e-16
+1.037015091185458
+2.34708158112965
+1.175269507164396
+1.5700924586837752e-16
+0.8950448614277382
+2.7871600437688953
+0.2241339390772882
+0.5787115219231367
+0.4490272863604217
+0.6544682520930933
+0.6155428367240515
+1.0668892855299636
+0.8061470538415888
+1.5381896304862426
+1.0046770865253403
+0.621323120886705
+1.1443916996305594e-16
+0.3551438181006476
+0.44034119371843283
+1.2074014371127124
+0.6293699871970018
+0.7649212170891164
+1.8322097956933059
+0.7688274049537382
+3.310040729098039
+0.0
+0.5931320794592801
+accumulated_time=0.9229934215545654
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pytransform3d.plot_utils</span> <span class="k">as</span> <span class="nn">ppu</span>
+<span class="kn">from</span> <span class="nn">distance3d</span> <span class="kn">import</span> <span class="n">gjk</span><span class="p">,</span> <span class="n">colliders</span>
+<span class="kn">from</span> <span class="nn">distance3d</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">distance3d</span> <span class="kn">import</span> <span class="n">plotting</span>
+
+
+<span class="n">random_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">center</span><span class="p">,</span> <span class="n">radius</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.random.rand_sphere.html#distance3d.random.rand_sphere" title="distance3d.random.rand_sphere" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><span class="n">random</span><span class="o">.</span><span class="n">rand_sphere</span></a><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">ppu</span><span class="o">.</span><span class="n">make_3d_axis</span><span class="p">(</span><span class="n">ax_s</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">accumulated_time</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">center2</span><span class="p">,</span> <span class="n">radius2</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.random.rand_sphere.html#distance3d.random.rand_sphere" title="distance3d.random.rand_sphere" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><span class="n">random</span><span class="o">.</span><span class="n">rand_sphere</span></a><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <a href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere" title="distance3d.colliders.Sphere" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">s1</span></a> <span class="o">=</span> <a href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere" title="distance3d.colliders.Sphere" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class"><span class="n">colliders</span><span class="o">.</span><span class="n">Sphere</span></a><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
+    <a href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere" title="distance3d.colliders.Sphere" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">s2</span></a> <span class="o">=</span> <a href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere" title="distance3d.colliders.Sphere" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class"><span class="n">colliders</span><span class="o">.</span><span class="n">Sphere</span></a><span class="p">(</span><span class="n">center2</span><span class="p">,</span> <span class="n">radius2</span><span class="p">)</span>
+    <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point_sphere</span><span class="p">,</span> <span class="n">contact_point_sphere2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.gjk.gjk_with_simplex.html#distance3d.gjk.gjk_with_simplex" title="distance3d.gjk.gjk_with_simplex" class="sphx-glr-backref-module-distance3d-gjk sphx-glr-backref-type-py-function"><span class="n">gjk</span><span class="o">.</span><span class="n">gjk_with_simplex</span></a><span class="p">(</span><a href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere" title="distance3d.colliders.Sphere" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">s1</span></a><span class="p">,</span> <a href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere" title="distance3d.colliders.Sphere" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">s2</span></a><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">accumulated_time</span> <span class="o">+=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">vertices1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><a href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere" title="distance3d.colliders.Sphere" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">s1</span></a><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">vertices1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">vertices1</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="n">vertices2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><a href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere" title="distance3d.colliders.Sphere" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">s2</span></a><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">vertices2</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices2</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">vertices2</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">)</span>
+    <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a><span class="p">(</span>
+        <span class="n">ax</span><span class="p">,</span> <span class="n">contact_point_sphere</span><span class="p">,</span> <span class="n">contact_point_sphere2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ppu</span><span class="o">.</span><span class="n">plot_sphere</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">center2</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius2</span><span class="p">,</span> <span class="n">wireframe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">accumulated_time</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">ppu</span><span class="o">.</span><span class="n">plot_sphere</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="n">wireframe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.136 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-gjk-plot-spheres-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e5eee9cca414c1a0682523ae2b53da3a/plot_spheres.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_spheres.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/490bd828f3e63e3ac7a9499ba80fae64/plot_spheres.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_spheres.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#aabb-tree">AABB Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#distance">Distance</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#gjk">GJK</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="plot_convex_mesh.html">Distance between convex meshes with GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_box.html">Distance between boxes with GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_cylinder.html">Distance between cylinders with GJK</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Distance between spheres with GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_collision_resolution_epa.html">Collision resolution with EPA after GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_capsules.html">Distance between capsules with GJK</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#visualizations">Visualizations</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Examples</a><ul>
+      <li>Previous: <a href="plot_cylinder.html" title="previous chapter">Distance between cylinders with GJK</a></li>
+      <li>Next: <a href="plot_collision_resolution_epa.html" title="next chapter">Collision resolution with EPA after GJK</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/_auto_examples/gjk/plot_spheres.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

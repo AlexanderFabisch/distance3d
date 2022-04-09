@@ -1,0 +1,6 @@
+﻿distance3d.distance.line\_to\_triangle
+======================================
+
+.. currentmodule:: distance3d.distance
+
+.. autofunction:: line_to_triangle

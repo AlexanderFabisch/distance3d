@@ -1,0 +1,28 @@
+﻿distance3d.colliders.Box
+========================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: Box
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Box.__init__
+      ~Box.aabb
+      ~Box.compute_point
+      ~Box.first_vertex
+      ~Box.make_artist
+      ~Box.support_function
+      ~Box.update_pose
+   
+   
+
+   
+   
+   

@@ -1,0 +1,6 @@
+﻿distance3d.geometry.convert\_rectangle\_to\_segment
+===================================================
+
+.. currentmodule:: distance3d.geometry
+
+.. autofunction:: convert_rectangle_to_segment

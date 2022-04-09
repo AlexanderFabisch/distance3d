@@ -1,0 +1,6 @@
+﻿distance3d.random.randn\_triangle
+=================================
+
+.. currentmodule:: distance3d.random
+
+.. autofunction:: randn_triangle
