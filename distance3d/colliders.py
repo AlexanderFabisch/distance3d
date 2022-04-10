@@ -27,12 +27,17 @@ class BoundingVolumeHierarchy:
 
     base_frame : str
         Name of the base frame in which colliders are represented.
+
+    Attributes
+    ----------
+    aabbtree_ : AABBTree
+        Tree of axis-aligned bounding boxes.
     """
     def __init__(self, tm, base_frame):
         self.tm = tm
         self.base_frame = base_frame
         self.collider_frames = set()
-        self.aabbtree = AABBTree()
+        self.aabbtree_ = AABBTree()
         self.colliders = {}
 
     def fill_tree_with_colliders(self, tm, make_artists=False):
@@ -79,16 +84,16 @@ class BoundingVolumeHierarchy:
         """
         self.collider_frames.add(frame)
         self.colliders[frame] = collider
-        self.aabbtree.add(collider.aabb(), (frame, collider))
+        self.aabbtree_.add(collider.aabb(), (frame, collider))
 
     def update_collider_poses(self):
         """Update poses of all colliders from transform manager."""
-        self.aabbtree = AABBTree()
+        self.aabbtree_ = AABBTree()
         for frame in self.colliders:
             A2B = self.tm.get_transform(frame, self.base_frame)
             collider = self.colliders[frame]
             collider.update_pose(A2B)
-            self.aabbtree.add(collider.aabb(), (frame, collider))
+            self.aabbtree_.add(collider.aabb(), (frame, collider))
 
     def get_colliders(self):
         """Get all colliders.
@@ -129,7 +134,7 @@ class BoundingVolumeHierarchy:
             Maps frame names to colliders with overlapping AABB.
         """
         aabb = collider.aabb()
-        return dict(self.aabbtree.overlap_values(aabb))
+        return dict(self.aabbtree_.overlap_values(aabb))
 
     def get_collider_frames(self):
         """Get collider frames.
