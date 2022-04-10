@@ -1,6 +1,7 @@
 import numpy as np
 from distance3d import colliders, gjk
 from pytest import approx
+from numpy.testing import assert_array_almost_equal
 
 
 def test_gjk_boxes():
@@ -20,7 +21,25 @@ def test_gjk_boxes():
     size2 = np.array([0.96366276, 0.38344152, 0.79172504])
 
     box_collider2 = colliders.Box(box2origin2, size2)
-    dist, contact_point_box, contact_point_box2, _ = gjk.gjk_with_simplex(
+    dist, closest_point_box, closest_point_box2, _ = gjk.gjk_with_simplex(
         box_collider, box_collider2)
 
     assert approx(dist) == 1.7900192730149391
+
+
+def test_gjk_spheres():
+    sphere1 = colliders.Sphere(center=np.array([0, 0, 0]), radius=1.0)
+    sphere2 = colliders.Sphere(center=np.array([1, 1, 1]), radius=1.0)
+    dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+        sphere1, sphere2)
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point1, np.array([0.5, 0.5, 0.633975]))
+    assert_array_almost_equal(closest_point1, closest_point2)
+
+    sphere1 = colliders.Sphere(center=np.array([0, 0, 0]), radius=1.0)
+    sphere2 = colliders.Sphere(center=np.array([0, 0, 3]), radius=1.0)
+    dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+        sphere1, sphere2)
+    assert approx(dist) == 1
+    assert_array_almost_equal(closest_point1, np.array([0, 0, 1]))
+    assert_array_almost_equal(closest_point2, np.array([0, 0, 2]))
