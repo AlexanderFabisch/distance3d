@@ -167,6 +167,7 @@ API Reference
    ~distance3d.plotting.plot_aabb
    ~distance3d.plotting.plot_convex
    ~distance3d.plotting.plot_tetrahedron
+   ~distance3d.plotting.plot_aabb_tree
 
 
 :mod:`distance3d.random`

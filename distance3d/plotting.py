@@ -1,4 +1,5 @@
 """Plotting functions for geometric shapes."""
+from collections import deque
 import numpy as np
 from mpl_toolkits import mplot3d
 import pytransform3d.plot_utils as ppu
@@ -248,3 +249,30 @@ def plot_tetrahedron(ax, vertices, show_triangles=False):
             for vertex_index, c in zip(range(3), "rgb"):
                 s = slice(triangle_index + vertex_index, triangle_index + vertex_index + 2)
                 ax.plot(line[s][:, 0], line[s][:, 1], line[s][:, 2], c=c)
+
+
+def plot_aabb_tree(ax, tree, alpha=0.5, color="red"):
+    """Plot tree of axis-aligned bounding boxes.
+
+    Parameters
+    ----------
+    ax : Matplotlib 3d axis
+        A matplotlib 3d axis.
+
+    tree : aabbtree.AABBTree
+        Tree of axis-aligned bounding boxes.
+
+    alpha : float, optional (default: 0.5)
+        Alpha value of edges.
+
+    color : str
+        Color of edges.
+    """
+    nodes = deque()
+    nodes.append(tree)
+    while nodes:
+        node = nodes.popleft()
+        mins, maxs = np.array(node.aabb.limits).T
+        plot_aabb(ax, mins, maxs, alpha=alpha, color=color)
+        if not node.is_leaf:
+            nodes.extend([node.left, node.right])
