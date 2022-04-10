@@ -22,7 +22,7 @@ Install dependencies with
 
 Run unit tests with
 
-    pytest --cov-report html --cov=distance3d distance3d
+    pytest
 
 You will find the coverage report in `htmlcov/index.html`.
 

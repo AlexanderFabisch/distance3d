@@ -25,6 +25,6 @@ jobs:
         python -m pip install -e .[test]
     - name: Test
       run: |
-        pytest --cov-report html --cov=distance3d distance3d
+        pytest
     - name: Codecov
       uses: codecov/codecov-action@v1.3.2

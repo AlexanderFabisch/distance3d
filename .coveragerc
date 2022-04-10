@@ -1,0 +1,16 @@
+[run]
+branch = True
+source = distance3d
+omit =
+    */setup.py
+    distance3d/plotting.py
+
+[report]
+omit =
+    distance3d/plotting.py
+exclude_lines =
+    pragma: no cover
+    except ImportError:
+    if verbose
+    if self.verbose
+    if __name__ == "__main__"
