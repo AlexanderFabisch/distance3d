@@ -141,6 +141,12 @@ def test_point_to_circle():
     assert approx(dist) == 0.0
     assert_array_almost_equal(closest_point_circle2, closest_point_circle)
 
+    point = np.array([0, 0, -1])
+    dist, closest_point_circle = point_to_circle(
+        point, center, radius, normal)
+    assert approx(dist) == np.sqrt(2)
+    assert approx(np.linalg.norm(closest_point_circle - center)) == 1.0
+
 
 def test_line_to_line():
     line_point1 = np.array([1.76405235, 0.40015721, 0.97873798])
