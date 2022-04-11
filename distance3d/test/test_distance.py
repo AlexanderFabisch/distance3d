@@ -1,8 +1,8 @@
 import numpy as np
 from distance3d.distance import (
     point_to_line, point_to_line_segment, point_to_plane, point_to_triangle,
-    point_to_box, line_to_line, line_to_box, line_segment_to_triangle,
-    line_segment_to_box, rectangle_to_rectangle)
+    point_to_box, point_to_circle, line_to_line, line_to_box,
+    line_segment_to_triangle, line_segment_to_box, rectangle_to_rectangle)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -125,6 +125,21 @@ def test_point_to_box():
     dist, closest_point_box = point_to_box(point, box2origin, size)
     assert approx(dist) == np.sqrt(0.75)
     assert_array_almost_equal(closest_point_box, np.array([0.5, 0.5, 0.5]))
+
+
+def test_point_to_circle():
+    point = np.array([0, 0, 0])
+    center = np.array([0, 0, 0])
+    normal = np.array([0, 0, 1])
+    radius = 1.0
+    dist, closest_point_circle = point_to_circle(point, center, radius, normal)
+    assert approx(dist) == 1.0
+    assert approx(np.linalg.norm(closest_point_circle - center)) == 1.0
+
+    dist, closest_point_circle2 = point_to_circle(
+        closest_point_circle, center, radius, normal)
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point_circle2, closest_point_circle)
 
 
 def test_line_to_line():

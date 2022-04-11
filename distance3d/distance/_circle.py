@@ -1,5 +1,7 @@
 import math
 import numpy as np
+import pytransform3d.rotations as pr
+from ..utils import norm_vector
 
 
 def point_to_circle(point, center, radius, normal, epsilon=1e-6):
@@ -55,7 +57,8 @@ def point_to_circle(point, center, radius, normal, epsilon=1e-6):
             center + (radius / math.sqrt(sqr_len)) * diff_in_plane)
         dist = np.linalg.norm(point - closest_point_circle)
     else:  # on the line defined by center and normal of the circle
-        closest_point_circle = np.array([np.finfo(float).max] * 3)
+        plane_direction = norm_vector(pr.perpendicular_to_vector(normal))
+        closest_point_circle = center + radius * plane_direction
         dist = math.sqrt(radius * radius + dist_to_plane * dist_to_plane)
 
     return dist, closest_point_circle
