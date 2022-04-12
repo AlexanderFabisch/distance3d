@@ -169,6 +169,11 @@ def test_point_to_disk():
     assert approx(dist, abs=1e-7) == 1.0
     assert_array_almost_equal(closest_point_circle, np.array([0, 1, 0]))
 
+    point = np.array([0, 2, -1])
+    dist, closest_point_circle = point_to_disk(point, center, radius, normal)
+    assert approx(dist, abs=1e-7) == np.sqrt(2)
+    assert_array_almost_equal(closest_point_circle, np.array([0, 1, 0]))
+
 
 def test_point_to_ellipsoid():
     random_state = np.random.RandomState(323)
