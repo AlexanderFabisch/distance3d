@@ -36,7 +36,7 @@ def point_to_disk(point, center, radius, normal):
     dist : float
         The shortest distance between point and disk.
 
-    contact_point_disk : array, shape (3,)
+    closest_point_disk : array, shape (3,)
         Closest point on the disk.
     """
     # signed distance from point to plane of disk
@@ -51,6 +51,6 @@ def point_to_disk(point, center, radius, normal):
     t = radius
     if length != 0.0:
         t /= length
-    contact_point_disk = center + min(1.0, t) * diff_in_plane
+    closest_point_disk = center + min(1.0, t) * diff_in_plane
 
-    return np.linalg.norm(point - contact_point_disk), contact_point_disk
+    return np.linalg.norm(point - closest_point_disk), closest_point_disk

@@ -35,9 +35,13 @@ def point_to_cylinder(point, cylinder2origin, radius, length):
     diff_in_plane = diff - dist_to_plane * cylinder2origin[:3, 2]
     sqr_len = diff_in_plane.dot(diff_in_plane)
 
+    length_in_plane = math.sqrt(sqr_len)
+    t = radius
+    if length_in_plane != 0.0:
+        t /= length_in_plane
+
     closest_point_cylinder = (
-        cylinder2origin[:3, 3]
-        + min(1.0, (radius / math.sqrt(sqr_len))) * diff_in_plane
+        cylinder2origin[:3, 3] + min(1.0, t) * diff_in_plane
         + np.clip(dist_to_plane, -0.5 * length, 0.5 * length) * cylinder2origin[:3, 2])
 
     return (np.linalg.norm(point - closest_point_cylinder),

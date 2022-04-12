@@ -2,9 +2,9 @@ import numpy as np
 import pytransform3d.transformations as pt
 from distance3d.distance import (
     point_to_line, point_to_line_segment, point_to_plane, point_to_triangle,
-    point_to_box, point_to_circle, point_to_disk, point_to_ellipsoid,
-    line_to_line, line_to_box, line_segment_to_triangle, line_segment_to_box,
-    rectangle_to_rectangle)
+    point_to_box, point_to_circle, point_to_disk, point_to_cylinder,
+    point_to_ellipsoid, line_to_line, line_to_box, line_segment_to_triangle,
+    line_segment_to_box, rectangle_to_rectangle)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -173,6 +173,44 @@ def test_point_to_disk():
     dist, closest_point_circle = point_to_disk(point, center, radius, normal)
     assert approx(dist, abs=1e-7) == np.sqrt(2)
     assert_array_almost_equal(closest_point_circle, np.array([0, 1, 0]))
+
+
+def test_point_to_cylinder():
+    point = np.array([0, 0, 0])
+    cylinder2origin = np.eye(4)
+    radius = 1.0
+    length = 1.0
+    dist, closest_point_cylinder = point_to_cylinder(
+        point, cylinder2origin, radius, length)
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point_cylinder, np.array([0, 0, 0]))
+
+    point = np.array([0, 0.5, 0])
+    cylinder2origin = np.eye(4)
+    radius = 1.0
+    length = 1.0
+    dist, closest_point_cylinder = point_to_cylinder(
+        point, cylinder2origin, radius, length)
+    assert approx(dist, abs=1e-7) == 0.0
+    assert_array_almost_equal(closest_point_cylinder, np.array([0, 0.5, 0]))
+
+    point = np.array([0.5, 0, 0])
+    cylinder2origin = np.eye(4)
+    radius = 1.0
+    length = 1.0
+    dist, closest_point_cylinder = point_to_cylinder(
+        point, cylinder2origin, radius, length)
+    assert approx(dist, abs=1e-7) == 0.0
+    assert_array_almost_equal(closest_point_cylinder, np.array([0.5, 0, 0]))
+
+    point = np.array([0.5, 0, -1])
+    cylinder2origin = np.eye(4)
+    radius = 1.0
+    length = 1.0
+    dist, closest_point_cylinder = point_to_cylinder(
+        point, cylinder2origin, radius, length)
+    assert approx(dist, abs=1e-7) == 0.5
+    assert_array_almost_equal(closest_point_cylinder, np.array([0.5, 0, -0.5]))
 
 
 def test_point_to_ellipsoid():
