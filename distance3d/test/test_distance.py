@@ -257,55 +257,130 @@ def test_line_to_line():
 
 
 def test_line_to_box():
-    line_point = np.array([0, 1, 0])
-    line_direction = np.array([1, 0, 0])
     box2origin = np.eye(4)
     size = np.array([1, 1, 1])
 
-    dist, closest_point_line, closest_point_box = line_to_box(
-        line_point, line_direction, box2origin, size)
+    for i in range(3):
+        for sign in [-1, 1]:
+            # parallel to box edge on i-axis without contact
+            line_point = np.array([1, 1, 1])
+            line_point[i] = 0
+            line_direction = np.array([0, 0, 0])
+            line_direction[i] = sign
+            dist, closest_point_line, closest_point_box = line_to_box(
+                line_point, line_direction, box2origin, size)
+            assert approx(dist) == np.sqrt(0.5)
+            assert approx(np.linalg.norm(closest_point_box - closest_point_line)) == np.sqrt(0.5)
+            assert -0.5 <= closest_point_box[0] <= 0.5
+            assert -0.5 <= closest_point_box[1] <= 0.5
+            assert -0.5 <= closest_point_box[2] <= 0.5
 
-    assert approx(dist) == 0.5
-    # multiple solutions, this is a regression test
-    assert_array_almost_equal(closest_point_line, np.array([0.5, 1, 0]))
-    assert_array_almost_equal(closest_point_box, np.array([0.5, 0.5, 0]))
+    # line in 3D without contact
+    for i in range(3):
+        for sign in [-1, 1]:
+            for sign_i in [-1, 1]:
+                for sign_j in [-1, 1]:
+                    for sign_k in [-1, 1]:
+                        line_point = np.array([0, 0, 0])
+                        line_point[i] = sign * 2
+                        line_direction = np.array([sign_i, sign_j, sign_k])
+                        dist, closest_point_line, closest_point_box = line_to_box(
+                            line_point, line_direction, box2origin, size)
+                        assert approx(dist) == 0.8164965809277259
+                        assert approx(np.linalg.norm(closest_point_box - closest_point_line)) == 0.8164965809277259
+                        assert -0.5 <= closest_point_box[0] <= 0.5
+                        assert -0.5 <= closest_point_box[1] <= 0.5
+                        assert -0.5 <= closest_point_box[2] <= 0.5
 
-    line_point = np.array([1, 0, 0])
-    line_direction = np.array([1, 0, 0])
-    box2origin = np.eye(4)
-    size = np.array([1, 1, 1])
+    for i in range(3):
+        # parallel to box face on i-axis without contact
+        line_point = np.array([0, 0, 0])
+        j = (i - 1) % 3
+        line_point[j] = 1
+        line_direction = np.array([0, 0, 0])
+        line_direction[i] = 1
+        dist, closest_point_line, closest_point_box = line_to_box(
+            line_point, line_direction, box2origin, size)
+        assert approx(dist) == 0.5
+        assert approx(np.linalg.norm(closest_point_box - closest_point_line)) == 0.5
+        assert -0.5 <= closest_point_box[0] <= 0.5
+        assert -0.5 <= closest_point_box[1] <= 0.5
+        assert -0.5 <= closest_point_box[2] <= 0.5
 
-    dist, closest_point_line, closest_point_box = line_to_box(
-        line_point, line_direction, box2origin, size)
+    for i in range(3):
+        # parallel to box face on i-axis with contact
+        line_point = np.array([0, 0, 0])
+        j = (i - 1) % 3
+        line_point[j] = 0.5
+        line_direction = np.array([0, 0, 0])
+        line_direction[i] = 1
+        dist, closest_point_line, closest_point_box = line_to_box(
+            line_point, line_direction, box2origin, size)
+        assert approx(dist) == 0
+        assert approx(np.linalg.norm(closest_point_box - closest_point_line)) == 0
+        assert -0.5 <= closest_point_box[0] <= 0.5
+        assert -0.5 <= closest_point_box[1] <= 0.5
+        assert -0.5 <= closest_point_box[2] <= 0.5
 
-    assert approx(dist) == 0.0
-    assert_array_almost_equal(closest_point_line, np.array([0.5, 0, 0]))
-    assert_array_almost_equal(closest_point_box, np.array([0.5, 0, 0]))
+    for i in range(3):
+        # passes through box face on i-axis
+        line_point = np.array([0, 0, 0])
+        line_point[i] = 1
+        line_direction = np.array([0, 0, 0])
+        line_direction[i] = 1
+        dist, closest_point_line, closest_point_box = line_to_box(
+            line_point, line_direction, box2origin, size)
+        assert approx(dist) == 0.0
+        expected = np.array([0, 0, 0])
+        expected[i] = 0.5
+        assert_array_almost_equal(closest_point_line, closest_point_box)
+        assert -0.5 <= closest_point_line[0] <= 0.5
+        assert -0.5 <= closest_point_line[1] <= 0.5
+        assert -0.5 <= closest_point_line[2] <= 0.5
 
-    line_point = np.array([1, 0, 0])
-    line_direction = np.array([0, 1, 0])
-    box2origin = np.eye(4)
-    size = np.array([1, 1, 1])
+    for i in range(3):
+        for j in range(3):
+            if i == j:
+                continue
+            # not parallel to any edge in i-j plane without contact
+            line_point = np.array([0, 0, 0])
+            line_point[i] = 1
+            line_point[j] = 1
+            line_direction = np.array([0, 0, 0])
+            line_direction[i] = -1
+            line_direction[j] = 1
+            dist, closest_point_line, closest_point_box = line_to_box(
+                line_point, line_direction, box2origin, size)
+            assert approx(dist) == np.sqrt(0.5)
+            expected = np.array([0, 0, 0])
+            expected[i] = 1
+            expected[j] = 1
+            assert_array_almost_equal(closest_point_line, expected)
+            assert_array_almost_equal(closest_point_box, 0.5 * expected)
 
-    dist, closest_point_line, closest_point_box = line_to_box(
-        line_point, line_direction, box2origin, size)
-
-    assert approx(dist) == 0.5
-    # multiple solutions, this is a regression test
-    assert_array_almost_equal(closest_point_line, np.array([1, 0.5, 0]))
-    assert_array_almost_equal(closest_point_box, np.array([0.5, 0.5, 0]))
-
-    line_point = np.array([1, 1, 0])
-    line_direction = np.array([-1, 1, 0])
-    box2origin = np.eye(4)
-    size = np.array([1, 1, 1])
-
-    dist, closest_point_line, closest_point_box = line_to_box(
-        line_point, line_direction, box2origin, size)
-
-    assert approx(dist) == np.sqrt(0.5)
-    assert_array_almost_equal(closest_point_line, np.array([1, 1, 0]))
-    assert_array_almost_equal(closest_point_box, np.array([0.5, 0.5, 0]))
+    for i in range(3):
+        for j in range(3):
+            if i == j:
+                continue
+            for sign in [-1, 1]:
+                # parallel to box face in i-j-plane without contact
+                line_point = np.array([0, 0, 0])
+                k = [0, 1, 2]
+                k.remove(i)
+                k.remove(j)
+                k = k[0]
+                line_point[k] = sign
+                line_direction = np.array([0, 0, 0])
+                line_direction[i] = sign
+                line_direction[j] = sign
+                dist, closest_point_line, closest_point_box = line_to_box(
+                    line_point, line_direction, box2origin, size)
+                assert approx(dist) == 0.5
+                # multiple solutions, this is a regression test
+                expected = sign * np.array([0.5, 0.5, 0.5])
+                assert_array_almost_equal(closest_point_box, expected)
+                expected[k] = sign
+                assert_array_almost_equal(closest_point_line, expected)
 
 
 def test_line_segment_to_triangle():
