@@ -89,6 +89,23 @@ def randn_line_segment(random_state, scale=1.0):
             randn_point(random_state, scale=scale))
 
 
+def randn_triangle(random_state):
+    """Sample triangle.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    Returns
+    -------
+    triangle_points : array, shape (3, 3)
+        Each row contains a point of the triangle (A, B, C) sampled from a
+        standard normal distribution.
+    """
+    return random_state.randn(3, 3)
+
+
 def randn_rectangle(random_state, center_scale=1.0, length_scale=1.0):
     """Sample rectangle.
 
@@ -117,31 +134,14 @@ def randn_rectangle(random_state, center_scale=1.0, length_scale=1.0):
 
     rectangle_lengths : array, shape (2,)
         Lengths of the two sides of the rectangle sampled from a uniform
-        distribution on the interval [0, length_scale).
+        distribution on the interval (0, length_scale].
     """
     rectangle_center = center_scale * randn_point(random_state)
     rectangle_axis1 = randn_direction(random_state)
     rectangle_axis2 = norm_vector(pr.perpendicular_to_vector(rectangle_axis1))
-    rectangle_lengths = random_state.rand(2) * length_scale
+    rectangle_lengths = (1.0 - random_state.rand(2)) * length_scale
     rectangle_axes = np.vstack((rectangle_axis1, rectangle_axis2))
     return rectangle_center, rectangle_axes, rectangle_lengths
-
-
-def randn_triangle(random_state):
-    """Sample triangle.
-
-    Parameters
-    ----------
-    random_state : np.random.RandomState
-        Random number generator.
-
-    Returns
-    -------
-    triangle_points : array, shape (3, 3)
-        Each row contains a point of the triangle (A, B, C) sampled from a
-        standard normal distribution.
-    """
-    return random_state.randn(3, 3)
 
 
 def rand_box(random_state, center_scale=1.0, size_scale=1.0):
@@ -164,11 +164,11 @@ def rand_box(random_state, center_scale=1.0, size_scale=1.0):
         Pose of the box.
 
     size : array, shape (3,)
-        Sizes of the box along its axes.
+        Sizes of the box along its axes within (0, size_scale].
     """
     box2origin = pt.random_transform(random_state)
     box2origin[:3, 3] *= center_scale
-    size = random_state.rand(3) * size_scale
+    size = (1.0 - random_state.rand(3)) * size_scale
     return box2origin, size
 
 
