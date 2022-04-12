@@ -1,8 +1,10 @@
 import numpy as np
+import pytransform3d.transformations as pt
 from distance3d.distance import (
     point_to_line, point_to_line_segment, point_to_plane, point_to_triangle,
-    point_to_box, point_to_circle, line_to_line, line_to_box,
-    line_segment_to_triangle, line_segment_to_box, rectangle_to_rectangle)
+    point_to_box, point_to_circle, point_to_ellipsoid, line_to_line,
+    line_to_box, line_segment_to_triangle, line_segment_to_box,
+    rectangle_to_rectangle)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -146,6 +148,32 @@ def test_point_to_circle():
         point, center, radius, normal)
     assert approx(dist) == np.sqrt(2)
     assert approx(np.linalg.norm(closest_point_circle - center)) == 1.0
+
+
+def test_point_to_ellipsoid():
+    random_state = np.random.RandomState(323)
+    ellipsoid2origin = pt.random_transform(random_state)
+    radii = random_state.rand(3)
+
+    dist, closest_point_ellipsoid = point_to_ellipsoid(
+        ellipsoid2origin[:3, 3], ellipsoid2origin, radii)
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point_ellipsoid, ellipsoid2origin[:3, 3])
+
+    point = ellipsoid2origin[:3, 3] + radii[0] * ellipsoid2origin[:3, 0]
+    dist, closest_point_ellipsoid = point_to_ellipsoid(
+        point, ellipsoid2origin, radii)
+    assert approx(dist, abs=1e-7) == 0.0
+    assert_array_almost_equal(closest_point_ellipsoid, point)
+
+    for i in range(3):
+        point = ellipsoid2origin[:3, 3] + 2 * radii[i] * ellipsoid2origin[:3, i]
+        dist, closest_point_ellipsoid = point_to_ellipsoid(
+            point, ellipsoid2origin, radii)
+        assert approx(dist, abs=1e-7) == radii[i]
+        assert_array_almost_equal(
+            closest_point_ellipsoid,
+            ellipsoid2origin[:3, 3] + radii[i] * ellipsoid2origin[:3, i])
 
 
 def test_line_to_line():
