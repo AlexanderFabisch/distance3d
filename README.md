@@ -1,3 +1,6 @@
+![continuous integration](https://github.com/AlexanderFabisch/distance3d/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/AlexanderFabisch/distance3d/branch/master/graph/badge.svg?token=GJE5ZMVVB8)](https://codecov.io/gh/AlexanderFabisch/distance3d)
+
 # distance3d
 
 Distance computation and collision detection in 3D.
