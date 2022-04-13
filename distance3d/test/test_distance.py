@@ -4,7 +4,9 @@ from distance3d.distance import (
     point_to_line, point_to_line_segment, point_to_plane, point_to_triangle,
     point_to_box, point_to_circle, point_to_disk, point_to_cylinder,
     point_to_ellipsoid, line_to_line, line_to_box, line_segment_to_triangle,
-    line_segment_to_box, triangle_to_triangle, rectangle_to_rectangle)
+    line_segment_to_box, triangle_to_triangle, rectangle_to_rectangle,
+    rectangle_to_box)
+from distance3d.geometry import convert_box_to_face
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -575,3 +577,24 @@ def test_rectangle_to_rectangle():
         closest_point_rectangle1, np.array([-0.5, -0.5, 0]))
     assert_array_almost_equal(
         closest_point_rectangle2, np.array([-0.5, -0.5, 1]))
+
+
+def test_rectangle_to_box():
+    box2origin = np.eye(4)
+    size = np.array([1, 1, 1])
+
+    for i in range(3):
+        for sign in [-1, 1]:
+            face_center, face_axes, face_lengths = convert_box_to_face(
+                box2origin, size, i, sign)
+            dist, closest_point_rectangle, closest_point_box = rectangle_to_box(
+                face_center, face_axes, face_lengths, box2origin, size)
+            assert approx(dist) == 0
+            assert_array_almost_equal(
+                closest_point_rectangle, closest_point_box)
+
+            face_center = box2origin[:3, 3] + sign * size[i] * box2origin[:3, i]
+            dist, closest_point_rectangle, closest_point_box = rectangle_to_box(
+                face_center, face_axes, face_lengths, box2origin, size)
+            assert approx(dist) == 0.5
+            assert approx(np.linalg.norm(closest_point_box - closest_point_rectangle)) == 0.5
