@@ -196,15 +196,15 @@ def rand_capsule(random_state, center_scale=1.0, radius_scale=1.0,
         Pose of the capsule.
 
     radius : float
-        Radius of the capsule.
+        Radius of the capsule within (0, radius_scale].
 
     height : float
-        Height of the capsule.
+        Height of the capsule within (0, height_scale].
     """
     capsule2origin = pt.random_transform(random_state)
     capsule2origin[:3, 3] *= center_scale
-    radius = random_state.rand() * radius_scale
-    height = random_state.rand() * height_scale
+    radius = (1.0 - random_state.rand()) * radius_scale
+    height = (1.0 - random_state.rand()) * height_scale
     return capsule2origin, radius, height
 
 
@@ -232,15 +232,15 @@ def rand_cylinder(random_state, center_scale=1.0, min_radius=0.0,
         Pose of the cylinder.
 
     radius : float
-        Radius of the cylinder.
+        Radius of the cylinder within (min_radius, min_radius + 1].
 
     length : float
-        Length of the cylinder.
+        Length of the cylinder within (min_length, min_length + 1].
     """
     cylinder2origin = pt.random_transform(random_state)
     cylinder2origin[:3, 3] *= center_scale
-    radius = min_radius + random_state.rand()
-    length = min_length + random_state.rand()
+    radius = min_radius + (1.0 - random_state.rand())
+    length = min_length + (1.0 - random_state.rand())
     return cylinder2origin, radius, length
 
 
@@ -264,10 +264,10 @@ def rand_sphere(random_state, center_scale=1.0, radius_scale=1.0):
         Center of the sphere.
 
     radius : float
-        Radius of the sphere.
+        Radius of the sphere within (0, radius_scale].
     """
     center = random_state.randn(3) * center_scale
-    radius = random_state.rand() * radius_scale
+    radius = (1.0 - random_state.rand()) * radius_scale
     return center, radius
 
 
