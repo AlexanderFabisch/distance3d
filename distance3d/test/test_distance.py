@@ -89,23 +89,87 @@ def test_point_to_plane():
 
 
 def test_point_to_triangle():
-    triangle_points = np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]])
-    point = np.array([0, 0, 0])
-    dist, contact_point = point_to_triangle(point, triangle_points)
-    assert_array_almost_equal(contact_point, np.array([0, 0.5, 0.5]))
-    assert_array_almost_equal(dist, np.sqrt(0.5))
+    for i in range(3):
+        all_dims = [0, 1, 2]
+        all_dims.remove(i)
 
-    triangle_points = np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]])
-    point = np.array([0, 0.5, 0.5])
-    dist, contact_point = point_to_triangle(point, triangle_points)
-    assert_array_almost_equal(contact_point, np.array([0, 0.5, 0.5]))
-    assert_array_almost_equal(dist, 0.0)
+        # example in x-y plane:
+        # 0-----1
+        #   \   |
+        #     \ |
+        #       2
+        triangle_points = np.zeros((3, 3))
+        triangle_points[0, all_dims[1]] = 1
+        triangle_points[1, all_dims[0]] = 1
+        triangle_points[1, all_dims[1]] = 1
+        triangle_points[2, all_dims[0]] = 1
 
-    triangle_points = np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]])
-    point = np.sqrt(np.array([0, 0.5, 0.5]))
-    dist, contact_point = point_to_triangle(point, triangle_points)
-    assert_array_almost_equal(contact_point, np.sqrt(np.array([0, 0.5, 0.5])))
-    assert_array_almost_equal(dist, 0.0)
+        point = np.array([0, 0, 0], dtype=float)
+        dist, closest_point = point_to_triangle(point, triangle_points)
+        expected = np.zeros(3)
+        expected[all_dims[0]] = 0.5
+        expected[all_dims[1]] = 0.5
+        assert_array_almost_equal(closest_point, expected)
+        assert_array_almost_equal(dist, np.sqrt(0.5))
+
+        point[all_dims[0]] = 1.5
+        point[all_dims[1]] = 0.5
+        dist, closest_point = point_to_triangle(point, triangle_points)
+        expected[all_dims[0]] = 1.0
+        expected[all_dims[1]] = 0.5
+        assert_array_almost_equal(closest_point, expected)
+        assert_array_almost_equal(dist, 0.5)
+
+        point[all_dims[0]] = 0.5
+        point[all_dims[1]] = 1.5
+        dist, closest_point = point_to_triangle(point, triangle_points)
+        expected[all_dims[0]] = 0.5
+        expected[all_dims[1]] = 1.0
+        assert_array_almost_equal(closest_point, expected)
+        assert_array_almost_equal(dist, 0.5)
+
+        point[all_dims[0]] = -0.25
+        point[all_dims[1]] = 1.5
+        dist, closest_point = point_to_triangle(point, triangle_points)
+        assert_array_almost_equal(closest_point, triangle_points[0])
+        assert_array_almost_equal(dist, 0.559017)
+
+        point[all_dims[0]] = 1.25
+        point[all_dims[1]] = 1.5
+        dist, closest_point = point_to_triangle(point, triangle_points)
+        assert_array_almost_equal(closest_point, triangle_points[1])
+        assert_array_almost_equal(dist, 0.559017)
+
+        point[all_dims[0]] = 1.25
+        point[all_dims[1]] = -0.5
+        dist, closest_point = point_to_triangle(point, triangle_points)
+        assert_array_almost_equal(closest_point, triangle_points[2])
+        assert_array_almost_equal(dist, 0.559017)
+
+        point[all_dims[0]] = 0.5
+        point[all_dims[1]] = 0.5
+        dist, closest_point = point_to_triangle(point, triangle_points)
+        assert_array_almost_equal(closest_point, point)
+        assert_array_almost_equal(dist, 0.0)
+
+        point[all_dims[0]] = 0.75
+        point[all_dims[1]] = 0.75
+        dist, closest_point = point_to_triangle(point, triangle_points)
+        assert_array_almost_equal(closest_point, point)
+        assert_array_almost_equal(dist, 0.0)
+
+        expected_closest_point_triangle = np.copy(point)
+        point[i] = 0.5
+        dist, closest_point = point_to_triangle(point, triangle_points)
+        assert_array_almost_equal(
+            closest_point, expected_closest_point_triangle)
+        assert_array_almost_equal(dist, 0.5)
+
+        point[i] = -0.5
+        dist, closest_point = point_to_triangle(point, triangle_points)
+        assert_array_almost_equal(
+            closest_point, expected_closest_point_triangle)
+        assert_array_almost_equal(dist, 0.5)
 
 
 def test_point_to_box():
