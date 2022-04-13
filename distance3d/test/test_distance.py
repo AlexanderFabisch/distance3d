@@ -4,7 +4,7 @@ from distance3d.distance import (
     point_to_line, point_to_line_segment, point_to_plane, point_to_triangle,
     point_to_box, point_to_circle, point_to_disk, point_to_cylinder,
     point_to_ellipsoid, line_to_line, line_to_box, line_segment_to_triangle,
-    line_segment_to_box, rectangle_to_rectangle)
+    line_segment_to_box, triangle_to_triangle, rectangle_to_rectangle)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -535,6 +535,26 @@ def test_line_segment_to_box():
     assert approx(dist) == 0.5
     assert_array_almost_equal(closest_point_segment, np.array([-1, 0, 0]))
     assert_array_almost_equal(closest_point_box, np.array([-0.5, 0, 0]))
+
+
+def test_triangel_to_triangle():
+    triangle_points = np.array([
+        [1, 0, 0],
+        [1, 1, 0],
+        [0, 1, 0]
+    ], dtype=float)
+    dist, closest_point1, closest_point2 = triangle_to_triangle(
+        triangle_points, triangle_points)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point1, closest_point2)
+
+    triangle_points2 = np.copy(triangle_points)
+    triangle_points2[:, 0] += 1.5
+    dist, closest_point1, closest_point2 = triangle_to_triangle(
+        triangle_points, triangle_points2)
+    assert approx(dist) == 0.5
+    assert_array_almost_equal(closest_point1, np.array([1, 1, 0]))
+    assert_array_almost_equal(closest_point2, np.array([1.5, 1, 0]))
 
 
 def test_rectangle_to_rectangle():
