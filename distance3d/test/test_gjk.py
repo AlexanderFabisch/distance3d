@@ -64,3 +64,41 @@ def test_gjk_capsules():
     assert approx(dist) == 1
     assert_array_almost_equal(closest_point1, np.array([0, 0, 1.5]))
     assert_array_almost_equal(closest_point2, np.array([0, 0, 2.5]))
+
+
+def test_gjk_convex():
+    random_state = np.random.RandomState(23)
+
+    for _ in range(50):
+        vertices1 = random_state.rand(6, 3) * np.array([[2, 5, 1]])
+        convex1 = colliders.Convex(vertices1)
+
+        vertices2 = random_state.rand(6, 3) * np.array([[1, 3, 1]])
+        convex2 = colliders.Convex(vertices2)
+
+        dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+            convex1, convex2)
+        assert 0 <= closest_point1[0] < 2
+        assert 0 <= closest_point1[1] < 5
+        assert 0 <= closest_point1[2] < 1
+        assert 0 <= closest_point2[0] < 1
+        assert 0 <= closest_point2[1] < 3
+        assert 0 <= closest_point2[2] < 1
+        assert approx(dist) == np.linalg.norm(closest_point2 - closest_point1)
+
+    for _ in range(50):
+        vertices1 = random_state.rand(6, 3) * np.array([[2, 5, 1]])
+        convex1 = colliders.Convex(vertices1)
+
+        vertices2 = random_state.rand(6, 3) * np.array([[-2, -3, 1]])
+        convex2 = colliders.Convex(vertices2)
+
+        dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+            convex1, convex2)
+        assert 0 <= closest_point1[0] < 2
+        assert 0 <= closest_point1[1] < 5
+        assert 0 <= closest_point1[2] < 1
+        assert -2 < closest_point2[0] <= 2
+        assert -3 < closest_point2[1] <= 5
+        assert 0 <= closest_point2[2] < 1
+        assert approx(dist) == np.linalg.norm(closest_point2 - closest_point1)
