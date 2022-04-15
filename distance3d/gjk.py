@@ -155,7 +155,7 @@ def distance_subalgorithm(
 
     Implements, in a very efficient way, the distance subalgorithm
     of finding the near point to the convex hull of four or less points
-    in 3-D space. The procedure and its efficient FORTRAN implementation
+    in 3D space. The procedure and its efficient FORTRAN implementation
     are both due to D.W. Johnson. Although this subroutine is quite long,
     only a very small part of it will be executed on each call. Refer to
     sections 5 and 6 of the report mentioned in routine DIST3 for details
@@ -163,36 +163,42 @@ def distance_subalgorithm(
     3/25/93.
 
     This function also determines an affinely independent subset of the
-    points such that zsol= near point to the affine hull of the points
-    in the subset. The variables nvs, y, ris, rjs and dell are modified
-    so that, on output, they correspond to this subset of points.
+    points such that search_direction near point to the affine hull of the
+    points in the subset. The variables n_simplex_points, simplex,
+    old_indices_polytope1, old_indices_polytope2 and dot_product_table are
+    modified so that, on output, they correspond to this subset of points.
 
     Parameters
     ----------
     n_simplex_points : int
-      The number of points. 1 <= nvs <= 4 .
+      The number of points. 1 <= n_simplex_points <= 4.
 
-    simplex : array, shape (n_points, 3)
+    simplex : array, shape (n_simplex_points, 3)
       The array containing the points.
 
-    old_indices_polytope1 : array, shape (n_points,)
-        Index vector for Polytope-I. For k = 1,...,nvs,
-        y[k] = zbi[ris[k]] - zbj[rjs[k]].
+    old_indices_polytope1 : array, shape (n_simplex_points,)
+        Index vector for first polytope. For k = 1, ..., n_simplex_points,
+        simplex[k] = vertices1[old_indices_polytope1[k]]
+        - vertices2[old_indices_polytope2[k]].
 
-    old_indices_polytope2 : array, shape (n_points,)
-        Index vectors for Polytope-I and Polytope-J. For k = 1,...,nvs,
-        y[k] = zbi[ris[k]] - zbj[rjs[k]].
+    old_indices_polytope2 : array, shape (n_simplex_points,)
+        Index vectors for first and second polytope. For k = 1, ...,
+        n_simplex_points, simplex[k] = vertices1[old_indices_polytope1[k]]
+        - vertices2[old_indices_polytope2[k]].
 
-    dot_product_table : array, shape (n_points, n_points)
-        dell[i, j] = Inner product of y[i] and y[j].
+    dot_product_table : array, shape (n_simplex_points, n_simplex_points)
+        dot_product_table[i, j] = Inner product of simplex[i] and simplex[j].
 
     search_direction : array, shape (3,)
-        Near point to the convex hull of the points in y.
+        Near point to the convex hull of the points in simplex.
 
-    barycentric_coordinates : array, shape (n_points,)
-        The barycentric coordinates of zsol, i.e.,
-        zsol = als[0]*y[1] + ... + ALS(nvs)*y[nvs-1],
-        als[k] > 0.0 for k=0,...,nvs-1, and, als[0] + ... + als[nvs-1] = 1.0 .
+    barycentric_coordinates : array, shape (n_simplex_points,)
+        The barycentric coordinates of search_direction, i.e.,
+        search_direction = barycentric_coordinates[0]*simplex[1] + ...
+        + barycentric_coordinates(n_simplex_points)*simplex[n_simplex_points-1],
+        barycentric_coordinates[k] > 0.0 for k=0,...,n_simplex_points-1, and,
+        barycentric_coordinates[0] + ...
+        + barycentric_coordinates[n_simplex_points-1] = 1.0.
 
     backup : int
         TODO
@@ -202,8 +208,8 @@ def distance_subalgorithm(
     dstsq : float
         Squared distance.
 
-    nvs : int
-        The new number of points. 1 <= nvs <= 4 .
+    n_new_simplex_points : int
+        The new number of points. 1 <= n_new_simplex_points <= 4.
 
     backup : int
         TODO
