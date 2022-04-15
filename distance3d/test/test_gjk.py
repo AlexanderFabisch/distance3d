@@ -1,5 +1,5 @@
 import numpy as np
-from distance3d import colliders, gjk
+from distance3d import colliders, gjk, geometry, random, distance
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -102,3 +102,38 @@ def test_gjk_convex():
         assert -3 < closest_point2[1] <= 5
         assert 0 <= closest_point2[2] < 1
         assert approx(dist) == np.linalg.norm(closest_point2 - closest_point1)
+
+
+def test_gjk_triangle_to_triangle():
+    random_state = np.random.RandomState(81)
+    for _ in range(10):
+        triangle_points = random.randn_triangle(random_state)
+        triangle_points2 = random.randn_triangle(random_state)
+        dist, closest_point_triangle, closest_point_triangle2 = gjk.gjk(
+            triangle_points, triangle_points2)
+        dist2, closest_point_triangle_2, closest_point_triangle2_2 = distance.triangle_to_triangle(
+            triangle_points, triangle_points2)
+        assert approx(dist) == dist2
+        assert_array_almost_equal(
+            closest_point_triangle, closest_point_triangle_2)
+        assert_array_almost_equal(
+            closest_point_triangle2, closest_point_triangle2_2)
+
+
+def test_gjk_triangle_to_rectangle():
+    random_state = np.random.RandomState(82)
+    for _ in range(10):
+        triangle_points = random.randn_triangle(random_state)
+        rectangle_center, rectangle_axes, rectangle_lengths = random.randn_rectangle(
+            random_state)
+        rectangle_points = geometry.convert_rectangle_to_vertices(
+            rectangle_center, rectangle_axes, rectangle_lengths)
+        dist, closest_point_triangle, closest_point_rectangle = gjk.gjk(
+            triangle_points, rectangle_points)
+        dist2, closest_point_triangle2, closest_point_rectangle2 = distance.triangle_to_rectangle(
+            triangle_points, rectangle_center, rectangle_axes, rectangle_lengths)
+        assert approx(dist) == dist2
+        assert_array_almost_equal(
+            closest_point_triangle, closest_point_triangle2)
+        assert_array_almost_equal(
+            closest_point_rectangle, closest_point_rectangle2)
