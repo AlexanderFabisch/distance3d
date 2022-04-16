@@ -146,6 +146,22 @@ API Reference
    ~distance3d.geometry.capsule_extreme_along_direction
 
 
+:mod:`distance3d.self_collision_detection`
+------------------------------------------
+
+.. automodule:: distance3d.self_collision_detection
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.self_collision_detection
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.self_collision_detection.detect
+
+
 :mod:`distance3d.plotting`
 --------------------------
 
