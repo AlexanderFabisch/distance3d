@@ -8,7 +8,7 @@ import os
 import numpy as np
 from pytransform3d.urdf import UrdfTransformManager
 import pytransform3d.visualizer as pv
-from distance3d import colliders, self_collision_detection
+from distance3d import colliders, self_collision
 
 
 BASE_DIR = "test/data/"
@@ -31,7 +31,7 @@ tm.set_joint("joint5", 2.05)
 bvh = colliders.BoundingVolumeHierarchy(tm, "robot_arm")
 bvh.fill_tree_with_colliders(tm, make_artists=True, fill_self_collision_whitelists=True)
 
-contacts = self_collision_detection.detect(bvh)
+contacts = self_collision.detect(bvh)
 
 fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.2)
