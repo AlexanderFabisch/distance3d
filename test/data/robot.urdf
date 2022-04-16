@@ -3,9 +3,9 @@
   <link name="linkmount"/>
   <link name="link1">
     <collision>
-      <origin xyz="0 0 0.07"/>
+      <origin xyz="0 0 0.055"/>
       <geometry>
-        <cylinder radius="0.05" length="0.14"/>
+        <cylinder radius="0.05" length="0.11"/>
       </geometry>
     </collision>
   </link>
@@ -19,7 +19,7 @@
     <collision>
       <origin xyz="0 0.14 0" rpy="1.570796 0 0"/>
       <geometry>
-        <cylinder radius="0.05" length="0.28"/>
+        <cylinder radius="0.05" length="0.18"/>
       </geometry>
     </collision>
   </link>
@@ -35,7 +35,7 @@
     <collision>
       <origin xyz="0 0 0.17"/>
       <geometry>
-        <cylinder radius="0.05" length="0.34"/>
+        <cylinder radius="0.05" length="0.24"/>
       </geometry>
     </collision>
   </link>
@@ -47,9 +47,9 @@
       </geometry>
     </collision>
     <collision>
-      <origin xyz="0 0.173 0" rpy="1.570796 0 0"/>
+      <origin xyz="0 0.198 0" rpy="1.570796 0 0"/>
       <geometry>
-        <cylinder radius="0.05" length="0.346"/>
+        <cylinder radius="0.05" length="0.296"/>
       </geometry>
     </collision>
   </link>
