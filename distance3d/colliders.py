@@ -36,6 +36,9 @@ class BoundingVolumeHierarchy:
 
     colliders_ : dict
         Maps frames of collision objects to colliders.
+
+    self_collision_whitelists_ : dict
+        TODO
     """
     def __init__(self, tm, base_frame):
         self.tm = tm
@@ -101,14 +104,15 @@ class BoundingVolumeHierarchy:
             except RuntimeError as e:
                 warnings.warn(str(e))
 
-            collision_children = {}
-            for child, parent in self_collision_whitelists.items():
-                if parent not in collision_children:
-                    collision_children[parent] = []
-                collision_children[parent].append(child)
-            for parent, children in collision_children.items():
-                for child in children:
-                    self.self_collision_whitelists_[child] = children + [parent]
+            if fill_self_collision_whitelists:
+                collision_children = {}
+                for child, parent in self_collision_whitelists.items():
+                    if parent not in collision_children:
+                        collision_children[parent] = []
+                    collision_children[parent].append(child)
+                for parent, children in collision_children.items():
+                    for child in children:
+                        self.self_collision_whitelists_[child] = children + [parent]
 
     def add_collider(self, frame, collider):
         """Add collider.
@@ -155,7 +159,7 @@ class BoundingVolumeHierarchy:
         return [collider.artist_ for collider in self.colliders_.values()
                 if collider.artist_ is not None]
 
-    def aabb_overlapping_colliders(self, collider, whitelist=[]):
+    def aabb_overlapping_colliders(self, collider, whitelist=()):
         """Get colliders with an overlapping AABB.
 
         This function performs broad phase collision detection with a bounding
@@ -167,7 +171,7 @@ class BoundingVolumeHierarchy:
         collider : ConvexCollider
             Collider.
 
-        whitelist : list
+        whitelist : sequence
             Names of frames to which collisions are allowed.
 
         Returns
@@ -176,13 +180,10 @@ class BoundingVolumeHierarchy:
             Maps frame names to colliders with overlapping AABB.
         """
         aabb = collider.aabb()
-        if whitelist:
-            colliders = dict(self.aabbtree_.overlap_values(aabb))
-            for frame in whitelist:
-                colliders.pop(frame, None)
-            return colliders
-        else:
-            return dict(self.aabbtree_.overlap_values(aabb))
+        colliders = dict(self.aabbtree_.overlap_values(aabb))
+        for frame in whitelist:
+            colliders.pop(frame, None)
+        return colliders
 
     def get_collider_frames(self):
         """Get collider frames.
