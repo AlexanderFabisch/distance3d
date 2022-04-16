@@ -24,8 +24,6 @@ def detect(bvh, collision_margin=1e-3):
             collider, whitelist=bvh.self_collision_whitelists_[frame])
         contacts[frame] = False
         for frame2, collider2 in candidates.items():
-            if collider is collider2:
-                continue
             dist, _, _, _ = gjk.gjk_with_simplex(collider, collider2)
             if dist < collision_margin:
                 contacts[frame] = True
