@@ -38,7 +38,8 @@ class BoundingVolumeHierarchy:
         Maps frames of collision objects to colliders.
 
     self_collision_whitelists_ : dict
-        TODO
+        Whitelists for self collision detection in case this BVH represents
+        a robot.
     """
     def __init__(self, tm, base_frame):
         self.tm = tm
