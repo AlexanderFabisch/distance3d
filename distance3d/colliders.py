@@ -62,57 +62,49 @@ class BoundingVolumeHierarchy:
             Create artist for visualization for each collision object.
 
         fill_self_collision_whitelists : bool, optional (default: False)
-            Fill whitelists for self collision detection.
+            Fill whitelists for self collision detection. All collision
+            objects connected to the current link, child, and parent links
+            will be ignored.
         """
-        if fill_self_collision_whitelists:
-            # HACK uses naming convention from URDF parser to extract link
-            #      of a collision object
-            prog = re.compile(r"collision:(.*)\/.*")
-            parent_links = {}
-            for parent, child in tm.transforms:
-                parent_links[child] = parent
-            self_collision_whitelists = {}
-
         for obj in tm.collision_objects:
-            A2B = tm.get_transform(obj.frame, self.base_frame)
             try:
-                if isinstance(obj, urdf.Sphere):
-                    collider = Sphere(center=A2B[:3, 3], radius=obj.radius)
-                elif isinstance(obj, urdf.Box):
-                    collider = Box(A2B, obj.size)
-                elif isinstance(obj, urdf.Cylinder):
-                    collider = Cylinder(
-                        cylinder2origin=A2B, radius=obj.radius,
-                        length=obj.length)
-                else:
-                    assert isinstance(obj, urdf.Mesh)
-                    collider = Mesh(obj.filename, A2B, obj.scale)
-                if make_artists:
-                    collider.make_artist()
+                collider = self._make_collider(tm, obj, make_artists)
                 self.add_collider(obj.frame, collider)
-
-                if fill_self_collision_whitelists:
-                    result = prog.match(obj.frame)
-                    if result is None:
-                        warnings.warn(
-                            f"Couldn't extract link of collision object at "
-                            f"frame '{obj.frame}'")
-                        continue
-                    link_frame = result.group(1)
-                    parent = parent_links[link_frame]
-                    self_collision_whitelists[obj.frame] = parent
             except RuntimeError as e:
                 warnings.warn(str(e))
 
-            if fill_self_collision_whitelists:
-                collision_children = {}
-                for child, parent in self_collision_whitelists.items():
-                    if parent not in collision_children:
-                        collision_children[parent] = []
-                    collision_children[parent].append(child)
-                for parent, children in collision_children.items():
-                    for child in children:
-                        self.self_collision_whitelists_[child] = children + [parent]
+        if fill_self_collision_whitelists:
+            self._fill_self_collision_whitelists(tm)
+
+    def _make_collider(self, tm, obj, make_artists):
+        A2B = tm.get_transform(obj.frame, self.base_frame)
+        if isinstance(obj, urdf.Sphere):
+            collider = Sphere(center=A2B[:3, 3], radius=obj.radius)
+        elif isinstance(obj, urdf.Box):
+            collider = Box(A2B, obj.size)
+        elif isinstance(obj, urdf.Cylinder):
+            collider = Cylinder(
+                cylinder2origin=A2B, radius=obj.radius,
+                length=obj.length)
+        else:
+            assert isinstance(obj, urdf.Mesh)
+            collider = Mesh(obj.filename, A2B, obj.scale)
+        if make_artists:
+            collider.make_artist()
+        return collider
+
+    def _fill_self_collision_whitelists(self, tm):
+        link_info = LinkInfo(tm)
+        for obj in tm.collision_objects:
+            link_frame = link_info.link(obj.frame)
+            parent_frame = link_info.parent_link(link_frame)
+            child_frame = link_info.child_link(link_frame)
+            collision_objects_link = link_info.collision_frames_attached_to_link(link_frame)
+            collision_objects_parent = link_info.collision_frames_attached_to_link(parent_frame)
+            collision_objects_child = link_info.collision_frames_attached_to_link(child_frame)
+            self.self_collision_whitelists_[obj.frame] = (
+                collision_objects_link + collision_objects_parent
+                + collision_objects_child)
 
     def add_collider(self, frame, collider):
         """Add collider.
@@ -194,6 +186,56 @@ class BoundingVolumeHierarchy:
             Collider frames.
         """
         return self.collider_frames
+
+
+class LinkInfo:  # TODO move to another module?
+    """Collect information about links from a UrdfTransformManager.
+
+    Parameters
+    ----------
+    tm : pytransform3d.urdf.UrdfTransformManager
+        Transform manager.
+    """
+    def __init__(self, tm):
+        self.tm = tm
+        self.parent_links = {}
+        self.child_links = {}
+        for child, parent in tm.transforms:
+            self.parent_links[child] = parent
+            self.child_links[parent] = child
+        # HACK uses naming convention from URDF parser to extract link
+        #      of a collision object
+        self.prog_match_link = re.compile(r"collision:(.*)\/.*")
+
+    def link(self, frame):
+        result = self.prog_match_link.match(frame)
+        if result is None:
+            warnings.warn(
+                f"Couldn't extract link of collision object at frame '{frame}'")
+            return None
+        else:
+            link_frame = result.group(1)
+            return link_frame
+
+    def child_link(self, link_frame):
+        return self._connected_link(self.child_links, link_frame)
+
+    def parent_link(self, link_frame):
+        return self._connected_link(self.parent_links, link_frame)
+
+    @staticmethod
+    def _connected_link(relation_info, link_frame):
+        return relation_info.get(link_frame, None)
+
+    def collision_frames_attached_to_link(self, link_frame):
+        collision_frames = []
+        # HACK uses naming convention from URDF parser to extract link
+        #      of a collision object
+        prog = re.compile(f"collision:{link_frame}" + r"\/.*")
+        for node in self.tm.nodes:
+            if prog.match(node):
+                collision_frames.append(node)
+        return collision_frames
 
 
 # for backwards compatibility:

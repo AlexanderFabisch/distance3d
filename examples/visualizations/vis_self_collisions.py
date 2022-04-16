@@ -24,16 +24,17 @@ filename = os.path.join(data_dir, "robot.urdf")
 with open(filename, "r") as f:
     robot_urdf = f.read()
     tm.load_urdf(robot_urdf, mesh_path=data_dir)
-tm.set_joint("joint2", 2.1)
-tm.set_joint("joint3", 2.1)
-tm.set_joint("joint5", 2.1)
+tm.set_joint("joint2", 1.57)
+tm.set_joint("joint3", 1.57)
+tm.set_joint("joint5", 2.05)
 
 colls = colliders.BoundingVolumeHierarchy(tm, "robot_arm")
 colls.fill_tree_with_colliders(tm, make_artists=True, fill_self_collision_whitelists=True)
 
 collision_margin = 1e-3
 for frame, collider in colls.colliders_.items():
-    candidates = colls.aabb_overlapping_colliders(collider, whitelist=colls.self_collision_whitelists_[frame])
+    candidates = colls.aabb_overlapping_colliders(
+        collider, whitelist=colls.self_collision_whitelists_[frame])
     in_contact = []
     for frame2, collider2 in candidates.items():
         if collider is collider2:
@@ -41,12 +42,14 @@ for frame, collider in colls.colliders_.items():
         dist, _, _, _ = gjk.gjk_with_simplex(collider, collider2)
         if dist < collision_margin:
             in_contact.append(collider2)
-    collider.artist_.geometries[0].paint_uniform_color((1, 0, 0))
+            collider.artist_.geometries[0].paint_uniform_color((1, 0, 0))
 
 fig = pv.figure()
+fig.plot_transform(np.eye(4), s=0.2)
 
 for artist in colls.get_artists():
     artist.add_artist(fig)
+    fig.plot_transform(artist.A2B, s=0.1)
 fig.view_init()
 fig.set_zoom(1.5)
 if "__file__" in globals():
