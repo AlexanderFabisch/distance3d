@@ -47,7 +47,7 @@ class AnimationCallback:
             if self.verbose:
                 print(f"With AABBTree: {total_time}")
         else:
-            for frame, collider in colls.colliders.items():
+            for frame, collider in colls.colliders_.items():
                 start = time.time()
                 for box in boxes:
                     dist = gjk.gjk_with_simplex(collider, box)[0]
@@ -60,7 +60,7 @@ class AnimationCallback:
         self.total_time += total_time
 
         for frame in in_contact:
-            geometry = colls.colliders[frame].artist_.geometries[0]
+            geometry = colls.colliders_[frame].artist_.geometries[0]
             if in_contact[frame]:
                 geometry.paint_uniform_color((1, 0, 0))
             elif in_aabb[frame]:
