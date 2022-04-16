@@ -7,6 +7,15 @@ Distance computation and collision detection in 3D.
 
 <img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/robot_collision_detection.png" width=50% />
 
+## Features
+
+* Fast collision detection and distance computation with GJK.
+* Calculation of penetration depth with EPA.
+* Various specific distance calculations for points, lines, line segments,
+  triangles, rectangles, circles, disks, boxes, cylinders, ellipsoids, ...
+* Broad phase collision detection with bounding volume hierarchy (AABB tree).
+* Self-collision detection for robots.
+
 ## Installation
 
 Install the package with
