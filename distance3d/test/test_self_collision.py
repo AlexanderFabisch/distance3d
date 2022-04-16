@@ -21,6 +21,14 @@ def test_self_collision_detection():
 
     tm.set_joint("joint2", 1.57)
     tm.set_joint("joint3", 1.57)
+    tm.set_joint("joint5", 1.93)
+    bvh.update_collider_poses()
+
+    contacts = list(self_collision.detect(bvh).values())
+    assert np.count_nonzero(contacts) == 0
+
+    tm.set_joint("joint2", 1.57)
+    tm.set_joint("joint3", 1.57)
     tm.set_joint("joint5", 2.05)
     bvh.update_collider_poses()
 
