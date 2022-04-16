@@ -1,5 +1,6 @@
 """Colliders used for collision detection with GJK algorithm."""
 import abc
+import re
 import warnings
 import numpy as np
 from pytransform3d import urdf
@@ -32,15 +33,21 @@ class BoundingVolumeHierarchy:
     ----------
     aabbtree_ : AABBTree
         Tree of axis-aligned bounding boxes.
+
+    colliders_ : dict
+        Maps frames of collision objects to colliders.
     """
     def __init__(self, tm, base_frame):
         self.tm = tm
         self.base_frame = base_frame
         self.collider_frames = set()
         self.aabbtree_ = AABBTree()
-        self.colliders = {}
+        self.colliders_ = {}
+        self.self_collision_whitelists_ = {}
 
-    def fill_tree_with_colliders(self, tm, make_artists=False):
+    def fill_tree_with_colliders(
+            self, tm, make_artists=False,
+            fill_self_collision_whitelists=False):
         """Fill tree with colliders from URDF transform manager.
 
         Parameters
@@ -50,7 +57,19 @@ class BoundingVolumeHierarchy:
 
         make_artists : bool, optional (default: False)
             Create artist for visualization for each collision object.
+
+        fill_self_collision_whitelists : bool, optional (default: False)
+            Fill whitelists for self collision detection.
         """
+        if fill_self_collision_whitelists:
+            # HACK uses naming convention from URDF parser to extract link
+            #      of a collision object
+            prog = re.compile(r"collision:(.*)\/.*")
+            parent_links = {}
+            for parent, child in tm.transforms:
+                parent_links[child] = parent
+            self_collision_whitelists = {}
+
         for obj in tm.collision_objects:
             A2B = tm.get_transform(obj.frame, self.base_frame)
             try:
@@ -68,8 +87,28 @@ class BoundingVolumeHierarchy:
                 if make_artists:
                     collider.make_artist()
                 self.add_collider(obj.frame, collider)
+
+                if fill_self_collision_whitelists:
+                    result = prog.match(obj.frame)
+                    if result is None:
+                        warnings.warn(
+                            f"Couldn't extract link of collision object at "
+                            f"frame '{obj.frame}'")
+                        continue
+                    link_frame = result.group(1)
+                    parent = parent_links[link_frame]
+                    self_collision_whitelists[obj.frame] = parent
             except RuntimeError as e:
                 warnings.warn(str(e))
+
+            collision_children = {}
+            for child, parent in self_collision_whitelists.items():
+                if parent not in collision_children:
+                    collision_children[parent] = []
+                collision_children[parent].append(child)
+            for parent, children in collision_children.items():
+                for child in children:
+                    self.self_collision_whitelists_[child] = children + [parent]
 
     def add_collider(self, frame, collider):
         """Add collider.
@@ -83,15 +122,15 @@ class BoundingVolumeHierarchy:
             Collider.
         """
         self.collider_frames.add(frame)
-        self.colliders[frame] = collider
+        self.colliders_[frame] = collider
         self.aabbtree_.add(collider.aabb(), (frame, collider))
 
     def update_collider_poses(self):
         """Update poses of all colliders from transform manager."""
         self.aabbtree_ = AABBTree()
-        for frame in self.colliders:
+        for frame in self.colliders_:
             A2B = self.tm.get_transform(frame, self.base_frame)
-            collider = self.colliders[frame]
+            collider = self.colliders_[frame]
             collider.update_pose(A2B)
             self.aabbtree_.add(collider.aabb(), (frame, collider))
 
@@ -103,7 +142,7 @@ class BoundingVolumeHierarchy:
         colliders : list
             List of colliders.
         """
-        return self.colliders.values()
+        return self.colliders_.values()
 
     def get_artists(self):
         """Get all artists.
@@ -113,10 +152,10 @@ class BoundingVolumeHierarchy:
         artists : list
             List of artists.
         """
-        return [collider.artist_ for collider in self.colliders.values()
+        return [collider.artist_ for collider in self.colliders_.values()
                 if collider.artist_ is not None]
 
-    def aabb_overlapping_colliders(self, collider):
+    def aabb_overlapping_colliders(self, collider, whitelist=[]):
         """Get colliders with an overlapping AABB.
 
         This function performs broad phase collision detection with a bounding
@@ -128,13 +167,22 @@ class BoundingVolumeHierarchy:
         collider : ConvexCollider
             Collider.
 
+        whitelist : list
+            Names of frames to which collisions are allowed.
+
         Returns
         -------
         colliders : dict
             Maps frame names to colliders with overlapping AABB.
         """
         aabb = collider.aabb()
-        return dict(self.aabbtree_.overlap_values(aabb))
+        if whitelist:
+            colliders = dict(self.aabbtree_.overlap_values(aabb))
+            for frame in whitelist:
+                colliders.pop(frame, None)
+            return colliders
+        else:
+            return dict(self.aabbtree_.overlap_values(aabb))
 
     def get_collider_frames(self):
         """Get collider frames.

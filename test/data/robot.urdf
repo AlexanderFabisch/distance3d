@@ -68,7 +68,6 @@
   <parent link="linkmount"/>
   <child link="link1"/>
   <axis xyz="0 0 1.0"/>
-  <limit lower="-1" upper="1"/>
 </joint>
 
 <joint name="joint2" type="revolute">
@@ -76,7 +75,6 @@
   <parent link="link1"/>
   <child link="link2"/>
   <axis xyz="0 0 -1.0"/>
-  <limit lower="-1"/>
 </joint>
 
 <joint name="joint3" type="revolute">
@@ -84,7 +82,6 @@
   <parent link="link2"/>
   <child link="link3"/>
   <axis xyz="0 0 -1.0"/>
-  <limit upper="1"/>
 </joint>
 
 <joint name="joint4" type="revolute">
