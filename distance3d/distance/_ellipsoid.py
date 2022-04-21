@@ -14,7 +14,7 @@ def point_to_ellipsoid(
 
     The Wild Magic Version 4 Foundation Library source code is supplied
     under the terms of the license agreement
-        http://www.geometrictools.com/License/Wm4FoundationLicense.pdf
+    (http://www.geometrictools.com/License/Wm4FoundationLicense.pdf)
     and may not be copied or disclosed except in accordance with the terms
     of that agreement.
 

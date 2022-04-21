@@ -5,6 +5,10 @@ These implementations are mostly based on
 
 and accompanying implementations. These are marked as such.
 
+The distance computation between a line and a circle is based on David Eberly's
+implementation, Copyright (c) 1998-2022 David Eberly, Geometric Tools,
+Redmond WA 98052, distributed under the Boost Software License, Version 1.0.
+
 The GJK algorithm is a translation to Python of the translation to C of the
 original Fortran implementation. The C implementation is from Diego Ruspini.
 It is available from http://realtimecollisiondetection.net/files/gilbert.c

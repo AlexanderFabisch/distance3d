@@ -89,6 +89,30 @@ def randn_line_segment(random_state, scale=1.0):
             randn_point(random_state, scale=scale))
 
 
+def randn_plane(random_state, scale=1.0):
+    """Sample plane in 3D.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    scale : float, optional (default: 1)
+        Scale of point sampled from normal distribution.
+
+    Returns
+    -------
+    plane_point : array, shape (3,)
+        3D Point sampled from normal distribution.
+
+    plane_normal : array, shape (3,)
+        Plane normal: 3D vector of unit length.
+    """
+    plane_point = randn_point(random_state, scale=scale)
+    plane_normal = randn_direction(random_state)
+    return plane_point, plane_normal
+
+
 def randn_triangle(random_state):
     """Sample triangle.
 
@@ -142,6 +166,34 @@ def randn_rectangle(random_state, center_scale=1.0, length_scale=1.0):
     rectangle_lengths = (1.0 - random_state.rand(2)) * length_scale
     rectangle_axes = np.vstack((rectangle_axis1, rectangle_axis2))
     return rectangle_center, rectangle_axes, rectangle_lengths
+
+
+def rand_circle(random_state, radius_scale=1.0):
+    """Sample circle (or disk).
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    radius_scale : float, optional (default: 1)
+        Scaling factor for radius.
+
+    Returns
+    -------
+    center : array, shape (3,)
+        Center of the circle.
+
+    radius : float
+        Radius of the circle within (0, radius_scale].
+
+    normal : array, shape (3,)
+        Normal to the plane in which the circle lies.
+    """
+    center = random_state.randn(3)
+    radius = (1.0 - random_state.rand()) * radius_scale
+    normal = norm_vector(random_state.randn(3))
+    return center, radius, normal
 
 
 def rand_box(random_state, center_scale=1.0, size_scale=1.0):

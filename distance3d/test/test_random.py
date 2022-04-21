@@ -2,8 +2,8 @@ import numpy as np
 import pytransform3d.transformations as pt
 from distance3d.random import (
     randn_point, randn_direction, randn_line, randn_line_segment,
-    randn_triangle, randn_rectangle, rand_box, rand_capsule, rand_cylinder,
-    rand_sphere)
+    randn_plane, randn_triangle, randn_rectangle, rand_circle, rand_box,
+    rand_capsule, rand_cylinder, rand_sphere)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -36,6 +36,14 @@ def test_randn_line_segment():
     assert len(e) == 3
 
 
+def test_randn_plane():
+    random_state = np.random.RandomState(1040)
+    p, n = randn_plane(random_state)
+    assert len(p) == 3
+    assert len(n) == 3
+    assert approx(np.linalg.norm(n)) == 1
+
+
 def test_randn_triangle():
     random_state = np.random.RandomState(105)
     triangle_points = randn_triangle(random_state)
@@ -49,6 +57,15 @@ def test_randn_rectangle():
     assert len(rectangle_center) == 3
     assert_array_almost_equal(np.linalg.norm(rectangle_axes, axis=1), [1, 1])
     assert all(rectangle_lengths > 0)
+
+
+def test_rand_circle():
+    random_state = np.random.RandomState(1060)
+    center, radius, normal = rand_circle(random_state)
+    assert len(center) == 3
+    assert radius > 0
+    assert len(normal) == 3
+    assert approx(np.linalg.norm(normal)) == 1
 
 
 def test_rand_box():

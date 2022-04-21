@@ -241,7 +241,7 @@ def triangle_to_triangle(triangle_points1, triangle_points2, epsilon=1e-6):
 
     The Wild Magic Version 4 Foundation Library source code is supplied
     under the terms of the license agreement
-        http://www.geometrictools.com/License/Wm4FoundationLicense.pdf
+    (http://www.geometrictools.com/License/Wm4FoundationLicense.pdf)
     and may not be copied or disclosed except in accordance with the terms
     of that agreement.
 

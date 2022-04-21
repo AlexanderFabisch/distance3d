@@ -16,7 +16,7 @@ data_dir = BASE_DIR
 search_path = ".."
 while (not os.path.exists(data_dir) and
        os.path.dirname(search_path) != "distance3d"):
-    search_path = os.path.join(search_path, "../..")
+    search_path = os.path.join(search_path, "..")
     data_dir = os.path.join(search_path, BASE_DIR)
 
 tm = UrdfTransformManager()

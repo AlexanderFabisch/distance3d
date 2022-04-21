@@ -7,7 +7,10 @@ def detect(bvh, collision_margin=1e-3):
     Parameters
     ----------
     bvh : BoundingVolumeHierarchy
-        Bounding volume hierarchy that contains colliders of a robot.
+        Bounding volume hierarchy that contains colliders of a robot. Note that
+        the attribute bvh.self_collision_whitelists_ has to be filled.
+        Otherwise a collection of a collider with itself or direct neighbors
+        will be considered a self collision!
 
     collision_margin : float, optional (default: 0.001)
         Distance between colliders that is considered to be a collision.

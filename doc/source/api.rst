@@ -27,17 +27,20 @@ API Reference
    ~distance3d.distance.point_to_plane
    ~distance3d.distance.point_to_triangle
    ~distance3d.distance.point_to_rectangle
+   ~distance3d.distance.point_to_circle
+   ~distance3d.distance.point_to_disk
    ~distance3d.distance.point_to_box
    ~distance3d.distance.point_to_cylinder
    ~distance3d.distance.point_to_ellipsoid
-   ~distance3d.distance.point_to_circle
-   ~distance3d.distance.point_to_disk
    ~distance3d.distance.line_to_line
    ~distance3d.distance.line_to_line_segment
+   ~distance3d.distance.line_to_plane
    ~distance3d.distance.line_to_triangle
    ~distance3d.distance.line_to_rectangle
+   ~distance3d.distance.line_to_circle
    ~distance3d.distance.line_to_box
    ~distance3d.distance.line_segment_to_line_segment
+   ~distance3d.distance.line_segment_to_plane
    ~distance3d.distance.line_segment_to_triangle
    ~distance3d.distance.line_segment_to_rectangle
    ~distance3d.distance.line_segment_to_box
@@ -45,6 +48,7 @@ API Reference
    ~distance3d.distance.triangle_to_rectangle
    ~distance3d.distance.rectangle_to_rectangle
    ~distance3d.distance.rectangle_to_box
+   ~distance3d.distance.disk_to_disk
 
 
 :mod:`distance3d.colliders`
@@ -144,6 +148,7 @@ API Reference
    ~distance3d.geometry.convert_box_to_vertices
    ~distance3d.geometry.cylinder_extreme_along_direction
    ~distance3d.geometry.capsule_extreme_along_direction
+   ~distance3d.geometry.hesse_normal_form
 
 
 :mod:`distance3d.self_collision`
@@ -177,6 +182,7 @@ API Reference
 
    ~distance3d.plotting.plot_line
    ~distance3d.plotting.plot_segment
+   ~distance3d.plotting.plot_plane
    ~distance3d.plotting.plot_triangle
    ~distance3d.plotting.plot_rectangle
    ~distance3d.plotting.plot_circle
@@ -203,6 +209,7 @@ API Reference
    ~distance3d.random.randn_direction
    ~distance3d.random.randn_line
    ~distance3d.random.randn_line_segment
+   ~distance3d.random.randn_plane
    ~distance3d.random.randn_rectangle
    ~distance3d.random.randn_triangle
    ~distance3d.random.rand_box

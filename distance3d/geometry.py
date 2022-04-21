@@ -241,3 +241,29 @@ def capsule_extreme_along_direction(
         local_vertex[2] -= 0.5 * height
 
     return np.dot(capsule2origin[:3, :3], local_vertex) + capsule2origin[:3, 3]
+
+
+def hesse_normal_form(plane_point, plane_normal):
+    """Computes Hesse normal form of a plane.
+
+    In the Hesse normal form (x * n - d = 0), x is any point on the plane,
+    n is the plane's normal, and d ist the distance from the origin to the
+    plane along its normal.
+
+    Parameters
+    ----------
+    plane_point : array, shape (3,)
+        Point on the plane.
+
+    plane_normal : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    Returns
+    -------
+    plane_normal : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    d : float, optional (default: None)
+        Distance of the plane to origin in Hesse normal form.
+    """
+    return plane_normal, np.dot(plane_point, plane_normal)

@@ -522,7 +522,6 @@ class Capsule(ConvexCollider):
         self.capsule2origin = capsule2origin
         self.radius = radius
         self.height = height
-        self.vertices_ = []
 
     def make_artist(self, c=None):
         self.artist_ = pv.Capsule(
@@ -571,7 +570,6 @@ class Sphere(ConvexCollider):
         super(Sphere, self).__init__([], artist)
         self.c = center
         self.radius = radius
-        self.vertices_ = []
 
     def make_artist(self, c=None):
         sphere2origin = np.eye(4)

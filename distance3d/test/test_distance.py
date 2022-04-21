@@ -3,11 +3,14 @@ import pytransform3d.transformations as pt
 from distance3d.distance import (
     point_to_line, point_to_line_segment, point_to_plane, point_to_triangle,
     point_to_box, point_to_circle, point_to_disk, point_to_cylinder,
-    point_to_ellipsoid, line_to_line, line_to_box,
-    line_segment_to_line_segment, line_segment_to_triangle,
-    line_segment_to_box, triangle_to_triangle, triangle_to_rectangle,
-    rectangle_to_rectangle, rectangle_to_box)
+    point_to_ellipsoid, line_to_line, line_to_plane, line_to_circle,
+    line_to_box, line_segment_to_line_segment, line_segment_to_plane,
+    line_segment_to_triangle, line_segment_to_box, triangle_to_triangle,
+    triangle_to_rectangle, rectangle_to_rectangle, rectangle_to_box,
+    disk_to_disk)
 from distance3d.geometry import convert_box_to_face
+from distance3d.utils import norm_vector
+from distance3d import random
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -361,6 +364,147 @@ def test_line_to_line():
         contact_point2, [-0.34791215, 0.15634897, 1.23029068])
 
 
+def test_line_to_plane():
+    plane_point = np.array([0, 0, 0])
+    plane_normal = np.array([0, 0, 1])
+
+    line_point = np.array([0, 0, 0])
+    line_direction = np.array([0, 0, 1])
+    dist, closest_point_line, closest_point_plane = line_to_plane(
+        line_point, line_direction, plane_point, plane_normal)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point_line, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point_line, closest_point_plane)
+
+    line_point = np.array([0, 0, 1])
+    line_direction = np.array([0, 0, 1])
+    dist, closest_point_line, closest_point_plane = line_to_plane(
+        line_point, line_direction, plane_point, plane_normal)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point_line, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point_line, closest_point_plane)
+
+    line_point = np.array([0, 0, 1])
+    line_direction = norm_vector(np.array([1, 1, 0]))
+    dist, closest_point_line, closest_point_plane = line_to_plane(
+        line_point, line_direction, plane_point, plane_normal)
+    assert approx(dist) == 1
+    assert_array_almost_equal(closest_point_line, np.array([0, 0, 1]))
+    assert_array_almost_equal(closest_point_plane, np.array([0, 0, 0]))
+
+    line_point = np.array([0, 0, 1])
+    line_direction = norm_vector(np.array([1, 1, 1]))
+    dist, closest_point_line, closest_point_plane = line_to_plane(
+        line_point, line_direction, plane_point, plane_normal)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point_line, np.array([-1, -1, 0]))
+    assert_array_almost_equal(closest_point_plane, closest_point_line)
+
+
+def test_line_to_circle():
+    center = np.array([0, 0, 0], dtype=float)
+    radius = 1.0
+    normal = np.array([0, 0, 1], dtype=float)
+
+    line_point = np.array([0, 0, 0], dtype=float)
+    line_direction = np.array([1, 0, 0], dtype=float)
+    dist, closest_point_line, closest_point_circle = line_to_circle(
+        line_point, line_direction, center, radius, normal)
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point_line, np.array([1, 0, 0]))
+    assert_array_almost_equal(closest_point_circle, np.array([1, 0, 0]))
+
+    line_point = np.array([0, 0, 0], dtype=float)
+    line_direction = np.array([0, 0, 1], dtype=float)
+    dist, closest_point_line, closest_point_circle = line_to_circle(
+        line_point, line_direction, center, radius, normal)
+    assert approx(dist) == 1.0
+    assert_array_almost_equal(closest_point_line, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point_circle, np.array([1, 0, 0]))
+
+    line_point = np.array([0.5, 0, 0], dtype=float)
+    line_direction = np.array([0, 0, 1], dtype=float)
+    dist, closest_point_line, closest_point_circle = line_to_circle(
+        line_point, line_direction, center, radius, normal)
+    assert approx(dist) == 0.5
+    assert_array_almost_equal(closest_point_line, np.array([0.5, 0, 0]))
+    assert_array_almost_equal(closest_point_circle, np.array([1, 0, 0]))
+
+    line_point = np.array([0, 0, 0], dtype=float)
+    line_direction = norm_vector(np.array([1, 1, 0.5], dtype=float))
+    dist, closest_point_line, closest_point_circle = line_to_circle(
+        line_point, line_direction, center, radius, normal)
+    assert approx(dist) == 0.333333333
+    assert_array_almost_equal(
+        closest_point_line, np.array([0.628539, 0.628539, 0.31427]))
+    assert_array_almost_equal(
+        closest_point_circle, np.array([0.707107, 0.707107, 0.0]))
+
+    line_point = np.array([1, 0, 0], dtype=float)
+    line_direction = np.array([0, 0, 1], dtype=float)
+    dist, closest_point_line, closest_point_circle = line_to_circle(
+        line_point, line_direction, center, radius, normal)
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point_line, np.array([1, 0, 0]))
+    assert_array_almost_equal(closest_point_circle, np.array([1, 0, 0]))
+
+    line_point = np.array([2, 0, 0], dtype=float)
+    line_direction = np.array([0, 0, 1], dtype=float)
+    dist, closest_point_line, closest_point_circle = line_to_circle(
+        line_point, line_direction, center, radius, normal)
+    assert approx(dist) == 1.0
+    assert_array_almost_equal(closest_point_line, np.array([2, 0, 0]))
+    assert_array_almost_equal(closest_point_circle, np.array([1, 0, 0]))
+
+    line_point = np.array([0, 0, 0], dtype=float)
+    line_direction = norm_vector(np.array([2, 0, 1], dtype=float))
+    dist, closest_point_line, closest_point_circle = line_to_circle(
+        line_point, line_direction, center, radius, normal)
+    assert approx(dist) == 0.4472135954999579
+    assert_array_almost_equal(closest_point_line, np.array([0.8, 0.0, 0.4]))
+    assert_array_almost_equal(closest_point_circle, np.array([1, 0, 0]))
+
+    line_point = np.array([2, 0, 0], dtype=float)
+    line_direction = norm_vector(np.array([2, 0, 1], dtype=float))
+    dist, closest_point_line, closest_point_circle = line_to_circle(
+        line_point, line_direction, center, radius, normal)
+    assert approx(dist) == 0.4472135954999579
+    assert_array_almost_equal(closest_point_line, np.array([1.2, 0.0, -0.4]))
+    assert_array_almost_equal(closest_point_circle, np.array([1, 0, 0]))
+
+    line_point = np.array([2, 2, 0], dtype=float)
+    line_direction = norm_vector(np.array([1, 1, 2], dtype=float))
+    dist, closest_point_line, closest_point_circle = line_to_circle(
+        line_point, line_direction, center, radius, normal)
+    assert approx(dist) == 1.4929044958307771
+    assert_array_almost_equal(
+        closest_point_line, np.array([1.569036,  1.569036, -0.861929]))
+    assert_array_almost_equal(
+        closest_point_circle, np.array([0.707107, 0.707107, 0]))
+
+    random_state = np.random.RandomState(2323)
+    for _ in range(100):
+        center, radius, normal = random.rand_circle(random_state)
+        line_point, line_direction = random.randn_line(random_state)
+
+        dist, closest_point_line, closest_point_circle = line_to_circle(
+            line_point, line_direction, center, radius, normal)
+        assert approx(dist) == np.linalg.norm(
+            closest_point_line - closest_point_circle)
+
+        dist1, point1 = point_to_circle(
+            closest_point_line, center, radius, normal)
+        assert approx(dist) == dist1
+        assert_array_almost_equal(closest_point_circle, point1)
+
+        dist2, _ = point_to_circle(
+            closest_point_line + 0.1 * line_direction, center, radius, normal)
+        assert dist1 < dist2
+        dist3, _ = point_to_circle(
+            closest_point_line - 0.1 * line_direction, center, radius, normal)
+        assert dist1 < dist3
+
+
 def test_line_to_box():
     box2origin = np.eye(4)
     size = np.array([1, 1, 1])
@@ -540,6 +684,41 @@ def test_line_segment_to_line_segment():
     assert_array_almost_equal(closest_point1, closest_point2)
 
 
+def test_line_segment_to_plane():
+    plane_point = np.array([0, 0, 0], dtype=float)
+    plane_normal = np.array([0, 0, 1], dtype=float)
+
+    dist, closest_point_segement, closest_point_plane = line_segment_to_plane(
+        plane_point, plane_point + plane_normal, plane_point, plane_normal)
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point_segement, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point_plane, np.array([0, 0, 0]))
+
+    segment_start = np.array([0, 0, 1], dtype=float)
+    segment_end = np.array([1, 0, 1], dtype=float)
+    dist, closest_point_segement, closest_point_plane = line_segment_to_plane(
+        segment_start, segment_end, plane_point, plane_normal)
+    assert approx(dist) == 1.0
+    assert_array_almost_equal(closest_point_segement, np.array([0, 0, 1]))
+    assert_array_almost_equal(closest_point_plane, np.array([0, 0, 0]))
+
+    segment_start = np.array([0, 0, 0.5], dtype=float)
+    segment_end = np.array([0, 0, 1], dtype=float)
+    dist, closest_point_segement, closest_point_plane = line_segment_to_plane(
+        segment_start, segment_end, plane_point, plane_normal)
+    assert approx(dist) == 0.5
+    assert_array_almost_equal(closest_point_segement, np.array([0, 0, 0.5]))
+    assert_array_almost_equal(closest_point_plane, np.array([0, 0, 0]))
+
+    segment_start = np.array([0, 0, 1], dtype=float)
+    segment_end = np.array([0, 0, 0.5], dtype=float)
+    dist, closest_point_segement, closest_point_plane = line_segment_to_plane(
+        segment_start, segment_end, plane_point, plane_normal)
+    assert approx(dist) == 0.5
+    assert_array_almost_equal(closest_point_segement, np.array([0, 0, 0.5]))
+    assert_array_almost_equal(closest_point_plane, np.array([0, 0, 0]))
+
+
 def test_line_segment_to_triangle():
     triangle_points = np.array([[0, 0, 1], [0, 1, 1], [0, 1, 0]], dtype=float)
     segment_start = np.array([1, 0, 0], dtype=float)
@@ -667,3 +846,59 @@ def test_rectangle_to_box():
                 face_center, face_axes, face_lengths, box2origin, size)
             assert approx(dist) == 0.5
             assert approx(np.linalg.norm(closest_point_box - closest_point_rectangle)) == 0.5
+
+
+def test_disk_to_disk():
+    center1 = np.array([0, 0, 0])
+    radius1 = 1.0
+    normal1 = np.array([0, 0, 1])
+    dist, closest_point1, closest_point2 = disk_to_disk(
+        center1, radius1, normal1, center1, radius1, normal1)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point1, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point2, np.array([0, 0, 0]))
+
+    center2 = np.array([0, 0, 1])
+    radius2 = 1.0
+    normal2 = np.array([0, 0, 1])
+    dist, closest_point1, closest_point2 = disk_to_disk(
+        center1, radius1, normal1, center2, radius2, normal2)
+    assert approx(dist) == 1
+    assert_array_almost_equal(closest_point1, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point2, np.array([0, 0, 1]))
+
+    center2 = np.array([0, 0, 1])
+    radius2 = 1.0
+    normal2 = np.array([1, 0, 0])
+    dist, closest_point1, closest_point2 = disk_to_disk(
+        center1, radius1, normal1, center2, radius2, normal2)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point1, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point2, np.array([0, 0, 0]))
+
+    center2 = np.array([0, 0, 0.5])
+    radius2 = 1.0
+    normal2 = np.array([1, 0, 0])
+    dist, closest_point1, closest_point2 = disk_to_disk(
+        center1, radius1, normal1, center2, radius2, normal2)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point1, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point2, np.array([0, 0, 0]))
+
+    center2 = np.array([0.5, 0.5, 0])
+    radius2 = 1.0
+    normal2 = norm_vector(np.array([1, 1, 0]))
+    dist, closest_point1, closest_point2 = disk_to_disk(
+        center1, radius1, normal1, center2, radius2, normal2)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point1, np.array([0.5, 0.5, 0]))
+    assert_array_almost_equal(closest_point2, np.array([0.5, 0.5, 0]))
+
+    center2 = np.array([0, 2, 0])
+    radius2 = 1.0
+    normal2 = np.array([1, 0, 0])
+    dist, closest_point1, closest_point2 = disk_to_disk(
+        center1, radius1, normal1, center2, radius2, normal2)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point1, np.array([0, 1, 0]))
+    assert_array_almost_equal(closest_point2, np.array([0, 1, 0]))

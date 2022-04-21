@@ -59,6 +59,32 @@ def plot_segment(ax, segment_start, segment_end, alpha=1.0, c=None, lw=2):
     ax.plot(points[:, 0], points[:, 1], points[:, 2], alpha=alpha, c=c, lw=lw)
 
 
+def plot_triangle(ax, triangle_points, surface_alpha=0.1):
+    """Plot triangle.
+
+    Parameters
+    ----------
+    ax : Matplotlib 3d axis
+        A matplotlib 3d axis.
+
+    triangle_points : array, shape (3, 3)
+        Each row contains a point of the triangle (A, B, C).
+
+    surface_alpha : float, optional (default: 0.1)
+        Alpha value of the rectangle surface.
+    """
+    try:  # Matplotlib < 3.5
+        triangle = mplot3d.art3d.Poly3DCollection(triangle_points)
+    except ValueError:  # Matplotlib >= 3.5
+        triangle = mplot3d.art3d.Poly3DCollection(
+            triangle_points.reshape(1, 3, 3))
+    triangle.set_alpha(surface_alpha)
+    ax.add_collection3d(triangle)
+
+    triangle_points = np.vstack((triangle_points, [triangle_points[0]]))
+    ax.plot(triangle_points[:, 0], triangle_points[:, 1], triangle_points[:, 2])
+
+
 def plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths, show_axes=True, surface_alpha=0.1):
     """Plot rectangle.
 
@@ -110,32 +136,6 @@ def plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths, show
         ppu.plot_vector(
             ax=ax, start=rectangle_center, direction=rectangle_axes[1],
             s=0.5 * rectangle_lengths[1], color="g")
-
-
-def plot_triangle(ax, triangle_points, surface_alpha=0.1):
-    """Plot triangle.
-
-    Parameters
-    ----------
-    ax : Matplotlib 3d axis
-        A matplotlib 3d axis.
-
-    triangle_points : array, shape (3, 3)
-        Each row contains a point of the triangle (A, B, C).
-
-    surface_alpha : float, optional (default: 0.1)
-        Alpha value of the rectangle surface.
-    """
-    try:  # Matplotlib < 3.5
-        triangle = mplot3d.art3d.Poly3DCollection(triangle_points)
-    except ValueError:  # Matplotlib >= 3.5
-        triangle = mplot3d.art3d.Poly3DCollection(
-            triangle_points.reshape(1, 3, 3))
-    triangle.set_alpha(surface_alpha)
-    ax.add_collection3d(triangle)
-
-    triangle_points = np.vstack((triangle_points, [triangle_points[0]]))
-    ax.plot(triangle_points[:, 0], triangle_points[:, 1], triangle_points[:, 2])
 
 
 def plot_circle(ax, center, radius, normal, show_normal=False):
@@ -276,3 +276,43 @@ def plot_aabb_tree(ax, tree, alpha=0.5, color="red"):
         plot_aabb(ax, mins, maxs, alpha=alpha, color=color)
         if not node.is_leaf:
             nodes.extend([node.left, node.right])
+
+
+def plot_plane(ax, plane_point, plane_normal, s=1.0, surface_alpha=0.1):
+    """Plot rectangle.
+
+    Parameters
+    ----------
+    ax : Matplotlib 3d axis
+        A matplotlib 3d axis.
+
+    plane_point : array, shape (3,)
+        Point on the plane.
+
+    plane_normal : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    s : float, optional (default: 1)
+        Scaling of the plane that will be drawn.
+
+    surface_alpha : float, optional (default: 0.1)
+        Alpha value of the rectangle surface.
+    """
+    x_axis, y_axis = pr.plane_basis_from_normal(plane_normal)
+    vertices = np.array([
+        plane_point + s * x_axis + s * y_axis,
+        plane_point - s * x_axis + s * y_axis,
+        plane_point + s * x_axis - s * y_axis,
+        plane_point - s * x_axis - s * y_axis,
+    ])
+    vertices = vertices[np.array([0, 1, 2, 1, 3, 2, 2, 1, 0, 2, 3, 1])]
+
+    try:  # Matplotlib < 3.5
+        rectangle = mplot3d.art3d.Poly3DCollection(vertices)
+    except ValueError:  # Matplotlib >= 3.5
+        rectangle = mplot3d.art3d.Poly3DCollection(vertices.reshape(4, 3, 3))
+    rectangle.set_alpha(surface_alpha)
+    ax.add_collection3d(rectangle)
+
+    ppu.plot_vector(
+        ax=ax, start=plane_point, direction=plane_normal, s=s, color="r")
