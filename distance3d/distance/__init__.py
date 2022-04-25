@@ -17,7 +17,7 @@ from ._rectangle import (
     point_to_rectangle, line_to_rectangle, line_segment_to_rectangle,
     rectangle_to_rectangle)
 from ._disk import point_to_disk, disk_to_disk
-from ._circle import point_to_circle, line_to_circle
+from ._circle import point_to_circle, line_to_circle, line_segment_to_circle
 from ._box import (
     point_to_box, line_to_box, line_segment_to_box, rectangle_to_box)
 from ._ellipsoid import point_to_ellipsoid
@@ -46,6 +46,7 @@ __all__ = [
     "line_segment_to_plane",
     "line_segment_to_triangle",
     "line_segment_to_rectangle",
+    "line_segment_to_circle",
     "line_segment_to_box",
     "triangle_to_triangle",
     "triangle_to_rectangle",

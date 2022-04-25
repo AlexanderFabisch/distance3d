@@ -3,6 +3,7 @@ from collections import namedtuple
 import numpy as np
 import pytransform3d.rotations as pr
 from ..utils import norm_vector
+from ..geometry import convert_segment_to_line
 
 
 def point_to_circle(point, center, radius, normal, epsilon=1e-6):
@@ -298,3 +299,62 @@ def _case_line_and_normal_parallel(
         closest_point_line = center
         closest_point_circle = center + radius * u
     return closest_point_line, closest_point_circle
+
+
+def line_segment_to_circle(segment_start, segment_end, center, radius, normal):
+    """Compute the shortest distance between line segment and circle.
+
+    Parameters
+    ----------
+    segment_start : array, shape (3,)
+        Start point of segment.
+
+    segment_end : array, shape (3,)
+        End point of segment.
+
+    center : array, shape (3,)
+        Center of the circle.
+
+    radius : float
+        Radius of the circle.
+
+    normal : array, shape (3,)
+        Normal to the plane in which the circle lies.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between line segment and circle.
+
+    closest_point_line_segment : array, shape (3,)
+        Closest point on line segment.
+
+    closest_point_circle : array, shape (3,)
+        Closest point on circle.
+    """
+    return _line_segment_to_circle(
+        segment_start, segment_end, center, radius, normal)[:3]
+
+
+def _line_segment_to_circle(segment_start, segment_end, center, radius, normal):
+    segment_direction, segment_length = convert_segment_to_line(
+        segment_start, segment_end)
+
+    dist, contact_point_segment, contact_point_circle = line_to_circle(
+        segment_start, segment_direction, center, radius, normal)
+
+    t = np.nanmean((contact_point_segment - segment_start) / segment_direction)
+    if t < 0.0:
+        dist, contact_point_circle = point_to_circle(
+            segment_start, center, radius, normal)
+        contact_point_segment = segment_start
+        on_line = False
+    elif t > segment_length:
+        dist, contact_point_circle = point_to_circle(
+            segment_end, center, radius, normal)
+        contact_point_segment = segment_end
+        on_line = False
+    else:
+        on_line = True
+
+    return dist, contact_point_segment, contact_point_circle, on_line
