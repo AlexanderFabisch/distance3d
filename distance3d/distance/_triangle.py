@@ -26,7 +26,7 @@ def point_to_triangle(point, triangle_points):
     distance : float
         The shortest distance between point and triangle.
 
-    contact_point : array, shape (3,)
+    closest_point : array, shape (3,)
         Closest point on triangle.
     """
     ab = triangle_points[1] - triangle_points[0]
@@ -37,53 +37,53 @@ def point_to_triangle(point, triangle_points):
     d1 = np.dot(ab, ap)
     d2 = np.dot(ac, ap)
     if d1 <= 0.0 and d2 <= 0.0:
-        contact_point = triangle_points[0]
-        return np.linalg.norm(point - contact_point), contact_point
+        closest_point = triangle_points[0]
+        return np.linalg.norm(point - closest_point), closest_point
 
     # Check if point in vertex region outside B
     bp = point - triangle_points[1]
     d3 = np.dot(ab, bp)
     d4 = np.dot(ac, bp)
     if d3 >= 0 and d4 <= d3:
-        contact_point = triangle_points[1]
-        return np.linalg.norm(point - contact_point), contact_point
+        closest_point = triangle_points[1]
+        return np.linalg.norm(point - closest_point), closest_point
 
     # Check if point in edge region of AB
     vc = d1 * d4 - d3 * d2
     if vc <= 0.0 <= d1 and d3 <= 0.0:
         v = d1 / (d1 - d3)
-        contact_point = triangle_points[0] + v * ab
-        return np.linalg.norm(point - contact_point), contact_point
+        closest_point = triangle_points[0] + v * ab
+        return np.linalg.norm(point - closest_point), closest_point
 
     # Check if point in vertex region outside C
     cp = point - triangle_points[2]
     d5 = np.dot(ab, cp)
     d6 = np.dot(ac, cp)
     if d6 >= 0.0 and d5 <= d6:
-        contact_point = triangle_points[2]
-        return np.linalg.norm(point - contact_point), contact_point
+        closest_point = triangle_points[2]
+        return np.linalg.norm(point - closest_point), closest_point
 
     # Check if point in edge region of AC
     vb = d5 * d2 - d1 * d6
     if vb <= 0.0 <= d2 and d6 <= 0.0:
         w = d2 / (d2 - d6)
-        contact_point = triangle_points[0] + w * ac
-        return np.linalg.norm(point - contact_point), contact_point
+        closest_point = triangle_points[0] + w * ac
+        return np.linalg.norm(point - closest_point), closest_point
 
     # Check if point in edge region of BC
     va = d3 * d6 - d5 * d4
     if va <= 0.0 <= d4 - d3 and d5 - d6 >= 0.0:
         w = (d4 - d3) / ((d4 - d3) + (d5 - d6))
-        contact_point = triangle_points[1] + w * (triangle_points[2] - triangle_points[1])
-        return np.linalg.norm(point - contact_point), contact_point
+        closest_point = triangle_points[1] + w * (triangle_points[2] - triangle_points[1])
+        return np.linalg.norm(point - closest_point), closest_point
 
     # Point inside face region
     denom = 1.0 / (va + vb + vc)
     v = vb * denom
     w = vc * denom
-    contact_point = triangle_points[0] + ab * v + ac * w
+    closest_point = triangle_points[0] + ab * v + ac * w
 
-    return np.linalg.norm(point - contact_point), contact_point
+    return np.linalg.norm(point - closest_point), closest_point
 
 
 def line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6):
@@ -112,10 +112,10 @@ def line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6):
     distance : float
         The shortest distance between line and triangle.
 
-    contact_point_line : array, shape (3,)
+    closest_point_line : array, shape (3,)
         Closest point on line.
 
-    contact_point_triangle : array, shape (3,)
+    closest_point_triangle : array, shape (3,)
         Closest point on triangle.
     """
     return _line_to_triangle(line_point, line_direction, triangle_points, epsilon)[:3]
@@ -151,9 +151,9 @@ def _line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6)
             line_parameter = b.dot(dde) - dddiff
 
             # The intersection point is inside or on the triangle.
-            best_contact_point_line = line_point + line_parameter * line_direction
-            best_contact_point_triangle = triangle_points[0] + b.dot(edge)
-            return 0.0, best_contact_point_line, best_contact_point_triangle, line_parameter
+            best_closest_point_line = line_point + line_parameter * line_direction
+            best_closest_point_triangle = triangle_points[0] + b.dot(edge)
+            return 0.0, best_closest_point_line, best_closest_point_triangle, line_parameter
 
     # Either (1) the line is not parallel to the triangle and the point of
     # intersection of the line and the plane of the triangle is outside the
@@ -164,19 +164,19 @@ def _line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6)
     i0 = 2
     i1 = 0
     while i1 < 3:
-        distance, contact_point_line, contact_point_segment, t, _ = _line_to_line_segment(
+        distance, closest_point_line, closest_point_segment, t, _ = _line_to_line_segment(
             line_point, line_direction, triangle_points[i0], triangle_points[i1],
             epsilon=epsilon)
 
         if distance < best_distance:
-            best_contact_point_line = contact_point_line
-            best_contact_point_triangle = contact_point_segment
+            best_closest_point_line = closest_point_line
+            best_closest_point_triangle = closest_point_segment
             best_distance = distance
             best_line_parameter = t
 
         i0 = i1
         i1 += 1
-    return best_distance, best_contact_point_line, best_contact_point_triangle, best_line_parameter
+    return best_distance, best_closest_point_line, best_closest_point_triangle, best_line_parameter
 
 
 def line_segment_to_triangle(
@@ -206,28 +206,28 @@ def line_segment_to_triangle(
     distance : float
         The shortest distance between line segment and triangle.
 
-    contact_point_line_segment : array, shape (3,)
+    closest_point_line_segment : array, shape (3,)
         Closest point on line segment.
 
-    contact_point_triangle : array, shape (3,)
+    closest_point_triangle : array, shape (3,)
         Closest point on triangle.
     """
     segment_direction, segment_length = convert_segment_to_line(
         segment_start, segment_end)
 
-    distance, contact_point_segment, contact_point_triangle, t_closest = _line_to_triangle(
+    distance, closest_point_segment, closest_point_triangle, t_closest = _line_to_triangle(
         segment_start, segment_direction, triangle_points, epsilon)
 
     if t_closest < 0:
-        distance, contact_point_triangle = point_to_triangle(
+        distance, closest_point_triangle = point_to_triangle(
             segment_start, triangle_points)
-        contact_point_segment = segment_start
+        closest_point_segment = segment_start
     elif t_closest > segment_length:
-        distance, contact_point_triangle = point_to_triangle(
+        distance, closest_point_triangle = point_to_triangle(
             segment_end, triangle_points)
-        contact_point_segment = segment_end
+        closest_point_segment = segment_end
 
-    return distance, contact_point_segment, contact_point_triangle
+    return distance, closest_point_segment, closest_point_triangle
 
 
 def triangle_to_triangle(triangle_points1, triangle_points2, epsilon=1e-6):
@@ -261,10 +261,10 @@ def triangle_to_triangle(triangle_points1, triangle_points2, epsilon=1e-6):
     distance : float
         Shortest distance.
 
-    contact_point_triangle1 : array, shape (3,)
+    closest_point_triangle1 : array, shape (3,)
         Closest point on triangle 1.
 
-    contact_point_triangle2 : array, shape (3,)
+    closest_point_triangle2 : array, shape (3,)
         Closest point on triangle 2.
     """
     # compare edges of triangle1 to the interior of triangle2
@@ -274,15 +274,15 @@ def triangle_to_triangle(triangle_points1, triangle_points2, epsilon=1e-6):
     while i1 < 3:
         segment_start = triangle_points1[i0]
         segment_end = triangle_points1[i1]
-        dist, contact_point_segment, contact_point_triangle = line_segment_to_triangle(
+        dist, closest_point_segment, closest_point_triangle = line_segment_to_triangle(
             segment_start, segment_end, triangle_points2, epsilon)
         if dist < best_dist:
-            best_contact_point_triangle1 = contact_point_segment
-            best_contact_point_triangle2 = contact_point_triangle
+            best_closest_point_triangle1 = closest_point_segment
+            best_closest_point_triangle2 = closest_point_triangle
             best_dist = dist
 
             if best_dist <= epsilon:
-                return 0.0, best_contact_point_triangle1, best_contact_point_triangle2
+                return 0.0, best_closest_point_triangle1, best_closest_point_triangle2
         i0 = i1
         i1 += 1
 
@@ -292,19 +292,19 @@ def triangle_to_triangle(triangle_points1, triangle_points2, epsilon=1e-6):
     while i1 < 3:
         segment_start = triangle_points2[i0]
         segment_end = triangle_points2[i1]
-        dist, contact_point_segment, contact_point_triangle = line_segment_to_triangle(
+        dist, closest_point_segment, closest_point_triangle = line_segment_to_triangle(
             segment_start, segment_end, triangle_points1, epsilon)
         if dist < best_dist:
-            best_contact_point_triangle1 = contact_point_triangle
-            best_contact_point_triangle2 = contact_point_segment
+            best_closest_point_triangle1 = closest_point_triangle
+            best_closest_point_triangle2 = closest_point_segment
             best_dist = dist
 
             if best_dist <= epsilon:
-                return 0.0, best_contact_point_triangle1, best_contact_point_triangle2
+                return 0.0, best_closest_point_triangle1, best_closest_point_triangle2
         i0 = i1
         i1 += 1
 
-    return best_dist, best_contact_point_triangle1, best_contact_point_triangle2
+    return best_dist, best_closest_point_triangle1, best_closest_point_triangle2
 
 
 def triangle_to_rectangle(
@@ -331,10 +331,10 @@ def triangle_to_rectangle(
     distance : float
         Shortest distance.
 
-    contact_point_triangle : array, shape (3,)
+    closest_point_triangle : array, shape (3,)
         Closest point on triangle.
 
-    contact_point_rectangle : array, shape (3,)
+    closest_point_rectangle : array, shape (3,)
         Closest point on rectangle.
     """
     # compare edges of triangle to the interior of rectangle
@@ -344,11 +344,11 @@ def triangle_to_rectangle(
     while i1 < 3:
         segment_start = triangle_points[i0]
         segment_end = triangle_points[i1]
-        dist, contact_point_triangle, contact_point_rectangle = line_segment_to_rectangle(
+        dist, closest_point_triangle, closest_point_rectangle = line_segment_to_rectangle(
             segment_start, segment_end, rectangle_center, rectangle_axes, rectangle_lengths)
         if dist < best_dist:
-            best_contact_point_triangle = contact_point_triangle
-            best_contact_point_rectangle = contact_point_rectangle
+            best_closest_point_triangle = closest_point_triangle
+            best_closest_point_rectangle = closest_point_rectangle
             best_dist = dist
         i0 = i1
         i1 += 1
@@ -359,11 +359,11 @@ def triangle_to_rectangle(
         for i0 in range(2):
             segment_end, segment_start = convert_rectangle_to_segment(
                 rectangle_center, rectangle_extents, i0, i1)
-            dist, contact_point_rectangle, contact_point_triangle = line_segment_to_triangle(
+            dist, closest_point_rectangle, closest_point_triangle = line_segment_to_triangle(
                 segment_start, segment_end, triangle_points)
             if dist < best_dist:
-                best_contact_point_triangle = contact_point_triangle
-                best_contact_point_rectangle = contact_point_rectangle
+                best_closest_point_triangle = closest_point_triangle
+                best_closest_point_rectangle = closest_point_rectangle
                 best_dist = dist
 
-    return best_dist, best_contact_point_triangle, best_contact_point_rectangle
+    return best_dist, best_closest_point_triangle, best_closest_point_rectangle

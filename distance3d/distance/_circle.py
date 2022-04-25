@@ -43,7 +43,7 @@ def point_to_circle(point, center, radius, normal, epsilon=1e-6):
     dist : float
         The shortest distance between point and circle.
 
-    contact_point_circle : array, shape (3,)
+    closest_point_circle : array, shape (3,)
         Closest point on the circle.
     """
     # signed distance from point to plane of circle
@@ -340,21 +340,21 @@ def _line_segment_to_circle(segment_start, segment_end, center, radius, normal):
     segment_direction, segment_length = convert_segment_to_line(
         segment_start, segment_end)
 
-    dist, contact_point_segment, contact_point_circle = line_to_circle(
+    dist, closest_point_segment, closest_point_circle = line_to_circle(
         segment_start, segment_direction, center, radius, normal)
 
-    t = np.nanmean((contact_point_segment - segment_start) / segment_direction)
+    t = np.nanmean((closest_point_segment - segment_start) / segment_direction)
     if t < 0.0:
-        dist, contact_point_circle = point_to_circle(
+        dist, closest_point_circle = point_to_circle(
             segment_start, center, radius, normal)
-        contact_point_segment = segment_start
+        closest_point_segment = segment_start
         on_line = False
     elif t > segment_length:
-        dist, contact_point_circle = point_to_circle(
+        dist, closest_point_circle = point_to_circle(
             segment_end, center, radius, normal)
-        contact_point_segment = segment_end
+        closest_point_segment = segment_end
         on_line = False
     else:
         on_line = True
 
-    return dist, contact_point_segment, contact_point_circle, on_line
+    return dist, closest_point_segment, closest_point_circle, on_line
