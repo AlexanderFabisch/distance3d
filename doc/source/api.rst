@@ -45,6 +45,7 @@ API Reference
    ~distance3d.distance.line_segment_to_rectangle
    ~distance3d.distance.line_segment_to_circle
    ~distance3d.distance.line_segment_to_box
+   ~distance3d.distance.plane_to_plane
    ~distance3d.distance.triangle_to_triangle
    ~distance3d.distance.triangle_to_rectangle
    ~distance3d.distance.rectangle_to_rectangle
@@ -150,6 +151,7 @@ API Reference
    ~distance3d.geometry.cylinder_extreme_along_direction
    ~distance3d.geometry.capsule_extreme_along_direction
    ~distance3d.geometry.hesse_normal_form
+   ~distance3d.geometry.line_from_pluecker
 
 
 :mod:`distance3d.self_collision`

@@ -1,5 +1,6 @@
 import numpy as np
-from ..geometry import hesse_normal_form, convert_segment_to_line
+from ..geometry import (
+    hesse_normal_form, convert_segment_to_line, line_from_pluecker)
 
 
 def point_to_plane(point, plane_point, plane_normal, signed=False):
@@ -143,3 +144,59 @@ def line_segment_to_plane(
     dist, closest_point_plane = point_to_plane(
         closest_point_segment, plane_point, plane_normal)
     return dist, closest_point_segment, closest_point_plane
+
+
+def plane_to_plane(plane_point1, plane_normal1, plane_point2, plane_normal2,
+                   epsilon=1e-6):
+    """Compute the shortest distance between two planes.
+
+    Parameters
+    ----------
+    plane_point1 : array, shape (3,)
+        Point on the plane.
+
+    plane_normal1 : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    plane_point2 : array, shape (3,)
+        Point on the plane.
+
+    plane_normal2 : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    epsilon : float, optional (default: 1e-6)
+        Values smaller than epsilon are considered to be 0.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between line segment and plane.
+
+    closest_point_plane1 : array, shape (3,)
+        Closest point on first plane.
+
+    closest_point_plane2 : array, shape (3,)
+        Closest point on second plane.
+    """
+    line_direction = np.cross(plane_normal1, plane_normal2)
+    if np.linalg.norm(line_direction) > epsilon:
+        line_direction, line_moment = plane_intersects_plane(
+            plane_point1, plane_normal1, plane_point2, plane_normal2,
+            line_direction=line_direction)
+        line_point, _ = line_from_pluecker(line_direction, line_moment)
+        return 0.0, line_point, line_point
+    else:
+        dist, closest_point_plane2 = point_to_plane(
+            plane_point1, plane_point2, plane_normal2)
+        return dist, plane_point1, closest_point_plane2
+
+
+def plane_intersects_plane(
+        plane_point1, plane_normal1, plane_point2, plane_normal2,
+        line_direction=None):
+    _, d1 = hesse_normal_form(plane_point1, plane_normal1)
+    _, d2 = hesse_normal_form(plane_point2, plane_normal2)
+    if line_direction is None:
+        line_direction = np.cross(plane_normal1, plane_normal2)
+    line_moment = plane_normal1 * d2 - plane_normal2 * d1
+    return line_direction, line_moment

@@ -278,7 +278,8 @@ def plot_aabb_tree(ax, tree, alpha=0.5, color="red"):
             nodes.extend([node.left, node.right])
 
 
-def plot_plane(ax, plane_point, plane_normal, s=1.0, surface_alpha=0.1):
+def plot_plane(
+        ax, plane_point, plane_normal, s=1.0, surface_alpha=0.1, color="b"):
     """Plot rectangle.
 
     Parameters
@@ -297,6 +298,9 @@ def plot_plane(ax, plane_point, plane_normal, s=1.0, surface_alpha=0.1):
 
     surface_alpha : float, optional (default: 0.1)
         Alpha value of the rectangle surface.
+
+    color : str
+        Color of faces.
     """
     x_axis, y_axis = pr.plane_basis_from_normal(plane_normal)
     vertices = np.array([
@@ -311,6 +315,7 @@ def plot_plane(ax, plane_point, plane_normal, s=1.0, surface_alpha=0.1):
         rectangle = mplot3d.art3d.Poly3DCollection(vertices)
     except ValueError:  # Matplotlib >= 3.5
         rectangle = mplot3d.art3d.Poly3DCollection(vertices.reshape(4, 3, 3))
+    rectangle.set_facecolor(color)
     rectangle.set_alpha(surface_alpha)
     ax.add_collection3d(rectangle)
 

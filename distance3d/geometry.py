@@ -267,3 +267,28 @@ def hesse_normal_form(plane_point, plane_normal):
         Distance of the plane to origin in Hesse normal form.
     """
     return plane_normal, np.dot(plane_point, plane_normal)
+
+
+def line_from_pluecker(line_direction, line_moment):
+    """Computes line from Plücker coordinates.
+
+    Parameters
+    ----------
+    line_direction : array, shape (3,)
+        Direction of the line. Not necessarily of unit length.
+
+    line_moment : array, shape (3,)
+        Moment of the line.
+
+    Returns
+    -------
+    line_point : array, shape (3,)
+        Point on line.
+
+    line_direction : array, shape (3,)
+        Direction of the line. This is assumed to be of unit length.
+    """
+    line_dir_norm_squared = np.dot(line_direction, line_direction)
+    line_point = np.cross(line_direction, line_moment) / line_dir_norm_squared
+    line_direction = line_direction / math.sqrt(line_dir_norm_squared)
+    return line_point, line_direction
