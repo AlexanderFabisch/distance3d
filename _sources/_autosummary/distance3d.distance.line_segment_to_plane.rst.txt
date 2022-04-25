@@ -1,0 +1,6 @@
+﻿distance3d.distance.line\_segment\_to\_plane
+============================================
+
+.. currentmodule:: distance3d.distance
+
+.. autofunction:: line_segment_to_plane

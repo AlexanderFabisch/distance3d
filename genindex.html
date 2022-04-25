@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; distance3d 0.1.0 documentation</title>
+    <title>Index &#8212; distance3d 0.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -46,6 +46,7 @@
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
@@ -58,12 +59,12 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box.__init__">__init__() (distance3d.colliders.Box method)</a>
+      <li><a href="_autosummary/distance3d.colliders.BoundingVolumeHierarchy.html#distance3d.colliders.BoundingVolumeHierarchy.__init__">__init__() (distance3d.colliders.BoundingVolumeHierarchy method)</a>
 
       <ul>
-        <li><a href="_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule.__init__">(distance3d.colliders.Capsule method)</a>
+        <li><a href="_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box.__init__">(distance3d.colliders.Box method)</a>
 </li>
-        <li><a href="_autosummary/distance3d.colliders.ColliderTree.html#distance3d.colliders.ColliderTree.__init__">(distance3d.colliders.ColliderTree method)</a>
+        <li><a href="_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule.__init__">(distance3d.colliders.Capsule method)</a>
 </li>
         <li><a href="_autosummary/distance3d.colliders.Convex.html#distance3d.colliders.Convex.__init__">(distance3d.colliders.Convex method)</a>
 </li>
@@ -90,10 +91,12 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box">Box (class in distance3d.colliders)</a>
+      <li><a href="_autosummary/distance3d.colliders.BoundingVolumeHierarchy.html#distance3d.colliders.BoundingVolumeHierarchy">BoundingVolumeHierarchy (class in distance3d.colliders)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box">Box (class in distance3d.colliders)</a>
+</li>
       <li><a href="_autosummary/distance3d.containment.box_aabb.html#distance3d.containment.box_aabb">box_aabb() (in module distance3d.containment)</a>
 </li>
   </ul></td>
@@ -107,8 +110,6 @@
       <li><a href="_autosummary/distance3d.containment.capsule_aabb.html#distance3d.containment.capsule_aabb">capsule_aabb() (in module distance3d.containment)</a>
 </li>
       <li><a href="_autosummary/distance3d.geometry.capsule_extreme_along_direction.html#distance3d.geometry.capsule_extreme_along_direction">capsule_extreme_along_direction() (in module distance3d.geometry)</a>
-</li>
-      <li><a href="_autosummary/distance3d.colliders.ColliderTree.html#distance3d.colliders.ColliderTree">ColliderTree (class in distance3d.colliders)</a>
 </li>
       <li><a href="_autosummary/distance3d.geometry.convert_box_to_face.html#distance3d.geometry.convert_box_to_face">convert_box_to_face() (in module distance3d.geometry)</a>
 </li>
@@ -138,6 +139,10 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/distance3d.self_collision.detect.html#distance3d.self_collision.detect">detect() (in module distance3d.self_collision)</a>
+</li>
+      <li><a href="_autosummary/distance3d.distance.disk_to_disk.html#distance3d.distance.disk_to_disk">disk_to_disk() (in module distance3d.distance)</a>
+</li>
       <li>
     distance3d
 
@@ -204,6 +209,13 @@
 </li>
       </ul></li>
       <li>
+    distance3d.self_collision
+
+      <ul>
+        <li><a href="api.html#module-distance3d.self_collision">module</a>
+</li>
+      </ul></li>
+      <li>
     distance3d.utils
 
       <ul>
@@ -237,6 +249,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/distance3d.geometry.hesse_normal_form.html#distance3d.geometry.hesse_normal_form">hesse_normal_form() (in module distance3d.geometry)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -244,17 +264,23 @@
 </li>
       <li><a href="_autosummary/distance3d.distance.line_segment_to_line_segment.html#distance3d.distance.line_segment_to_line_segment">line_segment_to_line_segment() (in module distance3d.distance)</a>
 </li>
+      <li><a href="_autosummary/distance3d.distance.line_segment_to_plane.html#distance3d.distance.line_segment_to_plane">line_segment_to_plane() (in module distance3d.distance)</a>
+</li>
       <li><a href="_autosummary/distance3d.distance.line_segment_to_rectangle.html#distance3d.distance.line_segment_to_rectangle">line_segment_to_rectangle() (in module distance3d.distance)</a>
 </li>
       <li><a href="_autosummary/distance3d.distance.line_segment_to_triangle.html#distance3d.distance.line_segment_to_triangle">line_segment_to_triangle() (in module distance3d.distance)</a>
 </li>
+      <li><a href="_autosummary/distance3d.distance.line_to_box.html#distance3d.distance.line_to_box">line_to_box() (in module distance3d.distance)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/distance3d.distance.line_to_box.html#distance3d.distance.line_to_box">line_to_box() (in module distance3d.distance)</a>
+      <li><a href="_autosummary/distance3d.distance.line_to_circle.html#distance3d.distance.line_to_circle">line_to_circle() (in module distance3d.distance)</a>
 </li>
       <li><a href="_autosummary/distance3d.distance.line_to_line.html#distance3d.distance.line_to_line">line_to_line() (in module distance3d.distance)</a>
 </li>
       <li><a href="_autosummary/distance3d.distance.line_to_line_segment.html#distance3d.distance.line_to_line_segment">line_to_line_segment() (in module distance3d.distance)</a>
+</li>
+      <li><a href="_autosummary/distance3d.distance.line_to_plane.html#distance3d.distance.line_to_plane">line_to_plane() (in module distance3d.distance)</a>
 </li>
       <li><a href="_autosummary/distance3d.distance.line_to_rectangle.html#distance3d.distance.line_to_rectangle">line_to_rectangle() (in module distance3d.distance)</a>
 </li>
@@ -290,6 +316,8 @@
 </li>
         <li><a href="api.html#module-distance3d.random">distance3d.random</a>
 </li>
+        <li><a href="api.html#module-distance3d.self_collision">distance3d.self_collision</a>
+</li>
         <li><a href="api.html#module-distance3d.utils">distance3d.utils</a>
 </li>
       </ul></li>
@@ -309,11 +337,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/distance3d.plotting.plot_aabb.html#distance3d.plotting.plot_aabb">plot_aabb() (in module distance3d.plotting)</a>
 </li>
+      <li><a href="_autosummary/distance3d.plotting.plot_aabb_tree.html#distance3d.plotting.plot_aabb_tree">plot_aabb_tree() (in module distance3d.plotting)</a>
+</li>
       <li><a href="_autosummary/distance3d.plotting.plot_circle.html#distance3d.plotting.plot_circle">plot_circle() (in module distance3d.plotting)</a>
 </li>
       <li><a href="_autosummary/distance3d.plotting.plot_convex.html#distance3d.plotting.plot_convex">plot_convex() (in module distance3d.plotting)</a>
 </li>
       <li><a href="_autosummary/distance3d.plotting.plot_line.html#distance3d.plotting.plot_line">plot_line() (in module distance3d.plotting)</a>
+</li>
+      <li><a href="_autosummary/distance3d.plotting.plot_plane.html#distance3d.plotting.plot_plane">plot_plane() (in module distance3d.plotting)</a>
 </li>
       <li><a href="_autosummary/distance3d.plotting.plot_rectangle.html#distance3d.plotting.plot_rectangle">plot_rectangle() (in module distance3d.plotting)</a>
 </li>
@@ -323,10 +355,10 @@
 </li>
       <li><a href="_autosummary/distance3d.plotting.plot_triangle.html#distance3d.plotting.plot_triangle">plot_triangle() (in module distance3d.plotting)</a>
 </li>
-      <li><a href="_autosummary/distance3d.distance.point_to_box.html#distance3d.distance.point_to_box">point_to_box() (in module distance3d.distance)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/distance3d.distance.point_to_box.html#distance3d.distance.point_to_box">point_to_box() (in module distance3d.distance)</a>
+</li>
       <li><a href="_autosummary/distance3d.distance.point_to_circle.html#distance3d.distance.point_to_circle">point_to_circle() (in module distance3d.distance)</a>
 </li>
       <li><a href="_autosummary/distance3d.distance.point_to_cylinder.html#distance3d.distance.point_to_cylinder">point_to_cylinder() (in module distance3d.distance)</a>
@@ -363,11 +395,13 @@
 </li>
       <li><a href="_autosummary/distance3d.random.randn_direction.html#distance3d.random.randn_direction">randn_direction() (in module distance3d.random)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/distance3d.random.randn_line.html#distance3d.random.randn_line">randn_line() (in module distance3d.random)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/distance3d.random.randn_line_segment.html#distance3d.random.randn_line_segment">randn_line_segment() (in module distance3d.random)</a>
+</li>
+      <li><a href="_autosummary/distance3d.random.randn_plane.html#distance3d.random.randn_plane">randn_plane() (in module distance3d.random)</a>
 </li>
       <li><a href="_autosummary/distance3d.random.randn_point.html#distance3d.random.randn_point">randn_point() (in module distance3d.random)</a>
 </li>

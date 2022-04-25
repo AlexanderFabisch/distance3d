@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.distance.disk_to_disk &#8212; distance3d 0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="distance3d.colliders.BoundingVolumeHierarchy" href="distance3d.colliders.BoundingVolumeHierarchy.html" />
+    <link rel="prev" title="distance3d.distance.rectangle_to_box" href="distance3d.distance.rectangle_to_box.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="distance3d-distance-disk-to-disk">
+<h1>distance3d.distance.disk_to_disk<a class="headerlink" href="#distance3d-distance-disk-to-disk" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="distance3d.distance.disk_to_disk">
+<span class="sig-prename descclassname"><span class="pre">distance3d.distance.</span></span><span class="sig-name descname"><span class="pre">disk_to_disk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normal1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normal2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/distance/_disk.html#disk_to_disk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.distance.disk_to_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the shortest distance between two disks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>center1</strong><span class="classifier">array, shape (3,)</span></dt><dd><p>Center of the disk.</p>
+</dd>
+<dt><strong>radius1</strong><span class="classifier">float</span></dt><dd><p>Radius of the disk.</p>
+</dd>
+<dt><strong>normal1</strong><span class="classifier">array, shape (3,)</span></dt><dd><p>Normal to the plane in which the disk lies.</p>
+</dd>
+<dt><strong>center2</strong><span class="classifier">array, shape (3,)</span></dt><dd><p>Center of the disk.</p>
+</dd>
+<dt><strong>radius2</strong><span class="classifier">float</span></dt><dd><p>Radius of the disk.</p>
+</dd>
+<dt><strong>normal2</strong><span class="classifier">array, shape (3,)</span></dt><dd><p>Normal to the plane in which the disk lies.</p>
+</dd>
+<dt><strong>epsilon</strong><span class="classifier">float, optional (default: 1e-8)</span></dt><dd><p>Values smaller than epsilon are considered to be 0.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>dist</strong><span class="classifier">float</span></dt><dd><p>The shortest distance between two disks.</p>
+</dd>
+<dt><strong>closest_point_disk1</strong><span class="classifier">array, shape (3,)</span></dt><dd><p>Closest point on the disk 1.</p>
+</dd>
+<dt><strong>closest_point_disk2</strong><span class="classifier">array, shape (3,)</span></dt><dd><p>Closest point on the disk 2.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#module-distance3d"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d</span></code></a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../api.html#module-distance3d.distance"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.distance</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.colliders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.colliders</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.containment"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.containment</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.epa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.epa</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.gjk"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.gjk</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.geometry"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.geometry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.self_collision"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.self_collision</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.random"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.random</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.utils</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API Reference</a><ul>
+      <li>Previous: <a href="distance3d.distance.rectangle_to_box.html" title="previous chapter">distance3d.distance.rectangle_to_box</a></li>
+      <li>Next: <a href="distance3d.colliders.BoundingVolumeHierarchy.html" title="next chapter">distance3d.colliders.BoundingVolumeHierarchy</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/_autosummary/distance3d.distance.disk_to_disk.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -93,7 +93,7 @@ Collision resolution with EPA after GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.210 seconds)
+   **Total running time of the script:** ( 0 minutes  0.217 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_collision_resolution_epa.py:

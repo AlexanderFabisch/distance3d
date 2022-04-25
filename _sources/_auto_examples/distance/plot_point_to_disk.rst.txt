@@ -62039,7 +62039,7 @@ Distance from point to disk
     1.1024439756563336
     2.446786079788448
     1.6452046602520765
-    accumulated_time=1.0586471557617188
+    accumulated_time=1.0962114334106445
 
 
 
@@ -62088,7 +62088,7 @@ Distance from point to disk
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.180 seconds)
+   **Total running time of the script:** ( 0 minutes  3.272 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_disk.py:

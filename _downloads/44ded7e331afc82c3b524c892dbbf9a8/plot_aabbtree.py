@@ -3,10 +3,9 @@
 AABB Tree
 =========
 
-Plot AABB Tree.
+Plot AABB tree.
 """
 print(__doc__)
-from collections import deque
 import numpy as np
 import pytransform3d.plot_utils as ppu
 import matplotlib.pyplot as plt
@@ -46,13 +45,5 @@ tree.add(aabb1, "sphere")
 tree.add(aabb2, "box")
 tree.add(aabb3, "cylinder")
 tree.add(aabb4, "capsule")
-mins, maxs = np.array(tree.aabb.limits).T
-nodes = deque()
-nodes.append(tree)
-while nodes:
-    node = nodes.popleft()
-    mins, maxs = np.array(node.aabb.limits).T
-    plotting.plot_aabb(ax, mins, maxs, alpha=0.4)
-    if not node.is_leaf:
-        nodes.extend([node.left, node.right])
+plotting.plot_aabb_tree(ax, tree)
 plt.show()

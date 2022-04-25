@@ -7,16 +7,13 @@ print(__doc__)
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-import pytransform3d.rotations as pr
 import pytransform3d.plot_utils as ppu
 from distance3d.distance import point_to_plane
 from distance3d import random, plotting
 
 
-random_state = np.random.RandomState(0)
-# TODO move to random
-plane_point = random_state.randn(3)
-plane_normal = pr.norm_vector(random_state.randn(3))
+random_state = np.random.RandomState(3)
+plane_point, plane_normal = random.randn_plane(random_state)
 
 ax = ppu.make_3d_axis(ax_s=2)
 
@@ -33,6 +30,7 @@ for i in range(150000):
     plotting.plot_segment(ax, point, contact_point, lw=1)
 print(f"{accumulated_time=}")
 
-# TODO how to plot a plane? part of pytransform3d?
-ppu.plot_vector(ax=ax, start=plane_point, direction=plane_normal)
+plotting.plot_plane(
+    ax=ax, plane_point=plane_point, plane_normal=plane_normal, s=2)
+ax.view_init(azim=150, elev=30)
 plt.show()

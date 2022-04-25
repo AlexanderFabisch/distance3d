@@ -47,7 +47,7 @@ class AnimationCallback:
             if self.verbose:
                 print(f"With AABBTree: {total_time}")
         else:
-            for frame, collider in colls.colliders.items():
+            for frame, collider in colls.colliders_.items():
                 start = time.time()
                 for box in boxes:
                     dist = gjk.gjk_with_simplex(collider, box)[0]
@@ -60,7 +60,7 @@ class AnimationCallback:
         self.total_time += total_time
 
         for frame in in_contact:
-            geometry = colls.colliders[frame].artist_.geometries[0]
+            geometry = colls.colliders_[frame].artist_.geometries[0]
             if in_contact[frame]:
                 geometry.paint_uniform_color((1, 0, 0))
             elif in_aabb[frame]:
@@ -79,7 +79,7 @@ data_dir = BASE_DIR
 search_path = ".."
 while (not os.path.exists(data_dir) and
        os.path.dirname(search_path) != "distance3d"):
-    search_path = os.path.join(search_path, "../..")
+    search_path = os.path.join(search_path, "..")
     data_dir = os.path.join(search_path, BASE_DIR)
 
 tm = UrdfTransformManager()
@@ -91,8 +91,8 @@ joint_names = ["joint%d" % i for i in range(1, 7)]
 for joint_name in joint_names:
     tm.set_joint(joint_name, 0.7)
 
-colls = colliders.ColliderTree(tm, "robot_arm")
-colls.fill_tree_with_colliders(tm)
+colls = colliders.BoundingVolumeHierarchy(tm, "robot_arm")
+colls.fill_tree_with_colliders(tm, make_artists=True)
 
 random_state = np.random.RandomState(5)
 

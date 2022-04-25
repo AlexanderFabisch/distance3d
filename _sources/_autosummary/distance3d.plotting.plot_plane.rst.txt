@@ -1,0 +1,6 @@
+﻿distance3d.plotting.plot\_plane
+===============================
+
+.. currentmodule:: distance3d.plotting
+
+.. autofunction:: plot_plane

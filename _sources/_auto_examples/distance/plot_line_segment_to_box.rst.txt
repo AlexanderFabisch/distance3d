@@ -8039,7 +8039,7 @@ Distance from line segment to box
     0.0
     0.38155275214534345
     0.0
-    accumulated_time=1.0122301578521729
+    accumulated_time=1.010875940322876
 
 
 
@@ -8087,7 +8087,7 @@ Distance from line segment to box
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.525 seconds)
+   **Total running time of the script:** ( 0 minutes  1.513 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_segment_to_box.py:

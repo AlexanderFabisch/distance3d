@@ -1,10 +1,20 @@
-.. distance3d documentation master file, created by
-   sphinx-quickstart on Thu Apr  7 20:46:08 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 distance3d
 ==========
+
+Distance computation and collision detection in 3D in pure Python.
+
+Features
+--------
+
+* Fast collision detection and distance computation with GJK.
+* Calculation of penetration depth with EPA.
+* Various specific distance calculations for points, lines, line segments,
+  triangles, rectangles, circles, disks, boxes, cylinders, ellipsoids, ...
+* Broad phase collision detection with bounding volume hierarchy (AABB tree).
+* Self-collision detection for robots.
+
+Content
+-------
 
 .. toctree::
    :maxdepth: 3

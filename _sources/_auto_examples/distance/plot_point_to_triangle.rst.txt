@@ -40039,7 +40039,7 @@ Distance from point to triangle
     4.915184842695194
     7.134314401709814
     0.9784975983735921
-    accumulated_time=0.9217362403869629
+    accumulated_time=1.0279908180236816
 
 
 
@@ -40083,7 +40083,7 @@ Distance from point to triangle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.400 seconds)
+   **Total running time of the script:** ( 0 minutes  2.710 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_triangle.py:

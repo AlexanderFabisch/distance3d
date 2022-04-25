@@ -1,0 +1,6 @@
+﻿distance3d.self\_collision.detect
+=================================
+
+.. currentmodule:: distance3d.self_collision
+
+.. autofunction:: detect

@@ -1,0 +1,6 @@
+﻿distance3d.geometry.hesse\_normal\_form
+=======================================
+
+.. currentmodule:: distance3d.geometry
+
+.. autofunction:: hesse_normal_form

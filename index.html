@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d &#8212; distance3d 0.1.0 documentation</title>
+    <title>distance3d &#8212; distance3d 0.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -38,6 +38,20 @@
             
   <div class="section" id="distance3d">
 <h1>distance3d<a class="headerlink" href="#distance3d" title="Permalink to this headline">¶</a></h1>
+<p>Distance computation and collision detection in 3D in pure Python.</p>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Fast collision detection and distance computation with GJK.</p></li>
+<li><p>Calculation of penetration depth with EPA.</p></li>
+<li><p>Various specific distance calculations for points, lines, line segments,
+triangles, rectangles, circles, disks, boxes, cylinders, ellipsoids, …</p></li>
+<li><p>Broad phase collision detection with bounding volume hierarchy (AABB tree).</p></li>
+<li><p>Self-collision detection for robots.</p></li>
+</ul>
+</div>
+<div class="section" id="content">
+<h2>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -49,6 +63,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api.html#module-distance3d.epa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.epa</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#module-distance3d.gjk"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.gjk</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#module-distance3d.geometry"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.geometry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-distance3d.self_collision"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.self_collision</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#module-distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#module-distance3d.random"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.random</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#module-distance3d.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.utils</span></code></a></li>
@@ -57,7 +72,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="_auto_examples/index.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="_auto_examples/index.html#aabb-tree">AABB Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_auto_examples/index.html#aabb-tree">AABB Tree</a><ul>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="_auto_examples/index.html#distance">Distance</a><ul>
 </ul>
 </li>
@@ -70,6 +87,7 @@
 </ul>
 </li>
 </ul>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">

@@ -94,5 +94,9 @@ artist2.add_artist(fig)
 
 fig.view_init()
 
-fig.animate(AnimationCallback(mesh22origin), 500, loop=True, fargs=(artist1, artist2))
-fig.show()
+if "__file__" in globals():
+    fig.animate(AnimationCallback(mesh22origin),
+                500, loop=False, fargs=(artist1, artist2))
+    fig.show()
+else:
+    fig.save_image("__open3d_rendered_image.jpg")

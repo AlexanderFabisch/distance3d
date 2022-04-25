@@ -1,0 +1,6 @@
+﻿distance3d.plotting.plot\_aabb\_tree
+====================================
+
+.. currentmodule:: distance3d.plotting
+
+.. autofunction:: plot_aabb_tree

@@ -29,7 +29,28 @@ AABB Tree
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Plot AABB Tree.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Plot AABB tree of a robot.">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/aabbtree/images/thumb/sphx_glr_plot_robot_thumb.png
+     :alt: Robot
+
+     :ref:`sphx_glr__auto_examples_aabbtree_plot_robot.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/aabbtree/plot_robot
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Plot AABB tree.">
 
 .. only:: html
 
@@ -124,6 +145,27 @@ Distance
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from point to plane">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_plane_thumb.png
+     :alt: Distance from point to plane
+
+     :ref:`sphx_glr__auto_examples_distance_plot_point_to_plane.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/distance/plot_point_to_plane
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Distance from point to rectangle">
 
 .. only:: html
@@ -166,14 +208,14 @@ Distance
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance from point to plane">
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between line and circle">
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_plane_thumb.png
-     :alt: Distance from point to plane
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_circle_thumb.png
+     :alt: Distance between line and circle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_plane.py`
+     :ref:`sphx_glr__auto_examples_distance_plot_line_to_circle.py`
 
 .. raw:: html
 
@@ -183,7 +225,7 @@ Distance
 .. toctree::
    :hidden:
 
-   /_auto_examples/distance/plot_point_to_plane
+   /_auto_examples/distance/plot_line_to_circle
 
 .. raw:: html
 
@@ -205,6 +247,27 @@ Distance
    :hidden:
 
    /_auto_examples/distance/plot_line_to_triangle
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between two disks">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_disk_to_disk_thumb.png
+     :alt: Distance between two disks
+
+     :ref:`sphx_glr__auto_examples_distance_plot_disk_to_disk.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/distance/plot_disk_to_disk
 
 .. raw:: html
 
@@ -439,6 +502,27 @@ Distance
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from line to plane">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_plane_thumb.png
+     :alt: Distance from line to plane
+
+     :ref:`sphx_glr__auto_examples_distance_plot_line_to_plane.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/distance/plot_line_to_plane
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Distance from triangle to rectangle">
 
 .. only:: html
@@ -457,6 +541,27 @@ Distance
    :hidden:
 
    /_auto_examples/distance/plot_triangle_to_rectangle
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to plane">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_plane_thumb.png
+     :alt: Distance from line segment to plane
+
+     :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_plane.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/distance/plot_line_segment_to_plane
 
 .. raw:: html
 
@@ -690,6 +795,27 @@ Visualizations
 --------------
 
 
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Self-collisions of a robot">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_self_collisions_thumb.png
+     :alt: Self-collisions of a robot
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_self_collisions.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_self_collisions
 
 .. raw:: html
 

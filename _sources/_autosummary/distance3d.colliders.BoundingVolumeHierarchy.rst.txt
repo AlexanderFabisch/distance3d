@@ -1,0 +1,29 @@
+﻿distance3d.colliders.BoundingVolumeHierarchy
+============================================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: BoundingVolumeHierarchy
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BoundingVolumeHierarchy.__init__
+      ~BoundingVolumeHierarchy.aabb_overlapping_colliders
+      ~BoundingVolumeHierarchy.add_collider
+      ~BoundingVolumeHierarchy.fill_tree_with_colliders
+      ~BoundingVolumeHierarchy.get_artists
+      ~BoundingVolumeHierarchy.get_collider_frames
+      ~BoundingVolumeHierarchy.get_colliders
+      ~BoundingVolumeHierarchy.update_collider_poses
+   
+   
+
+   
+   
+   

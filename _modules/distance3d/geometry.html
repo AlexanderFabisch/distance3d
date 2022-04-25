@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.geometry &#8212; distance3d 0.1.0 documentation</title>
+    <title>distance3d.geometry &#8212; distance3d 0.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -279,6 +279,32 @@
         <span class="n">local_vertex</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">height</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">capsule2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">local_vertex</span><span class="p">)</span> <span class="o">+</span> <span class="n">capsule2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="hesse_normal_form"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.hesse_normal_form.html#distance3d.geometry.hesse_normal_form">[docs]</a><span class="k">def</span> <span class="nf">hesse_normal_form</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes Hesse normal form of a plane.</span>
+
+<span class="sd">    In the Hesse normal form (x * n - d = 0), x is any point on the plane,</span>
+<span class="sd">    n is the plane&#39;s normal, and d ist the distance from the origin to the</span>
+<span class="sd">    plane along its normal.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plane_point : array, shape (3,)</span>
+<span class="sd">        Point on the plane.</span>
+
+<span class="sd">    plane_normal : array, shape (3,)</span>
+<span class="sd">        Normal of the plane. We assume unit length.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    plane_normal : array, shape (3,)</span>
+<span class="sd">        Normal of the plane. We assume unit length.</span>
+
+<span class="sd">    d : float, optional (default: None)</span>
+<span class="sd">        Distance of the plane to origin in Hesse normal form.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

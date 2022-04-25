@@ -1,0 +1,6 @@
+﻿distance3d.distance.disk\_to\_disk
+==================================
+
+.. currentmodule:: distance3d.distance
+
+.. autofunction:: disk_to_disk

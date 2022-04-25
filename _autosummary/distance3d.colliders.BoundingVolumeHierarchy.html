@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.colliders.ColliderTree &#8212; distance3d 0.1.0 documentation</title>
+    <title>distance3d.colliders.BoundingVolumeHierarchy &#8212; distance3d 0.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="distance3d.colliders.ConvexCollider" href="distance3d.colliders.ConvexCollider.html" />
-    <link rel="prev" title="distance3d.distance.rectangle_to_box" href="distance3d.distance.rectangle_to_box.html" />
+    <link rel="prev" title="distance3d.distance.disk_to_disk" href="distance3d.distance.disk_to_disk.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -37,13 +37,14 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="distance3d-colliders-collidertree">
-<h1>distance3d.colliders.ColliderTree<a class="headerlink" href="#distance3d-colliders-collidertree" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="distance3d-colliders-boundingvolumehierarchy">
+<h1>distance3d.colliders.BoundingVolumeHierarchy<a class="headerlink" href="#distance3d-colliders-boundingvolumehierarchy" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="distance3d.colliders.ColliderTree">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">distance3d.colliders.</span></span><span class="sig-name descname"><span class="pre">ColliderTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/colliders.html#ColliderTree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.colliders.ColliderTree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wraps multiple colliders that are connected through transformations.</p>
-<p>In addition, these colliders are stored in an AABB tree for broad phase
+<dt class="sig sig-object py" id="distance3d.colliders.BoundingVolumeHierarchy">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">distance3d.colliders.</span></span><span class="sig-name descname"><span class="pre">BoundingVolumeHierarchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/colliders.html#BoundingVolumeHierarchy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.colliders.BoundingVolumeHierarchy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bounding volume hierarchy (BVH) for broad phase collision detection.</p>
+<p>Wraps multiple colliders that are connected through transformations.
+In addition, these colliders are stored in an AABB tree for broad phase
 collision detection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -51,6 +52,17 @@ collision detection.</p>
 <dt><strong>tm</strong><span class="classifier">pytransform3d.transform_manager.TransformManager</span></dt><dd><p>Transform manager that stores the transformations.</p>
 </dd>
 <dt><strong>base_frame</strong><span class="classifier">str</span></dt><dd><p>Name of the base frame in which colliders are represented.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>aabbtree_</strong><span class="classifier">AABBTree</span></dt><dd><p>Tree of axis-aligned bounding boxes.</p>
+</dd>
+<dt><strong>colliders_</strong><span class="classifier">dict</span></dt><dd><p>Maps frames of collision objects to colliders.</p>
+</dd>
+<dt><strong>self_collision_whitelists_</strong><span class="classifier">dict</span></dt><dd><p>Whitelists for self collision detection in case this BVH represents
+a robot.</p>
 </dd>
 </dl>
 </dd>
@@ -62,13 +74,13 @@ collision detection.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb_overlapping_colliders</span></code>(collider)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb_overlapping_colliders</span></code>(collider[, whitelist])</p></td>
 <td><p>Get colliders with an overlapping AABB.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_collider</span></code>(frame, collider)</p></td>
 <td><p>Add collider.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fill_tree_with_colliders</span></code>(tm)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fill_tree_with_colliders</span></code>(tm[, make_artists, …])</p></td>
 <td><p>Fill tree with colliders from URDF transform manager.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_artists</span></code>()</p></td>
@@ -86,8 +98,8 @@ collision detection.</p>
 </tbody>
 </table>
 <dl class="py method">
-<dt class="sig sig-object py" id="distance3d.colliders.ColliderTree.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/colliders.html#ColliderTree.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.colliders.ColliderTree.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="distance3d.colliders.BoundingVolumeHierarchy.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/colliders.html#BoundingVolumeHierarchy.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.colliders.BoundingVolumeHierarchy.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -98,16 +110,16 @@ collision detection.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#distance3d.colliders.ColliderTree.__init__" title="distance3d.colliders.ColliderTree.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(tm, base_frame)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#distance3d.colliders.BoundingVolumeHierarchy.__init__" title="distance3d.colliders.BoundingVolumeHierarchy.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(tm, base_frame)</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb_overlapping_colliders</span></code>(collider)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb_overlapping_colliders</span></code>(collider[, whitelist])</p></td>
 <td><p>Get colliders with an overlapping AABB.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_collider</span></code>(frame, collider)</p></td>
 <td><p>Add collider.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fill_tree_with_colliders</span></code>(tm)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fill_tree_with_colliders</span></code>(tm[, make_artists, …])</p></td>
 <td><p>Fill tree with colliders from URDF transform manager.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_artists</span></code>()</p></td>
@@ -155,6 +167,7 @@ collision detection.</p>
 <li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.epa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.epa</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.gjk"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.gjk</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.geometry"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.geometry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.self_collision"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.self_collision</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.random"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.random</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.utils</span></code></a></li>
@@ -170,7 +183,7 @@ collision detection.</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="../api.html">API Reference</a><ul>
-      <li>Previous: <a href="distance3d.distance.rectangle_to_box.html" title="previous chapter">distance3d.distance.rectangle_to_box</a></li>
+      <li>Previous: <a href="distance3d.distance.disk_to_disk.html" title="previous chapter">distance3d.distance.disk_to_disk</a></li>
       <li>Next: <a href="distance3d.colliders.ConvexCollider.html" title="next chapter">distance3d.colliders.ConvexCollider</a></li>
   </ul></li>
   </ul></li>
@@ -206,7 +219,7 @@ collision detection.</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="../_sources/_autosummary/distance3d.colliders.ColliderTree.rst.txt"
+      <a href="../_sources/_autosummary/distance3d.colliders.BoundingVolumeHierarchy.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
