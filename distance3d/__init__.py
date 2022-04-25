@@ -1,4 +1,4 @@
 """Distance computation and collision detection in 3D."""
 
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
