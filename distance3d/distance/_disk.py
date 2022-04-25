@@ -98,7 +98,7 @@ def disk_to_disk(center1, radius1, normal1, center2, radius2, normal2, epsilon=1
     # (1) test intersection first (source: https://stackoverflow.com/a/67116330/915743)
     # Plücker coordinates of intersection line
     line_direction, line_moment = plane_intersects_plane(center1, normal1, center2, normal2)
-    line_point = np.cross(line_direction, line_moment) / np.dot(line_direction, line_direction)
+    line_point, line_direction = line_from_pluecker(line_direction, line_moment)
     h1, p1 = point_to_line(center1, line_point, line_direction)
     h2, p2 = point_to_line(center2, line_point, line_direction)
     ell = np.linalg.norm(p2 - p1)
@@ -136,3 +136,10 @@ def plane_intersects_plane(
     line_direction = np.cross(plane_normal1, plane_normal2)
     line_moment = plane_normal1 * d2 - plane_normal2 * d1
     return line_direction, line_moment
+
+
+def line_from_pluecker(line_direction, line_moment):
+    line_dir_norm_squared = np.dot(line_direction, line_direction)
+    line_point = np.cross(line_direction, line_moment) / line_dir_norm_squared
+    line_direction = line_direction / math.sqrt(line_dir_norm_squared)
+    return line_point, line_direction

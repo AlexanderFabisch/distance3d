@@ -30,7 +30,7 @@ for i in range(3000):
     print(dist)
     if i > 10:
         continue
-    plotting.plot_segment(ax, closest_point1, closest_point2)
+    plotting.plot_segment(ax, closest_point1, closest_point2, c="k", lw=1)
     plotting.plot_circle(ax, center2, radius2, normal2, show_normal=True)
 print(f"{accumulated_time=}")
 
