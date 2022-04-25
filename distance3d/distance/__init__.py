@@ -5,6 +5,182 @@ spheres, capsules, and convex meshes GJK is usually the fastest option if
 applicable. GJK is not applicable if one of the geometric objects is a line
 or a plane and GJK is slower when one of the objects is a point or a line
 segment.
+
+In the following table an X indicates that the distance computation between
+two geometric objects is implemented.
+
+.. raw:: html
+
+    <table>
+      <tr>
+        <th></th>
+        <th style="transform:rotate(315deg);height: 130px;">point</th>
+        <th style="transform:rotate(315deg);height: 130px;">line</th>
+        <th style="transform:rotate(315deg);height: 130px;">line segment</th>
+        <th style="transform:rotate(315deg);height: 130px;">plane</th>
+        <th style="transform:rotate(315deg);height: 130px;">triangle</th>
+        <th style="transform:rotate(315deg);height: 130px;">rectangle</th>
+        <th style="transform:rotate(315deg);height: 130px;">circle</th>
+        <th style="transform:rotate(315deg);height: 130px;">disk</th>
+        <th style="transform:rotate(315deg);height: 130px;">box</th>
+        <th style="transform:rotate(315deg);height: 130px;">ellipsoid</th>
+        <th style="transform:rotate(315deg);height: 130px;">cylinder</th>
+      </tr>
+      <tr>
+        <td>point</td>
+        <td>-</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+      </tr>
+      <tr>
+        <td>line</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>-</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>line segment</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>-</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>plane</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>triangle</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>-</td>
+        <td>X</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>rectangle</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>circle</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>disk</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>box</td>
+        <td>X</td>
+        <td>X</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>ellipsoid</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>cylinder</td>
+        <td>X</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+    </table>
 """
 from ._line import (
     point_to_line, line_to_line, point_to_line_segment, line_to_line_segment,
