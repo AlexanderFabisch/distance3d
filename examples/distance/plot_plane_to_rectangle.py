@@ -18,8 +18,9 @@ plane_point, plane_normal = random.randn_plane(random_state)
 ax = ppu.make_3d_axis(ax_s=2)
 
 accumulated_time = 0.0
-for i in range(18000):
-    rectangle_center, rectangle_axes, rectangle_lengths = random.randn_rectangle(random_state)
+for i in range(40000):
+    rectangle_center, rectangle_axes, rectangle_lengths = random.randn_rectangle(
+        random_state, length_scale=3.0)
     start = time.time()
     dist, closest_point_plane, closest_point_rectangle = plane_to_rectangle(
         plane_point, plane_normal, rectangle_center, rectangle_axes,

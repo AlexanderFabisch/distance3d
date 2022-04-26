@@ -56,12 +56,9 @@ def convert_rectangle_to_vertices(
     rectangle_points : array, shape (4, 3)
         Vertices of the rectangle.
     """
-    return np.array([
-        rectangle_center
-        + 0.5 * a * rectangle_axes[0] * rectangle_lengths[0]
-        + 0.5 * b * rectangle_axes[1] * rectangle_lengths[1]
-        for a in [-1, 1] for b in [-1, 1]
-    ])
+    return rectangle_center + (np.array([
+        [-0.5, -0.5], [-0.5, 0.5], [0.5, -0.5], [0.5, 0.5]
+    ]) * rectangle_lengths).dot(rectangle_axes)
 
 
 def convert_box_to_face(box2origin, size, i, sign):
