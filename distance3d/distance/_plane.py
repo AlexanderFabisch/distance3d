@@ -228,16 +228,24 @@ def plane_to_triangle(plane_point, plane_normal, triangle_points):
     closest_point_triangle : array, shape (3,)
         Closest point on triangle.
     """
-    return _plane_to_points(plane_point, plane_normal, triangle_points)
+    return _plane_to_convex_hull_points(plane_point, plane_normal, triangle_points)
 
 
-def _plane_to_points(plane_point, plane_normal, points):
+def _plane_to_convex_hull_points(plane_point, plane_normal, points):
     ts = np.dot(points - plane_point[np.newaxis], plane_normal)
-    t_idx = np.argmin(ts)
-    closest_point_triangle = points[t_idx]
-    t = ts[t_idx]
-    closest_point_plane = closest_point_triangle - t * plane_normal
-    return abs(t), closest_point_plane, closest_point_triangle
+    min_idx = np.argmin(ts)
+    max_idx = np.argmax(ts)
+
+    if ts[min_idx] * ts[max_idx] < 0:  # on opposite sides, intersection
+        return line_segment_to_plane(
+            points[min_idx], points[max_idx], plane_point, plane_normal)
+
+    closest_idx = np.argmin(np.abs(ts))
+    closest_point = points[closest_idx]
+    t = ts[closest_idx]
+    closest_point_plane = closest_point - t * plane_normal
+
+    return abs(t), closest_point_plane, closest_point
 
 
 def plane_to_rectangle(
@@ -276,7 +284,7 @@ def plane_to_rectangle(
     """
     points = convert_rectangle_to_vertices(
         rectangle_center, rectangle_axes, rectangle_lengths)
-    return _plane_to_points(plane_point, plane_normal, points)
+    return _plane_to_convex_hull_points(plane_point, plane_normal, points)
 
 
 def plane_to_box(plane_point, plane_normal, box2origin, size):
@@ -308,4 +316,4 @@ def plane_to_box(plane_point, plane_normal, box2origin, size):
         Closest point on box.
     """
     points = convert_box_to_vertices(box2origin, size)
-    return _plane_to_points(plane_point, plane_normal, points)
+    return _plane_to_convex_hull_points(plane_point, plane_normal, points)

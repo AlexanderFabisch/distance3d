@@ -18,7 +18,7 @@ plane_point, plane_normal = random.randn_plane(random_state)
 ax = ppu.make_3d_axis(ax_s=2)
 
 accumulated_time = 0.0
-for i in range(75000):
+for i in range(40000):
     triangle_points = random.randn_triangle(random_state)
     start = time.time()
     dist, closest_point_plane, closest_point_triangle = plane_to_triangle(

@@ -18,7 +18,7 @@ plane_point, plane_normal = random.randn_plane(random_state)
 ax = ppu.make_3d_axis(ax_s=2)
 
 accumulated_time = 0.0
-for i in range(40000):
+for i in range(30000):
     rectangle_center, rectangle_axes, rectangle_lengths = random.randn_rectangle(
         random_state, length_scale=3.0)
     start = time.time()

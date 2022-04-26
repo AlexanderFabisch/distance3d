@@ -19,7 +19,7 @@ plane_point, plane_normal = random.randn_plane(random_state)
 ax = ppu.make_3d_axis(ax_s=3)
 
 accumulated_time = 0.0
-for i in range(30000):
+for i in range(25000):
     box2origin, size = random.rand_box(random_state)
     start = time.time()
     dist, closest_point_plane, closest_point_box = plane_to_box(
