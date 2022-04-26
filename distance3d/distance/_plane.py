@@ -1,7 +1,7 @@
 import numpy as np
 from ..geometry import (
     hesse_normal_form, convert_segment_to_line, line_from_pluecker,
-    convert_rectangle_to_vertices)
+    convert_rectangle_to_vertices, convert_box_to_vertices)
 
 
 def point_to_plane(point, plane_point, plane_normal, signed=False):
@@ -240,7 +240,9 @@ def _plane_to_points(plane_point, plane_normal, points):
     return abs(t), closest_point_plane, closest_point_triangle
 
 
-def plane_to_rectangle(plane_point, plane_normal, rectangle_center, rectangle_axes, rectangle_lengths):
+def plane_to_rectangle(
+        plane_point, plane_normal, rectangle_center, rectangle_axes,
+        rectangle_lengths):
     """Compute the shortest distance between a plane and a rectangle.
 
     Parameters
@@ -274,4 +276,36 @@ def plane_to_rectangle(plane_point, plane_normal, rectangle_center, rectangle_ax
     """
     points = convert_rectangle_to_vertices(
         rectangle_center, rectangle_axes, rectangle_lengths)
+    return _plane_to_points(plane_point, plane_normal, points)
+
+
+def plane_to_box(plane_point, plane_normal, box2origin, size):
+    """Compute the shortest distance between a plane and a box.
+
+    Parameters
+    ----------
+    plane_point : array, shape (3,)
+        Point on the plane.
+
+    plane_normal : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    box2origin : array, shape (4, 4)
+        Pose of the box.
+
+    size : array, shape (3,)
+        Size of the box along its axes.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between rectangle and plane.
+
+    closest_point_plane : array, shape (3,)
+        Closest point on plane.
+
+    closest_point_box : array, shape (3,)
+        Closest point on box.
+    """
+    points = convert_box_to_vertices(box2origin, size)
     return _plane_to_points(plane_point, plane_normal, points)

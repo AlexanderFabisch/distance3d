@@ -1,5 +1,6 @@
 """Tools for geometric computations."""
 import math
+from itertools import product
 import numpy as np
 
 
@@ -140,13 +141,8 @@ def convert_box_to_vertices(box2origin, size):
     box_points : array, shape (8, 3)
         Vertices of the box.
     """
-    box_points = np.array([
-        box2origin[:3, 3]
-        + 0.5 * sign0 * box2origin[:3, 0] * size[0]
-        + 0.5 * sign1 * box2origin[:3, 1] * size[1]
-        + 0.5 * sign2 * box2origin[:3, 2] * size[2]
-        for sign0 in [-1, 1] for sign1 in [-1, 1] for sign2 in [-1, 1]])
-    return box_points
+    return box2origin[:3, 3] + (np.array(list(product([-0.5, 0.5], repeat=3))
+                                         ) * size).dot(box2origin[:3, :3].T)
 
 
 def cylinder_extreme_along_direction(

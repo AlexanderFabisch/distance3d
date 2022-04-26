@@ -6,9 +6,9 @@ from distance3d.distance import (
     point_to_ellipsoid, line_to_line, line_to_plane, line_to_circle,
     line_to_box, line_segment_to_line_segment, line_segment_to_plane,
     line_segment_to_triangle, line_segment_to_circle, line_segment_to_box,
-    plane_to_plane, plane_to_triangle, plane_to_rectangle, triangle_to_triangle,
-    triangle_to_rectangle, rectangle_to_rectangle, rectangle_to_box,
-    disk_to_disk)
+    plane_to_plane, plane_to_triangle, plane_to_rectangle, plane_to_box,
+    triangle_to_triangle, triangle_to_rectangle, rectangle_to_rectangle,
+    rectangle_to_box, disk_to_disk)
 from distance3d.geometry import convert_box_to_face
 from distance3d.utils import norm_vector
 from distance3d import random
@@ -879,6 +879,19 @@ def test_plane_to_rectangle():
         plane_point, plane_normal, rectangle_center, rectangle_axes,
         rectangle_lengths)
     assert approx(dist) == 1
+    assert approx(dist) == np.linalg.norm(
+        closest_point_plane - closest_point_rectangle)
+
+
+def test_plane_to_box():
+    plane_point = np.array([0, 0, 0], dtype=float)
+    plane_normal = np.array([0, 0, 1], dtype=float)
+
+    box2origin = np.eye(4)
+    size = np.array([1, 1, 1], dtype=float)
+    dist, closest_point_plane, closest_point_rectangle = plane_to_box(
+        plane_point, plane_normal, box2origin, size)
+    assert approx(dist) == 0
     assert approx(dist) == np.linalg.norm(
         closest_point_plane - closest_point_rectangle)
 
