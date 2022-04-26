@@ -200,3 +200,39 @@ def plane_intersects_plane(
         line_direction = np.cross(plane_normal1, plane_normal2)
     line_moment = plane_normal1 * d2 - plane_normal2 * d1
     return line_direction, line_moment
+
+
+def plane_to_triangle(plane_point, plane_normal, triangle_points):
+    """Compute the shortest distance between a plane and a triangle.
+
+    Parameters
+    ----------
+    plane_point : array, shape (3,)
+        Point on the plane.
+
+    plane_normal : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    triangle_points : array, shape (3, 3)
+        Each row contains a point of the triangle (A, B, C).
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between triangle and plane.
+
+    closest_point_plane : array, shape (3,)
+        Closest point on plane.
+
+    closest_point_triangle : array, shape (3,)
+        Closest point on triangle.
+    """
+    ts = np.dot(triangle_points - plane_point[np.newaxis], plane_normal)
+    t_idx = np.argmin(ts)
+    closest_point_triangle = triangle_points[t_idx]
+    t = ts[t_idx]
+    closest_point_plane = closest_point_triangle - t * plane_normal
+    return abs(t), closest_point_plane, closest_point_triangle
+
+
+# TODO plane_to_rectangle similar to plane_to_triangle

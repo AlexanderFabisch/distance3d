@@ -6,8 +6,9 @@ from distance3d.distance import (
     point_to_ellipsoid, line_to_line, line_to_plane, line_to_circle,
     line_to_box, line_segment_to_line_segment, line_segment_to_plane,
     line_segment_to_triangle, line_segment_to_circle, line_segment_to_box,
-    plane_to_plane, triangle_to_triangle, triangle_to_rectangle,
-    rectangle_to_rectangle, rectangle_to_box, disk_to_disk)
+    plane_to_plane, plane_to_triangle, triangle_to_triangle,
+    triangle_to_rectangle, rectangle_to_rectangle, rectangle_to_box,
+    disk_to_disk)
 from distance3d.geometry import convert_box_to_face
 from distance3d.utils import norm_vector
 from distance3d import random
@@ -827,6 +828,44 @@ def test_plane_to_plane():
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point1, np.array([0, 0, 0]))
     assert_array_almost_equal(closest_point2, np.array([0, 0, 0]))
+
+
+def test_plane_to_triangle():
+    plane_point = np.array([0, 0, 0], dtype=float)
+    plane_normal = np.array([0, 0, 1], dtype=float)
+
+    triangle_points = np.array([
+        [0, 0, 0],
+        [0, 1, 0],
+        [1, 0, 0]
+    ], dtype=float)
+    dist, closest_point_plane, closest_point_triangle = plane_to_triangle(
+        plane_point, plane_normal, triangle_points)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point_plane, [0, 0, 0])
+    assert_array_almost_equal(closest_point_triangle, [0, 0, 0])
+
+    triangle_points = np.array([
+        [0, 0, 1],
+        [0, 1, 1],
+        [1, 0, 1]
+    ], dtype=float)
+    dist, closest_point_plane, closest_point_triangle = plane_to_triangle(
+        plane_point, plane_normal, triangle_points)
+    assert approx(dist) == 1
+    assert_array_almost_equal(closest_point_plane, [0, 0, 0])
+    assert_array_almost_equal(closest_point_triangle, [0, 0, 1])
+
+    triangle_points = np.array([
+        [0, 0, 5],
+        [0, 1, 3],
+        [1, 0, 2]
+    ], dtype=float)
+    dist, closest_point_plane, closest_point_triangle = plane_to_triangle(
+        plane_point, plane_normal, triangle_points)
+    assert approx(dist) == 2
+    assert_array_almost_equal(closest_point_plane, [1, 0, 0])
+    assert_array_almost_equal(closest_point_triangle, [1, 0, 2])
 
 
 def test_triangel_to_triangle():
