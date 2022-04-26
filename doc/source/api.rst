@@ -47,6 +47,7 @@ API Reference
    ~distance3d.distance.line_segment_to_box
    ~distance3d.distance.plane_to_plane
    ~distance3d.distance.plane_to_triangle
+   ~distance3d.distance.plane_to_rectangle
    ~distance3d.distance.triangle_to_triangle
    ~distance3d.distance.triangle_to_rectangle
    ~distance3d.distance.rectangle_to_rectangle

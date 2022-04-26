@@ -75,7 +75,7 @@ two geometric objects is implemented.
         <td>X</td>
         <td>X</td>
         <td>X</td>
-        <td>-</td>
+        <td>X</td>
         <td>-</td>
         <td>-</td>
         <td>-</td>
@@ -101,7 +101,7 @@ two geometric objects is implemented.
         <td>X</td>
         <td>X</td>
         <td>X</td>
-        <td>-</td>
+        <td>X</td>
         <td>X</td>
         <td>-</td>
         <td>-</td>
@@ -187,7 +187,7 @@ from ._line import (
     line_segment_to_line_segment)
 from ._plane import (
     point_to_plane, line_to_plane, line_segment_to_plane, plane_to_plane,
-    plane_to_triangle)
+    plane_to_triangle, plane_to_rectangle)
 from ._triangle import (
     point_to_triangle, line_to_triangle, line_segment_to_triangle,
     triangle_to_triangle, triangle_to_rectangle)
@@ -228,6 +228,7 @@ __all__ = [
     "line_segment_to_box",
     "plane_to_plane",
     "plane_to_triangle",
+    "plane_to_rectangle",
     "triangle_to_triangle",
     "triangle_to_rectangle",
     "rectangle_to_rectangle",

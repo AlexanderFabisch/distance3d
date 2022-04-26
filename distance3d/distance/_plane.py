@@ -1,6 +1,7 @@
 import numpy as np
 from ..geometry import (
-    hesse_normal_form, convert_segment_to_line, line_from_pluecker)
+    hesse_normal_form, convert_segment_to_line, line_from_pluecker,
+    convert_rectangle_to_vertices)
 
 
 def point_to_plane(point, plane_point, plane_normal, signed=False):
@@ -227,12 +228,50 @@ def plane_to_triangle(plane_point, plane_normal, triangle_points):
     closest_point_triangle : array, shape (3,)
         Closest point on triangle.
     """
-    ts = np.dot(triangle_points - plane_point[np.newaxis], plane_normal)
+    return _plane_to_points(plane_point, plane_normal, triangle_points)
+
+
+def _plane_to_points(plane_point, plane_normal, points):
+    ts = np.dot(points - plane_point[np.newaxis], plane_normal)
     t_idx = np.argmin(ts)
-    closest_point_triangle = triangle_points[t_idx]
+    closest_point_triangle = points[t_idx]
     t = ts[t_idx]
     closest_point_plane = closest_point_triangle - t * plane_normal
     return abs(t), closest_point_plane, closest_point_triangle
 
 
-# TODO plane_to_rectangle similar to plane_to_triangle
+def plane_to_rectangle(plane_point, plane_normal, rectangle_center, rectangle_axes, rectangle_lengths):
+    """Compute the shortest distance between a plane and a rectangle.
+
+    Parameters
+    ----------
+    plane_point : array, shape (3,)
+        Point on the plane.
+
+    plane_normal : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    rectangle_center : array, shape (3,)
+        Center point of the rectangle.
+
+    rectangle_axes : array, shape (2, 3)
+        Each row is a vector of unit length, indicating the direction of one
+        axis of the rectangle. Both vectors are orthogonal.
+
+    rectangle_lengths : array, shape (2,)
+        Lengths of the two sides of the rectangle.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between rectangle and plane.
+
+    closest_point_plane : array, shape (3,)
+        Closest point on plane.
+
+    closest_point_rectangle : array, shape (3,)
+        Closest point on rectangle.
+    """
+    points = convert_rectangle_to_vertices(
+        rectangle_center, rectangle_axes, rectangle_lengths)
+    return _plane_to_points(plane_point, plane_normal, points)
