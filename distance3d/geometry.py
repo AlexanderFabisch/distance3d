@@ -36,6 +36,10 @@ def convert_rectangle_to_segment(rectangle_center, rectangle_extents, i0, i1):
     return segment_end, segment_start
 
 
+RECTANGLE_COORDS = np.array([
+    [-0.5, -0.5], [-0.5, 0.5], [0.5, -0.5], [0.5, 0.5]])
+
+
 def convert_rectangle_to_vertices(
         rectangle_center, rectangle_axes, rectangle_lengths):
     """Convert rectangle to vertices.
@@ -57,9 +61,7 @@ def convert_rectangle_to_vertices(
     rectangle_points : array, shape (4, 3)
         Vertices of the rectangle.
     """
-    return rectangle_center + (np.array([
-        [-0.5, -0.5], [-0.5, 0.5], [0.5, -0.5], [0.5, 0.5]
-    ]) * rectangle_lengths).dot(rectangle_axes)
+    return rectangle_center + (RECTANGLE_COORDS * rectangle_lengths).dot(rectangle_axes)
 
 
 def convert_box_to_face(box2origin, size, i, sign):
@@ -125,6 +127,9 @@ def convert_segment_to_line(segment_start, segment_end):
     return segment_direction, segment_length
 
 
+BOX_COORDS = np.array(list(product([-0.5, 0.5], repeat=3)))
+
+
 def convert_box_to_vertices(box2origin, size):
     """Convert box to vertices.
 
@@ -141,8 +146,7 @@ def convert_box_to_vertices(box2origin, size):
     box_points : array, shape (8, 3)
         Vertices of the box.
     """
-    return box2origin[:3, 3] + (np.array(list(product([-0.5, 0.5], repeat=3))
-                                         ) * size).dot(box2origin[:3, :3].T)
+    return box2origin[:3, 3] + (BOX_COORDS * size).dot(box2origin[:3, :3].T)
 
 
 def cylinder_extreme_along_direction(
