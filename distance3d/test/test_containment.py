@@ -4,6 +4,8 @@ import pytransform3d.transformations as pt
 from distance3d.containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb)
+from distance3d.geometry import cylinder_extreme_along_direction
+from distance3d import random
 from numpy.testing import assert_array_almost_equal
 
 
@@ -49,6 +51,38 @@ def test_cylinder_aabb():
     mins, maxs = cylinder_aabb(cylinder2origin, radius, length)
     assert_array_almost_equal(mins, [-2.372774, -2.353267, -2.366925])
     assert_array_almost_equal(maxs, [2.772774, 2.953267, 3.166925])
+
+    random_state = np.random.RandomState(3)
+    for _ in range(100):
+        cylinder2origin, radius, length = random.rand_cylinder(random_state)
+        mins1, maxs1 = cylinder_aabb(cylinder2origin, radius, length)
+        mins2, maxs2 = cylinder_aabb_slow(cylinder2origin, radius, length)
+        assert_array_almost_equal(mins1, mins2)
+        assert_array_almost_equal(maxs1, maxs2)
+
+
+XM = np.array([-1.0, 0.0, 0.0])
+YM = np.array([0.0, -1.0, 0.0])
+ZM = np.array([0.0, 0.0, -1.0])
+XP = np.array([1.0, 0.0, 0.0])
+YP = np.array([0.0, 1.0, 0.0])
+ZP = np.array([0.0, 0.0, 1.0])
+
+
+def cylinder_aabb_slow(cylinder2origin, radius, length):
+    negative_vertices = np.vstack((
+        cylinder_extreme_along_direction(XM, cylinder2origin, radius, length),
+        cylinder_extreme_along_direction(YM, cylinder2origin, radius, length),
+        cylinder_extreme_along_direction(ZM, cylinder2origin, radius, length),
+    ))
+    mins = np.min(negative_vertices, axis=0)
+    positive_vertices = np.vstack((
+        cylinder_extreme_along_direction(XP, cylinder2origin, radius, length),
+        cylinder_extreme_along_direction(YP, cylinder2origin, radius, length),
+        cylinder_extreme_along_direction(ZP, cylinder2origin, radius, length),
+    ))
+    maxs = np.max(positive_vertices, axis=0)
+    return mins, maxs
 
 
 def test_capsule_aabb():

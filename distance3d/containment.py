@@ -99,19 +99,11 @@ def cylinder_aabb(cylinder2origin, radius, length):
     maxs : array, shape (3,)
         Maximum coordinates.
     """
-    negative_vertices = np.vstack((
-        cylinder_extreme_along_direction(XM, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(YM, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(ZM, cylinder2origin, radius, length),
-    ))
-    mins = np.min(negative_vertices, axis=0)
-    positive_vertices = np.vstack((
-        cylinder_extreme_along_direction(XP, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(YP, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(ZP, cylinder2origin, radius, length),
-    ))
-    maxs = np.max(positive_vertices, axis=0)
-    return mins, maxs
+    # AABB of a cylinder is the same as the AABB of its caps,
+    # see https://iquilezles.org/articles/diskbbox/
+    axis = cylinder2origin[:3, 2]
+    extent = 0.5 * length * np.abs(axis) + radius * np.sqrt(1.0 - axis * axis)
+    return cylinder2origin[:3, 3] - extent, cylinder2origin[:3, 3] + extent
 
 
 def capsule_aabb(capsule2origin, radius, height):
