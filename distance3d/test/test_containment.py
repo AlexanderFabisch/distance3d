@@ -1,4 +1,6 @@
 import numpy as np
+import pytransform3d.rotations as pr
+import pytransform3d.transformations as pt
 from distance3d.containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb)
@@ -37,6 +39,16 @@ def test_cylinder_aabb():
     mins, maxs = cylinder_aabb(cylinder2origin, radius, length)
     assert_array_almost_equal(mins, [-1, -1, -5])
     assert_array_almost_equal(maxs, [1, 1, 5])
+
+    cylinder2origin = pt.transform_from(
+        R=pr.active_matrix_from_extrinsic_euler_xyz([0.5, 0.3, 0.2]),
+        p=np.array([0.2, 0.3, 0.4])
+    )
+    radius = 2
+    length = 4
+    mins, maxs = cylinder_aabb(cylinder2origin, radius, length)
+    assert_array_almost_equal(mins, [-2.372774, -2.353267, -2.366925])
+    assert_array_almost_equal(maxs, [2.772774, 2.953267, 3.166925])
 
 
 def test_capsule_aabb():
