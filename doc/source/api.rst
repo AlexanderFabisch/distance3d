@@ -171,6 +171,7 @@ API Reference
    :toctree: _autosummary/
 
    ~distance3d.self_collision.detect
+   ~distance3d.self_collision.detect_any
 
 
 :mod:`distance3d.plotting`
