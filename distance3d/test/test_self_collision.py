@@ -18,6 +18,7 @@ def test_self_collision_detection():
 
     contacts = list(self_collision.detect(bvh).values())
     assert np.count_nonzero(contacts) == 0
+    assert not self_collision.detect_any(bvh)
 
     tm.set_joint("joint2", 1.57)
     tm.set_joint("joint3", 1.57)
@@ -26,6 +27,7 @@ def test_self_collision_detection():
 
     contacts = list(self_collision.detect(bvh).values())
     assert np.count_nonzero(contacts) == 0
+    assert not self_collision.detect_any(bvh)
 
     tm.set_joint("joint2", 1.57)
     tm.set_joint("joint3", 1.57)
@@ -34,3 +36,4 @@ def test_self_collision_detection():
 
     contacts = list(self_collision.detect(bvh).values())
     assert np.count_nonzero(contacts) == 3
+    assert self_collision.detect_any(bvh)
