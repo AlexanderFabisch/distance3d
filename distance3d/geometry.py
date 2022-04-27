@@ -181,7 +181,7 @@ def cylinder_extreme_along_direction(
     """
     local_dir = np.dot(cylinder2origin[:3, :3].T, search_direction)
 
-    s = math.sqrt(local_dir[0] ** 2 + local_dir[1] ** 2)
+    s = math.sqrt(local_dir[0] * local_dir[0] + local_dir[1] * local_dir[1])
     if local_dir[2] < 0.0:
         z = -0.5 * length
     else:
@@ -191,7 +191,7 @@ def cylinder_extreme_along_direction(
         local_vertex = np.array([local_dir[0] * d, local_dir[1] * d, z])
     else:
         local_vertex = np.array([radius, 0.0, z])
-    return np.dot(cylinder2origin[:3, :3], local_vertex) + cylinder2origin[:3, 3]
+    return cylinder2origin[:3, 3] + np.dot(cylinder2origin[:3, :3], local_vertex)
 
 
 def capsule_extreme_along_direction(
@@ -224,20 +224,21 @@ def capsule_extreme_along_direction(
     extreme_point : array, shape (3,)
         Extreme point along search direction.
     """
-    # TODO error with axis-aligned capsules
     local_dir = np.dot(capsule2origin[:3, :3].T, search_direction)
 
-    s = np.linalg.norm(local_dir)
+    s = math.sqrt(local_dir[0] * local_dir[0] + local_dir[1] * local_dir[1]
+                  + local_dir[2] * local_dir[2])
+    # TODO error with axis-aligned capsules?
     if s == 0.0:
         local_vertex = np.zeros(3)
     else:
-        local_vertex = local_dir / s * radius
+        local_vertex = local_dir * (radius / s)
     if local_dir[2] > 0.0:
         local_vertex[2] += 0.5 * height
     else:
         local_vertex[2] -= 0.5 * height
 
-    return np.dot(capsule2origin[:3, :3], local_vertex) + capsule2origin[:3, 3]
+    return capsule2origin[:3, 3] + np.dot(capsule2origin[:3, :3], local_vertex)
 
 
 def hesse_normal_form(plane_point, plane_normal):
