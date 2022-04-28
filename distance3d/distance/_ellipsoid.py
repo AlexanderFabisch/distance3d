@@ -62,7 +62,7 @@ def point_to_ellipsoid(
     normalized_point_norm = np.linalg.norm(point_in_ellipsoid / radii)
     if normalized_point_norm < 1.0:
         if distance_to_surface:
-            if normalized_point_norm < 10.0 * epsilon:
+            if normalized_point_norm < 100.0 * epsilon:
                 # Point is the center of the ellipsoid, we have two possible
                 # solutions on opposite sides and must select one.
                 min_radius_idx = np.argmin(radii)
