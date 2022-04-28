@@ -84,10 +84,11 @@ def point_to_ellipsoid(
                     - radii2point2[2] * pq * (pqr[0] + pqr[1]))
         t -= s / ds
 
-    contact_point_in_ellipsoid = radii2 * point_in_ellipsoid / pqr
-    diff = contact_point_in_ellipsoid - point_in_ellipsoid
+    closest_point_in_ellipsoid = radii2 * point_in_ellipsoid / pqr
+    diff = closest_point_in_ellipsoid - point_in_ellipsoid
 
-    closest_point_ellipsoid = pt.transform(
-        ellipsoid2origin, pt.vector_to_point(contact_point_in_ellipsoid))[:3]
+    closest_point_ellipsoid = (
+        ellipsoid2origin[:3, 3]
+        + ellipsoid2origin[:3, :3].dot(closest_point_in_ellipsoid))
 
     return np.linalg.norm(diff), closest_point_ellipsoid
