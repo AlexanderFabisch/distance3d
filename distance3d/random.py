@@ -355,11 +355,24 @@ def randn_convex(random_state, n_points=10, center_scale=1.0, std=1.0, return_in
         Indices of points forming the simplical facets of the convex hull.
     """
     points = random_state.randn(n_points, 3) * std
-    points += random_state.randn(1, 3) * center_scale
-    ch = ConvexHull(points)
+    ch = ConvexHull(points, qhull_options="Qf")
+    simplices = ch.simplices
+    faces = np.array([points[[i, j, k]] for i, j, k in simplices])
+
+    reordered_indices = np.array([2, 1, 0], dtype=int)
+    for face_idx in range(len(faces)):
+        if pr.angle_between_vectors(
+                np.cross(faces[face_idx, 2] - faces[face_idx, 0],
+                         faces[face_idx, 1] - faces[face_idx, 0]),
+                np.mean(faces[face_idx], axis=0)) < 0.5 * np.pi:
+            faces[face_idx] = faces[face_idx, reordered_indices]
+            simplices[face_idx] = simplices[face_idx, reordered_indices]
+
+    center = random_state.randn(1, 3) * center_scale
+    points += center
+    faces += center
     vertices = points[ch.vertices]
-    faces = np.array([points[[i, j, k]] for i, j, k in ch.simplices])
     ret = [vertices, faces]
     if return_indices:
-        ret.extend([ch.points, ch.simplices])
+        ret.extend([ch.points, simplices])
     return ret
