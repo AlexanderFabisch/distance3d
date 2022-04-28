@@ -19,9 +19,6 @@ def point_to_ellipsoid(
     and may not be copied or disclosed except in accordance with the terms
     of that agreement.
 
-    TODO known bug: when the point is exactly the center of the ellipsoid,
-         the function will return wrong results
-
     Parameters
     ----------
     point : array, shape (3,)
@@ -62,8 +59,17 @@ def point_to_ellipsoid(
     radii2point2 = radii2 * point2
 
     # initial guess
-    if np.linalg.norm(point_in_ellipsoid / radii) < 1.0:
+    normalized_point_norm = np.linalg.norm(point_in_ellipsoid / radii)
+    if normalized_point_norm < 1.0:
         if distance_to_surface:
+            if normalized_point_norm < 10.0 * epsilon:
+                # Point is the center of the ellipsoid, we have two possible
+                # solutions on opposite sides and must select one.
+                min_radius_idx = np.argmin(radii)
+                closest_point = (
+                    ellipsoid2origin[:3, 3]
+                    + radii[min_radius_idx] * ellipsoid2origin[:3, min_radius_idx])
+                return radii[min_radius_idx], closest_point
             t = 0.0
         else:
             return 0.0, point

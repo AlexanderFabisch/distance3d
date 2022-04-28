@@ -315,10 +315,19 @@ def test_point_to_ellipsoid_surface():
     for _ in range(10):
         ellipsoid2origin = pt.random_transform(random_state)
         radii = np.array([0.5, 1.0, 2.0])
+
         point = ellipsoid2origin[:3, 3] + 0.25 * ellipsoid2origin[:3, 0]
         dist, closest_point_ellipsoid = point_to_ellipsoid(
             point, ellipsoid2origin, radii, distance_to_surface=True)
         assert approx(dist) == 0.25
+        assert_array_almost_equal(
+            closest_point_ellipsoid,
+            ellipsoid2origin[:3, 3] + 0.5 * ellipsoid2origin[:3, 0])
+
+        point = ellipsoid2origin[:3, 3]
+        dist, closest_point_ellipsoid = point_to_ellipsoid(
+            point, ellipsoid2origin, radii, distance_to_surface=True)
+        assert approx(dist) == 0.5
         assert_array_almost_equal(
             closest_point_ellipsoid,
             ellipsoid2origin[:3, 3] + 0.5 * ellipsoid2origin[:3, 0])
