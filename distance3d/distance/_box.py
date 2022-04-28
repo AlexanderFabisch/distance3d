@@ -7,7 +7,7 @@ from ._line_to_box import _line_to_box
 from ._rectangle import rectangle_to_rectangle
 
 
-def point_to_box(point, box2origin, size, origin2box=None):
+def point_to_box(point, box2origin, size, origin2box=None, check=False):
     """Compute the shortest distance between point and box.
 
     Parameters
@@ -24,6 +24,9 @@ def point_to_box(point, box2origin, size, origin2box=None):
     origin2box : array, shape (4, 4), optional (default: None)
         Transform from origin to box coordinates.
 
+    check : bool, optional (default: True)
+        Check if transformation matrix is valid before inversion.
+
     Returns
     -------
     dist : float
@@ -33,12 +36,11 @@ def point_to_box(point, box2origin, size, origin2box=None):
         Closest point on box.
     """
     if origin2box is None:
-        origin2box = pt.invert_transform(box2origin)
+        origin2box = pt.invert_transform(box2origin, check=check)
     point_in_box = origin2box[:3, 3] + origin2box[:3, :3].dot(point)
     half_size = 0.5 * size
     contact_point_in_box = np.clip(point_in_box, -half_size, half_size)
-    contact_point = pt.transform(
-        box2origin, pt.vector_to_point(contact_point_in_box))[:3]
+    contact_point = box2origin[:3, 3] + box2origin[:3, :3].dot(contact_point_in_box)
     return np.linalg.norm(point - contact_point), contact_point
 
 
