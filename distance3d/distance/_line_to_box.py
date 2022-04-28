@@ -77,153 +77,214 @@ def _line_to_box(line_point, line_direction, box2origin, size, origin2box=None):
 
 
 def _case_no_zeros(point_in_box, direction_in_box, box_half_size):
-    kPmE = point_in_box - box_half_size
+    point_m_edge = point_in_box - box_half_size
 
-    fProdDxPy = direction_in_box[0] * kPmE[1]
-    fProdDyPx = direction_in_box[1] * kPmE[0]
+    prod_dx_py = direction_in_box[0] * point_m_edge[1]
+    prod_dy_px = direction_in_box[1] * point_m_edge[0]
 
-    if fProdDyPx >= fProdDxPy:
-        fProdDzPx = direction_in_box[2] * kPmE[0]
-        fProdDxPz = direction_in_box[0] * kPmE[2]
-        if fProdDzPx >= fProdDxPz:
+    if prod_dy_px >= prod_dx_py:
+        prod_dz_px = direction_in_box[2] * point_m_edge[0]
+        prod_dx_pz = direction_in_box[0] * point_m_edge[2]
+        if prod_dz_px >= prod_dx_pz:
             # line intersects x = e0
-            sqr_dist, line_parameter = _box_face(0, 1, 2, point_in_box, direction_in_box, kPmE, box_half_size)
+            sqr_dist, line_parameter = _box_face(
+                0, 1, 2, point_in_box, direction_in_box, point_m_edge,
+                box_half_size)
         else:
             # line intersects z = e2
-            sqr_dist, line_parameter = _box_face(2, 0, 1, point_in_box, direction_in_box, kPmE, box_half_size)
+            sqr_dist, line_parameter = _box_face(
+                2, 0, 1, point_in_box, direction_in_box, point_m_edge,
+                box_half_size)
     else:
-        fProdDzPy = direction_in_box[2] * kPmE[1]
-        fProdDyPz = direction_in_box[1] * kPmE[2]
-        if fProdDzPy >= fProdDyPz:
+        prod_dz_py = direction_in_box[2] * point_m_edge[1]
+        prod_dy_pz = direction_in_box[1] * point_m_edge[2]
+        if prod_dz_py >= prod_dy_pz:
             # line intersects y = e1
-            sqr_dist, line_parameter = _box_face(1, 2, 0, point_in_box, direction_in_box, kPmE, box_half_size)
+            sqr_dist, line_parameter = _box_face(
+                1, 2, 0, point_in_box, direction_in_box, point_m_edge,
+                box_half_size)
         else:
             # line intersects z = e2
-            sqr_dist, line_parameter = _box_face(2, 0, 1, point_in_box, direction_in_box, kPmE, box_half_size)
+            sqr_dist, line_parameter = _box_face(
+                2, 0, 1, point_in_box, direction_in_box, point_m_edge,
+                box_half_size)
     return sqr_dist, line_parameter
 
 
-def _box_face(i0, i1, i2, point_in_box, direction_in_box, rkPmE, box_half_size):
+def _box_face(i0, i1, i2, point_in_box, direction_in_box, point_m_edge, box_half_size):
     sqr_dist = 0.0
-    kPpE = np.zeros(3)
+    point_p_edge = np.zeros(3)
 
-    kPpE[i1] = point_in_box[i1] + box_half_size[i1]
-    kPpE[i2] = point_in_box[i2] + box_half_size[i2]
-    if direction_in_box[i0] * kPpE[i1] >= direction_in_box[i1] * rkPmE[i0]:
-        if direction_in_box[i0] * kPpE[i2] >= direction_in_box[i2] * rkPmE[i0]:
+    point_p_edge[i1] = point_in_box[i1] + box_half_size[i1]
+    point_p_edge[i2] = point_in_box[i2] + box_half_size[i2]
+    if direction_in_box[i0] * point_p_edge[i1] >= direction_in_box[i1] * point_m_edge[i0]:
+        if direction_in_box[i0] * point_p_edge[i2] >= direction_in_box[i2] * point_m_edge[i0]:
             # v[i1] >= -e[i1], v[i2] >= -e[i2] (distance = 0)
             point_in_box[i0] = box_half_size[i0]
-            point_in_box[i1] -= direction_in_box[i1] * rkPmE[i0] / direction_in_box[i0]
-            point_in_box[i2] -= direction_in_box[i2] * rkPmE[i0] / direction_in_box[i0]
-            line_parameter = -rkPmE[i0] / direction_in_box[i0]
+            point_in_box[i1] -= direction_in_box[i1] * point_m_edge[i0] / direction_in_box[i0]
+            point_in_box[i2] -= direction_in_box[i2] * point_m_edge[i0] / direction_in_box[i0]
+            line_parameter = -point_m_edge[i0] / direction_in_box[i0]
         else:
             # v[i1] >= -e[i1], v[i2] < -e[i2]
-            fLSqr = direction_in_box[i0] * direction_in_box[i0] + direction_in_box[i2] * direction_in_box[i2]
-            fTmp = fLSqr * kPpE[i1] - direction_in_box[i1] * (direction_in_box[i0] * rkPmE[i0] + direction_in_box[i2] * kPpE[i2])
-            if fTmp <= 2.0 * fLSqr * box_half_size[i1]:
-                fT = fTmp / fLSqr
-                fLSqr += direction_in_box[i1] * direction_in_box[i1]
-                fTmp = kPpE[i1] - fT
-                delta = direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * fTmp + direction_in_box[i2] * kPpE[i2]
-                line_parameter = -delta / fLSqr
-                sqr_dist += rkPmE[i0] * rkPmE[i0] + fTmp * fTmp + kPpE[i2] * kPpE[i2] + delta * line_parameter
+            l_sqr = (direction_in_box[i0] * direction_in_box[i0]
+                     + direction_in_box[i2] * direction_in_box[i2])
+            tmp = (l_sqr * point_p_edge[i1]
+                   - direction_in_box[i1] * (direction_in_box[i0] * point_m_edge[i0]
+                                             + direction_in_box[i2] * point_p_edge[i2]))
+            if tmp <= 2.0 * l_sqr * box_half_size[i1]:
+                t = tmp / l_sqr
+                l_sqr += direction_in_box[i1] * direction_in_box[i1]
+                tmp = point_p_edge[i1] - t
+                delta = (direction_in_box[i0] * point_m_edge[i0]
+                         + direction_in_box[i1] * tmp
+                         + direction_in_box[i2] * point_p_edge[i2])
+                line_parameter = -delta / l_sqr
+                sqr_dist += (point_m_edge[i0] * point_m_edge[i0]
+                             + tmp * tmp
+                             + point_p_edge[i2] * point_p_edge[i2]
+                             + delta * line_parameter)
 
                 point_in_box[i0] = box_half_size[i0]
-                point_in_box[i1] = fT - box_half_size[i1]
+                point_in_box[i1] = t - box_half_size[i1]
                 point_in_box[i2] = -box_half_size[i2]
             else:
-                fLSqr += direction_in_box[i1] * direction_in_box[i1]
-                delta = direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * rkPmE[i1] + direction_in_box[i2] * kPpE[i2]
-                line_parameter = -delta / fLSqr
-                sqr_dist += rkPmE[i0] * rkPmE[i0] + rkPmE[i1] * rkPmE[i1] + kPpE[i2] * kPpE[i2] + delta * line_parameter
+                l_sqr += direction_in_box[i1] * direction_in_box[i1]
+                delta = (direction_in_box[i0] * point_m_edge[i0]
+                         + direction_in_box[i1] * point_m_edge[i1]
+                         + direction_in_box[i2] * point_p_edge[i2])
+                line_parameter = -delta / l_sqr
+                sqr_dist += (point_m_edge[i0] * point_m_edge[i0]
+                             + point_m_edge[i1] * point_m_edge[i1]
+                             + point_p_edge[i2] * point_p_edge[i2]
+                             + delta * line_parameter)
 
                 point_in_box[i0] = box_half_size[i0]
                 point_in_box[i1] = box_half_size[i1]
                 point_in_box[i2] = -box_half_size[i2]
     else:
-        if direction_in_box[i0] * kPpE[i2] >= direction_in_box[i2] * rkPmE[i0]:
+        if direction_in_box[i0] * point_p_edge[i2] >= direction_in_box[i2] * point_m_edge[i0]:
             # v[i1] < -e[i1], v[i2] >= -e[i2]
-            fLSqr = direction_in_box[i0] * direction_in_box[i0] + direction_in_box[i1] * direction_in_box[i1]
-            fTmp = fLSqr * kPpE[i2] - direction_in_box[i2] * (direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * kPpE[i1])
-            if fTmp <= 2.0 * fLSqr * box_half_size[i2]:
-                fT = fTmp / fLSqr
-                fLSqr += direction_in_box[i2] * direction_in_box[i2]
-                fTmp = kPpE[i2] - fT
-                delta = direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * kPpE[i1] + direction_in_box[i2] * fTmp
-                line_parameter = -delta / fLSqr
-                sqr_dist += rkPmE[i0] * rkPmE[i0] + kPpE[i1] * kPpE[i1] + fTmp * fTmp + delta * line_parameter
+            l_sqr = (direction_in_box[i0] * direction_in_box[i0]
+                     + direction_in_box[i1] * direction_in_box[i1])
+            tmp = (l_sqr * point_p_edge[i2]
+                   - direction_in_box[i2] * (direction_in_box[i0] * point_m_edge[i0]
+                                             + direction_in_box[i1] * point_p_edge[i1]))
+            if tmp <= 2.0 * l_sqr * box_half_size[i2]:
+                t = tmp / l_sqr
+                l_sqr += direction_in_box[i2] * direction_in_box[i2]
+                tmp = point_p_edge[i2] - t
+                delta = (direction_in_box[i0] * point_m_edge[i0]
+                         + direction_in_box[i1] * point_p_edge[i1]
+                         + direction_in_box[i2] * tmp)
+                line_parameter = -delta / l_sqr
+                sqr_dist += (point_m_edge[i0] * point_m_edge[i0]
+                             + point_p_edge[i1] * point_p_edge[i1]
+                             + tmp * tmp + delta * line_parameter)
 
                 point_in_box[i0] = box_half_size[i0]
                 point_in_box[i1] = -box_half_size[i1]
-                point_in_box[i2] = fT - box_half_size[i2]
+                point_in_box[i2] = t - box_half_size[i2]
             else:
-                fLSqr += direction_in_box[i2] * direction_in_box[i2]
-                delta = direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * kPpE[i1] + direction_in_box[i2] * rkPmE[i2]
-                line_parameter = -delta / fLSqr
-                sqr_dist += rkPmE[i0] * rkPmE[i0] + kPpE[i1] * kPpE[i1] + rkPmE[i2] * rkPmE[i2] + delta * line_parameter
+                l_sqr += direction_in_box[i2] * direction_in_box[i2]
+                delta = (direction_in_box[i0] * point_m_edge[i0]
+                         + direction_in_box[i1] * point_p_edge[i1]
+                         + direction_in_box[i2] * point_m_edge[i2])
+                line_parameter = -delta / l_sqr
+                sqr_dist += (point_m_edge[i0] * point_m_edge[i0]
+                             + point_p_edge[i1] * point_p_edge[i1]
+                             + point_m_edge[i2] * point_m_edge[i2]
+                             + delta * line_parameter)
 
                 point_in_box[i0] = box_half_size[i0]
                 point_in_box[i1] = -box_half_size[i1]
                 point_in_box[i2] = box_half_size[i2]
         else:
             # v[i1] < -e[i1], v[i2] < -e[i2]
-            fLSqr = direction_in_box[i0] * direction_in_box[i0] + direction_in_box[i2] * direction_in_box[i2]
-            fTmp = fLSqr * kPpE[i1] - direction_in_box[i1] * (direction_in_box[i0] * rkPmE[i0] + direction_in_box[i2] * kPpE[i2])
-            if fTmp >= 0.0:
+            l_sqr = (direction_in_box[i0] * direction_in_box[i0]
+                     + direction_in_box[i2] * direction_in_box[i2])
+            tmp = (l_sqr * point_p_edge[i1]
+                   - direction_in_box[i1] * (direction_in_box[i0] * point_m_edge[i0]
+                                             + direction_in_box[i2] * point_p_edge[i2]))
+            if tmp >= 0.0:
                 # v[i1]-edge is closest
-                if fTmp <= 2.0 * fLSqr * box_half_size[i1]:
-                    fT = fTmp / fLSqr
-                    fLSqr += direction_in_box[i1] * direction_in_box[i1]
-                    fTmp = kPpE[i1] - fT
-                    delta = direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * fTmp + direction_in_box[i2] * kPpE[i2]
-                    line_parameter = -delta / fLSqr
-                    sqr_dist += rkPmE[i0] * rkPmE[i0] + fTmp * fTmp + kPpE[i2] * kPpE[i2] + delta * line_parameter
+                if tmp <= 2.0 * l_sqr * box_half_size[i1]:
+                    t = tmp / l_sqr
+                    l_sqr += direction_in_box[i1] * direction_in_box[i1]
+                    tmp = point_p_edge[i1] - t
+                    delta = (direction_in_box[i0] * point_m_edge[i0]
+                             + direction_in_box[i1] * tmp
+                             + direction_in_box[i2] * point_p_edge[i2])
+                    line_parameter = -delta / l_sqr
+                    sqr_dist += (point_m_edge[i0] * point_m_edge[i0]
+                                 + tmp * tmp
+                                 + point_p_edge[i2] * point_p_edge[i2]
+                                 + delta * line_parameter)
 
                     point_in_box[i0] = box_half_size[i0]
-                    point_in_box[i1] = fT - box_half_size[i1]
+                    point_in_box[i1] = t - box_half_size[i1]
                     point_in_box[i2] = -box_half_size[i2]
                 else:
-                    fLSqr += direction_in_box[i1] * direction_in_box[i1]
-                    delta = direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * rkPmE[i1] + direction_in_box[i2] * kPpE[i2]
-                    line_parameter = -delta / fLSqr
-                    sqr_dist += rkPmE[i0] * rkPmE[i0] + rkPmE[i1] * rkPmE[i1] + kPpE[i2] * kPpE[
-                        i2] + delta * line_parameter
+                    l_sqr += direction_in_box[i1] * direction_in_box[i1]
+                    delta = (direction_in_box[i0] * point_m_edge[i0]
+                             + direction_in_box[i1] * point_m_edge[i1]
+                             + direction_in_box[i2] * point_p_edge[i2])
+                    line_parameter = -delta / l_sqr
+                    sqr_dist += (point_m_edge[i0] * point_m_edge[i0]
+                                 + point_m_edge[i1] * point_m_edge[i1]
+                                 + point_p_edge[i2] * point_p_edge[i2]
+                                 + delta * line_parameter)
 
                     point_in_box[i0] = box_half_size[i0]
                     point_in_box[i1] = box_half_size[i1]
                     point_in_box[i2] = -box_half_size[i2]
             else:
-                fLSqr = direction_in_box[i0] * direction_in_box[i0] + direction_in_box[i1] * direction_in_box[i1]
-                fTmp = fLSqr * kPpE[i2] - direction_in_box[i2] * (direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * kPpE[i1])
-                if fTmp >= 0.0:
+                l_sqr = (direction_in_box[i0] * direction_in_box[i0]
+                         + direction_in_box[i1] * direction_in_box[i1])
+                tmp = (l_sqr * point_p_edge[i2]
+                       - direction_in_box[i2] * (direction_in_box[i0] * point_m_edge[i0]
+                                                 + direction_in_box[i1] * point_p_edge[i1]))
+                if tmp >= 0.0:
                     # v[i2]-edge is closest
-                    if fTmp <= 2.0 * fLSqr * box_half_size[i2]:
-                        fT = fTmp / fLSqr
-                        fLSqr += direction_in_box[i2] * direction_in_box[i2]
-                        fTmp = kPpE[i2] - fT
-                        delta = direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * kPpE[i1] + direction_in_box[i2] * fTmp
-                        line_parameter = -delta / fLSqr
-                        sqr_dist += rkPmE[i0] * rkPmE[i0] + kPpE[i1] * kPpE[i1] + fTmp * fTmp + delta * line_parameter
+                    if tmp <= 2.0 * l_sqr * box_half_size[i2]:
+                        t = tmp / l_sqr
+                        l_sqr += direction_in_box[i2] * direction_in_box[i2]
+                        tmp = point_p_edge[i2] - t
+                        delta = (direction_in_box[i0] * point_m_edge[i0]
+                                 + direction_in_box[i1] * point_p_edge[i1]
+                                 + direction_in_box[i2] * tmp)
+                        line_parameter = -delta / l_sqr
+                        sqr_dist += (point_m_edge[i0] * point_m_edge[i0]
+                                     + point_p_edge[i1] * point_p_edge[i1]
+                                     + tmp * tmp + delta * line_parameter)
 
                         point_in_box[i0] = box_half_size[i0]
                         point_in_box[i1] = -box_half_size[i1]
-                        point_in_box[i2] = fT - box_half_size[i2]
+                        point_in_box[i2] = t - box_half_size[i2]
                     else:
-                        fLSqr += direction_in_box[i2] * direction_in_box[i2]
-                        delta = direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * kPpE[i1] + direction_in_box[i2] * rkPmE[i2]
-                        line_parameter = -delta / fLSqr
-                        sqr_dist += rkPmE[i0] * rkPmE[i0] + kPpE[i1] * kPpE[i1] + rkPmE[i2] * rkPmE[
-                            i2] + delta * line_parameter
+                        l_sqr += direction_in_box[i2] * direction_in_box[i2]
+                        delta = (direction_in_box[i0] * point_m_edge[i0]
+                                 + direction_in_box[i1] * point_p_edge[i1]
+                                 + direction_in_box[i2] * point_m_edge[i2])
+                        line_parameter = -delta / l_sqr
+                        sqr_dist += (point_m_edge[i0] * point_m_edge[i0]
+                                     + point_p_edge[i1] * point_p_edge[i1]
+                                     + point_m_edge[i2] * point_m_edge[i2]
+                                     + delta * line_parameter)
 
                         point_in_box[i0] = box_half_size[i0]
                         point_in_box[i1] = -box_half_size[i1]
                         point_in_box[i2] = box_half_size[i2]
                 else:
                     # (v[i1],v[i2])-corner is closest
-                    fLSqr += direction_in_box[i2] * direction_in_box[i2]
-                    delta = direction_in_box[i0] * rkPmE[i0] + direction_in_box[i1] * kPpE[i1] + direction_in_box[i2] * kPpE[i2]
-                    line_parameter = -delta / fLSqr
-                    sqr_dist += rkPmE[i0] * rkPmE[i0] + kPpE[i1] * kPpE[i1] + kPpE[i2] * kPpE[i2] + delta * line_parameter
+                    l_sqr += direction_in_box[i2] * direction_in_box[i2]
+                    delta = (direction_in_box[i0] * point_m_edge[i0]
+                             + direction_in_box[i1] * point_p_edge[i1]
+                             + direction_in_box[i2] * point_p_edge[i2])
+                    line_parameter = -delta / l_sqr
+                    sqr_dist += (point_m_edge[i0] * point_m_edge[i0]
+                                 + point_p_edge[i1] * point_p_edge[i1]
+                                 + point_p_edge[i2] * point_p_edge[i2]
+                                 + delta * line_parameter)
 
                     point_in_box[i0] = box_half_size[i0]
                     point_in_box[i1] = -box_half_size[i1]
@@ -234,41 +295,45 @@ def _box_face(i0, i1, i2, point_in_box, direction_in_box, rkPmE, box_half_size):
 
 def _case_0(i0, i1, i2, point_in_box, direction_in_box, box_half_size):
     sqr_dist = 0.0
-    fPmE0 = point_in_box[i0] - box_half_size[i0]
-    fPmE1 = point_in_box[i1] - box_half_size[i1]
-    fProd0 = direction_in_box[i1] * fPmE0
-    fProd1 = direction_in_box[i0] * fPmE1
+    point_m_edge0 = point_in_box[i0] - box_half_size[i0]
+    point_m_edge1 = point_in_box[i1] - box_half_size[i1]
+    prod0 = direction_in_box[i1] * point_m_edge0
+    prod1 = direction_in_box[i0] * point_m_edge1
 
-    if fProd0 >= fProd1:
+    if prod0 >= prod1:
         # line intersects P[i0] = e[i0]
         point_in_box[i0] = box_half_size[i0]
 
-        fPpE1 = point_in_box[i1] + box_half_size[i1]
-        delta = fProd0 - direction_in_box[i0] * fPpE1
+        point_p_edge1 = point_in_box[i1] + box_half_size[i1]
+        delta = prod0 - direction_in_box[i0] * point_p_edge1
         if delta >= 0.0:
-            fInvLSqr = 1.0 / (direction_in_box[i0] * direction_in_box[i0] + direction_in_box[i1] * direction_in_box[i1])
-            sqr_dist += delta * delta * fInvLSqr
+            inv_l_sqr = 1.0 / (direction_in_box[i0] * direction_in_box[i0]
+                               + direction_in_box[i1] * direction_in_box[i1])
+            sqr_dist += delta * delta * inv_l_sqr
             point_in_box[i1] = -box_half_size[i1]
-            line_parameter = -(direction_in_box[i0] * fPmE0 + direction_in_box[i1] * fPpE1) * fInvLSqr
+            line_parameter = -(direction_in_box[i0] * point_m_edge0
+                               + direction_in_box[i1] * point_p_edge1) * inv_l_sqr
         else:
-            fInv = 1.0 / direction_in_box[i0]
-            point_in_box[i1] -= fProd0 * fInv
-            line_parameter = -fPmE0 * fInv
+            inv = 1.0 / direction_in_box[i0]
+            point_in_box[i1] -= prod0 * inv
+            line_parameter = -point_m_edge0 * inv
     else:
         # line intersects P[i1] = e[i1]
         point_in_box[i1] = box_half_size[i1]
 
-        fPpE0 = point_in_box[i0] + box_half_size[i0]
-        delta = fProd1 - direction_in_box[i1] * fPpE0
+        point_p_edge0 = point_in_box[i0] + box_half_size[i0]
+        delta = prod1 - direction_in_box[i1] * point_p_edge0
         if delta >= 0.0:
-            fInvLSqr = 1.0 / (direction_in_box[i0] * direction_in_box[i0] + direction_in_box[i1] * direction_in_box[i1])
-            sqr_dist += delta * delta * fInvLSqr
+            inv_l_sqr = 1.0 / (direction_in_box[i0] * direction_in_box[i0]
+                               + direction_in_box[i1] * direction_in_box[i1])
+            sqr_dist += delta * delta * inv_l_sqr
             point_in_box[i0] = -box_half_size[i0]
-            line_parameter = -(direction_in_box[i0] * fPpE0 + direction_in_box[i1] * fPmE1) * fInvLSqr
+            line_parameter = -(direction_in_box[i0] * point_p_edge0
+                               + direction_in_box[i1] * point_m_edge1) * inv_l_sqr
         else:
-            fInv = 1.0 / direction_in_box[i1]
-            point_in_box[i0] -= fProd1 * fInv
-            line_parameter = -fPmE1 * fInv
+            inv = 1.0 / direction_in_box[i1]
+            point_in_box[i0] -= prod1 * inv
+            line_parameter = -point_m_edge1 * inv
 
     if point_in_box[i2] < -box_half_size[i2]:
         delta = point_in_box[i2] + box_half_size[i2]
@@ -286,7 +351,8 @@ def _case_00(i0, i1, i2, point_in_box, direction_in_box, box_half_size):
     line_parameter = (box_half_size[i0] - point_in_box[i0]) / direction_in_box[i0]
     point_in_box[i0] = box_half_size[i0]
     box_half_size_i12 = box_half_size[[i1, i2]]
-    new_point_in_box = np.clip(point_in_box[[i1, i2]], -box_half_size_i12, box_half_size_i12)
+    new_point_in_box = np.clip(
+        point_in_box[[i1, i2]], -box_half_size_i12, box_half_size_i12)
     deltas = point_in_box[[i1, i2]] - new_point_in_box
     point_in_box[[i1, i2]] = new_point_in_box
     return np.dot(deltas, deltas), line_parameter
