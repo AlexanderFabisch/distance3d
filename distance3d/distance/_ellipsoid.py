@@ -3,7 +3,8 @@ import pytransform3d.transformations as pt
 
 
 def point_to_ellipsoid(
-        point, ellipsoid2origin, radii, epsilon=1e-16, max_iter=64):
+        point, ellipsoid2origin, radii, epsilon=1e-16, max_iter=64,
+        check=False):
     """Compute the shortest distance between point and ellipsoid.
 
     Implementation adapted from 3D Game Engine Design by David H. Eberly.
@@ -35,6 +36,9 @@ def point_to_ellipsoid(
     max_iter : int, optional (default: 64)
         Maximum number of iterations of the optimization.
 
+    check : bool, optional (default: True)
+        Check if transformation matrix is valid before inversion.
+
     Returns
     -------
     dist : float
@@ -44,8 +48,8 @@ def point_to_ellipsoid(
         Closest point on ellipsoid.
     """
     # compute coordinates of point in ellipsoid coordinate system
-    point_in_ellipsoid = pt.transform(pt.invert_transform(ellipsoid2origin),
-                                      pt.vector_to_point(point))[:3]
+    origin2ellipsoid = pt.invert_transform(ellipsoid2origin, check=check)
+    point_in_ellipsoid = origin2ellipsoid[:3, 3] + origin2ellipsoid[:3, :3].dot(point)
 
     radii2 = radii ** 2
     point2 = point_in_ellipsoid ** 2
