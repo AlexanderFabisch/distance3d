@@ -19,6 +19,9 @@ def point_to_ellipsoid(
     and may not be copied or disclosed except in accordance with the terms
     of that agreement.
 
+    TODO known bug: when the point is exactly the center of the ellipsoid,
+         the function will return wrong results
+
     Parameters
     ----------
     point : array, shape (3,)
