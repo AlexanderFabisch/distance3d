@@ -1,8 +1,6 @@
 """Containment methods compute bounding volumes."""
 import numpy as np
-from .geometry import (
-    convert_box_to_vertices, cylinder_extreme_along_direction,
-    capsule_extreme_along_direction)
+from .geometry import convert_box_to_vertices
 
 
 def axis_aligned_bounding_box(P):
@@ -69,14 +67,6 @@ def box_aabb(box2origin, size):
     return axis_aligned_bounding_box(vertices)
 
 
-XM = np.array([-1.0, 0.0, 0.0])
-YM = np.array([0.0, -1.0, 0.0])
-ZM = np.array([0.0, 0.0, -1.0])
-XP = np.array([1.0, 0.0, 0.0])
-YP = np.array([0.0, 1.0, 0.0])
-ZP = np.array([0.0, 0.0, 1.0])
-
-
 def cylinder_aabb(cylinder2origin, radius, length):
     """Compute axis-aligned bounding box of cylinder.
 
@@ -128,16 +118,5 @@ def capsule_aabb(capsule2origin, radius, height):
     maxs : array, shape (3,)
         Maximum coordinates.
     """
-    negative_vertices = np.vstack((
-        capsule_extreme_along_direction(XM, capsule2origin, radius, height),
-        capsule_extreme_along_direction(YM, capsule2origin, radius, height),
-        capsule_extreme_along_direction(ZM, capsule2origin, radius, height),
-    ))
-    mins = np.min(negative_vertices, axis=0)
-    positive_vertices = np.vstack((
-        capsule_extreme_along_direction(XP, capsule2origin, radius, height),
-        capsule_extreme_along_direction(YP, capsule2origin, radius, height),
-        capsule_extreme_along_direction(ZP, capsule2origin, radius, height),
-    ))
-    maxs = np.max(positive_vertices, axis=0)
-    return mins, maxs
+    extent = 0.5 * height * np.abs(capsule2origin[:3, 2]) + radius
+    return capsule2origin[:3, 3] - extent, capsule2origin[:3, 3] + extent

@@ -4,7 +4,8 @@ import pytransform3d.transformations as pt
 from distance3d.containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb)
-from distance3d.geometry import cylinder_extreme_along_direction
+from distance3d.geometry import (
+    cylinder_extreme_along_direction, capsule_extreme_along_direction)
 from distance3d import random
 from numpy.testing import assert_array_almost_equal
 
@@ -92,3 +93,27 @@ def test_capsule_aabb():
     mins, maxs = capsule_aabb(capsule2origin, radius, height)
     assert_array_almost_equal(mins, [-1, -1, -3.5])
     assert_array_almost_equal(maxs, [1, 1, 3.5])
+
+    random_state = np.random.RandomState(3)
+    for _ in range(100):
+        capsule2origin, radius, height = random.rand_capsule(random_state)
+        mins1, maxs1 = capsule_aabb(capsule2origin, radius, height)
+        mins2, maxs2 = capsule_aabb_slow(capsule2origin, radius, height)
+        assert_array_almost_equal(mins1, mins2)
+        assert_array_almost_equal(maxs1, maxs2)
+
+
+def capsule_aabb_slow(capsule2origin, radius, height):
+    negative_vertices = np.vstack((
+        capsule_extreme_along_direction(XM, capsule2origin, radius, height),
+        capsule_extreme_along_direction(YM, capsule2origin, radius, height),
+        capsule_extreme_along_direction(ZM, capsule2origin, radius, height),
+    ))
+    mins = np.min(negative_vertices, axis=0)
+    positive_vertices = np.vstack((
+        capsule_extreme_along_direction(XP, capsule2origin, radius, height),
+        capsule_extreme_along_direction(YP, capsule2origin, radius, height),
+        capsule_extreme_along_direction(ZP, capsule2origin, radius, height),
+    ))
+    maxs = np.max(positive_vertices, axis=0)
+    return mins, maxs
