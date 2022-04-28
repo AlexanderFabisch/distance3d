@@ -3,7 +3,7 @@ import pytransform3d.transformations as pt
 from distance3d.random import (
     randn_point, randn_direction, randn_line, randn_line_segment,
     randn_plane, randn_triangle, randn_rectangle, rand_circle, rand_box,
-    rand_capsule, rand_cylinder, rand_sphere)
+    rand_capsule, rand_cylinder, rand_sphere, randn_convex)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -96,3 +96,15 @@ def test_rand_sphere():
     center, radius = rand_sphere(random_state)
     assert len(center) == 3
     assert 0 < radius <= 1
+
+
+def test_randn_convex():
+    random_state = np.random.RandomState(111)
+    n_points = 10
+    vertices, faces = randn_convex(random_state, n_points)
+    assert len(vertices) <= n_points
+
+    vertices, faces, points, triangles = randn_convex(
+        random_state, n_points, return_indices=True)
+    assert len(faces) == len(triangles)
+    assert len(points) == n_points

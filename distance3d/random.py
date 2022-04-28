@@ -341,7 +341,7 @@ def randn_convex(random_state, n_points=10, center_scale=1.0, std=1.0, return_in
         Standard deviation of normal distribution.
 
     return_indices : bool, optional (default: False)
-        Return indices of vertices in faces.
+        Return indices of vertices in faces and all points.
 
     Returns
     -------
@@ -351,7 +351,10 @@ def randn_convex(random_state, n_points=10, center_scale=1.0, std=1.0, return_in
     faces : array, shape (n_triangles, 3, 3)
         Vertices organized as triangles.
 
-    indices : array, shape (n_triangles, 3)
+    points : array, shape (n_points,), optional
+        All points that have been sampled from normal distribution.
+
+    indices : array, shape (n_triangles, 3), optional
         Indices of points forming the simplical facets of the convex hull.
     """
     points = random_state.randn(n_points, 3) * std
