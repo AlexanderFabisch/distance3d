@@ -3,8 +3,8 @@ import pytransform3d.transformations as pt
 
 
 def point_to_ellipsoid(
-        point, ellipsoid2origin, radii, epsilon=1e-16, max_iter=64,
-        check=False):
+        point, ellipsoid2origin, radii, distance_to_surface=False,
+        epsilon=1e-16, max_iter=64, check=False):
     """Compute the shortest distance between point and ellipsoid.
 
     Implementation adapted from 3D Game Engine Design by David H. Eberly.
@@ -29,6 +29,9 @@ def point_to_ellipsoid(
 
     radii : array, shape (3,)
         Radii of the ellipsoid.
+
+    distance_to_surface : bool, optional (default: False)
+        Compute distance to surface or volume otherwise.
 
     epsilon : float, optional (default: 1e-16)
         Values smaller than epsilon are considered to be 0.
@@ -57,9 +60,10 @@ def point_to_ellipsoid(
 
     # initial guess
     if np.linalg.norm(point_in_ellipsoid / radii) < 1.0:
-        # TODO in case we want to compute the distance to the surface:
-        #t = 0.0  # and don't return here:
-        return 0.0, point
+        if distance_to_surface:
+            t = 0.0
+        else:
+            return 0.0, point
     else:
         t = max(radii) * np.linalg.norm(point_in_ellipsoid)
 

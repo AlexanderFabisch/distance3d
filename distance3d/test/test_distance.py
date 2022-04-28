@@ -310,6 +310,20 @@ def test_point_to_ellipsoid():
             ellipsoid2origin[:3, 3] + radii[i] * ellipsoid2origin[:3, i])
 
 
+def test_point_to_ellipsoid_surface():
+    random_state = np.random.RandomState(324)
+    for _ in range(10):
+        ellipsoid2origin = pt.random_transform(random_state)
+        radii = np.array([0.5, 1.0, 2.0])
+        point = ellipsoid2origin[:3, 3] + 0.25 * ellipsoid2origin[:3, 0]
+        dist, closest_point_ellipsoid = point_to_ellipsoid(
+            point, ellipsoid2origin, radii, distance_to_surface=True)
+        assert approx(dist) == 0.25
+        assert_array_almost_equal(
+            closest_point_ellipsoid,
+            ellipsoid2origin[:3, 3] + 0.5 * ellipsoid2origin[:3, 0])
+
+
 def test_line_to_line():
     line_point1 = np.array([1.76405235, 0.40015721, 0.97873798])
     line_direction1 = np.array([0.72840603, 0.6070528, -0.31766579])
