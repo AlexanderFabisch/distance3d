@@ -10,7 +10,7 @@ def norm_vector(v):
 
     Parameters
     ----------
-    v : array-like, shape (n,)
+    v : array, shape (n,)
         nd vector
 
     Returns
@@ -22,4 +22,4 @@ def norm_vector(v):
     if norm == 0.0:
         return v
 
-    return np.asarray(v) / norm
+    return v / norm
