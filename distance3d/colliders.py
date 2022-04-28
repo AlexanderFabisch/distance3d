@@ -443,10 +443,6 @@ class Mesh(Convex):
         self.artist_.set_data(pose)
         self.vertices_ = np.asarray(self.artist_.mesh.vertices)
 
-    def aabb(self):
-        mins, maxs = axis_aligned_bounding_box(self.vertices_)
-        return AABB(np.array([mins, maxs]).T)
-
 
 class Cylinder(ConvexCollider):
     """Wraps cylinder for GJK algorithm.
