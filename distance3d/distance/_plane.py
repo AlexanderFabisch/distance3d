@@ -317,3 +317,45 @@ def plane_to_box(plane_point, plane_normal, box2origin, size):
     """
     points = convert_box_to_vertices(box2origin, size)
     return _plane_to_convex_hull_points(plane_point, plane_normal, points)
+
+
+def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
+    """Compute the shortest distance between a plane and a box.
+
+    Parameters
+    ----------
+    plane_point : array, shape (3,)
+        Point on the plane.
+
+    plane_normal : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    ellipsoid2origin : array, shape (4, 4)
+        Pose of the ellipsoid.
+
+    radii : array, shape (3,)
+        Radii of the ellipsoid.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between rectangle and plane.
+
+    closest_point_plane : array, shape (3,)
+        Closest point on plane.
+
+    closest_point_box : array, shape (3,)
+        Closest point on box.
+    """
+    point = ellipsoid2origin[:3, 3]
+    t = np.dot(plane_normal, point - plane_point)
+    closest_point_plane = point - t * plane_normal
+    axes_on_normal = np.dot(plane_normal, radii[:, np.newaxis] * ellipsoid2origin[:3, :3])
+    extent = sum(axes_on_normal)
+    abs_t = abs(t)
+    if extent >= abs_t:
+        dist = 0.0
+    else:
+        dist = abs_t - extent
+    closest_point_ellipsoid = point + axes_on_normal
+    return dist, closest_point_plane, closest_point_ellipsoid
