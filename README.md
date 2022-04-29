@@ -12,7 +12,8 @@ Distance computation and collision detection in 3D.
 * Fast collision detection and distance computation with GJK.
 * Calculation of penetration depth with EPA.
 * Various specific distance calculations for points, lines, line segments,
-  triangles, rectangles, circles, disks, boxes, cylinders, ellipsoids, ...
+  planes, triangles, rectangles, circles, disks, boxes, cylinders, ellipsoids,
+  ...
 * Broad phase collision detection with bounding volume hierarchy (AABB tree).
 * Self-collision detection for robots.
 
