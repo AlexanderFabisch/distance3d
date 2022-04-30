@@ -365,6 +365,7 @@ def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
     extent = M_inv.dot(plane_normal) / math.sqrt(tmp)
     point1 = C + extent
     point2 = C + extent
+    # TODO maybe only one point is a valid solution?
     dist, closest_point_plane, closest_point_ellipsoid = _plane_to_convex_hull_points(
         plane_point, plane_normal, np.vstack((point1, point2)))
     return dist, closest_point_plane, closest_point_ellipsoid
