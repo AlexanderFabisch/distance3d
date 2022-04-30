@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 from ..geometry import (
     hesse_normal_form, convert_segment_to_line, line_from_pluecker,
@@ -347,15 +349,22 @@ def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
     closest_point_box : array, shape (3,)
         Closest point on box.
     """
-    point = ellipsoid2origin[:3, 3]
-    t = np.dot(plane_normal, point - plane_point)
-    closest_point_plane = point - t * plane_normal
-    axes_on_normal = np.dot(plane_normal, radii[:, np.newaxis] * ellipsoid2origin[:3, :3])
-    extent = sum(axes_on_normal)
-    abs_t = abs(t)
-    if extent >= abs_t:
-        dist = 0.0
-    else:
-        dist = abs_t - extent
-    closest_point_ellipsoid = point + axes_on_normal
+    # https://gamedev.net/forums/topic/457831-distance-between-ellipsoid-plane/4028358/
+    # Let the ellipsoid be represented in standard form,
+    # (X-C)^T*M*(X-C) = 1, where C is the center point, M is a positive
+    # definite matrix, and X is any point on the ellipsoid. The superscript T
+    # denotes the transpose operator. Let N be a normal vector to the plane.
+    # When the ellipsoid is not intersected by the plane, the closest and
+    # farthest points are
+    # X = C +/- M^{-1}*N/sqrt(N^T*M^{-1}*N)
+    # where M^{-1} is the inverse of M.
+    C = ellipsoid2origin[:3, 3]
+    M = (ellipsoid2origin[:3, :3] / (radii ** 2)[np.newaxis]).T.dot(ellipsoid2origin[:3, :3])
+    M_inv = np.linalg.inv(M)
+    tmp = plane_normal.dot(M_inv).dot(plane_normal)
+    extent = M_inv.dot(plane_normal) / math.sqrt(tmp)
+    point1 = C + extent
+    point2 = C + extent
+    dist, closest_point_plane, closest_point_ellipsoid = _plane_to_convex_hull_points(
+        plane_point, plane_normal, np.vstack((point1, point2)))
     return dist, closest_point_plane, closest_point_ellipsoid
