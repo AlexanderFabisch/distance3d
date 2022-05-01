@@ -24,10 +24,14 @@ for i in range(300):
         random_state, center_scale=2.0, size_scale=0.5)
     collider = Box(box2origin, size)
     collider.make_artist(c=(0, 1, 0))
-    timer.start("aabbtree")
+
+    # This part takes a lot of time when executed the first time. Updating
+    # is not computationally expensive.
     tm.add_transform(i, "base", box2origin)
-    timer.stop_and_add_to_total("aabbtree")
+
+    timer.start("aabbtree")
     bvh.add_collider(i, collider)
+    timer.stop_and_add_to_total("aabbtree")
 
 timer.start("collision")
 collisions = []
