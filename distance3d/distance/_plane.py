@@ -359,13 +359,28 @@ def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
     # X = C +/- M^{-1}*N/sqrt(N^T*M^{-1}*N)
     # where M^{-1} is the inverse of M.
     C = ellipsoid2origin[:3, 3]
-    M = (ellipsoid2origin[:3, :3] / (radii ** 2)[np.newaxis]).T.dot(ellipsoid2origin[:3, :3])
+    M = _ellipsoid_quadric_matrix(ellipsoid2origin, radii)
+
+    #for axis in range(3):
+    #    for sign in [-1, 1]:
+    #        x = ellipsoid2origin[:3, 3] + sign * ellipsoid2origin[:3, axis] * radii[axis]
+    #        assert abs(_ellipsoid_quadric(M, C, x)) - 1.0 < 1e-10
+
     M_inv = np.linalg.inv(M)
-    tmp = plane_normal.dot(M_inv).dot(plane_normal)
-    extent = M_inv.dot(plane_normal) / math.sqrt(tmp)
-    point1 = C + extent
-    point2 = C + extent
-    # TODO maybe only one point is a valid solution?
+    M_inv_normal = M_inv.dot(plane_normal)
+    extent_along_plane_normal = (
+        M_inv_normal / math.sqrt(plane_normal.dot(M_inv_normal)))
+    point1 = C - extent_along_plane_normal
+    point2 = C + extent_along_plane_normal
     dist, closest_point_plane, closest_point_ellipsoid = _plane_to_convex_hull_points(
         plane_point, plane_normal, np.vstack((point1, point2)))
     return dist, closest_point_plane, closest_point_ellipsoid
+
+
+def _ellipsoid_quadric_matrix(ellipsoid2origin, radii):
+    R_scaled = ellipsoid2origin[:3, :3] / radii
+    return R_scaled.dot(R_scaled.T)
+
+
+def _ellipsoid_quadric(M, C, x):
+    return (x - C).dot(M).dot(x - C)

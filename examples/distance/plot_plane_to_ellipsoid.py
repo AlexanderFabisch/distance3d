@@ -21,7 +21,7 @@ radii = np.array([0.1, 1, 2])
 ax = ppu.make_3d_axis(ax_s=2)
 
 accumulated_time = 0.0
-for i in range(2):
+for i in range(15000):
     plane_point, plane_normal = random.randn_plane(random_state)
     start = time.time()
     dist, closest_point_plane, closest_point_ellipsoid = plane_to_ellipsoid(
