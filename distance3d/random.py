@@ -285,7 +285,7 @@ def rand_ellipsoid(random_state, min_radius=0.0):
 
 
 def rand_cylinder(random_state, center_scale=1.0, min_radius=0.0,
-                  min_length=0.0):
+                  min_length=0.0, radius_scale=1.0, length_scale=1.0):
     """Sample cylinder.
 
     Parameters
@@ -293,14 +293,20 @@ def rand_cylinder(random_state, center_scale=1.0, min_radius=0.0,
     random_state : np.random.RandomState
         Random number generator.
 
+    center_scale : float, optional (default: 1)
+        Scaling factor for center.
+
     min_radius : float, optional (default: 0)
         Minimum radius of cylinder.
 
     min_length : float, optional (default: 0)
         Minimum length of cylinder.
 
-    center_scale : float, optional (default: 1)
-        Scaling factor for center.
+    radius_scale : float, optional (default: 1)
+        Scaling factor for radius.
+
+    length_scale : float, optional (default: 1)
+        Scaling factor for length.
 
     Returns
     -------
@@ -308,15 +314,15 @@ def rand_cylinder(random_state, center_scale=1.0, min_radius=0.0,
         Pose of the cylinder.
 
     radius : float
-        Radius of the cylinder within (min_radius, min_radius + 1].
+        Radius of the cylinder within (min_radius, min_radius + radius_scale].
 
     length : float
-        Length of the cylinder within (min_length, min_length + 1].
+        Length of the cylinder within (min_length, min_length + length_scale].
     """
     cylinder2origin = pt.random_transform(random_state)
     cylinder2origin[:3, 3] *= center_scale
-    radius = min_radius + (1.0 - random_state.rand())
-    length = min_length + (1.0 - random_state.rand())
+    radius = min_radius + (1.0 - random_state.rand()) * radius_scale
+    length = min_length + (1.0 - random_state.rand()) * length_scale
     return cylinder2origin, radius, length
 
 
