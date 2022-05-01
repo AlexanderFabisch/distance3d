@@ -7,8 +7,8 @@ from distance3d.distance import (
     line_to_box, line_segment_to_line_segment, line_segment_to_plane,
     line_segment_to_triangle, line_segment_to_circle, line_segment_to_box,
     plane_to_plane, plane_to_triangle, plane_to_rectangle, plane_to_box,
-    triangle_to_triangle, triangle_to_rectangle, rectangle_to_rectangle,
-    rectangle_to_box, disk_to_disk)
+    plane_to_ellipsoid, triangle_to_triangle, triangle_to_rectangle,
+    rectangle_to_rectangle, rectangle_to_box, disk_to_disk)
 from distance3d.geometry import convert_box_to_face
 from distance3d.utils import norm_vector
 from distance3d import random
@@ -917,6 +917,37 @@ def test_plane_to_box():
     assert approx(dist) == 0
     assert approx(dist) == np.linalg.norm(
         closest_point_plane - closest_point_rectangle)
+
+
+def test_plane_to_ellipsoid():
+    plane_point = np.array([0, 0, 0], dtype=float)
+    plane_normal = np.array([0, 0, 1], dtype=float)
+
+    ellipsoid2origin = np.eye(4)
+    ellipsoid2origin[:3, 3] = np.array([0, 0, 1])
+    radii = np.array([10.0, 10.0, 0.5])
+    dist, closest_point_plane, closest_point_ellipsoid = plane_to_ellipsoid(
+        plane_point, plane_normal, ellipsoid2origin, radii)
+    assert approx(dist) == 0.5
+    assert_array_almost_equal(closest_point_plane, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point_ellipsoid, np.array([0, 0, 0.5]))
+
+    ellipsoid2origin = np.eye(4)
+    ellipsoid2origin[:3, 3] = np.array([0, 0, -1])
+    radii = np.array([10.0, 10.0, 0.5])
+    dist, closest_point_plane, closest_point_ellipsoid = plane_to_ellipsoid(
+        plane_point, plane_normal, ellipsoid2origin, radii)
+    assert approx(dist) == 0.5
+    assert_array_almost_equal(closest_point_plane, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point_ellipsoid, np.array([0, 0, -0.5]))
+
+    ellipsoid2origin = np.eye(4)
+    radii = np.array([10.0, 10.0, 0.5])
+    dist, closest_point_plane, closest_point_ellipsoid = plane_to_ellipsoid(
+        plane_point, plane_normal, ellipsoid2origin, radii)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point_plane, np.array([0, 0, 0]))
+    assert_array_almost_equal(closest_point_ellipsoid, np.array([0, 0, 0]))
 
 
 def test_triangel_to_triangle():

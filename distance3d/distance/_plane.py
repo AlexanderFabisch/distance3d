@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 from ..geometry import (
     hesse_normal_form, convert_segment_to_line, line_from_pluecker,
@@ -317,3 +319,59 @@ def plane_to_box(plane_point, plane_normal, box2origin, size):
     """
     points = convert_box_to_vertices(box2origin, size)
     return _plane_to_convex_hull_points(plane_point, plane_normal, points)
+
+
+def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
+    """Compute the shortest distance between a plane and a box.
+
+    Parameters
+    ----------
+    plane_point : array, shape (3,)
+        Point on the plane.
+
+    plane_normal : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    ellipsoid2origin : array, shape (4, 4)
+        Pose of the ellipsoid.
+
+    radii : array, shape (3,)
+        Radii of the ellipsoid.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between rectangle and plane.
+
+    closest_point_plane : array, shape (3,)
+        Closest point on plane.
+
+    closest_point_box : array, shape (3,)
+        Closest point on box.
+    """
+    # https://gamedev.net/forums/topic/457831-distance-between-ellipsoid-plane/4028358/
+    # Let the ellipsoid be represented in standard form,
+    # (X-C)^T*M*(X-C) = 1, where C is the center point, M is a positive
+    # definite matrix, and X is any point on the ellipsoid. The superscript T
+    # denotes the transpose operator. Let N be a normal vector to the plane.
+    # When the ellipsoid is not intersected by the plane, the closest and
+    # farthest points are
+    # X = C +/- M^{-1}*N/sqrt(N^T*M^{-1}*N)
+    # where M^{-1} is the inverse of M.
+    C = ellipsoid2origin[:3, 3]
+    M = _ellipsoid_quadric_matrix(ellipsoid2origin, radii)
+
+    M_inv = np.linalg.inv(M)
+    M_inv_normal = M_inv.dot(plane_normal)
+    extent_along_plane_normal = (
+        M_inv_normal / math.sqrt(plane_normal.dot(M_inv_normal)))
+    point1 = C - extent_along_plane_normal
+    point2 = C + extent_along_plane_normal
+    dist, closest_point_plane, closest_point_ellipsoid = _plane_to_convex_hull_points(
+        plane_point, plane_normal, np.vstack((point1, point2)))
+    return dist, closest_point_plane, closest_point_ellipsoid
+
+
+def _ellipsoid_quadric_matrix(ellipsoid2origin, radii):
+    R_scaled = ellipsoid2origin[:3, :3] / radii
+    return R_scaled.dot(R_scaled.T)
