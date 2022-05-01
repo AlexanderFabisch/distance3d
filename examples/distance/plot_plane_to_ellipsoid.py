@@ -13,10 +13,8 @@ from distance3d.distance import plane_to_ellipsoid
 from distance3d import random, plotting
 
 
-random_state = np.random.RandomState(5)
-# TODO move to random
-ellipsoid2origin = pt.random_transform(random_state)
-radii = np.array([0.1, 1, 2])
+random_state = np.random.RandomState(2)
+ellipsoid2origin, radii = random.rand_ellipsoid(random_state)
 
 ax = ppu.make_3d_axis(ax_s=2)
 

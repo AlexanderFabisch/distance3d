@@ -222,6 +222,7 @@ API Reference
    ~distance3d.random.randn_triangle
    ~distance3d.random.rand_box
    ~distance3d.random.rand_capsule
+   ~distance3d.random.rand_ellipsoid
    ~distance3d.random.rand_cylinder
    ~distance3d.random.rand_sphere
    ~distance3d.random.randn_convex
