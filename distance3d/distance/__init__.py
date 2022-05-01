@@ -79,7 +79,7 @@ two geometric objects is implemented.
         <td>-</td>
         <td>-</td>
         <td>X</td>
-        <td>-</td>
+        <td>X</td>
         <td>-</td>
       </tr>
       <tr>
@@ -157,7 +157,7 @@ two geometric objects is implemented.
         <td>X</td>
         <td>-</td>
         <td>-</td>
-        <td>-</td>
+        <td>X</td>
         <td>-</td>
         <td>-</td>
         <td>-</td>
