@@ -361,11 +361,6 @@ def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
     C = ellipsoid2origin[:3, 3]
     M = _ellipsoid_quadric_matrix(ellipsoid2origin, radii)
 
-    #for axis in range(3):
-    #    for sign in [-1, 1]:
-    #        x = ellipsoid2origin[:3, 3] + sign * ellipsoid2origin[:3, axis] * radii[axis]
-    #        assert abs(_ellipsoid_quadric(M, C, x)) - 1.0 < 1e-10
-
     M_inv = np.linalg.inv(M)
     M_inv_normal = M_inv.dot(plane_normal)
     extent_along_plane_normal = (
@@ -380,7 +375,3 @@ def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
 def _ellipsoid_quadric_matrix(ellipsoid2origin, radii):
     R_scaled = ellipsoid2origin[:3, :3] / radii
     return R_scaled.dot(R_scaled.T)
-
-
-def _ellipsoid_quadric(M, C, x):
-    return (x - C).dot(M).dot(x - C)
