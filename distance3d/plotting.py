@@ -146,7 +146,7 @@ def plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths,
 
 
 def plot_circle(ax, center, radius, normal, show_normal=False,
-                surface_alpha=0.1):
+                surface_alpha=0.1, color="b"):
     """Plot circle.
 
     Parameters
@@ -168,6 +168,9 @@ def plot_circle(ax, center, radius, normal, show_normal=False,
 
     surface_alpha : float, optional (default: 0.1)
         Alpha value of the circle surface.
+
+    color : str
+        Color of surface.
     """
     ax.scatter(center[0], center[1], center[2])
     u, v = pr.plane_basis_from_normal(normal)
@@ -184,6 +187,7 @@ def plot_circle(ax, center, radius, normal, show_normal=False,
         surface = mplot3d.art3d.Poly3DCollection(vertices)
     except ValueError:  # Matplotlib >= 3.5
         surface = mplot3d.art3d.Poly3DCollection(vertices.reshape(-1, 3, 3))
+    surface.set_facecolor(color)
     surface.set_alpha(surface_alpha)
     ax.add_collection3d(surface)
 
