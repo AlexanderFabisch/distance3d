@@ -220,10 +220,10 @@ def _line_to_line_segment(
 
             t = (b * s + f) / e
 
-    contact_point1 = line_point + t * line_direction
-    contact_point2 = segment_start + s * d
+    closest_point1 = line_point + t * line_direction
+    closest_point2 = segment_start + s * d
 
-    return np.linalg.norm(contact_point2 - contact_point1), contact_point1, contact_point2, t, s
+    return np.linalg.norm(closest_point2 - closest_point1), closest_point1, closest_point2, t, s
 
 
 def line_segment_to_line_segment(
@@ -256,10 +256,10 @@ def line_segment_to_line_segment(
     distance : float
         The shortest distance between two line segments.
 
-    contact_point_segment1 : array, shape (3,)
+    closest_point_segment1 : array, shape (3,)
         Closest point on first line segment.
 
-    contact_point_segment2 : array, shape (3,)
+    closest_point_segment2 : array, shape (3,)
         Closest point on second line segment.
     """
     # Segment direction vectors
@@ -311,7 +311,8 @@ def line_segment_to_line_segment(
                 t = 1.0
                 s = min(max((b - c) / a, 0.0), 1.0)
 
-    contact_point1 = segment_start1 + s * d1
-    contact_point2 = segment_start2 + t * d2
+    closest_point1 = segment_start1 + s * d1
+    closest_point2 = segment_start2 + t * d2
 
-    return np.linalg.norm(contact_point2 - contact_point1), contact_point1, contact_point2
+    return (np.linalg.norm(closest_point2 - closest_point1), closest_point1,
+            closest_point2)

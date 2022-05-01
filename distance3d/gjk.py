@@ -20,11 +20,11 @@ def gjk(vertices1, vertices2):
     distance : float
         The shortest distance between two convex shapes.
 
-    contact_point1 : array, shape (3,)
-        Contact point on first convex shape.
+    closest_point1 : array, shape (3,)
+        Closest point on first convex shape.
 
-    contact_point2 : array, shape (3,)
-        Contact point on second convex shape.
+    closest_point2 : array, shape (3,)
+        Closest point on second convex shape.
     """
     return gjk_with_simplex(Convex(vertices1), Convex(vertices2))[:3]
 
@@ -54,11 +54,11 @@ def gjk_with_simplex(collider1, collider2):
     distance : float
         The shortest distance between two convex shapes.
 
-    contact_point1 : array, shape (3,)
-        Contact point on first convex shape.
+    closest_point1 : array, shape (3,)
+        Closest point on first convex shape.
 
-    contact_point2 : array, shape (3,)
-        Contact point on second convex shape.
+    closest_point2 : array, shape (3,)
+        Closest point on second convex shape.
 
     simplex : array, shape (4, 3)
         Simplex defined by 4 points of the Minkowski difference between

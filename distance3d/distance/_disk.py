@@ -110,20 +110,21 @@ def disk_to_disk(center1, radius1, normal1, center2, radius2, normal2, epsilon=1
         if np.linalg.norm(closest_to_both_disks - center1) < radius1 and np.linalg.norm(closest_to_both_disks - center2) < radius2:
             return 0.0, closest_to_both_disks, closest_to_both_disks
     elif ell <= radius1 + radius2:  # both centers are on the common line
-        contact = 0.5 * (center1 + center2)
-        return 0.0, contact, contact
+        closest = 0.5 * (center1 + center2)
+        return 0.0, closest, closest
 
     # (2) no contact: simple iterative procedure
     # better solution: https://www.sciencedirect.com/science/article/pii/S0307904X0200080X
-    _, contact_point_disk2 = point_to_disk(center1, center2, radius2, normal2)
+    _, closest_point_disk2 = point_to_disk(center1, center2, radius2, normal2)
     prev_dist = np.linalg.norm(center2 - center1)
     for i in range(20):
-        _, contact_point_disk1 = point_to_disk(
-            contact_point_disk2, center1, radius1, normal1)
-        _, contact_point_disk2 = point_to_disk(
-            contact_point_disk1, center2, radius2, normal2)
-        dist = np.linalg.norm(contact_point_disk2 - contact_point_disk1)
+        _, closest_point_disk1 = point_to_disk(
+            closest_point_disk2, center1, radius1, normal1)
+        _, closest_point_disk2 = point_to_disk(
+            closest_point_disk1, center2, radius2, normal2)
+        dist = np.linalg.norm(closest_point_disk2 - closest_point_disk1)
         if prev_dist - dist < epsilon:
             break
         prev_dist = dist
-    return np.linalg.norm(contact_point_disk2 - contact_point_disk1), contact_point_disk1, contact_point_disk2
+    return (np.linalg.norm(closest_point_disk2 - closest_point_disk1),
+            closest_point_disk1, closest_point_disk2)

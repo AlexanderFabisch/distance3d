@@ -66,14 +66,15 @@ def _line_to_box(line_point, line_direction, box2origin, size, origin2box=None):
                 line_parameter = 0.0
 
     # compute closest point on line
-    contact_point_line = line_point + line_parameter * line_direction
+    closest_point_line = line_point + line_parameter * line_direction
 
     # compute closest point on box
     # undo the reflections applied previously
-    contact_point_box = box2origin[:3, 3] + box2origin[:3, :3].dot(
+    closest_point_box = box2origin[:3, 3] + box2origin[:3, :3].dot(
         direction_sign * point_in_box)
 
-    return math.sqrt(sqr_dist), contact_point_line, contact_point_box, line_parameter
+    return (math.sqrt(sqr_dist), closest_point_line, closest_point_box,
+            line_parameter)
 
 
 def _case_no_zeros(point_in_box, direction_in_box, box_half_size):

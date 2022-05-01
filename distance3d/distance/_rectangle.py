@@ -88,10 +88,10 @@ def line_to_rectangle(
     dist : float
         The shortest distance between line and rectangle.
 
-    contact_point_line : array, shape (3,)
+    closest_point_line : array, shape (3,)
         Closest point on the line.
 
-    contact_point_rectangle : array, shape (3,)
+    closest_point_rectangle : array, shape (3,)
         Closest point on the rectangle.
     """
     return _line_to_rectangle(
@@ -122,18 +122,18 @@ def _line_to_rectangle(
         for i0 in range(2):
             segment_end, segment_start = convert_rectangle_to_segment(
                 rectangle_center, rectangle_extents, i0, i1)
-            dist, contact_point_line, contact_point_segment, l_closest, s_closest = _line_to_line_segment(
+            dist, closest_point_line, closest_point_segment, l_closest, s_closest = _line_to_line_segment(
                 line_point, line_direction, segment_start, segment_end, epsilon=epsilon)
 
             if dist < best_dist:
-                best_contact_point_line = contact_point_line
-                best_contact_point_rectangle = contact_point_segment
+                best_closest_point_line = closest_point_line
+                best_closest_point_rectangle = closest_point_segment
                 best_dist = dist
                 best_line_parameter = l_closest
             if best_dist < epsilon:
                 break
 
-    return best_dist, best_contact_point_line, best_contact_point_rectangle, best_line_parameter
+    return best_dist, best_closest_point_line, best_closest_point_rectangle, best_line_parameter
 
 
 def _line_intersects_rectangle(
@@ -162,9 +162,9 @@ def _line_intersects_rectangle(
             line_parameter = np.dot(s, line_direction_d_d) - line_direction_dot_diff
 
             # The intersection point is inside or on the rectangle.
-            contact_point_line = line_point + line_parameter * line_direction
-            contact_point_rectangle = rectangle_center + s.dot(rectangle_axes)
-            return True, (0.0, contact_point_line, contact_point_rectangle, line_parameter)
+            closest_point_line = line_point + line_parameter * line_direction
+            closest_point_rectangle = rectangle_center + s.dot(rectangle_axes)
+            return True, (0.0, closest_point_line, closest_point_rectangle, line_parameter)
     return False, None
 
 
@@ -288,12 +288,12 @@ def rectangle_to_rectangle(
             segment_end, segment_start = convert_rectangle_to_segment(
                 rectangle_center1, rectangle_extents1, i0, i1)
 
-            dist, contact_point_rectangle1, contact_point_rectangle2 = line_segment_to_rectangle(
+            dist, closest_point_rectangle1, closest_point_rectangle2 = line_segment_to_rectangle(
                 segment_start, segment_end, rectangle_center2, rectangle_axes2, rectangle_lengths2)
 
             if dist < best_dist:
-                best_contact_point_rectangle1 = contact_point_rectangle1
-                best_contact_point_rectangle2 = contact_point_rectangle2
+                best_closest_point_rectangle1 = closest_point_rectangle1
+                best_closest_point_rectangle2 = closest_point_rectangle2
                 best_dist = dist
             if dist <= epsilon:
                 break
@@ -306,14 +306,14 @@ def rectangle_to_rectangle(
             segment_end, segment_start = convert_rectangle_to_segment(
                 rectangle_center2, rectangle_extents2, i0, i1)
 
-            dist, contact_point_rectangle2, contact_point_rectangle1 = line_segment_to_rectangle(
+            dist, closest_point_rectangle2, closest_point_rectangle1 = line_segment_to_rectangle(
                 segment_start, segment_end, rectangle_center1, rectangle_axes1, rectangle_lengths1)
 
             if dist < best_dist:
-                best_contact_point_rectangle1 = contact_point_rectangle1
-                best_contact_point_rectangle2 = contact_point_rectangle2
+                best_closest_point_rectangle1 = closest_point_rectangle1
+                best_closest_point_rectangle2 = closest_point_rectangle2
                 best_dist = dist
             if dist <= epsilon:
                 break
 
-    return best_dist, best_contact_point_rectangle1, best_contact_point_rectangle2
+    return best_dist, best_closest_point_rectangle1, best_closest_point_rectangle2
