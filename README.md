@@ -1,5 +1,6 @@
 ![continuous integration](https://github.com/AlexanderFabisch/distance3d/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/AlexanderFabisch/distance3d/branch/master/graph/badge.svg?token=GJE5ZMVVB8)](https://codecov.io/gh/AlexanderFabisch/distance3d)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6509736.svg)](https://doi.org/10.5281/zenodo.6509736)
 
 # distance3d
 
