@@ -10,6 +10,7 @@ import pytransform3d.visualizer as pv
 from distance3d.random import rand_box
 from distance3d.colliders import BoundingVolumeHierarchy, Box
 from distance3d.gjk import gjk_with_simplex
+from distance3d.urdf_utils import fast_transform_manager_initialization
 from distance3d.benchmark import Timer
 
 
@@ -19,7 +20,9 @@ bvh = BoundingVolumeHierarchy(tm, "base")
 random_state = np.random.RandomState(32)
 
 timer = Timer()
-for i in range(300):
+box_frames = list(range(300))
+fast_transform_manager_initialization(tm, box_frames, "base")
+for i in box_frames:
     box2origin, size = rand_box(
         random_state, center_scale=2.0, size_scale=0.5)
     collider = Box(box2origin, size)

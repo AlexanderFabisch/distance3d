@@ -1,5 +1,38 @@
 import re
 import warnings
+import numpy as np
+
+
+def fast_transform_manager_initialization(tm, frames, base):
+    """Initialize a transform manager with many frames.
+
+    Parameters
+    ----------
+    tm : pytransform3d.transform_manager.TransformManager
+        Transform manager.
+
+    frames : list
+        Names of frames that are defined with respect to base frame.
+
+    base : Hashable
+        Name of the base frame.
+    """
+    if base not in tm.nodes:
+        tm.nodes.append(base)
+
+    for frame in frames:
+        tm.nodes.append(frame)
+
+        transform_key = (frame, base)
+
+        ij_index = len(tm.i)
+        tm.i.append(tm.nodes.index(frame))
+        tm.j.append(tm.nodes.index(base))
+        tm.transform_to_ij_index[transform_key] = ij_index
+
+        tm.transforms[transform_key] = np.eye(4)
+
+    tm._recompute_shortest_path()
 
 
 def self_collision_whitelists(tm):
