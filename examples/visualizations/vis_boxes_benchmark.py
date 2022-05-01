@@ -20,11 +20,11 @@ bvh = BoundingVolumeHierarchy(tm, "base")
 random_state = np.random.RandomState(32)
 
 timer = Timer()
-box_frames = list(range(300))
+box_frames = list(range(2000))
 fast_transform_manager_initialization(tm, box_frames, "base")
 for i in box_frames:
     box2origin, size = rand_box(
-        random_state, center_scale=2.0, size_scale=0.5)
+        random_state, center_scale=2.0, size_scale=0.3)
     collider = Box(box2origin, size)
     collider.make_artist(c=(0, 1, 0))
 
