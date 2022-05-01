@@ -22,7 +22,7 @@ accumulated_time = 0.0
 for i in range(750):
     triangle_points = random.randn_triangle(random_state) + 4 * np.sign(np.random.randn(1, 3))
     start = time.time()
-    dist, contact_point_triangle, contact_point_rectangle = triangle_to_rectangle(
+    dist, closest_point_triangle, closest_point_rectangle = triangle_to_rectangle(
         triangle_points, rectangle_center, rectangle_axes, rectangle_lengths)
     end = time.time()
     accumulated_time += end - start
@@ -30,7 +30,7 @@ for i in range(750):
     if i > 10:
         continue
     plotting.plot_segment(
-        ax, contact_point_triangle, contact_point_rectangle, c="k", lw=1)
+        ax, closest_point_triangle, closest_point_rectangle, c="k", lw=1)
     plotting.plot_triangle(ax, triangle_points, surface_alpha=0.8)
 print(f"{accumulated_time=}")
 

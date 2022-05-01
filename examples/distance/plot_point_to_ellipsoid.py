@@ -22,13 +22,13 @@ accumulated_time = 0.0
 for i in range(1500):
     point = random.randn_point(random_state)
     start = time.time()
-    dist, contact_point = point_to_ellipsoid(point, ellipsoid2origin, radii)
+    dist, closest_point = point_to_ellipsoid(point, ellipsoid2origin, radii)
     end = time.time()
     accumulated_time += end - start
     print(dist)
     if i > 50:
         continue
-    plotting.plot_segment(ax, point, contact_point, lw=1)
+    plotting.plot_segment(ax, point, closest_point, lw=1)
 print(f"{accumulated_time=}")
 
 ppu.plot_ellipsoid(ax=ax, A2B=ellipsoid2origin, radii=radii, wireframe=False, alpha=0.5)

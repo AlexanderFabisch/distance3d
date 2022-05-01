@@ -26,7 +26,7 @@ for i in range(50000):
         segment_end2 = (segment_start2 + segment_direction1
                         * np.linalg.norm(segment_end2 - segment_start2))
     start = time.time()
-    dist, contact_point_segment1, contact_point_segment2 = line_segment_to_line_segment(
+    dist, closest_point_segment1, closest_point_segment2 = line_segment_to_line_segment(
         segment_start1, segment_end1, segment_start2, segment_end2)
     end = time.time()
     accumulated_time += end - start
@@ -34,7 +34,7 @@ for i in range(50000):
     if i > 15:
         continue
     plotting.plot_segment(
-        ax, contact_point_segment1, contact_point_segment2, c="k", lw=1)
+        ax, closest_point_segment1, closest_point_segment2, c="k", lw=1)
     plotting.plot_segment(ax, segment_start2, segment_end2)
 print(f"{accumulated_time=}")
 

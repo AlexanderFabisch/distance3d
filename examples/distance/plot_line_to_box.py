@@ -29,7 +29,7 @@ for i in range(18000):
     if random_state.rand() < 0.33:
         line_direction[random_state.randint(3)] = 0.0
     start = time.time()
-    dist, contact_point_line, contact_point_box = line_to_box(
+    dist, closest_point_line, closest_point_box = line_to_box(
         line_point, line_direction, box2origin, size)
     end = time.time()
     accumulated_time += end - start
@@ -37,7 +37,7 @@ for i in range(18000):
     if i > 10:
         continue
     plotting.plot_segment(
-        ax, contact_point_line, contact_point_box, c="k", lw=1)
+        ax, closest_point_line, closest_point_box, c="k", lw=1)
     plotting.plot_line(ax, line_point, line_direction)
 print(f"{accumulated_time=}")
 

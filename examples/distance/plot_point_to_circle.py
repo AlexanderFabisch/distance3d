@@ -25,13 +25,13 @@ accumulated_time = 0.0
 for i in range(65000):
     point = random.randn_point(random_state)
     start = time.time()
-    distance, contact_point = point_to_circle(point, center, radius, normal)
+    distance, closest_point = point_to_circle(point, center, radius, normal)
     end = time.time()
     accumulated_time += end - start
     print(f"{distance}")
     if i > 25:
         continue
-    plotting.plot_segment(ax, point, contact_point, lw=1)
+    plotting.plot_segment(ax, point, closest_point, lw=1)
 print(f"{accumulated_time=}")
 
 ax.scatter(center[0], center[1], center[2])

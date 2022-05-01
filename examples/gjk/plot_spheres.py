@@ -24,7 +24,7 @@ for i in range(1000):
     start = time.time()
     s1 = colliders.Sphere(center, radius)
     s2 = colliders.Sphere(center2, radius2)
-    dist, contact_point_sphere, contact_point_sphere2, _ = gjk.gjk_with_simplex(s1, s2)
+    dist, closest_point_sphere, closest_point_sphere2, _ = gjk.gjk_with_simplex(s1, s2)
     end = time.time()
     accumulated_time += end - start
     print(dist)
@@ -36,7 +36,7 @@ for i in range(1000):
         vertices2 = np.array(s2.vertices_)
         ax.scatter(vertices2[:, 0], vertices2[:, 1], vertices2[:, 2], color="g")
     plotting.plot_segment(
-        ax, contact_point_sphere, contact_point_sphere2, c="k", lw=1)
+        ax, closest_point_sphere, closest_point_sphere2, c="k", lw=1)
     ppu.plot_sphere(ax, p=center2, radius=radius2, wireframe=False, alpha=0.2)
 print(f"{accumulated_time=}")
 

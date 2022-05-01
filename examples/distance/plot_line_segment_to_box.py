@@ -22,7 +22,7 @@ accumulated_time = 0.0
 for i in range(8000):
     segment_start, segment_end = random.randn_line_segment(random_state)
     start = time.time()
-    dist, contact_point_segment, contact_point_box = line_segment_to_box(
+    dist, closest_point_segment, closest_point_box = line_segment_to_box(
         segment_start, segment_end, box2origin, size)
     end = time.time()
     accumulated_time += end - start
@@ -30,7 +30,7 @@ for i in range(8000):
     if i > 15:
         continue
     plotting.plot_segment(
-        ax, contact_point_segment, contact_point_box, c="k", lw=1)
+        ax, closest_point_segment, closest_point_box, c="k", lw=1)
     plotting.plot_segment(ax, segment_start, segment_end)
 print(f"{accumulated_time=}")
 

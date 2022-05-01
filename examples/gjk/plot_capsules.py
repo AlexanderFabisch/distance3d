@@ -25,7 +25,7 @@ for i in range(700):
     start = time.time()
     c1 = colliders.Capsule(capsule2origin, radius, height)
     c2 = colliders.Capsule(capsule2origin2, radius2, height2)
-    dist, contact_point_capsule, contact_point_capsule2, _ = gjk.gjk_with_simplex(c1, c2)
+    dist, closest_point_capsule, closest_point_capsule2, _ = gjk.gjk_with_simplex(c1, c2)
     end = time.time()
     accumulated_time += end - start
     print(dist)
@@ -37,7 +37,7 @@ for i in range(700):
         vertices2 = np.array(c2.vertices_)
         ax.scatter(vertices2[:, 0], vertices2[:, 1], vertices2[:, 2], color="g")
     plotting.plot_segment(
-        ax, contact_point_capsule, contact_point_capsule2, c="k", lw=1)
+        ax, closest_point_capsule, closest_point_capsule2, c="k", lw=1)
     pt.plot_transform(ax=ax, A2B=capsule2origin2, s=0.1)
     ppu.plot_capsule(
         ax=ax, A2B=capsule2origin2, radius=radius2, height=height2,
