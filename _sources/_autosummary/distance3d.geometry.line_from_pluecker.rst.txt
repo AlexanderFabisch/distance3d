@@ -1,0 +1,6 @@
+﻿distance3d.geometry.line\_from\_pluecker
+========================================
+
+.. currentmodule:: distance3d.geometry
+
+.. autofunction:: line_from_pluecker

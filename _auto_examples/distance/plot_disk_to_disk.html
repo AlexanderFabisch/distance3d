@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Distance between two disks &#8212; distance3d 0.2.0 documentation</title>
+    <title>Distance between two disks &#8212; distance3d 0.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -19,8 +19,8 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Distance from point to disk" href="plot_point_to_disk.html" />
-    <link rel="prev" title="Distance from line to triangle" href="plot_line_to_triangle.html" />
+    <link rel="next" title="Distance from line segment to box" href="plot_line_segment_to_box.html" />
+    <link rel="prev" title="Distance from point to circle" href="plot_point_to_circle.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -77,7 +77,7 @@ to download the full example code</p>
 0.0
 0.0011384209628012888
 0.4024532069109428
-1.903989178472787e-08
+0.0
 0.0
 0.8612527223991431
 0.9821872279817041
@@ -125,7 +125,7 @@ to download the full example code</p>
 1.182732860598179
 1.9222460512432098
 0.002818625577601204
-0.0
+7.014162872041346e-05
 1.3096338161181096
 2.3511009768525724
 0.5045336265882711
@@ -162,7 +162,7 @@ to download the full example code</p>
 0.1084659312894988
 9.829007607820017e-10
 0.9706908423192626
-0.0
+0.0016418714308477367
 7.063138400211146e-08
 1.0796481005517098
 0.7365332967838922
@@ -189,7 +189,7 @@ to download the full example code</p>
 0.0
 0.26623666386383005
 0.5055813939845518
-0.0
+1.276267980188095e-11
 0.35770542020003737
 0.1326229940848603
 0.6425446849931663
@@ -235,13 +235,13 @@ to download the full example code</p>
 1.251594461389776
 0.5292608347861772
 0.9937768321371927
-0.0
+4.737468750626306e-11
 1.8668970411686925
 0.22536900250750544
 0.09619818951269656
 3.0267137957143224e-09
 0.0
-0.0
+0.01596880281591319
 0.5534625656758915
 0.0
 2.4919733555298516
@@ -319,7 +319,7 @@ to download the full example code</p>
 0.0
 0.6685112921376682
 0.0
-0.0
+8.0753570497194e-10
 0.5775636456163922
 0.0
 1.304505648016384
@@ -486,7 +486,7 @@ to download the full example code</p>
 1.0256838515731446
 0.0
 0.0
-0.0
+1.2560855307264251e-10
 0.6121422128320305
 0.6138157439135977
 0.8751121648977258
@@ -542,7 +542,7 @@ to download the full example code</p>
 0.8190435306102828
 0.6560430638301535
 0.0
-0.0
+7.50925460826779e-06
 0.0
 2.220446049250313e-16
 1.2553051531155073
@@ -652,7 +652,7 @@ to download the full example code</p>
 1.4176118063540197
 0.8798002682998717
 1.6665067858427456
-0.0004806494720104649
+0.0
 1.3151012629818633
 1.649858512833219
 0.0
@@ -663,7 +663,7 @@ to download the full example code</p>
 1.6815975482395082
 1.3107015247480898
 1.8330910496638333
-1.4139796586931652e-06
+0.0
 0.39027419068665614
 1.7997588279302874
 1.811629460353803
@@ -671,7 +671,7 @@ to download the full example code</p>
 0.10054494155486615
 0.0
 0.3159628662844495
-0.0
+1.6809155178876267e-09
 1.3158590255667175
 1.47062808569457
 1.0208164944687796
@@ -761,7 +761,7 @@ to download the full example code</p>
 2.989053449198309e-12
 0.6850339578274446
 0.3781748481899368
-3.830845045016407e-06
+0.0
 1.4137601641276796
 0.651952610295813
 0.0
@@ -772,7 +772,7 @@ to download the full example code</p>
 0.2788907147739974
 0.6736688220430317
 0.0
-0.0
+2.8807035072908604e-06
 1.1827288204790478
 0.5951316100593789
 0.5435335024602954
@@ -791,7 +791,7 @@ to download the full example code</p>
 1.0773275326476388
 0.6455521471035187
 1.525747606076893
-0.0
+4.039886818451153e-06
 1.1561503994274889
 0.21387966513201212
 1.4192037755177094
@@ -809,11 +809,11 @@ to download the full example code</p>
 0.8926783704288209
 0.18317099408454027
 0.09254262733833794
-2.645483921336067e-09
+0.0
 0.18358506880794878
 0.0
 1.5515521518258975
-0.0
+1.1718360171109055e-09
 1.6495902205831685
 0.49337185941465656
 0.7920547652908719
@@ -859,7 +859,7 @@ to download the full example code</p>
 2.092399814176492
 0.7626031452646237
 1.5094371932305641
-0.0
+1.3968620482529559e-08
 0.014861606996483881
 1.2705890860557973
 2.481507058221963
@@ -894,7 +894,7 @@ to download the full example code</p>
 0.6542613494366007
 1.0077813529969508
 1.3465017509298116
-0.0
+0.0008592104147718446
 1.1859989479193136
 0.10655287415517685
 0.7570145012630728
@@ -959,7 +959,7 @@ to download the full example code</p>
 1.3669226353540056
 2.6042722354967753
 2.278768277950232
-7.752942390165662e-06
+0.0
 0.3254895900579472
 0.9268152210452029
 0.34434773324348034
@@ -1028,7 +1028,7 @@ to download the full example code</p>
 0.5306860139480595
 0.9430199559543392
 2.105776218862408
-0.0
+1.6343485156611326e-05
 1.1885337992813396
 0.056013996677988676
 0.018500883071806366
@@ -1103,7 +1103,7 @@ to download the full example code</p>
 1.416571512251091
 0.0
 0.3228578588189028
-0.0
+2.6924606090841937e-09
 0.18251355577198874
 0.6658556351905627
 1.0496466825577695
@@ -1115,7 +1115,7 @@ to download the full example code</p>
 1.4182241790877355
 0.0
 0.6375985307561457
-0.0
+1.299031715529253e-09
 1.7965001159629486
 0.9527647884033786
 1.076821263837943
@@ -1201,7 +1201,7 @@ to download the full example code</p>
 0.14324924652476456
 0.0
 0.17792851677246863
-0.012250402195322474
+0.0
 0.7949075552908491
 0.0
 0.0751007355206591
@@ -1223,7 +1223,7 @@ to download the full example code</p>
 1.8106729153005776
 0.12467901799152237
 0.5110650860374915
-2.7049706363690973e-09
+0.0
 0.9187249672332194
 0.7601852702917574
 3.278368393050072e-09
@@ -1331,7 +1331,7 @@ to download the full example code</p>
 0.9237514055295875
 0.800560422404923
 0.5582284982138135
-0.0
+0.0005408674343972616
 0.0
 1.93428166694963
 1.4319019363223855
@@ -1422,7 +1422,7 @@ to download the full example code</p>
 0.07680799436202455
 0.28494474801187125
 0.11442454190116537
-0.0
+0.006339281249031964
 0.46020807224675786
 0.15425915406644783
 1.007764861700069
@@ -1577,7 +1577,7 @@ to download the full example code</p>
 0.6272051328627969
 0.6181954236391701
 0.5149557324369727
-0.0
+8.839574132352146e-05
 0.0
 0.2622043864514481
 1.1167691276320009
@@ -1680,7 +1680,7 @@ to download the full example code</p>
 0.5438462491434141
 0.9737231842868106
 0.2729844651498307
-0.0
+1.3856682051782698e-09
 0.5472325289179678
 0.37500288755268396
 0.5910312181437654
@@ -1755,7 +1755,7 @@ to download the full example code</p>
 0.8384044222316605
 2.020751171333615e-06
 1.5888405481826093
-0.0
+3.544686627554583e-09
 0.2187255907900763
 0.0029123831109525715
 0.16318424494991604
@@ -1817,7 +1817,7 @@ to download the full example code</p>
 0.23792085131669732
 0.18661006960456283
 0.17976601029437134
-0.0
+6.010952569024397e-10
 0.25976736221026625
 0.0
 1.153399463154459
@@ -1870,7 +1870,7 @@ to download the full example code</p>
 1.876733021571277e-09
 0.0
 2.563051762546586
-0.0
+2.2775659136442528e-10
 0.3394479578554994
 0.0
 0.08981882437737702
@@ -1918,7 +1918,7 @@ to download the full example code</p>
 0.28472664685349536
 0.7517432415021064
 0.5955354493265014
-0.0
+0.0004208239942272429
 0.07249128176777621
 0.43774956846967517
 3.9338643453845634e-11
@@ -1927,7 +1927,7 @@ to download the full example code</p>
 0.10179027144236968
 0.017640531117959723
 0.38219106380885615
-0.0
+1.804879024014383e-09
 1.2910226984435789
 1.0460532109913365
 1.6991523519474117
@@ -1956,7 +1956,7 @@ to download the full example code</p>
 1.1304062200104141
 0.47328125256977815
 0.7819516499393837
-2.1313210867304755e-05
+0.0
 0.033390145765506474
 0.6430843916896138
 0.6508171644441719
@@ -2149,13 +2149,13 @@ to download the full example code</p>
 0.6460337053910633
 0.7267831966070845
 0.6037202175221303
-0.0
+6.1072068513468025e-09
 0.7036806568878592
 0.38416303070769914
 0.14901366209614758
 1.4515593649094636
 0.4152855550361123
-0.0
+1.378506265281576e-05
 1.3904314793475896
 0.0981898706156209
 0.4486719923639604
@@ -2216,7 +2216,7 @@ to download the full example code</p>
 0.7623393665101164
 0.0
 0.9641094574799001
-0.0
+1.2813467973438186e-05
 0.05411738514550104
 0.9842136505753842
 0.763319995813368
@@ -2229,7 +2229,7 @@ to download the full example code</p>
 1.1194949268617085
 0.6020473257677978
 0.18939840027585317
-0.0
+0.00019398698412222522
 1.5866560710692088
 0.9803744244729913
 0.1317272721394559
@@ -2336,7 +2336,7 @@ to download the full example code</p>
 0.014138730034947335
 0.4636322903919818
 0.7552630598157309
-0.0
+3.3633004292377144e-05
 0.3421491060265053
 0.8942575705140946
 3.1347193813017307
@@ -2367,7 +2367,7 @@ to download the full example code</p>
 0.5419340795506077
 1.0361003808029066
 1.004300590736543
-0.0
+2.682008198862107e-09
 2.3218997273393525
 0.09494866949363984
 0.2638635917711114
@@ -2395,7 +2395,7 @@ to download the full example code</p>
 0.0330441996670355
 0.431361492038292
 0.81032756407365
-0.0
+4.955482968416192e-09
 0.06858330762160203
 0.5623963603697163
 1.066490079602078
@@ -2441,7 +2441,7 @@ to download the full example code</p>
 0.0
 0.31050202351911815
 0.321630617460893
-0.002184270862772897
+0.0
 0.6792707330665679
 0.5899522785769628
 4.483763915708039e-10
@@ -2611,7 +2611,7 @@ to download the full example code</p>
 0.9389519943538607
 0.3082486012626144
 0.7799696763856657
-6.005218960991598e-10
+0.0
 0.00602361205985863
 0.044687846352750436
 0.5223976376011166
@@ -2645,14 +2645,14 @@ to download the full example code</p>
 0.0
 0.3088931987977911
 0.0
-0.0
+5.756303540795323e-06
 0.6291175888772896
 0.13578617462970033
 0.8417013791996256
 0.7054421881283808
 0.0
 0.0
-0.0
+0.0004364561716042805
 0.5040912709160528
 1.2798839874530723
 0.9170086853944718
@@ -2894,7 +2894,7 @@ to download the full example code</p>
 0.5253421924190134
 1.1258113916501076
 1.0745189320953716
-2.9235426579621304e-08
+0.0
 0.5981578621017921
 0.4711371802318917
 1.222589086900002
@@ -2958,7 +2958,7 @@ to download the full example code</p>
 0.8364732126586035
 1.0705434274595946
 2.004716546808367
-0.0
+6.929435247479687e-06
 1.363305771084
 0.28783128894024756
 1.9319068567114073e-10
@@ -3045,7 +3045,7 @@ to download the full example code</p>
 0.11356933591454194
 0.5862331178465497
 0.0
-accumulated_time=0.9610617160797119
+accumulated_time=0.9852843284606934
 </pre></div>
 </div>
 <div class="line-block">
@@ -3078,7 +3078,7 @@ accumulated_time=0.9610617160797119
     <span class="nb">print</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
         <span class="k">continue</span>
-    <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">closest_point1</span><span class="p">,</span> <span class="n">closest_point2</span><span class="p">)</span>
+    <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">closest_point1</span><span class="p">,</span> <span class="n">closest_point2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <a href="../../_autosummary/distance3d.plotting.plot_circle.html#distance3d.plotting.plot_circle" title="distance3d.plotting.plot_circle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_circle</span></a><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">center2</span><span class="p">,</span> <span class="n">radius2</span><span class="p">,</span> <span class="n">normal2</span><span class="p">,</span> <span class="n">show_normal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">accumulated_time</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -3086,7 +3086,7 @@ accumulated_time=0.9610617160797119
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.303 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.310 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-distance-plot-disk-to-disk-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7813613c93958553a4a6d7d9618a5e5d/plot_disk_to_disk.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_disk_to_disk.py</span></code></a></p>
@@ -3127,21 +3127,27 @@ accumulated_time=0.9610617160797119
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_plane.html">Distance from point to plane</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_rectangle.html">Distance from point to rectangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_box.html">Distance from point to box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_point_to_ellipsoid.html">Distance from point to ellipsoid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_circle.html">Distance between line and circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_triangle.html">Distance from line to triangle</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Distance between two disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_disk.html">Distance from point to disk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_circle.html">Distance from point to circle</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Distance between two disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_box.html">Distance from line segment to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_ellipsoid.html">Distance from point to ellipsoid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_circle.html">Distance from line segment to circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_line_segment.html">Distance from line to line segment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_triangle.html">Distance from line segment to triangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_cylinder.html">Distance from point to cylinder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_triangle.html">Distance from plane to triangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_line.html">Distance from line to line</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_triangle_to_triangle.html">Distance between two triangles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_rectangle.html">Distance from line to rectangle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_plane.html">Distance from plane to plane</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_rectangle.html">Distance from line segment to rectangle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_box.html">Distance from point to box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_plane.html">Distance from line to plane</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_rectangle.html">Distance from plane to rectangle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_ellipsoid.html">Distance from plane to ellipsoid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_triangle_to_rectangle.html">Distance from triangle to rectangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_plane.html">Distance from line segment to plane</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_rectangle_to_rectangle.html">Distance between two rectangles</a></li>
@@ -3161,8 +3167,8 @@ accumulated_time=0.9610617160797119
 <ul>
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Examples</a><ul>
-      <li>Previous: <a href="plot_line_to_triangle.html" title="previous chapter">Distance from line to triangle</a></li>
-      <li>Next: <a href="plot_point_to_disk.html" title="next chapter">Distance from point to disk</a></li>
+      <li>Previous: <a href="plot_point_to_circle.html" title="previous chapter">Distance from point to circle</a></li>
+      <li>Next: <a href="plot_line_segment_to_box.html" title="next chapter">Distance from line segment to box</a></li>
   </ul></li>
   </ul></li>
 </ul>

@@ -1,0 +1,6 @@
+﻿distance3d.distance.plane\_to\_box
+==================================
+
+.. currentmodule:: distance3d.distance
+
+.. autofunction:: plane_to_box

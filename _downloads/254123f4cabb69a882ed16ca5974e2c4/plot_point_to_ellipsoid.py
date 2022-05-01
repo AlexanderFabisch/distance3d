@@ -14,9 +14,7 @@ from distance3d import random, plotting
 
 
 random_state = np.random.RandomState(3)
-# TODO move to random
-ellipsoid2origin = pt.random_transform(random_state)
-radii = 1 + random_state.rand(3)
+ellipsoid2origin, radii = random.rand_ellipsoid(random_state, min_radius=0.5)
 
 ax = ppu.make_3d_axis(ax_s=2)
 

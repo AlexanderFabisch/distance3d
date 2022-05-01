@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.distance._plane &#8212; distance3d 0.2.0 documentation</title>
+    <title>distance3d.distance._plane &#8212; distance3d 0.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
@@ -36,8 +36,12 @@
           <div class="body" role="main">
             
   <h1>Source code for distance3d.distance._plane</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">..geometry</span> <span class="kn">import</span> <span class="n">hesse_normal_form</span><span class="p">,</span> <span class="n">convert_segment_to_line</span>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">..geometry</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">hesse_normal_form</span><span class="p">,</span> <span class="n">convert_segment_to_line</span><span class="p">,</span> <span class="n">line_from_pluecker</span><span class="p">,</span>
+    <span class="n">convert_rectangle_to_vertices</span><span class="p">,</span> <span class="n">convert_box_to_vertices</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="point_to_plane"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.point_to_plane.html#distance3d.distance.point_to_plane">[docs]</a><span class="k">def</span> <span class="nf">point_to_plane</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -181,6 +185,234 @@
     <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_plane</span> <span class="o">=</span> <span class="n">point_to_plane</span><span class="p">(</span>
         <span class="n">closest_point_segment</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_segment</span><span class="p">,</span> <span class="n">closest_point_plane</span></div>
+
+
+<div class="viewcode-block" id="plane_to_plane"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.plane_to_plane.html#distance3d.distance.plane_to_plane">[docs]</a><span class="k">def</span> <span class="nf">plane_to_plane</span><span class="p">(</span><span class="n">plane_point1</span><span class="p">,</span> <span class="n">plane_normal1</span><span class="p">,</span> <span class="n">plane_point2</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">,</span>
+                   <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between two planes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plane_point1 : array, shape (3,)</span>
+<span class="sd">        Point on the plane.</span>
+
+<span class="sd">    plane_normal1 : array, shape (3,)</span>
+<span class="sd">        Normal of the plane. We assume unit length.</span>
+
+<span class="sd">    plane_point2 : array, shape (3,)</span>
+<span class="sd">        Point on the plane.</span>
+
+<span class="sd">    plane_normal2 : array, shape (3,)</span>
+<span class="sd">        Normal of the plane. We assume unit length.</span>
+
+<span class="sd">    epsilon : float, optional (default: 1e-6)</span>
+<span class="sd">        Values smaller than epsilon are considered to be 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dist : float</span>
+<span class="sd">        The shortest distance between line segment and plane.</span>
+
+<span class="sd">    closest_point_plane1 : array, shape (3,)</span>
+<span class="sd">        Closest point on first plane.</span>
+
+<span class="sd">    closest_point_plane2 : array, shape (3,)</span>
+<span class="sd">        Closest point on second plane.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">line_direction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">plane_normal1</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">line_direction</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">epsilon</span><span class="p">:</span>
+        <span class="n">line_direction</span><span class="p">,</span> <span class="n">line_moment</span> <span class="o">=</span> <span class="n">plane_intersects_plane</span><span class="p">(</span>
+            <span class="n">plane_point1</span><span class="p">,</span> <span class="n">plane_normal1</span><span class="p">,</span> <span class="n">plane_point2</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">,</span>
+            <span class="n">line_direction</span><span class="o">=</span><span class="n">line_direction</span><span class="p">)</span>
+        <span class="n">line_point</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">line_from_pluecker</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">line_moment</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">line_point</span><span class="p">,</span> <span class="n">line_point</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_plane2</span> <span class="o">=</span> <span class="n">point_to_plane</span><span class="p">(</span>
+            <span class="n">plane_point1</span><span class="p">,</span> <span class="n">plane_point2</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dist</span><span class="p">,</span> <span class="n">plane_point1</span><span class="p">,</span> <span class="n">closest_point_plane2</span></div>
+
+
+<span class="k">def</span> <span class="nf">plane_intersects_plane</span><span class="p">(</span>
+        <span class="n">plane_point1</span><span class="p">,</span> <span class="n">plane_normal1</span><span class="p">,</span> <span class="n">plane_point2</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">,</span>
+        <span class="n">line_direction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">hesse_normal_form</span><span class="p">(</span><span class="n">plane_point1</span><span class="p">,</span> <span class="n">plane_normal1</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">d2</span> <span class="o">=</span> <span class="n">hesse_normal_form</span><span class="p">(</span><span class="n">plane_point2</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">line_direction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">line_direction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">plane_normal1</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">)</span>
+    <span class="n">line_moment</span> <span class="o">=</span> <span class="n">plane_normal1</span> <span class="o">*</span> <span class="n">d2</span> <span class="o">-</span> <span class="n">plane_normal2</span> <span class="o">*</span> <span class="n">d1</span>
+    <span class="k">return</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">line_moment</span>
+
+
+<div class="viewcode-block" id="plane_to_triangle"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.plane_to_triangle.html#distance3d.distance.plane_to_triangle">[docs]</a><span class="k">def</span> <span class="nf">plane_to_triangle</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between a plane and a triangle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plane_point : array, shape (3,)</span>
+<span class="sd">        Point on the plane.</span>
+
+<span class="sd">    plane_normal : array, shape (3,)</span>
+<span class="sd">        Normal of the plane. We assume unit length.</span>
+
+<span class="sd">    triangle_points : array, shape (3, 3)</span>
+<span class="sd">        Each row contains a point of the triangle (A, B, C).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dist : float</span>
+<span class="sd">        The shortest distance between triangle and plane.</span>
+
+<span class="sd">    closest_point_plane : array, shape (3,)</span>
+<span class="sd">        Closest point on plane.</span>
+
+<span class="sd">    closest_point_triangle : array, shape (3,)</span>
+<span class="sd">        Closest point on triangle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_plane_to_convex_hull_points</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_plane_to_convex_hull_points</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">points</span> <span class="o">-</span> <span class="n">plane_point</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">plane_normal</span><span class="p">)</span>
+    <span class="n">min_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+    <span class="n">max_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ts</span><span class="p">[</span><span class="n">min_idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">ts</span><span class="p">[</span><span class="n">max_idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># on opposite sides, intersection</span>
+        <span class="k">return</span> <span class="n">line_segment_to_plane</span><span class="p">(</span>
+            <span class="n">points</span><span class="p">[</span><span class="n">min_idx</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="n">max_idx</span><span class="p">],</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">)</span>
+
+    <span class="n">closest_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span>
+    <span class="n">closest_point</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">closest_idx</span><span class="p">]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">closest_idx</span><span class="p">]</span>
+    <span class="n">closest_point_plane</span> <span class="o">=</span> <span class="n">closest_point</span> <span class="o">-</span> <span class="n">t</span> <span class="o">*</span> <span class="n">plane_normal</span>
+
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">closest_point_plane</span><span class="p">,</span> <span class="n">closest_point</span>
+
+
+<div class="viewcode-block" id="plane_to_rectangle"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.plane_to_rectangle.html#distance3d.distance.plane_to_rectangle">[docs]</a><span class="k">def</span> <span class="nf">plane_to_rectangle</span><span class="p">(</span>
+        <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span>
+        <span class="n">rectangle_lengths</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between a plane and a rectangle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plane_point : array, shape (3,)</span>
+<span class="sd">        Point on the plane.</span>
+
+<span class="sd">    plane_normal : array, shape (3,)</span>
+<span class="sd">        Normal of the plane. We assume unit length.</span>
+
+<span class="sd">    rectangle_center : array, shape (3,)</span>
+<span class="sd">        Center point of the rectangle.</span>
+
+<span class="sd">    rectangle_axes : array, shape (2, 3)</span>
+<span class="sd">        Each row is a vector of unit length, indicating the direction of one</span>
+<span class="sd">        axis of the rectangle. Both vectors are orthogonal.</span>
+
+<span class="sd">    rectangle_lengths : array, shape (2,)</span>
+<span class="sd">        Lengths of the two sides of the rectangle.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dist : float</span>
+<span class="sd">        The shortest distance between rectangle and plane.</span>
+
+<span class="sd">    closest_point_plane : array, shape (3,)</span>
+<span class="sd">        Closest point on plane.</span>
+
+<span class="sd">    closest_point_rectangle : array, shape (3,)</span>
+<span class="sd">        Closest point on rectangle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">convert_rectangle_to_vertices</span><span class="p">(</span>
+        <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span> <span class="n">rectangle_lengths</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_plane_to_convex_hull_points</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plane_to_box"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.plane_to_box.html#distance3d.distance.plane_to_box">[docs]</a><span class="k">def</span> <span class="nf">plane_to_box</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between a plane and a box.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plane_point : array, shape (3,)</span>
+<span class="sd">        Point on the plane.</span>
+
+<span class="sd">    plane_normal : array, shape (3,)</span>
+<span class="sd">        Normal of the plane. We assume unit length.</span>
+
+<span class="sd">    box2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the box.</span>
+
+<span class="sd">    size : array, shape (3,)</span>
+<span class="sd">        Size of the box along its axes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dist : float</span>
+<span class="sd">        The shortest distance between rectangle and plane.</span>
+
+<span class="sd">    closest_point_plane : array, shape (3,)</span>
+<span class="sd">        Closest point on plane.</span>
+
+<span class="sd">    closest_point_box : array, shape (3,)</span>
+<span class="sd">        Closest point on box.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">convert_box_to_vertices</span><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_plane_to_convex_hull_points</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plane_to_ellipsoid"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.plane_to_ellipsoid.html#distance3d.distance.plane_to_ellipsoid">[docs]</a><span class="k">def</span> <span class="nf">plane_to_ellipsoid</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between a plane and an ellipsoid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plane_point : array, shape (3,)</span>
+<span class="sd">        Point on the plane.</span>
+
+<span class="sd">    plane_normal : array, shape (3,)</span>
+<span class="sd">        Normal of the plane. We assume unit length.</span>
+
+<span class="sd">    ellipsoid2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the ellipsoid.</span>
+
+<span class="sd">    radii : array, shape (3,)</span>
+<span class="sd">        Radii of the ellipsoid.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dist : float</span>
+<span class="sd">        The shortest distance between rectangle and plane.</span>
+
+<span class="sd">    closest_point_plane : array, shape (3,)</span>
+<span class="sd">        Closest point on plane.</span>
+
+<span class="sd">    closest_point_box : array, shape (3,)</span>
+<span class="sd">        Closest point on box.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># https://gamedev.net/forums/topic/457831-distance-between-ellipsoid-plane/4028358/</span>
+    <span class="c1"># Let the ellipsoid be represented in standard form,</span>
+    <span class="c1"># (X-C)^T*M*(X-C) = 1, where C is the center point, M is a positive</span>
+    <span class="c1"># definite matrix, and X is any point on the ellipsoid. The superscript T</span>
+    <span class="c1"># denotes the transpose operator. Let N be a normal vector to the plane.</span>
+    <span class="c1"># When the ellipsoid is not intersected by the plane, the closest and</span>
+    <span class="c1"># farthest points are</span>
+    <span class="c1"># X = C +/- M^{-1}*N/sqrt(N^T*M^{-1}*N)</span>
+    <span class="c1"># where M^{-1} is the inverse of M.</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">ellipsoid2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">_ellipsoid_quadric_matrix</span><span class="p">(</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">)</span>
+
+    <span class="n">M_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">M_inv_normal</span> <span class="o">=</span> <span class="n">M_inv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">plane_normal</span><span class="p">)</span>
+    <span class="n">extent_along_plane_normal</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">M_inv_normal</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">plane_normal</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">M_inv_normal</span><span class="p">)))</span>
+    <span class="n">point1</span> <span class="o">=</span> <span class="n">C</span> <span class="o">-</span> <span class="n">extent_along_plane_normal</span>
+    <span class="n">point2</span> <span class="o">=</span> <span class="n">C</span> <span class="o">+</span> <span class="n">extent_along_plane_normal</span>
+    <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_plane</span><span class="p">,</span> <span class="n">closest_point_ellipsoid</span> <span class="o">=</span> <span class="n">_plane_to_convex_hull_points</span><span class="p">(</span>
+        <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_plane</span><span class="p">,</span> <span class="n">closest_point_ellipsoid</span></div>
+
+
+<span class="k">def</span> <span class="nf">_ellipsoid_quadric_matrix</span><span class="p">(</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
+    <span class="n">R_scaled</span> <span class="o">=</span> <span class="n">ellipsoid2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">radii</span>
+    <span class="k">return</span> <span class="n">R_scaled</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R_scaled</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 </pre></div>
 
           </div>

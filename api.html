@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API Reference &#8212; distance3d 0.2.0 documentation</title>
+    <title>API Reference &#8212; distance3d 0.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -50,7 +50,178 @@ spheres, capsules, and convex meshes GJK is usually the fastest option if
 applicable. GJK is not applicable if one of the geometric objects is a line
 or a plane and GJK is slower when one of the objects is a point or a line
 segment.</p>
-<table class="longtable docutils align-default">
+<p>In the following table an X indicates that the distance computation between
+two geometric objects is implemented.</p>
+<table>
+  <tr>
+    <th></th>
+    <th style="transform:rotate(315deg);height: 130px;">point</th>
+    <th style="transform:rotate(315deg);height: 130px;">line</th>
+    <th style="transform:rotate(315deg);height: 130px;">line segment</th>
+    <th style="transform:rotate(315deg);height: 130px;">plane</th>
+    <th style="transform:rotate(315deg);height: 130px;">triangle</th>
+    <th style="transform:rotate(315deg);height: 130px;">rectangle</th>
+    <th style="transform:rotate(315deg);height: 130px;">circle</th>
+    <th style="transform:rotate(315deg);height: 130px;">disk</th>
+    <th style="transform:rotate(315deg);height: 130px;">box</th>
+    <th style="transform:rotate(315deg);height: 130px;">ellipsoid</th>
+    <th style="transform:rotate(315deg);height: 130px;">cylinder</th>
+  </tr>
+  <tr>
+    <td>point</td>
+    <td>-</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+  </tr>
+  <tr>
+    <td>line</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>-</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>line segment</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>-</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>plane</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+    <td>X</td>
+    <td>X</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>triangle</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>rectangle</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>circle</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>disk</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>box</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>ellipsoid</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>cylinder</td>
+    <td>X</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+</table><table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -119,8 +290,26 @@ segment.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.line_segment_to_rectangle.html#distance3d.distance.line_segment_to_rectangle" title="distance3d.distance.line_segment_to_rectangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_segment_to_rectangle</span></code></a></p></td>
 <td><p>Compute the shortest distance between line segment and rectangle.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.line_segment_to_box.html#distance3d.distance.line_segment_to_box" title="distance3d.distance.line_segment_to_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_segment_to_box</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.line_segment_to_circle.html#distance3d.distance.line_segment_to_circle" title="distance3d.distance.line_segment_to_circle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_segment_to_circle</span></code></a></p></td>
+<td><p>Compute the shortest distance between line segment and circle.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.line_segment_to_box.html#distance3d.distance.line_segment_to_box" title="distance3d.distance.line_segment_to_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_segment_to_box</span></code></a></p></td>
 <td><p>Compute the shortest distance from line segment to box.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.plane_to_plane.html#distance3d.distance.plane_to_plane" title="distance3d.distance.plane_to_plane"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plane_to_plane</span></code></a></p></td>
+<td><p>Compute the shortest distance between two planes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.plane_to_triangle.html#distance3d.distance.plane_to_triangle" title="distance3d.distance.plane_to_triangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plane_to_triangle</span></code></a></p></td>
+<td><p>Compute the shortest distance between a plane and a triangle.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.plane_to_rectangle.html#distance3d.distance.plane_to_rectangle" title="distance3d.distance.plane_to_rectangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plane_to_rectangle</span></code></a></p></td>
+<td><p>Compute the shortest distance between a plane and a rectangle.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.plane_to_box.html#distance3d.distance.plane_to_box" title="distance3d.distance.plane_to_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plane_to_box</span></code></a></p></td>
+<td><p>Compute the shortest distance between a plane and a box.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.plane_to_ellipsoid.html#distance3d.distance.plane_to_ellipsoid" title="distance3d.distance.plane_to_ellipsoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plane_to_ellipsoid</span></code></a></p></td>
+<td><p>Compute the shortest distance between a plane and an ellipsoid.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.triangle_to_triangle.html#distance3d.distance.triangle_to_triangle" title="distance3d.distance.triangle_to_triangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triangle_to_triangle</span></code></a></p></td>
 <td><p>Compute the shortest distance between two triangles.</p></td>
@@ -272,6 +461,9 @@ segment.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.hesse_normal_form.html#distance3d.geometry.hesse_normal_form" title="distance3d.geometry.hesse_normal_form"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hesse_normal_form</span></code></a></p></td>
 <td><p>Computes Hesse normal form of a plane.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.line_from_pluecker.html#distance3d.geometry.line_from_pluecker" title="distance3d.geometry.line_from_pluecker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_from_pluecker</span></code></a></p></td>
+<td><p>Computes line from Plücker coordinates.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -284,6 +476,9 @@ segment.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.self_collision.detect.html#distance3d.self_collision.detect" title="distance3d.self_collision.detect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detect</span></code></a></p></td>
+<td><p>Detect self collisions of a robot represented by a BVH.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.self_collision.detect_any.html#distance3d.self_collision.detect_any" title="distance3d.self_collision.detect_any"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detect_any</span></code></a></p></td>
 <td><p>Detect self collisions of a robot represented by a BVH.</p></td>
 </tr>
 </tbody>
@@ -367,13 +562,16 @@ segment.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_capsule.html#distance3d.random.rand_capsule" title="distance3d.random.rand_capsule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_capsule</span></code></a></p></td>
 <td><p>Sample capsule.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_cylinder.html#distance3d.random.rand_cylinder" title="distance3d.random.rand_cylinder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_cylinder</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_ellipsoid.html#distance3d.random.rand_ellipsoid" title="distance3d.random.rand_ellipsoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_ellipsoid</span></code></a></p></td>
+<td><p>Sample ellipsoid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_cylinder.html#distance3d.random.rand_cylinder" title="distance3d.random.rand_cylinder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_cylinder</span></code></a></p></td>
 <td><p>Sample cylinder.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_sphere.html#distance3d.random.rand_sphere" title="distance3d.random.rand_sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_sphere</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_sphere.html#distance3d.random.rand_sphere" title="distance3d.random.rand_sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_sphere</span></code></a></p></td>
 <td><p>Sample sphere.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.random.randn_convex.html#distance3d.random.randn_convex" title="distance3d.random.randn_convex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randn_convex</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.random.randn_convex.html#distance3d.random.randn_convex" title="distance3d.random.randn_convex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randn_convex</span></code></a></p></td>
 <td><p>Sample convex mesh.</p></td>
 </tr>
 </tbody>

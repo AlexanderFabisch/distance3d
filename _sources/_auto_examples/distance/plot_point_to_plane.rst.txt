@@ -150039,7 +150039,7 @@ Distance from point to plane
     1.1289977903487023
     3.0472637005226924
     2.0379173746805725
-    accumulated_time=1.1583623886108398
+    accumulated_time=1.0634920597076416
 
 
 
@@ -150068,13 +150068,13 @@ Distance from point to plane
     for i in range(150000):
         point = random.randn_point(random_state)
         start = time.time()
-        dist, contact_point = point_to_plane(point, plane_point, plane_normal)
+        dist, closest_point = point_to_plane(point, plane_point, plane_normal)
         end = time.time()
         accumulated_time += end - start
         print(dist)
         if i > 10:
             continue
-        plotting.plot_segment(ax, point, contact_point, lw=1)
+        plotting.plot_segment(ax, point, closest_point, lw=1)
     print(f"{accumulated_time=}")
 
     plotting.plot_plane(
@@ -150085,7 +150085,7 @@ Distance from point to plane
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.750 seconds)
+   **Total running time of the script:** ( 0 minutes  5.378 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_plane.py:

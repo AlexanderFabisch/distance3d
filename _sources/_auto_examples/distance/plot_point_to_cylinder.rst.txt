@@ -25039,7 +25039,7 @@ Distance from point to cylinder
     5.551115123125783e-17
     0.3356825577043006
     1.1102230246251565e-16
-    accumulated_time=0.9648611545562744
+    accumulated_time=0.9392616748809814
 
 
 
@@ -25085,7 +25085,7 @@ Distance from point to cylinder
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.996 seconds)
+   **Total running time of the script:** ( 0 minutes  1.958 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_cylinder.py:

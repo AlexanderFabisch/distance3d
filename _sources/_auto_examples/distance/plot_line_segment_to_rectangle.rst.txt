@@ -5539,7 +5539,7 @@ Distance from line segment to rectangle
     0.0
     0.03694754962283033
     2.0670401648134558
-    accumulated_time=0.995002031326294
+    accumulated_time=0.9929940700531006
 
 
 
@@ -5587,7 +5587,7 @@ Distance from line segment to rectangle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.350 seconds)
+   **Total running time of the script:** ( 0 minutes  1.347 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_segment_to_rectangle.py:

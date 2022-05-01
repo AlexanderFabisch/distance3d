@@ -85039,7 +85039,7 @@ Distance from line to line
     0.10504011599776458
     0.9547529759248472
     0.3154815721103556
-    accumulated_time=1.1548399925231934
+    accumulated_time=1.0949838161468506
 
 
 
@@ -85087,7 +85087,7 @@ Distance from line to line
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.010 seconds)
+   **Total running time of the script:** ( 0 minutes  4.857 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_to_line.py:

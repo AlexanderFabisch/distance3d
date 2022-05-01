@@ -7539,7 +7539,7 @@ Distance from line to triangle
     2.2969670679039456
     2.978331338977724
     2.315607292090072
-    accumulated_time=0.992504358291626
+    accumulated_time=0.9957780838012695
 
 
 
@@ -7586,7 +7586,7 @@ Distance from line to triangle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.436 seconds)
+   **Total running time of the script:** ( 0 minutes  1.447 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_to_triangle.py:

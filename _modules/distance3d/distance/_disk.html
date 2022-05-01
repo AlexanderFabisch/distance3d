@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.distance._disk &#8212; distance3d 0.2.0 documentation</title>
+    <title>distance3d.distance._disk &#8212; distance3d 0.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
@@ -38,8 +38,9 @@
   <h1>Source code for distance3d.distance._disk</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">..geometry</span> <span class="kn">import</span> <span class="n">hesse_normal_form</span>
+<span class="kn">from</span> <span class="nn">..geometry</span> <span class="kn">import</span> <span class="n">line_from_pluecker</span>
 <span class="kn">from</span> <span class="nn">._line</span> <span class="kn">import</span> <span class="n">point_to_line</span>
+<span class="kn">from</span> <span class="nn">._plane</span> <span class="kn">import</span> <span class="n">plane_intersects_plane</span>
 
 
 <div class="viewcode-block" id="point_to_disk"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.point_to_disk.html#distance3d.distance.point_to_disk">[docs]</a><span class="k">def</span> <span class="nf">point_to_disk</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">normal</span><span class="p">):</span>
@@ -136,7 +137,7 @@
     <span class="c1"># (1) test intersection first (source: https://stackoverflow.com/a/67116330/915743)</span>
     <span class="c1"># Plücker coordinates of intersection line</span>
     <span class="n">line_direction</span><span class="p">,</span> <span class="n">line_moment</span> <span class="o">=</span> <span class="n">plane_intersects_plane</span><span class="p">(</span><span class="n">center1</span><span class="p">,</span> <span class="n">normal1</span><span class="p">,</span> <span class="n">center2</span><span class="p">,</span> <span class="n">normal2</span><span class="p">)</span>
-    <span class="n">line_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">line_moment</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">)</span>
+    <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span> <span class="o">=</span> <span class="n">line_from_pluecker</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">line_moment</span><span class="p">)</span>
     <span class="n">h1</span><span class="p">,</span> <span class="n">p1</span> <span class="o">=</span> <span class="n">point_to_line</span><span class="p">(</span><span class="n">center1</span><span class="p">,</span> <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">)</span>
     <span class="n">h2</span><span class="p">,</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">point_to_line</span><span class="p">(</span><span class="n">center2</span><span class="p">,</span> <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">)</span>
     <span class="n">ell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span>
@@ -164,16 +165,6 @@
             <span class="k">break</span>
         <span class="n">prev_dist</span> <span class="o">=</span> <span class="n">dist</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">contact_point_disk2</span> <span class="o">-</span> <span class="n">contact_point_disk1</span><span class="p">),</span> <span class="n">contact_point_disk1</span><span class="p">,</span> <span class="n">contact_point_disk2</span></div>
-
-
-<span class="c1"># TODO find a better place</span>
-<span class="k">def</span> <span class="nf">plane_intersects_plane</span><span class="p">(</span>
-        <span class="n">plane_point1</span><span class="p">,</span> <span class="n">plane_normal1</span><span class="p">,</span> <span class="n">plane_point2</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">):</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">d1</span> <span class="o">=</span> <span class="n">hesse_normal_form</span><span class="p">(</span><span class="n">plane_point1</span><span class="p">,</span> <span class="n">plane_normal1</span><span class="p">)</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">d2</span> <span class="o">=</span> <span class="n">hesse_normal_form</span><span class="p">(</span><span class="n">plane_point2</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">)</span>
-    <span class="n">line_direction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">plane_normal1</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">)</span>
-    <span class="n">line_moment</span> <span class="o">=</span> <span class="n">plane_normal1</span> <span class="o">*</span> <span class="n">d2</span> <span class="o">-</span> <span class="n">plane_normal2</span> <span class="o">*</span> <span class="n">d1</span>
-    <span class="k">return</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">line_moment</span>
 </pre></div>
 
           </div>

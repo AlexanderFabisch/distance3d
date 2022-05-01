@@ -81,7 +81,7 @@ Distance between cylinders with GJK
     0.0
     0.0
     0.6533456316077505
-    0.6467068084800425
+    0.6467068084800419
     0.539375441638451
     0.036086172925146584
     1.782235768387383
@@ -453,7 +453,7 @@ Distance between cylinders with GJK
     1.691626338698764
     0.0
     0.4786014096696131
-    0.4676495430874905
+    0.4676495430874907
     1.4594610758751545
     0.1264619742204717
     0.0
@@ -467,7 +467,7 @@ Distance between cylinders with GJK
     0.2731947757756465
     1.3573054540843839
     1.767508005438434
-    0.7920473800122849
+    0.7920473800122851
     0.029538774817929932
     0.4067060139917001
     1.3311402758047115
@@ -739,7 +739,7 @@ Distance between cylinders with GJK
     0.23022978416072926
     0.2566507061203936
     0.0
-    accumulated_time=0.9018611907958984
+    accumulated_time=0.874779462814331
 
 
 
@@ -790,7 +790,7 @@ Distance between cylinders with GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.087 seconds)
+   **Total running time of the script:** ( 0 minutes  1.061 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_cylinder.py:

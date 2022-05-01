@@ -6539,7 +6539,7 @@ Distance from line segment to triangle
     1.7689653318784027
     0.0
     1.2693605406861288
-    accumulated_time=1.0248489379882812
+    accumulated_time=0.96846604347229
 
 
 
@@ -6586,7 +6586,7 @@ Distance from line segment to triangle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.445 seconds)
+   **Total running time of the script:** ( 0 minutes  1.365 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_segment_to_triangle.py:
