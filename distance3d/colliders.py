@@ -99,7 +99,7 @@ class BoundingVolumeHierarchy:
 
         Parameters
         ----------
-        frame : str
+        frame : Hashable
             Frame in which the collider is located.
 
         collider : ConvexCollider
