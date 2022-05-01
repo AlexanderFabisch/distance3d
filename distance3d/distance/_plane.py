@@ -322,7 +322,7 @@ def plane_to_box(plane_point, plane_normal, box2origin, size):
 
 
 def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
-    """Compute the shortest distance between a plane and a box.
+    """Compute the shortest distance between a plane and an ellipsoid.
 
     Parameters
     ----------
