@@ -85,7 +85,8 @@ def plot_triangle(ax, triangle_points, surface_alpha=0.1):
     ax.plot(triangle_points[:, 0], triangle_points[:, 1], triangle_points[:, 2])
 
 
-def plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths, show_axes=True, surface_alpha=0.1):
+def plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths,
+                   show_axes=True, surface_alpha=0.1):
     """Plot rectangle.
 
     Parameters
@@ -110,11 +111,16 @@ def plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths, show
         Alpha value of the rectangle surface.
     """
     rectangle_points = np.vstack((
-        rectangle_center + -0.5 * rectangle_axes[0] * rectangle_lengths[0] + -0.5 * rectangle_axes[1] * rectangle_lengths[1],
-        rectangle_center + 0.5 * rectangle_axes[0] * rectangle_lengths[0] + -0.5 * rectangle_axes[1] * rectangle_lengths[1],
-        rectangle_center + 0.5 * rectangle_axes[0] * rectangle_lengths[0] + 0.5 * rectangle_axes[1] * rectangle_lengths[1],
-        rectangle_center + -0.5 * rectangle_axes[0] * rectangle_lengths[0] + 0.5 * rectangle_axes[1] * rectangle_lengths[1],
-        rectangle_center + -0.5 * rectangle_axes[0] * rectangle_lengths[0] + -0.5 * rectangle_axes[1] * rectangle_lengths[1],
+        rectangle_center + -0.5 * rectangle_axes[0] * rectangle_lengths[0]
+        + -0.5 * rectangle_axes[1] * rectangle_lengths[1],
+        rectangle_center + 0.5 * rectangle_axes[0] * rectangle_lengths[0]
+        + -0.5 * rectangle_axes[1] * rectangle_lengths[1],
+        rectangle_center + 0.5 * rectangle_axes[0] * rectangle_lengths[0]
+        + 0.5 * rectangle_axes[1] * rectangle_lengths[1],
+        rectangle_center + -0.5 * rectangle_axes[0] * rectangle_lengths[0]
+        + 0.5 * rectangle_axes[1] * rectangle_lengths[1],
+        rectangle_center + -0.5 * rectangle_axes[0] * rectangle_lengths[0]
+        + -0.5 * rectangle_axes[1] * rectangle_lengths[1],
     ))
 
     vertices = np.vstack((
@@ -127,7 +133,8 @@ def plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths, show
     rectangle.set_alpha(surface_alpha)
     ax.add_collection3d(rectangle)
 
-    ax.plot(rectangle_points[:, 0], rectangle_points[:, 1], rectangle_points[:, 2])
+    ax.plot(rectangle_points[:, 0], rectangle_points[:, 1],
+            rectangle_points[:, 2])
     ax.scatter(rectangle_center[0], rectangle_center[1], rectangle_center[2])
     if show_axes:
         ppu.plot_vector(
@@ -138,7 +145,8 @@ def plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths, show
             s=0.5 * rectangle_lengths[1], color="g")
 
 
-def plot_circle(ax, center, radius, normal, show_normal=False):
+def plot_circle(ax, center, radius, normal, show_normal=False,
+                surface_alpha=0.1):
     """Plot circle.
 
     Parameters
@@ -157,13 +165,28 @@ def plot_circle(ax, center, radius, normal, show_normal=False):
 
     show_normal : bool, optional (default: False)
         Display normal of the circle plane.
+
+    surface_alpha : float, optional (default: 0.1)
+        Alpha value of the circle surface.
     """
     ax.scatter(center[0], center[1], center[2])
     u, v = pr.plane_basis_from_normal(normal)
     R = np.column_stack((u, v, normal))
-    circle = np.array([center + R.dot(pr.matrix_from_angle(2, angle)).dot([radius, 0, 0])
-                       for angle in np.linspace(0, 2 * np.pi, 20)])
+    circle = np.array([
+        center + R.dot(pr.matrix_from_angle(2, angle)).dot([radius, 0, 0])
+        for angle in np.linspace(0, 2 * np.pi, 20)])
     ax.plot(circle[:, 0], circle[:, 1], circle[:, 2])
+
+    vertices = np.array([
+        [circle[i], circle[j], center]
+        for i, j in zip(range(len(circle) - 1), range(1, len(circle)))])
+    try:  # Matplotlib < 3.5
+        surface = mplot3d.art3d.Poly3DCollection(vertices)
+    except ValueError:  # Matplotlib >= 3.5
+        surface = mplot3d.art3d.Poly3DCollection(vertices.reshape(-1, 3, 3))
+    surface.set_alpha(surface_alpha)
+    ax.add_collection3d(surface)
+
     if show_normal:
         ppu.plot_vector(ax=ax, start=center, direction=normal, s=1.0)
 
