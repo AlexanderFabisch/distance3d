@@ -98,7 +98,6 @@ def epa(simplex, collider1, collider2, max_iter=64, max_loose_edges=32, max_face
 
         if np.dot(new_point, search_direction) - min_dist < epsilon:
             # Convergence: new point is not significantly further from origin.
-            # Dot product vertex with normal to resolve collision along normal.
             mtv = closest_face[3] * np.dot(new_point, search_direction)
             return mtv, faces.faces[:faces.n_faces], True
 
