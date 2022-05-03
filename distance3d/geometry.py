@@ -200,7 +200,7 @@ def capsule_extreme_along_direction(
 
     You can find similar implementations here:
 
-    * https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L42/kevinmoran/GJK/blob/master/Collider.h#L42
+    * https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L57
       (Copyright (c) 2017 Kevin Moran, MIT License or Unlicense)
     * https://github.com/bulletphysics/bullet3/blob/e306b274f1885f32b7e9d65062aa942b398805c2/src/BulletCollision/CollisionShapes/btConvexShape.cpp#L228
       (Copyright (c) 2003-2009 Erwin Coumans, zlib license)
