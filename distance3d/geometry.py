@@ -228,7 +228,6 @@ def capsule_extreme_along_direction(
 
     s = math.sqrt(local_dir[0] * local_dir[0] + local_dir[1] * local_dir[1]
                   + local_dir[2] * local_dir[2])
-    # TODO error with axis-aligned capsules?
     if s == 0.0:
         local_vertex = np.array([radius, 0, 0])
     else:
