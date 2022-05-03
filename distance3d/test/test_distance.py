@@ -1028,54 +1028,63 @@ def test_rectangle_to_box():
 
 
 def test_disk_to_disk():
-    center1 = np.array([0, 0, 0])
+    center1 = np.array([0, 0, 0], dtype=float)
     radius1 = 1.0
-    normal1 = np.array([0, 0, 1])
+    normal1 = np.array([0, 0, 1], dtype=float)
     dist, closest_point1, closest_point2 = disk_to_disk(
         center1, radius1, normal1, center1, radius1, normal1)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point1, np.array([0, 0, 0]))
     assert_array_almost_equal(closest_point2, np.array([0, 0, 0]))
 
-    center2 = np.array([0, 0, 1])
+    center2 = np.array([3, 0, 0], dtype=float)
     radius2 = 1.0
-    normal2 = np.array([0, 0, 1])
+    normal2 = np.array([0, 0, 1], dtype=float)
+    dist, closest_point1, closest_point2 = disk_to_disk(
+        center1, radius1, normal1, center2, radius2, normal2)
+    assert approx(dist) == 1
+    assert_array_almost_equal(closest_point1, np.array([1, 0, 0]))
+    assert_array_almost_equal(closest_point2, np.array([2, 0, 0]))
+
+    center2 = np.array([0, 0, 1], dtype=float)
+    radius2 = 1.0
+    normal2 = np.array([0, 0, 1], dtype=float)
     dist, closest_point1, closest_point2 = disk_to_disk(
         center1, radius1, normal1, center2, radius2, normal2)
     assert approx(dist) == 1
     assert_array_almost_equal(closest_point1, np.array([0, 0, 0]))
     assert_array_almost_equal(closest_point2, np.array([0, 0, 1]))
 
-    center2 = np.array([0, 0, 1])
+    center2 = np.array([0, 0, 1], dtype=float)
     radius2 = 1.0
-    normal2 = np.array([1, 0, 0])
+    normal2 = np.array([1, 0, 0], dtype=float)
     dist, closest_point1, closest_point2 = disk_to_disk(
         center1, radius1, normal1, center2, radius2, normal2)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point1, np.array([0, 0, 0]))
     assert_array_almost_equal(closest_point2, np.array([0, 0, 0]))
 
-    center2 = np.array([0, 0, 0.5])
+    center2 = np.array([0, 0, 0.5], dtype=float)
     radius2 = 1.0
-    normal2 = np.array([1, 0, 0])
+    normal2 = np.array([1, 0, 0], dtype=float)
     dist, closest_point1, closest_point2 = disk_to_disk(
         center1, radius1, normal1, center2, radius2, normal2)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point1, np.array([0, 0, 0]))
     assert_array_almost_equal(closest_point2, np.array([0, 0, 0]))
 
-    center2 = np.array([0.5, 0.5, 0])
+    center2 = np.array([0.5, 0.5, 0], dtype=float)
     radius2 = 1.0
-    normal2 = norm_vector(np.array([1, 1, 0]))
+    normal2 = norm_vector(np.array([1, 1, 0], dtype=float))
     dist, closest_point1, closest_point2 = disk_to_disk(
         center1, radius1, normal1, center2, radius2, normal2)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point1, np.array([0.5, 0.5, 0]))
     assert_array_almost_equal(closest_point2, np.array([0.5, 0.5, 0]))
 
-    center2 = np.array([0, 2, 0])
+    center2 = np.array([0, 2, 0], dtype=float)
     radius2 = 1.0
-    normal2 = np.array([1, 0, 0])
+    normal2 = np.array([1, 0, 0], dtype=float)
     dist, closest_point1, closest_point2 = disk_to_disk(
         center1, radius1, normal1, center2, radius2, normal2)
     assert approx(dist) == 0

@@ -3,6 +3,7 @@ import numpy as np
 from ..geometry import line_from_pluecker
 from ._line import point_to_line
 from ._plane import plane_intersects_plane
+from ..utils import norm_vector
 
 
 def point_to_disk(point, center, radius, normal):
@@ -99,6 +100,16 @@ def disk_to_disk(center1, radius1, normal1, center2, radius2, normal2, epsilon=1
     # (1) test intersection first (source: https://stackoverflow.com/a/67116330/915743)
     # Plücker coordinates of intersection line
     line_direction, line_moment = plane_intersects_plane(center1, normal1, center2, normal2)
+
+    # Special case: disks lie in the same plane
+    if (np.dot(line_direction, line_direction) < epsilon
+            and np.dot(line_moment, line_moment) < epsilon):
+        direction_disk1_to_disk2 = norm_vector(center2 - center1)
+        closest_point_1 = center1 + radius1 * direction_disk1_to_disk2
+        closest_point_2 = center2 - radius2 * direction_disk1_to_disk2
+        return (np.linalg.norm(closest_point_2 - closest_point_1),
+                closest_point_1, closest_point_2)
+
     line_point, line_direction = line_from_pluecker(line_direction, line_moment)
     h1, p1 = point_to_line(center1, line_point, line_direction)
     h2, p2 = point_to_line(center2, line_point, line_direction)
@@ -107,7 +118,8 @@ def disk_to_disk(center1, radius1, normal1, center2, radius2, normal2, epsilon=1
     if abs(h) > epsilon:
         t1 = h1 * ell / h
         closest_to_both_disks = p1 - line_direction * t1
-        if np.linalg.norm(closest_to_both_disks - center1) < radius1 and np.linalg.norm(closest_to_both_disks - center2) < radius2:
+        if (np.linalg.norm(closest_to_both_disks - center1) < radius1
+                and np.linalg.norm(closest_to_both_disks - center2) < radius2):
             return 0.0, closest_to_both_disks, closest_to_both_disks
     elif ell <= radius1 + radius2:  # both centers are on the common line
         closest = 0.5 * (center1 + center2)

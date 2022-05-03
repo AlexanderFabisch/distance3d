@@ -285,7 +285,10 @@ def line_from_pluecker(line_direction, line_moment):
     line_direction : array, shape (3,)
         Direction of the line. This is assumed to be of unit length.
     """
+    line_point = np.cross(line_direction, line_moment)
+    line_direction = line_direction
     line_dir_norm_squared = np.dot(line_direction, line_direction)
-    line_point = np.cross(line_direction, line_moment) / line_dir_norm_squared
-    line_direction = line_direction / math.sqrt(line_dir_norm_squared)
+    if line_dir_norm_squared > 0.0:
+        line_point /= line_dir_norm_squared
+        line_direction /= math.sqrt(line_dir_norm_squared)
     return line_point, line_direction
