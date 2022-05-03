@@ -47,6 +47,12 @@ def test_gjk_spheres():
 
 def test_gjk_capsules():
     capsule1 = colliders.Capsule(np.eye(4), 1, 1)
+    dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+        capsule1, capsule1)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point1, np.array([1, 0, 0]))
+    assert_array_almost_equal(closest_point2, np.array([1, 0, 0]))
+
     A2B = np.eye(4)
     A2B[:3, 3] = np.array([3, 0, 0])
     capsule2 = colliders.Capsule(A2B, 1, 1)
