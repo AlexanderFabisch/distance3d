@@ -343,7 +343,13 @@ def _line_segment_to_circle(segment_start, segment_end, center, radius, normal):
     dist, closest_point_segment, closest_point_circle = line_to_circle(
         segment_start, segment_direction, center, radius, normal)
 
-    t = np.nanmean((closest_point_segment - segment_start) / segment_direction)
+    comparison_dimensions = np.where(segment_direction != 0.0)[0]
+    assert len(comparison_dimensions) > 0
+    comparison_dimension = comparison_dimensions[0]
+    t = ((closest_point_segment[comparison_dimension]
+          - segment_start[comparison_dimension])
+         / segment_direction[comparison_dimension])
+
     if t < 0.0:
         dist, closest_point_circle = point_to_circle(
             segment_start, center, radius, normal)
