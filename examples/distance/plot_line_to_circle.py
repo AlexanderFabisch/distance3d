@@ -35,5 +35,5 @@ for i in range(5000):
     plotting.plot_line(ax, line_point, line_direction)
 print(f"{accumulated_time=}")
 
-plotting.plot_circle(ax, center, radius, normal)
+plotting.plot_circle(ax, center, radius, normal, surface_alpha=0)
 plt.show()

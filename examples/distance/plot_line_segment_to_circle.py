@@ -34,5 +34,5 @@ for i in range(3500):
     plotting.plot_segment(ax, segment_start, segment_end)
 print(f"{accumulated_time=}")
 
-plotting.plot_circle(ax, center, radius, normal)
+plotting.plot_circle(ax, center, radius, normal, surface_alpha=0)
 plt.show()

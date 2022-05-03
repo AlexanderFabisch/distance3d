@@ -35,5 +35,5 @@ for i in range(65000):
 print(f"{accumulated_time=}")
 
 ax.scatter(center[0], center[1], center[2])
-plotting.plot_circle(ax, center, radius, normal)
+plotting.plot_circle(ax, center, radius, normal, surface_alpha=0)
 plt.show()
