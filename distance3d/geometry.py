@@ -186,11 +186,11 @@ def cylinder_extreme_along_direction(
         z = -0.5 * length
     else:
         z = 0.5 * length
-    if s != 0.0:
+    if s == 0.0:
+        local_vertex = np.array([radius, 0.0, z])
+    else:
         d = radius / s
         local_vertex = np.array([local_dir[0] * d, local_dir[1] * d, z])
-    else:
-        local_vertex = np.array([radius, 0.0, z])
     return cylinder2origin[:3, 3] + np.dot(cylinder2origin[:3, :3], local_vertex)
 
 
