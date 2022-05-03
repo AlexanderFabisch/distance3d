@@ -45,6 +45,33 @@ def test_gjk_spheres():
     assert_array_almost_equal(closest_point2, np.array([0, 0, 2]))
 
 
+def test_gjk_cylinders():
+    cylinder1 = colliders.Cylinder(np.eye(4), 1, 1)
+    dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+        cylinder1, cylinder1)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point1, np.array([1, 0, 0.5]))
+    assert_array_almost_equal(closest_point2, np.array([1, 0, 0.5]))
+
+    A2B = np.eye(4)
+    A2B[:3, 3] = np.array([3, 0, 0])
+    cylinder2 = colliders.Cylinder(A2B, 1, 1)
+    dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+        cylinder1, cylinder2)
+    assert approx(dist) == 1
+    assert_array_almost_equal(closest_point1, np.array([1, 0, 0.5]))
+    assert_array_almost_equal(closest_point2, np.array([2, 0, 0.5]))
+
+    A2B = np.eye(4)
+    A2B[:3, 3] = np.array([0, 0, 4])
+    cylinder2 = colliders.Cylinder(A2B, 1, 1)
+    dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+        cylinder1, cylinder2)
+    assert approx(dist) == 3
+    assert_array_almost_equal(closest_point1, np.array([1, 0, 0.5]))
+    assert_array_almost_equal(closest_point2, np.array([1, 0, 3.5]))
+
+
 def test_gjk_capsules():
     capsule1 = colliders.Capsule(np.eye(4), 1, 1)
     dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
