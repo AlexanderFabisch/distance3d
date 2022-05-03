@@ -785,6 +785,16 @@ def test_line_segment_to_circle():
     assert_array_almost_equal(closest_point_segment, np.array([1, 0, -0.5]))
     assert_array_almost_equal(closest_point_circle, np.array([1, 0, 0]))
 
+    segment_start = np.array([1, -1, -1], dtype=float)
+    segment_end = np.array([1, 1, -0.5], dtype=float)
+    dist, closest_point_segment, closest_point_circle = line_segment_to_circle(
+        segment_start, segment_end, center, radius, normal)
+    assert approx(dist) == 0.6154234857626465
+    assert_array_almost_equal(
+        closest_point_segment, np.array([1, 0.731618, -0.567096]))
+    assert_array_almost_equal(
+        closest_point_circle, np.array([0.807065, 0.590463, 0]))
+
 
 def test_line_segment_to_box():
     box2origin = np.array([
