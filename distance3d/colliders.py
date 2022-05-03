@@ -75,7 +75,8 @@ class BoundingVolumeHierarchy:
                 warnings.warn(str(e))
 
         if fill_self_collision_whitelists:
-            self.self_collision_whitelists_ = self_collision_whitelists(tm)
+            self.self_collision_whitelists_.update(
+                self_collision_whitelists(tm))
 
     def _make_collider(self, tm, obj, make_artists):
         A2B = tm.get_transform(obj.frame, self.base_frame)
