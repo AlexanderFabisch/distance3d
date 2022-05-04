@@ -5,6 +5,42 @@ from numpy.testing import assert_array_almost_equal
 
 
 def test_gjk_boxes():
+    box2origin = np.eye(4)
+    size = np.ones(3)
+    box_collider = colliders.Box(box2origin, size)
+
+    # complete overlap
+    dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+        box_collider, box_collider)
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point1, np.array([-0.5, -0.5, -0.5]))
+    assert_array_almost_equal(closest_point1, closest_point2)
+
+    # touching faces, edges, or points
+    for dim1 in range(3):
+        for dim2 in range(3):
+            for dim3 in range(3):
+                for sign1 in [-1, 1]:
+                    for sign2 in [-1, 1]:
+                        for sign3 in [-1, 1]:
+                            box2origin2 = np.eye(4)
+                            box2origin2[dim1, 3] = sign1
+                            box2origin2[dim2, 3] = sign2
+                            box2origin2[dim3, 3] = sign3
+                            size2 = np.ones(3)
+                            box_collider2 = colliders.Box(box2origin2, size2)
+
+                            dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+                                box_collider, box_collider2)
+                            assert approx(dist) == 0.0
+                            expected = -0.5 * np.ones(3)
+                            expected[dim1] = 0.5 * sign1
+                            expected[dim2] = 0.5 * sign2
+                            expected[dim3] = 0.5 * sign3
+                            assert_array_almost_equal(closest_point1, expected)
+                            assert_array_almost_equal(
+                                closest_point1, closest_point2)
+
     box2origin = np.array([
         [-0.29265666, -0.76990535, 0.56709596, 0.1867558],
         [0.93923897, -0.12018753, 0.32153556, -0.09772779],
@@ -19,9 +55,9 @@ def test_gjk_boxes():
         [-0.17939408, 0.62673815, 0.75829879, 1.90017684],
         [0., 0., 0., 1.]])
     size2 = np.array([0.96366276, 0.38344152, 0.79172504])
-
     box_collider2 = colliders.Box(box2origin2, size2)
-    dist, closest_point_box, closest_point_box2, _ = gjk.gjk_with_simplex(
+
+    dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
         box_collider, box_collider2)
 
     assert approx(dist) == 1.7900192730149391
@@ -29,6 +65,12 @@ def test_gjk_boxes():
 
 def test_gjk_spheres():
     sphere1 = colliders.Sphere(center=np.array([0, 0, 0]), radius=1.0)
+    dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+        sphere1, sphere1)
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point1, np.array([0, 0, 1]))
+    assert_array_almost_equal(closest_point1, closest_point2)
+
     sphere2 = colliders.Sphere(center=np.array([1, 1, 1]), radius=1.0)
     dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
         sphere1, sphere2)
@@ -99,7 +141,7 @@ def test_gjk_capsules():
     assert_array_almost_equal(closest_point2, np.array([0, 0, 2.5]))
 
 
-def test_gjk_convex():
+def test_gjk_points():
     random_state = np.random.RandomState(23)
 
     for _ in range(50):
