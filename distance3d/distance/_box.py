@@ -7,7 +7,7 @@ from ._line_to_box import _line_to_box
 from ._rectangle import rectangle_to_rectangle
 
 
-def point_to_box(point, box2origin, size, origin2box=None, check=False):
+def point_to_box(point, box2origin, size, check=False):
     """Compute the shortest distance between point and box.
 
     Parameters
@@ -21,9 +21,6 @@ def point_to_box(point, box2origin, size, origin2box=None, check=False):
     size : array, shape (3,)
         Size of the box along its axes.
 
-    origin2box : array, shape (4, 4), optional (default: None)
-        Transform from origin to box coordinates.
-
     check : bool, optional (default: True)
         Check if transformation matrix is valid before inversion.
 
@@ -35,8 +32,7 @@ def point_to_box(point, box2origin, size, origin2box=None, check=False):
     closest_point_box : array, shape (3,)
         Closest point on box.
     """
-    if origin2box is None:
-        origin2box = pt.invert_transform(box2origin, check=check)
+    origin2box = pt.invert_transform(box2origin, check=check)
     point_in_box = origin2box[:3, 3] + origin2box[:3, :3].dot(point)
     half_size = 0.5 * size
     closest_point_in_box = np.clip(point_in_box, -half_size, half_size)
@@ -75,7 +71,7 @@ def line_to_box(line_point, line_direction, box2origin, size):
     return _line_to_box(line_point, line_direction, box2origin, size)[:3]
 
 
-def line_segment_to_box(segment_start, segment_end, box2origin, size, origin2box=None):
+def line_segment_to_box(segment_start, segment_end, box2origin, size):
     """Compute the shortest distance from line segment to box.
 
     Parameters
@@ -92,9 +88,6 @@ def line_segment_to_box(segment_start, segment_end, box2origin, size, origin2box
     size : array, shape (3,)
         Size of the box along its axes.
 
-    origin2box : array, shape (4, 4), optional (default: None)
-        Transform from origin to box coordinates.
-
     Returns
     -------
     distance : float
@@ -110,22 +103,22 @@ def line_segment_to_box(segment_start, segment_end, box2origin, size, origin2box
         segment_start, segment_end)
 
     distance, closest_point_segment, closest_point_box, t_closest = _line_to_box(
-        segment_start, segment_direction, box2origin, size, origin2box=origin2box)
+        segment_start, segment_direction, box2origin, size)
 
     if t_closest < 0:
         distance, closest_point_box = point_to_box(
-            segment_start, box2origin, size, origin2box=origin2box)
+            segment_start, box2origin, size)
         closest_point_segment = segment_start
     elif t_closest > segment_length:
         distance, closest_point_box = point_to_box(
-            segment_end, box2origin, size, origin2box=origin2box)
+            segment_end, box2origin, size)
         closest_point_segment = segment_end
 
     return distance, closest_point_segment, closest_point_box
 
 
 def rectangle_to_box(rectangle_center, rectangle_axes, rectangle_lengths,
-                     box2origin, size, epsilon=1e-6, origin2box=None):
+                     box2origin, size, epsilon=1e-6):
     """Compute the shortest distance from rectangle to box.
 
     Parameters
@@ -149,9 +142,6 @@ def rectangle_to_box(rectangle_center, rectangle_axes, rectangle_lengths,
     epsilon : float, optional (default: 1e-6)
         Values smaller than epsilon are considered to be 0.
 
-    origin2box : array, shape (4, 4), optional (default: None)
-        Transform from origin to box coordinates.
-
     Returns
     -------
     dist : float
@@ -165,7 +155,7 @@ def rectangle_to_box(rectangle_center, rectangle_axes, rectangle_lengths,
     """
     overlap, result = _rectangle_points_in_box(
         rectangle_center, rectangle_axes, rectangle_lengths,
-        box2origin, size, epsilon=epsilon, origin2box=origin2box)
+        box2origin, size, epsilon=epsilon)
     if overlap:
         return result
     return _rectangle_to_box_faces(
@@ -175,12 +165,12 @@ def rectangle_to_box(rectangle_center, rectangle_axes, rectangle_lengths,
 
 def _rectangle_points_in_box(
         rectangle_center, rectangle_axes, rectangle_lengths, box2origin, size,
-        epsilon=1e-6, origin2box=None):
+        epsilon=1e-6):
     rectangle_points = convert_rectangle_to_vertices(
         rectangle_center, rectangle_axes, rectangle_lengths)
     for i in range(len(rectangle_points)):
         dist, closest_point_box = point_to_box(
-            rectangle_points[i], box2origin, size, origin2box=origin2box)
+            rectangle_points[i], box2origin, size)
         if dist <= epsilon:
             return True, (dist, rectangle_points[i], closest_point_box)
     return False, None
