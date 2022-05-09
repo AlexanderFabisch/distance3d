@@ -169,8 +169,8 @@ def distance_subalgorithm(
     3/25/93.
 
     This function also determines an affinely independent subset of the
-    points such that search_direction near point to the affine hull of the
-    points in the subset. The variables n_simplex_points, simplex,
+    points such that search_direction is a near point to the affine hull of
+    the points in the subset. The variables n_simplex_points, simplex,
     old_indices_polytope1, old_indices_polytope2 and dot_product_table are
     modified so that, on output, they correspond to this subset of points.
 
