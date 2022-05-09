@@ -74,10 +74,8 @@ def gjk_with_simplex(collider1, collider2):
     indices_polytope2 = np.array([0, 0, 0, 0], dtype=int)
 
     barycentric_coordinates = np.zeros(4, dtype=float)
-    simplex = np.zeros((4, 3), dtype=float)
-    old_simplex = np.zeros((4, 3), dtype=float)
-    dot_product_table = np.zeros((4, 4), dtype=float)
-    old_dot_product_table = np.zeros((4, 4), dtype=float)
+    simplex = Simplex()
+    old_simplex = Simplex()
     old_indices_polytope1 = np.zeros(4, dtype=int)
     old_indices_polytope2 = np.zeros(4, dtype=int)
     iord = np.zeros(4, dtype=int)
@@ -86,47 +84,45 @@ def gjk_with_simplex(collider1, collider2):
 
     # Initialize simplex to difference of first points of the objects
     ncy = 0
-    n_simplex_points = 1
+    simplex.n_simplex_points = 1
     barycentric_coordinates[0] = 1.0
 
-    simplex[0] = collider1.first_vertex() - collider2.first_vertex()
-    dot_product_table[0, 0] = np.dot(simplex[0], simplex[0])
+    simplex.simplex[0] = collider1.first_vertex() - collider2.first_vertex()
+    simplex.dot_product_table[0, 0] = np.dot(simplex.simplex[0], simplex.simplex[0])
 
-    lastdstsq = dot_product_table[0, 0] + dot_product_table[0, 0] + 1.0
+    lastdstsq = simplex.dot_product_table[0, 0] + simplex.dot_product_table[0, 0] + 1.0
     while True:
         ncy += 1
 
         # Compute point of minimum norm in the convex hull of the simplex
-        dstsq, n_simplex_points, backup = distance_subalgorithm(
-            n_simplex_points, indices_polytope1, indices_polytope2, simplex,
-            dot_product_table, search_direction, barycentric_coordinates, backup)
+        dstsq, backup = distance_subalgorithm(
+            simplex, indices_polytope1, indices_polytope2,
+            search_direction, barycentric_coordinates, backup)
 
-        if dstsq >= lastdstsq or n_simplex_points == 4:
+        if dstsq >= lastdstsq or simplex.n_simplex_points == 4:
             if backup:
                 closest_point1 = collider1.compute_point(
-                    barycentric_coordinates[:n_simplex_points],
-                    indices_polytope1[:n_simplex_points])
+                    barycentric_coordinates[:simplex.n_simplex_points],
+                    indices_polytope1[:simplex.n_simplex_points])
                 closest_point2 = collider2.compute_point(
-                    barycentric_coordinates[:n_simplex_points],
-                    indices_polytope2[:n_simplex_points])
+                    barycentric_coordinates[:simplex.n_simplex_points],
+                    indices_polytope2[:simplex.n_simplex_points])
 
                 # Make sure intersection has zero distance
-                if n_simplex_points == 4:
+                if simplex.n_simplex_points == 4:
                     closest_point1[:] = 0.5 * (closest_point1 + closest_point2)
                     closest_point2[:] = closest_point1
                     distance = 0.0
                 else:
                     distance = math.sqrt(dstsq)
 
-                return distance, closest_point1, closest_point2, simplex
+                return distance, closest_point1, closest_point2, simplex.simplex
 
             backup = True
             if ncy != 1:
-                n_simplex_points = _revert_to_old_simplex(
-                    dot_product_table, indices_polytope1, indices_polytope2,
-                    old_dot_product_table, old_indices_polytope1,
-                    old_indices_polytope2, old_simplex, n_old_simplex_points,
-                    simplex)
+                simplex.n_simplex_points = _revert_to_old_simplex(
+                    simplex, old_simplex, indices_polytope1, indices_polytope2,
+                    old_indices_polytope1, old_indices_polytope2)
             continue
 
         lastdstsq = dstsq
@@ -137,26 +133,44 @@ def gjk_with_simplex(collider1, collider2):
         new_index2, new_vertex2 = collider2.support_function(search_direction)
         new_simplex_point = new_vertex1 - new_vertex2
 
-        n_simplex_points = _add_new_point(
-            dot_product_table, indices_polytope1, indices_polytope2,
-            n_simplex_points, new_index1, new_index2, simplex,
-            new_simplex_point)
-        n_old_simplex_points = _save_old_simplex(
-            dot_product_table, indices_polytope1, indices_polytope2,
-            n_simplex_points, old_dot_product_table, old_indices_polytope1,
-            old_indices_polytope2, old_simplex, simplex)
+        simplex.n_simplex_points = _add_new_point(
+            simplex, indices_polytope1, indices_polytope2,
+            new_index1, new_index2, new_simplex_point)
+        old_simplex.n_simplex_points = _save_old_simplex(
+            simplex, old_simplex, indices_polytope1, indices_polytope2,
+            simplex.n_simplex_points, old_indices_polytope1,
+            old_indices_polytope2)
         _reorder_simplex(
-            dot_product_table, indices_polytope1, indices_polytope2, iord,
-            n_simplex_points, old_dot_product_table, old_indices_polytope1,
-            old_indices_polytope2, old_simplex, simplex)
+            simplex, old_simplex, indices_polytope1, indices_polytope2, iord,
+            simplex.n_simplex_points, old_indices_polytope1,
+            old_indices_polytope2)
 
     raise RuntimeError("Solution should be found in loop.")
 
 
+class Simplex:
+    """Simplex and additional data.
+
+    Attributes
+    ----------
+    simplex : array, shape (n_simplex_points, 3)
+      Current simplex.
+
+    dot_product_table : array, shape (n_simplex_points, n_simplex_points)
+        dot_product_table[i, j] = Inner product of simplex[i] and simplex[j].
+
+    n_simplex_points : int
+        Number of current simplex points.
+    """
+    def __init__(self):
+        self.simplex = np.zeros((4, 3), dtype=float)
+        self.dot_product_table = np.zeros((4, 4), dtype=float)
+        self.n_simplex_points = 0
+
+
 def distance_subalgorithm(
-        n_simplex_points, old_indices_polytope1, old_indices_polytope2,
-        simplex, dot_product_table, search_direction, barycentric_coordinates,
-        backup):
+        simplex, old_indices_polytope1, old_indices_polytope2,
+        search_direction, barycentric_coordinates, backup):
     """Distance subalgorithm.
 
     Implements, in a very efficient way, the distance subalgorithm
@@ -176,11 +190,8 @@ def distance_subalgorithm(
 
     Parameters
     ----------
-    n_simplex_points : int
-      The number of points. 1 <= n_simplex_points <= 4.
-
     simplex : array, shape (n_simplex_points, 3)
-      The array containing the points.
+      Current simplex.
 
     old_indices_polytope1 : array, shape (n_simplex_points,)
         Index vector for first polytope. For k = 1, ..., n_simplex_points,
@@ -191,9 +202,6 @@ def distance_subalgorithm(
         Index vectors for first and second polytope. For k = 1, ...,
         n_simplex_points, simplex[k] = vertices1[old_indices_polytope1[k]]
         - vertices2[old_indices_polytope2[k]].
-
-    dot_product_table : array, shape (n_simplex_points, n_simplex_points)
-        dot_product_table[i, j] = Inner product of simplex[i] and simplex[j].
 
     search_direction : array, shape (3,)
         Near point to the convex hull of the points in simplex.
@@ -214,9 +222,6 @@ def distance_subalgorithm(
     dstsq : float
         Squared distance.
 
-    n_new_simplex_points : int
-        The new number of points. 1 <= n_new_simplex_points <= 4.
-
     backup : int
         Perform backup procedure.
     """
@@ -231,275 +236,256 @@ def distance_subalgorithm(
     d4[7] = 1.0
 
     if not backup:
-        result = _regular_distance_subalgorithm(
-            n_simplex_points, dot_product_table, barycentric_coordinates,
-            simplex, search_direction, d1, d2, d3, d4, old_indices_polytope1,
-            old_indices_polytope2)
-        if result is not None:
-            return result[0], result[1], backup
+        dstsqr = _regular_distance_subalgorithm(
+            simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
+            old_indices_polytope1, old_indices_polytope2)
+        if dstsqr is not None:
+            return dstsqr, backup
 
     return _backup_procedure(
-        n_simplex_points, dot_product_table, barycentric_coordinates, simplex,
-        search_direction, d1, d2, d3, d4, old_indices_polytope1,
-        old_indices_polytope2, backup)
+        simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
+        old_indices_polytope1, old_indices_polytope2, backup)
 
 
 def _regular_distance_subalgorithm(
-        n_simplex_points, dot_product_table, barycentric_coordinates, simplex,
-        search_direction, d1, d2, d3, d4, old_indices_polytope1,
-        old_indices_polytope2):
-    if n_simplex_points == 1:
+        simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
+        old_indices_polytope1, old_indices_polytope2):
+    if simplex.n_simplex_points == 1:
         # case of a single point ...
         barycentric_coordinates[0] = d1[0]
-        search_direction[:] = simplex[0]
-        dstsq = dot_product_table[0, 0]
-        return dstsq, n_simplex_points
-    elif n_simplex_points == 2:
+        search_direction[:] = simplex.simplex[0]
+        dstsq = simplex.dot_product_table[0, 0]
+        return dstsq
+    elif simplex.n_simplex_points == 2:
         # case of two points ...
         # check optimality of vertex 1
-        d2[2] = dot_product_table[0, 0] - dot_product_table[1, 0]
+        d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
         if d2[2] <= 0.0:
-            n_simplex_points = 1
+            simplex.n_simplex_points = 1
             barycentric_coordinates[0] = d1[0]
-            search_direction[:] = simplex[0]
-            dstsq = dot_product_table[0, 0]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[0]
+            return simplex.dot_product_table[0, 0]
         # check optimality of line segment 1-2
-        d1[2] = dot_product_table[1, 1] - dot_product_table[1, 0]
+        d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
         if not (d1[2] <= 0.0 or d2[2] <= 0.0):
             sum = d1[2] + d2[2]
             barycentric_coordinates[0] = d1[2] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
-            search_direction[:] = simplex[1] + barycentric_coordinates[0] * (simplex[0] - simplex[1])
-            dstsq = np.dot(search_direction, search_direction)
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[1] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[1])
+            return np.dot(search_direction, search_direction)
         # check optimality of vertex 2
         if d1[2] <= 0.0:
-            n_simplex_points = 1
+            simplex.n_simplex_points = 1
             old_indices_polytope1[0] = old_indices_polytope1[1]
             old_indices_polytope2[0] = old_indices_polytope2[1]
             barycentric_coordinates[0] = d2[1]
-            search_direction[:] = simplex[1]
-            dstsq = dot_product_table[1, 1]
-            simplex[0, :] = simplex[1, :]
-            dot_product_table[0, 0] = dot_product_table[1, 1]
-            return dstsq, n_simplex_points
-    elif n_simplex_points == 3:
+            search_direction[:] = simplex.simplex[1]
+            dstsq = simplex.dot_product_table[1, 1]
+            simplex.simplex[0, :] = simplex.simplex[1, :]
+            simplex.dot_product_table[0, 0] = dstsq
+            return dstsq
+    elif simplex.n_simplex_points == 3:
         # case of three points ...
         # check optimality of vertex 1
-        d2[2] = dot_product_table[0, 0] - dot_product_table[1, 0]
-        d3[4] = dot_product_table[0, 0] - dot_product_table[2, 0]
+        d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
+        d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
         if not (d2[2] > 0.0 or d3[4] > 0.0):
-            n_simplex_points = 1
+            simplex.n_simplex_points = 1
             barycentric_coordinates[0] = d1[0]
-            search_direction[:] = simplex[0]
-            dstsq = dot_product_table[0, 0]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[0]
+            return simplex.dot_product_table[0, 0]
         # check optimality of line segment 1-2
-        e132 = dot_product_table[1, 0] - dot_product_table[2, 1]
-        d1[2] = dot_product_table[1, 1] - dot_product_table[1, 0]
+        e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
+        d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
         d3[6] = d1[2] * d3[4] + d2[2] * e132
         if not (d1[2] <= 0.0 or d2[2] <= 0.0 or d3[6] > 0.0):
-            n_simplex_points = 2
+            simplex.n_simplex_points = 2
             sum = d1[2] + d2[2]
             barycentric_coordinates[0] = d1[2] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
-            search_direction[:] = simplex[1] + barycentric_coordinates[0] * (simplex[0] - simplex[1])
-            dstsq = np.dot(search_direction, search_direction)
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[1] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[1])
+            return np.dot(search_direction, search_direction)
         # check optimality of line segment 1-3
-        e123 = dot_product_table[2, 0] - dot_product_table[2, 1]
-        d1[4] = dot_product_table[2, 2] - dot_product_table[2, 0]
+        e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
+        d1[4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
         d2[6] = d1[4] * d2[2] + d3[4] * e123
         if not (d1[4] <= 0.0 or d2[6] > 0.0 or d3[4] <= 0.0):
-            n_simplex_points = 2
+            simplex.n_simplex_points = 2
             old_indices_polytope1[1] = old_indices_polytope1[2]
             old_indices_polytope2[1] = old_indices_polytope2[2]
             sum = d1[4] + d3[4]
             barycentric_coordinates[0] = d1[4] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
-            search_direction[:] = simplex[2] + barycentric_coordinates[0] * (simplex[0] - simplex[2])
-            dstsq = np.dot(search_direction, search_direction)
-            simplex[1, 0] = simplex[2, 0]
-            simplex[1, 1] = simplex[2, 1]
-            simplex[1, 2] = simplex[2, 2]
-            dot_product_table[1, 0] = dot_product_table[2, 0]
-            dot_product_table[1, 1] = dot_product_table[2, 2]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[2] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[2])
+            simplex.simplex[1, 0] = simplex.simplex[2, 0]
+            simplex.simplex[1, 1] = simplex.simplex[2, 1]
+            simplex.simplex[1, 2] = simplex.simplex[2, 2]
+            simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 0]
+            simplex.dot_product_table[1, 1] = simplex.dot_product_table[2, 2]
+            return np.dot(search_direction, search_direction)
         # check optimality of face 123
         e213 = -e123
-        d2[5] = dot_product_table[2, 2] - dot_product_table[2, 1]
-        d3[5] = dot_product_table[1, 1] - dot_product_table[2, 1]
+        d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
+        d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
         d1[6] = d2[5] * d1[2] + d3[5] * e213
         if not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0):
             sum = d1[6] + d2[6] + d3[6]
             barycentric_coordinates[0] = d1[6] / sum
             barycentric_coordinates[1] = d2[6] / sum
             barycentric_coordinates[2] = 1.0 - barycentric_coordinates[0] - barycentric_coordinates[1]
-            search_direction[:] = simplex[2] + barycentric_coordinates[0] * (simplex[0] - simplex[2]) + barycentric_coordinates[1] * (simplex[1] - simplex[2])
-            dstsq = np.dot(search_direction, search_direction)
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[2] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[2]) + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[2])
+            return np.dot(search_direction, search_direction)
         # check optimality of vertex 2
         if not (d1[2] > 0.0 or d3[5] > 0.0):
-            n_simplex_points = 1
+            simplex.n_simplex_points = 1
             old_indices_polytope1[0] = old_indices_polytope1[1]
             old_indices_polytope2[0] = old_indices_polytope2[1]
             barycentric_coordinates[0] = d2[1]
-            search_direction[:] = simplex[1]
-            dstsq = dot_product_table[1, 1]
-            simplex[0, :] = simplex[1, :]
-            dot_product_table[0, 0] = dot_product_table[1, 1]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[1]
+            simplex.simplex[0, :] = simplex.simplex[1, :]
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[1, 1]
+            return simplex.dot_product_table[0, 0]
         # check optimality of vertex 3
         if not (d1[4] > 0.0 or d2[5] > 0.0):
-            n_simplex_points = 1
+            simplex.n_simplex_points = 1
             old_indices_polytope1[0] = old_indices_polytope1[2]
             old_indices_polytope2[0] = old_indices_polytope2[2]
             barycentric_coordinates[0] = d3[3]
-            search_direction[:] = simplex[2]
-            dstsq = dot_product_table[2, 2]
-            simplex[0] = simplex[2]
-            dot_product_table[0, 0] = dot_product_table[2, 2]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[2]
+            simplex.simplex[0] = simplex.simplex[2]
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
+            return simplex.dot_product_table[0, 0]
         # check optimality of line segment 2-3
         if not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0):
-            n_simplex_points = 2
+            simplex.n_simplex_points = 2
             old_indices_polytope1[0] = old_indices_polytope1[2]
             old_indices_polytope2[0] = old_indices_polytope2[2]
             sum = d2[5] + d3[5]
             barycentric_coordinates[1] = d2[5] / sum
             barycentric_coordinates[0] = 1.0 - barycentric_coordinates[1]
-            search_direction[:] = simplex[2] + barycentric_coordinates[1] * (simplex[1] - simplex[2])
-            dstsq = np.dot(search_direction, search_direction)
-            simplex[0] = simplex[2]
-            dot_product_table[1, 0] = dot_product_table[2, 1]
-            dot_product_table[0, 0] = dot_product_table[2, 2]
-            return dstsq, n_simplex_points
-    elif n_simplex_points == 4:
+            search_direction[:] = simplex.simplex[2] + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[2])
+            simplex.simplex[0] = simplex.simplex[2]
+            simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 1]
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
+            return np.dot(search_direction, search_direction)
+    elif simplex.n_simplex_points == 4:
         # case of four points ...
         # check optimality of vertex 1
-        d2[2] = dot_product_table[0, 0] - dot_product_table[1, 0]
-        d3[4] = dot_product_table[0, 0] - dot_product_table[2, 0]
-        d4[8] = dot_product_table[0, 0] - dot_product_table[3, 0]
+        d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
+        d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
+        d4[8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
         if not (d2[2] > 0.0 or d3[4] > 0.0 or d4[8] > 0.0):
-            n_simplex_points = 1
+            simplex.n_simplex_points = 1
             barycentric_coordinates[0] = d1[0]
-            search_direction[:] = simplex[0]
-            dstsq = dot_product_table[0, 0]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[0]
+            return simplex.dot_product_table[0, 0]
         # check optimality of line segment 1-2
-        e132 = dot_product_table[1, 0] - dot_product_table[2, 1]
-        e142 = dot_product_table[1, 0] - dot_product_table[3, 1]
-        d1[2] = dot_product_table[1, 1] - dot_product_table[1, 0]
+        e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
+        e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
+        d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
         d3[6] = d1[2] * d3[4] + d2[2] * e132
         d4[11] = d1[2] * d4[8] + d2[2] * e142
         if not (d1[2] <= 0.0 or d2[2] <= 0.0 or d3[6] > 0.0 or d4[11] > 0.0):
-            n_simplex_points = 2
+            simplex.n_simplex_points = 2
             sum = d1[2] + d2[2]
             barycentric_coordinates[0] = d1[2] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
-            search_direction[:] = simplex[1] + barycentric_coordinates[0] * (simplex[0] - simplex[1])
-            dstsq = np.dot(search_direction, search_direction)
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[1] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[1])
+            return np.dot(search_direction, search_direction)
         # check optimality of line segment 1-3
-        e123 = dot_product_table[2, 0] - dot_product_table[2, 1]
-        e143 = dot_product_table[2, 0] - dot_product_table[3, 2]
-        d1[4] = dot_product_table[2, 2] - dot_product_table[2, 0]
+        e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
+        e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
+        d1[4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
         d2[6] = d1[4] * d2[2] + d3[4] * e123
         d4[12] = d1[4] * d4[8] + d3[4] * e143
         if not (d1[4] <= 0.0 or d2[6] > 0.0 or d3[4] <= 0.0 or d4[12] > 0.0):
-            n_simplex_points = 2
+            simplex.n_simplex_points = 2
             old_indices_polytope1[1] = old_indices_polytope1[2]
             old_indices_polytope2[1] = old_indices_polytope2[2]
             sum = d1[4] + d3[4]
             barycentric_coordinates[0] = d1[4] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
-            search_direction[:] = simplex[2] + barycentric_coordinates[0] * (simplex[0] - simplex[2])
-            dstsq = np.dot(search_direction, search_direction)
-            simplex[1] = simplex[2]
-            dot_product_table[1, 0] = dot_product_table[2, 0]
-            dot_product_table[1, 1] = dot_product_table[2, 2]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[2] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[2])
+            simplex.simplex[1] = simplex.simplex[2]
+            simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 0]
+            simplex.dot_product_table[1, 1] = simplex.dot_product_table[2, 2]
+            return np.dot(search_direction, search_direction)
         # check optimality of face 123
-        d2[5] = dot_product_table[2, 2] - dot_product_table[2, 1]
-        d3[5] = dot_product_table[1, 1] - dot_product_table[2, 1]
+        d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
+        d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
         e213 = -e123
         d1[6] = d2[5] * d1[2] + d3[5] * e213
         d4[14] = d1[6] * d4[8] + d2[6] * e142 + d3[6] * e143
         if not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0 or d4[14] > 0.0):
-            n_simplex_points = 3
+            simplex.n_simplex_points = 3
             sum = d1[6] + d2[6] + d3[6]
             barycentric_coordinates[0] = d1[6] / sum
             barycentric_coordinates[1] = d2[6] / sum
             barycentric_coordinates[2] = 1.0 - barycentric_coordinates[0] - barycentric_coordinates[1]
-            search_direction[:] = simplex[2] + barycentric_coordinates[0] * (simplex[0] - simplex[2]) + barycentric_coordinates[1] * (simplex[1] - simplex[2])
-            dstsq = np.dot(search_direction, search_direction)
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[2] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[2]) + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[2])
+            return np.dot(search_direction, search_direction)
         # check optimality of line segment 1-4
-        e124 = dot_product_table[3, 0] - dot_product_table[3, 1]
-        e134 = dot_product_table[3, 0] - dot_product_table[3, 2]
-        d1[8] = dot_product_table[3, 3] - dot_product_table[3, 0]
+        e124 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 1]
+        e134 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 2]
+        d1[8] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 0]
         d2[11] = d1[8] * d2[2] + d4[8] * e124
         d3[12] = d1[8] * d3[4] + d4[8] * e134
         if not (d1[8] <= 0.0 or d2[11] > 0.0 or d3[12] > 0.0 or d4[8] <= 0.0):
-            n_simplex_points = 2
+            simplex.n_simplex_points = 2
             old_indices_polytope1[1] = old_indices_polytope1[3]
             old_indices_polytope2[1] = old_indices_polytope2[3]
             sum = d1[8] + d4[8]
             barycentric_coordinates[0] = d1[8] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
-            search_direction[:] = simplex[3] + barycentric_coordinates[0] * (simplex[0] - simplex[3])
-            dstsq = np.dot(search_direction, search_direction)
-            simplex[1] = simplex[3]
-            dot_product_table[1, 0] = dot_product_table[3, 0]
-            dot_product_table[1, 1] = dot_product_table[3, 3]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[3] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[3])
+            simplex.simplex[1] = simplex.simplex[3]
+            simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 0]
+            simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
+            return np.dot(search_direction, search_direction)
         # check optimality of face 1-2-4
-        d2[9] = dot_product_table[3, 3] - dot_product_table[3, 1]
-        d4[9] = dot_product_table[1, 1] - dot_product_table[3, 1]
+        d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
+        d4[9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
         e214 = -e124
         d1[11] = d2[9] * d1[2] + d4[9] * e214
         d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
         if not (d1[11] <= 0.0 or d2[11] <= 0.0 or d3[14] > 0.0 or d4[11] <= 0.0):
-            n_simplex_points = 3
+            simplex.n_simplex_points = 3
             old_indices_polytope1[2] = old_indices_polytope1[3]
             old_indices_polytope2[2] = old_indices_polytope2[3]
             sum = d1[11] + d2[11] + d4[11]
             barycentric_coordinates[0] = d1[11] / sum
             barycentric_coordinates[1] = d2[11] / sum
             barycentric_coordinates[2] = 1.0 - barycentric_coordinates[0] - barycentric_coordinates[1]
-            search_direction[:] = simplex[3] + barycentric_coordinates[0] * (simplex[0] - simplex[3]) + barycentric_coordinates[1] * (simplex[1] - simplex[3])
-            dstsq = np.dot(search_direction, search_direction)
-            simplex[2] = simplex[3]
-            dot_product_table[2, 0] = dot_product_table[3, 0]
-            dot_product_table[2, 1] = dot_product_table[3, 1]
-            dot_product_table[2, 2] = dot_product_table[3, 3]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[3] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[3]) + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[3])
+            simplex.simplex[2] = simplex.simplex[3]
+            simplex.dot_product_table[2, 0] = simplex.dot_product_table[3, 0]
+            simplex.dot_product_table[2, 1] = simplex.dot_product_table[3, 1]
+            simplex.dot_product_table[2, 2] = simplex.dot_product_table[3, 3]
+            return np.dot(search_direction, search_direction)
         # check optimality of face 1-3-4
-        d3[10] = dot_product_table[3, 3] - dot_product_table[3, 2]
-        d4[10] = dot_product_table[2, 2] - dot_product_table[3, 2]
+        d3[10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
+        d4[10] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[3, 2]
         e314 = -e134
         d1[12] = d3[10] * d1[4] + d4[10] * e314
         d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
         if not (d1[12] <= 0.0 or d2[14] > 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0):
-            n_simplex_points = 3
+            simplex.n_simplex_points = 3
             old_indices_polytope1[1] = old_indices_polytope1[3]
             old_indices_polytope2[1] = old_indices_polytope2[3]
             sum = d1[12] + d3[12] + d4[12]
             barycentric_coordinates[0] = d1[12] / sum
             barycentric_coordinates[2] = d3[12] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0] - barycentric_coordinates[2]
-            search_direction[:] = simplex[3] + barycentric_coordinates[0] * (simplex[0] - simplex[3]) + barycentric_coordinates[2] * (simplex[2] - simplex[3])
-            dstsq = np.dot(search_direction, search_direction)
-            simplex[1] = simplex[3]
-            dot_product_table[1, 0] = dot_product_table[3, 0]
-            dot_product_table[1, 1] = dot_product_table[3, 3]
-            dot_product_table[2, 1] = dot_product_table[3, 2]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[3] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[3]) + barycentric_coordinates[2] * (simplex.simplex[2] - simplex.simplex[3])
+            simplex.simplex[1] = simplex.simplex[3]
+            simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 0]
+            simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
+            simplex.dot_product_table[2, 1] = simplex.dot_product_table[3, 2]
+            return np.dot(search_direction, search_direction)
         # check optimality of the hull of all 4 points
-        e243 = dot_product_table[2, 1] - dot_product_table[3, 2]
+        e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
         d4[13] = d2[5] * d4[9] + d3[5] * e243
-        e234 = dot_product_table[3, 1] - dot_product_table[3, 2]
+        e234 = simplex.dot_product_table[3, 1] - simplex.dot_product_table[3, 2]
         d3[13] = d2[9] * d3[5] + d4[9] * e234
         e324 = -e234
         d2[13] = d3[10] * d2[5] + d4[10] * e324
@@ -510,73 +496,68 @@ def _regular_distance_subalgorithm(
             barycentric_coordinates[1] = d2[14] / sum
             barycentric_coordinates[2] = d3[14] / sum
             barycentric_coordinates[3] = 1.0 - barycentric_coordinates[0] - barycentric_coordinates[1] - barycentric_coordinates[2]
-            search_direction[:] = barycentric_coordinates[0] * simplex[0] + barycentric_coordinates[1] * simplex[1] + barycentric_coordinates[2] * simplex[2] + barycentric_coordinates[3] * simplex[3]
-            dstsq = np.dot(search_direction, search_direction)
-            return dstsq, n_simplex_points
+            search_direction[:] = barycentric_coordinates[0] * simplex.simplex[0] + barycentric_coordinates[1] * simplex.simplex[1] + barycentric_coordinates[2] * simplex.simplex[2] + barycentric_coordinates[3] * simplex.simplex[3]
+            return np.dot(search_direction, search_direction)
         # check optimality of vertex 2
         if not (d1[2] > 0.0 or d3[5] > 0.0 or d4[9] > 0.0):
-            n_simplex_points = 1
+            simplex.n_simplex_points = 1
             old_indices_polytope1[0] = old_indices_polytope1[1]
             old_indices_polytope2[0] = old_indices_polytope2[1]
             barycentric_coordinates[0] = d2[1]
-            search_direction[:] = simplex[1]
-            dstsq = dot_product_table[1, 1]
-            simplex[0] = simplex[1]
-            dot_product_table[0, 0] = dot_product_table[1, 1]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[1]
+            simplex.simplex[0] = simplex.simplex[1]
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[1, 1]
+            return simplex.dot_product_table[0, 0]
         # check optimality of vertex 3
         if not (d1[4] > 0.0 or d2[5] > 0.0 or d4[10] > 0.0):
-            n_simplex_points = 1
+            simplex.n_simplex_points = 1
             old_indices_polytope1[0] = old_indices_polytope1[2]
             old_indices_polytope2[0] = old_indices_polytope2[2]
             barycentric_coordinates[0] = d3[3]
-            search_direction[:] = simplex[2]
-            dstsq = dot_product_table[2, 2]
-            simplex[0] = simplex[2]
-            dot_product_table[0, 0] = dot_product_table[2, 2]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[2]
+            simplex.simplex[0] = simplex.simplex[2]
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
+            return simplex.dot_product_table[0, 0]
         # check optimality of vertex 4
         if not (d1[8] > 0.0 or d2[9] > 0.0 or d3[10] > 0.0):
-            n_simplex_points = 1
+            simplex.n_simplex_points = 1
             old_indices_polytope1[0] = old_indices_polytope1[3]
             old_indices_polytope2[0] = old_indices_polytope2[3]
             barycentric_coordinates[0] = d4[7]
-            search_direction[:] = simplex[3]
-            dstsq = dot_product_table[3, 3]
-            simplex[0] = simplex[3]
-            dot_product_table[0, 0] = dot_product_table[3, 3]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[3]
+            simplex.simplex[0] = simplex.simplex[3]
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[3, 3]
+            return simplex.dot_product_table[0, 0]
         # check optimality of line segment 2-3
         if not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0 or d4[13] > 0.0):
-            n_simplex_points = 2
+            simplex.n_simplex_points = 2
             old_indices_polytope1[0] = old_indices_polytope1[2]
             old_indices_polytope2[0] = old_indices_polytope2[2]
             sum = d2[5] + d3[5]
             barycentric_coordinates[1] = d2[5] / sum
             barycentric_coordinates[0] = 1.0 - barycentric_coordinates[1]
-            search_direction[:] = simplex[2] + barycentric_coordinates[1] * (simplex[1] - simplex[2])
+            search_direction[:] = simplex.simplex[2] + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[2])
             dstsq = np.dot(search_direction, search_direction)
-            simplex[0] = simplex[2]
-            dot_product_table[1, 0] = dot_product_table[2, 1]
-            dot_product_table[0, 0] = dot_product_table[2, 2]
-            return dstsq, n_simplex_points
+            simplex.simplex[0] = simplex.simplex[2]
+            simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 1]
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
+            return dstsq
         # check optimality of line segment 2-4
         if not (d1[11] > 0.0 or d2[9] <= 0.0 or d3[13] > 0.0 or d4[9] <= 0.0):
-            n_simplex_points = 2
+            simplex.n_simplex_points = 2
             old_indices_polytope1[0] = old_indices_polytope1[3]
             old_indices_polytope2[0] = old_indices_polytope2[3]
             sum = d2[9] + d4[9]
             barycentric_coordinates[1] = d2[9] / sum
             barycentric_coordinates[0] = 1.0 - barycentric_coordinates[1]
-            search_direction[:] = simplex[3] + barycentric_coordinates[1] * (simplex[1] - simplex[3])
-            dstsq = np.dot(search_direction, search_direction)
-            simplex[0] = simplex[3]
-            dot_product_table[1, 0] = dot_product_table[3, 1]
-            dot_product_table[0, 0] = dot_product_table[3, 3]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[3] + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[3])
+            simplex.simplex[0] = simplex.simplex[3]
+            simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 1]
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[3, 3]
+            return np.dot(search_direction, search_direction)
         # check optimality of line segment 3-4
         if not (d1[12] > 0.0 or d2[13] > 0.0 or d3[10] <= 0.0 or d4[10] <= 0.0):
-            n_simplex_points = 2
+            simplex.n_simplex_points = 2
             old_indices_polytope1[0] = old_indices_polytope1[2]
             old_indices_polytope1[1] = old_indices_polytope1[3]
             old_indices_polytope2[0] = old_indices_polytope2[2]
@@ -584,66 +565,62 @@ def _regular_distance_subalgorithm(
             sum = d3[10] + d4[10]
             barycentric_coordinates[0] = d3[10] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
-            search_direction[:] = simplex[3] + barycentric_coordinates[0] * (simplex[2] - simplex[3])
-            dstsq = np.dot(search_direction, search_direction)
-            simplex[0] = simplex[2]
-            simplex[1] = simplex[3]
-            dot_product_table[0, 0] = dot_product_table[2, 2]
-            dot_product_table[1, 0] = dot_product_table[3, 2]
-            dot_product_table[1, 1] = dot_product_table[3, 3]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[3] + barycentric_coordinates[0] * (simplex.simplex[2] - simplex.simplex[3])
+            simplex.simplex[0] = simplex.simplex[2]
+            simplex.simplex[1] = simplex.simplex[3]
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
+            simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 2]
+            simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
+            return np.dot(search_direction, search_direction)
         # check optimality of face 2-3-4
         if not (d1[14] > 0.0 or d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0):
-            n_simplex_points = 3
+            simplex.n_simplex_points = 3
             old_indices_polytope1[0] = old_indices_polytope1[3]
             old_indices_polytope2[0] = old_indices_polytope2[3]
             sum = d2[13] + d3[13] + d4[13]
             barycentric_coordinates[1] = d2[13] / sum
             barycentric_coordinates[2] = d3[13] / sum
             barycentric_coordinates[0] = 1.0 - barycentric_coordinates[1] - barycentric_coordinates[2]
-            search_direction[:] = simplex[3] + barycentric_coordinates[1] * (simplex[1] - simplex[3]) + barycentric_coordinates[2] * (simplex[2] - simplex[3])
-            dstsq = np.dot(search_direction, search_direction)
-            simplex[0] = simplex[3]
-            dot_product_table[0, 0] = dot_product_table[3, 3]
-            dot_product_table[1, 0] = dot_product_table[3, 1]
-            dot_product_table[2, 0] = dot_product_table[3, 2]
-            return dstsq, n_simplex_points
+            search_direction[:] = simplex.simplex[3] + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[3]) + barycentric_coordinates[2] * (simplex.simplex[2] - simplex.simplex[3])
+            simplex.simplex[0] = simplex.simplex[3]
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[3, 3]
+            simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 1]
+            simplex.dot_product_table[2, 0] = simplex.dot_product_table[3, 2]
+            return np.dot(search_direction, search_direction)
     else:
-        raise ValueError("Invalid value for nvs %d given" % n_simplex_points)
+        raise ValueError("Invalid value for nvs %d given" % simplex.n_simplex_points)
     return None
 
 
 def _backup_procedure(
-        n_simplex_points, dot_product_table, barycentric_coordinates, simplex,
-        search_direction, d1, d2, d3, d4, old_indices_polytope1,
-        old_indices_polytope2, backup):
+        simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
+        old_indices_polytope1, old_indices_polytope2, backup):
     iord = np.empty(4, dtype=int)
     zsold = np.empty(3, dtype=float)
     alsd = np.empty(4, dtype=float)
-    if n_simplex_points == 1:
+    if simplex.n_simplex_points == 1:
         # case of a single point ...
-        dstsq = dot_product_table[0, 0]
         barycentric_coordinates[0] = d1[0]
-        search_direction[:] = simplex[0]
+        search_direction[:] = simplex.simplex[0]
         backup = True
-        return dstsq, n_simplex_points, backup
-    elif n_simplex_points == 2:
+        return simplex.dot_product_table[0, 0], backup
+    elif simplex.n_simplex_points == 2:
         # case of two points ...
         if backup:
-            d2[2] = dot_product_table[0, 0] - dot_product_table[1, 0]
-            d1[2] = dot_product_table[1, 1] - dot_product_table[1, 0]
+            d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
+            d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
         # check vertex 1
-        dstsq = dot_product_table[0, 0]
+        dstsq = simplex.dot_product_table[0, 0]
         nvsd = 1
         barycentric_coordinates[0] = d1[0]
-        search_direction[:] = simplex[0]
+        search_direction[:] = simplex.simplex[0]
         iord[0] = 0
         # check line segment 1-2
         if not (d1[2] <= 0.0 or d2[2] <= 0.0):
             sum = d1[2] + d2[2]
             alsd[0] = d1[2] / sum
             alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex[1, :] + alsd[0] * (simplex[0, :] - simplex[1, :])
+            zsold[:] = simplex.simplex[1, :] + alsd[0] * (simplex.simplex[0, :] - simplex.simplex[1, :])
             dstsqd = zsold[0] * zsold[0] + zsold[1] * zsold[1] + zsold[2] * zsold[2]
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -653,39 +630,39 @@ def _backup_procedure(
                 iord[0] = 0
                 iord[1] = 1
         # check vertex 2
-        if dot_product_table[1, 1] < dstsq:
-            dstsq = dot_product_table[1, 1]
+        if simplex.dot_product_table[1, 1] < dstsq:
+            dstsq = simplex.dot_product_table[1, 1]
             nvsd = 1
             barycentric_coordinates[0] = d2[1]
-            search_direction[:] = simplex[1]
+            search_direction[:] = simplex.simplex[1]
             iord[0] = 1
-    elif n_simplex_points == 3:
+    elif simplex.n_simplex_points == 3:
         # case of three points
         if backup:
-            d2[2] = dot_product_table[0, 0] - dot_product_table[1, 0]
-            d3[4] = dot_product_table[0, 0] - dot_product_table[2, 0]
-            e132 = dot_product_table[1, 0] - dot_product_table[2, 1]
-            d1[2] = dot_product_table[1, 1] - dot_product_table[1, 0]
+            d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
+            d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
+            e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
+            d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
             d3[6] = d1[2] * d3[4] + d2[2] * e132
-            e123 = dot_product_table[2, 0] - dot_product_table[2, 1]
-            d1[4] = dot_product_table[2, 2] - dot_product_table[2, 0]
+            e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
+            d1[4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
             d2[6] = d1[4] * d2[2] + d3[4] * e123
             e213 = -e123
-            d2[5] = dot_product_table[2, 2] - dot_product_table[2, 1]
-            d3[5] = dot_product_table[1, 1] - dot_product_table[2, 1]
+            d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
+            d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
             d1[6] = d2[5] * d1[2] + d3[5] * e213
         # check vertex 1
-        dstsq = dot_product_table[0, 0]
+        dstsq = simplex.dot_product_table[0, 0]
         nvsd = 1
         barycentric_coordinates[0] = d1[0]
-        search_direction[:] = simplex[0]
+        search_direction[:] = simplex.simplex[0]
         iord[0] = 0
         # check line segment 1-2
         if not (d1[2] <= 0.0 or d2[2] <= 0.0):
             sum = d1[2] + d2[2]
             alsd[0] = d1[2] / sum
             alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex[1] + alsd[0] * (simplex[0] - simplex[1])
+            zsold[:] = simplex.simplex[1] + alsd[0] * (simplex.simplex[0] - simplex.simplex[1])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -699,7 +676,7 @@ def _backup_procedure(
             sum = d1[4] + d3[4]
             alsd[0] = d1[4] / sum
             alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex[2] + alsd[0] * (simplex[0] - simplex[2])
+            zsold[:] = simplex.simplex[2] + alsd[0] * (simplex.simplex[0] - simplex.simplex[2])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -714,7 +691,7 @@ def _backup_procedure(
             alsd[0] = d1[6] / sum
             alsd[1] = d2[6] / sum
             alsd[2] = 1.0 - alsd[0] - alsd[1]
-            zsold[:] = simplex[2] + alsd[0] * (simplex[0] - simplex[2]) + alsd[1] * (simplex[1] - simplex[2])
+            zsold[:] = simplex.simplex[2] + alsd[0] * (simplex.simplex[0] - simplex.simplex[2]) + alsd[1] * (simplex.simplex[1] - simplex.simplex[2])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -725,25 +702,25 @@ def _backup_procedure(
                 iord[1] = 1
                 iord[2] = 2
         # check vertex 2
-        if dot_product_table[1, 1] < dstsq:
+        if simplex.dot_product_table[1, 1] < dstsq:
             nvsd = 1
-            dstsq = dot_product_table[1, 1]
+            dstsq = simplex.dot_product_table[1, 1]
             barycentric_coordinates[0] = d2[1]
-            search_direction[:] = simplex[1]
+            search_direction[:] = simplex.simplex[1]
             iord[0] = 1
         # check vertex 3
-        if dot_product_table[2, 2] < dstsq:
+        if simplex.dot_product_table[2, 2] < dstsq:
             nvsd = 1
-            dstsq = dot_product_table[2, 2]
+            dstsq = simplex.dot_product_table[2, 2]
             barycentric_coordinates[0] = d3[3]
-            search_direction[:] = simplex[2]
+            search_direction[:] = simplex.simplex[2]
             iord[0] = 2
         # check line segment 2-3
         if not (d2[5] <= 0.0 or d3[5] <= 0.0):
             sum = d2[5] + d3[5]
             alsd[1] = d2[5] / sum
             alsd[0] = 1.0 - alsd[1]
-            zsold[:] = simplex[2] + alsd[1] * (simplex[1] - simplex[2])
+            zsold[:] = simplex.simplex[2] + alsd[1] * (simplex.simplex[1] - simplex.simplex[2])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -752,61 +729,61 @@ def _backup_procedure(
                 search_direction[:] = zsold
                 iord[0] = 2
                 iord[1] = 1
-    elif n_simplex_points == 4:
+    elif simplex.n_simplex_points == 4:
         # case of four points
         if backup:
-            d2[2] = dot_product_table[0, 0] - dot_product_table[1, 0]
-            d3[4] = dot_product_table[0, 0] - dot_product_table[2, 0]
-            d4[8] = dot_product_table[0, 0] - dot_product_table[3, 0]
-            e132 = dot_product_table[1, 0] - dot_product_table[2, 1]
-            e142 = dot_product_table[1, 0] - dot_product_table[3, 1]
-            d1[2] = dot_product_table[1, 1] - dot_product_table[1, 0]
+            d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
+            d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
+            d4[8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
+            e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
+            e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
+            d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
             d3[6] = d1[2] * d3[4] + d2[2] * e132
             d4[11] = d1[2] * d4[8] + d2[2] * e142
-            e123 = dot_product_table[2, 0] - dot_product_table[2, 1]
-            e143 = dot_product_table[2, 0] - dot_product_table[3, 2]
-            d1[4] = dot_product_table[2, 2] - dot_product_table[2, 0]
+            e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
+            e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
+            d1[4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
             d2[6] = d1[4] * d2[2] + d3[4] * e123
             d4[12] = d1[4] * d4[8] + d3[4] * e143
-            d2[5] = dot_product_table[2, 2] - dot_product_table[2, 1]
-            d3[5] = dot_product_table[1, 1] - dot_product_table[2, 1]
+            d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
+            d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
             e213 = -e123
             d1[6] = d2[5] * d1[2] + d3[5] * e213
             d4[14] = d1[6] * d4[8] + d2[6] * e142 + d3[6] * e143
-            e124 = dot_product_table[3, 0] - dot_product_table[3, 1]
-            e134 = dot_product_table[3, 0] - dot_product_table[3, 2]
-            d1[8] = dot_product_table[3, 3] - dot_product_table[3, 0]
+            e124 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 1]
+            e134 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 2]
+            d1[8] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 0]
             d2[11] = d1[8] * d2[2] + d4[8] * e124
             d3[12] = d1[8] * d3[4] + d4[8] * e134
-            d2[9] = dot_product_table[3, 3] - dot_product_table[3, 1]
-            d4[9] = dot_product_table[1, 1] - dot_product_table[3, 1]
+            d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
+            d4[9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
             e214 = -e124
             d1[11] = d2[9] * d1[2] + d4[9] * e214
             d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
-            d3[10] = dot_product_table[3, 3] - dot_product_table[3, 2]
-            d4[10] = dot_product_table[2, 2] - dot_product_table[3, 2]
+            d3[10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
+            d4[10] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[3, 2]
             e314 = -e134
             d1[12] = d3[10] * d1[4] + d4[10] * e314
             d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
-            e243 = dot_product_table[2, 1] - dot_product_table[3, 2]
+            e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
             d4[13] = d2[5] * d4[9] + d3[5] * e243
-            e234 = dot_product_table[3, 1] - dot_product_table[3, 2]
+            e234 = simplex.dot_product_table[3, 1] - simplex.dot_product_table[3, 2]
             d3[13] = d2[9] * d3[5] + d4[9] * e234
             e324 = -e234
             d2[13] = d3[10] * d2[5] + d4[10] * e324
             d1[14] = d2[13] * d1[2] + d3[13] * e213 + d4[13] * e214
         # check vertex 1
-        dstsq = dot_product_table[0, 0]
+        dstsq = simplex.dot_product_table[0, 0]
         nvsd = 1
         barycentric_coordinates[0] = d1[0]
-        search_direction[:] = simplex[0]
+        search_direction[:] = simplex.simplex[0]
         iord[0] = 0
         # check line segment 1-2
         if not (d1[2] <= 0.0 or d2[2] <= 0.0):
             sum = d1[2] + d2[2]
             alsd[0] = d1[2] / sum
             alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex[1] + alsd[0] * (simplex[0] - simplex[1])
+            zsold[:] = simplex.simplex[1] + alsd[0] * (simplex.simplex[0] - simplex.simplex[1])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -820,7 +797,7 @@ def _backup_procedure(
             sum = d1[4] + d3[4]
             alsd[0] = d1[4] / sum
             alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex[2] + alsd[0] * (simplex[0] - simplex[2])
+            zsold[:] = simplex.simplex[2] + alsd[0] * (simplex.simplex[0] - simplex.simplex[2])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -835,7 +812,7 @@ def _backup_procedure(
             alsd[0] = d1[6] / sum
             alsd[1] = d2[6] / sum
             alsd[2] = 1.0 - alsd[0] - alsd[1]
-            zsold[:] = simplex[2] + alsd[0] * (simplex[0] - simplex[2]) + alsd[1] * (simplex[1] - simplex[2])
+            zsold[:] = simplex.simplex[2] + alsd[0] * (simplex.simplex[0] - simplex.simplex[2]) + alsd[1] * (simplex.simplex[1] - simplex.simplex[2])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -850,7 +827,7 @@ def _backup_procedure(
             sum = d1[8] + d4[8]
             alsd[0] = d1[8] / sum
             alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex[3] + alsd[0] * (simplex[0] - simplex[3])
+            zsold[:] = simplex.simplex[3] + alsd[0] * (simplex.simplex[0] - simplex.simplex[3])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -865,7 +842,7 @@ def _backup_procedure(
             alsd[0] = d1[11] / sum
             alsd[1] = d2[11] / sum
             alsd[2] = 1.0 - alsd[0] - alsd[1]
-            zsold[:] = simplex[3] + alsd[0] * (simplex[0] - simplex[3]) + alsd[1] * (simplex[1] - simplex[3])
+            zsold[:] = simplex.simplex[3] + alsd[0] * (simplex.simplex[0] - simplex.simplex[3]) + alsd[1] * (simplex.simplex[1] - simplex.simplex[3])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -881,7 +858,7 @@ def _backup_procedure(
             alsd[0] = d1[12] / sum
             alsd[2] = d3[12] / sum
             alsd[1] = 1.0 - alsd[0] - alsd[2]
-            zsold[:] = simplex[3] + alsd[0] * (simplex[0] - simplex[3]) + alsd[2] * (simplex[2] - simplex[3])
+            zsold[:] = simplex.simplex[3] + alsd[0] * (simplex.simplex[0] - simplex.simplex[3]) + alsd[2] * (simplex.simplex[2] - simplex.simplex[3])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -898,7 +875,7 @@ def _backup_procedure(
             alsd[1] = d2[14] / sum
             alsd[2] = d3[14] / sum
             alsd[3] = 1.0 - alsd[0] - alsd[1] - alsd[2]
-            zsold[:] = alsd[0] * simplex[0] + alsd[1] * simplex[1] + alsd[2] * simplex[2] + alsd[3] * simplex[3]
+            zsold[:] = alsd[0] * simplex.simplex[0] + alsd[1] * simplex.simplex[1] + alsd[2] * simplex.simplex[2] + alsd[3] * simplex.simplex[3]
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -910,32 +887,32 @@ def _backup_procedure(
                 iord[2] = 2
                 iord[3] = 3
         # check vertex 2
-        if dot_product_table[1, 1] < dstsq:
+        if simplex.dot_product_table[1, 1] < dstsq:
             nvsd = 1
-            dstsq = dot_product_table[1, 1]
+            dstsq = simplex.dot_product_table[1, 1]
             barycentric_coordinates[0] = d2[1]
-            search_direction[:] = simplex[1]
+            search_direction[:] = simplex.simplex[1]
             iord[0] = 1
         # check vertex 3
-        if dot_product_table[2, 2] < dstsq:
+        if simplex.dot_product_table[2, 2] < dstsq:
             nvsd = 1
-            dstsq = dot_product_table[2, 2]
+            dstsq = simplex.dot_product_table[2, 2]
             barycentric_coordinates[0] = d3[3]
-            search_direction[:] = simplex[2]
+            search_direction[:] = simplex.simplex[2]
             iord[0] = 2
         # check vertex 4
-        if dot_product_table[3, 3] < dstsq:
+        if simplex.dot_product_table[3, 3] < dstsq:
             nvsd = 1
-            dstsq = dot_product_table[3, 3]
+            dstsq = simplex.dot_product_table[3, 3]
             barycentric_coordinates[0] = d4[7]
-            search_direction[:] = simplex[3]
+            search_direction[:] = simplex.simplex[3]
             iord[0] = 3
         # check line segment 2-3
         if not (d2[5] <= 0.0 or d3[5] <= 0.0):
             sum = d2[5] + d3[5]
             alsd[1] = d2[5] / sum
             alsd[0] = 1.0 - alsd[1]
-            zsold[:] = simplex[2] + alsd[1] * (simplex[1] - simplex[2])
+            zsold[:] = simplex.simplex[2] + alsd[1] * (simplex.simplex[1] - simplex.simplex[2])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -949,7 +926,7 @@ def _backup_procedure(
             sum = d2[9] + d4[9]
             alsd[1] = d2[9] / sum
             alsd[0] = 1.0 - alsd[1]
-            zsold[:] = simplex[3] + alsd[1] * (simplex[1] - simplex[3])
+            zsold[:] = simplex.simplex[3] + alsd[1] * (simplex.simplex[1] - simplex.simplex[3])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -963,7 +940,7 @@ def _backup_procedure(
             sum = d3[10] + d4[10]
             alsd[0] = d3[10] / sum
             alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex[3] + alsd[0] * (simplex[2] - simplex[3])
+            zsold[:] = simplex.simplex[3] + alsd[0] * (simplex.simplex[2] - simplex.simplex[3])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -978,7 +955,7 @@ def _backup_procedure(
             alsd[1] = d2[13] / sum
             alsd[2] = d3[13] / sum
             alsd[0] = 1.0 - alsd[1] - alsd[2]
-            zsold[:] = simplex[3] + alsd[1] * (simplex[1] - simplex[3]) + alsd[2] * (simplex[2] - simplex[3])
+            zsold[:] = simplex.simplex[3] + alsd[1] * (simplex.simplex[1] - simplex.simplex[3]) + alsd[2] * (simplex.simplex[2] - simplex.simplex[3])
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -990,97 +967,94 @@ def _backup_procedure(
                 iord[2] = 2
     # final reordering
     risd = np.empty(4, dtype=int)
-    risd[:n_simplex_points] = old_indices_polytope1[:n_simplex_points]
+    risd[:simplex.n_simplex_points] = old_indices_polytope1[:simplex.n_simplex_points]
     rjsd = np.empty(4, dtype=int)
-    rjsd[:n_simplex_points] = old_indices_polytope2[:n_simplex_points]
+    rjsd[:simplex.n_simplex_points] = old_indices_polytope2[:simplex.n_simplex_points]
     yd = np.empty((4, 3), dtype=float)
-    yd[:n_simplex_points] = simplex[:n_simplex_points]
+    yd[:simplex.n_simplex_points] = simplex.simplex[:simplex.n_simplex_points]
     delld = np.empty((4, 4), dtype=float)
-    for k in range(n_simplex_points):
-        delld[k, :k + 1] = dot_product_table[k, :k + 1]
+    for k in range(simplex.n_simplex_points):
+        delld[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
 
-    n_simplex_points = nvsd
-    for k in range(n_simplex_points):
+    simplex.n_simplex_points = nvsd
+    for k in range(simplex.n_simplex_points):
         kk = iord[k]
         old_indices_polytope1[k] = risd[kk]
         old_indices_polytope2[k] = rjsd[kk]
-        simplex[k] = yd[kk]
+        simplex.simplex[k] = yd[kk]
         for l in range(k):
             ll = iord[l]
             if kk >= ll:
-                dot_product_table[k, l] = delld[kk, ll]
+                simplex.dot_product_table[k, l] = delld[kk, ll]
             else:
-                dot_product_table[k, l] = delld[ll, kk]
-        dot_product_table[k, k] = delld[kk, kk]
+                simplex.dot_product_table[k, l] = delld[ll, kk]
+        simplex.dot_product_table[k, k] = delld[kk, kk]
     backup = True
-    return dstsq, n_simplex_points, backup
+    return dstsq, backup
 
 
 def _revert_to_old_simplex(
-        dot_product_table, indices_polytope1, indices_polytope2,
-        old_dot_product_table, old_indices_polytope1, old_indices_polytope2,
-        old_simplex, n_old_simplex_points, simplex):
-    simplex[:n_old_simplex_points] = old_simplex[:n_old_simplex_points]
-    indices_polytope1[:n_old_simplex_points] = old_indices_polytope1[:n_old_simplex_points]
-    indices_polytope2[:n_old_simplex_points] = old_indices_polytope2[:n_old_simplex_points]
-    dot_product_table[:n_old_simplex_points] = old_dot_product_table[:n_old_simplex_points]
-    return n_old_simplex_points
+        simplex, old_simplex, indices_polytope1, indices_polytope2,
+        old_indices_polytope1, old_indices_polytope2):
+    simplex.simplex[:old_simplex.n_simplex_points] = old_simplex.simplex[:old_simplex.n_simplex_points]
+    indices_polytope1[:old_simplex.n_simplex_points] = old_indices_polytope1[:old_simplex.n_simplex_points]
+    indices_polytope2[:old_simplex.n_simplex_points] = old_indices_polytope2[:old_simplex.n_simplex_points]
+    simplex.dot_product_table[:old_simplex.n_simplex_points] = old_simplex.dot_product_table[:old_simplex.n_simplex_points]
+    return old_simplex.n_simplex_points
 
 
 def _add_new_point(
-        dot_product_table, indices_polytope1, indices_polytope2,
-        n_simplex_points, new_index1, new_index2, simplex, new_simplex_point):
+        simplex, indices_polytope1, indices_polytope2, new_index1, new_index2,
+        new_simplex_point):
     # Move first point to last spot
-    indices_polytope1[n_simplex_points] = indices_polytope1[0]
-    indices_polytope2[n_simplex_points] = indices_polytope2[0]
-    simplex[n_simplex_points] = simplex[0]
-    dot_product_table[n_simplex_points, :n_simplex_points] = dot_product_table[:n_simplex_points, 0]
-    dot_product_table[n_simplex_points, n_simplex_points] = dot_product_table[0, 0]
+    indices_polytope1[simplex.n_simplex_points] = indices_polytope1[0]
+    indices_polytope2[simplex.n_simplex_points] = indices_polytope2[0]
+    simplex.simplex[simplex.n_simplex_points] = simplex.simplex[0]
+    simplex.dot_product_table[simplex.n_simplex_points, :simplex.n_simplex_points] = simplex.dot_product_table[:simplex.n_simplex_points, 0]
+    simplex.dot_product_table[simplex.n_simplex_points, simplex.n_simplex_points] = simplex.dot_product_table[0, 0]
     # Put new point in first spot
     indices_polytope1[0] = new_index1
     indices_polytope2[0] = new_index2
-    simplex[0] = new_simplex_point
+    simplex.simplex[0] = new_simplex_point
     # Update dot product table
-    n_simplex_points += 1
-    dot_product_table[:n_simplex_points, 0] = np.dot(simplex[:n_simplex_points], simplex[0])
-    return n_simplex_points
+    simplex.n_simplex_points += 1
+    simplex.dot_product_table[:simplex.n_simplex_points, 0] = np.dot(simplex.simplex[:simplex.n_simplex_points], simplex.simplex[0])
+    return simplex.n_simplex_points
 
 
 def _save_old_simplex(
-        dot_product_table, indices_polytope1, indices_polytope2,
-        n_simplex_points, old_dot_product_table, old_indices_polytope1,
-        old_indices_polytope2, old_simplex, simplex):
+        simplex, old_simplex, indices_polytope1, indices_polytope2,
+        n_simplex_points, old_indices_polytope1, old_indices_polytope2):
     # Save old values of n_simplex_points, indices_polytope1,
     # indices_polytope2, simplex and dot_product_table
     oldnvs = n_simplex_points
-    old_simplex[:n_simplex_points] = simplex[:n_simplex_points]
+    old_simplex.simplex[:n_simplex_points] = simplex.simplex[:n_simplex_points]
     old_indices_polytope1[:n_simplex_points] = indices_polytope1[:n_simplex_points]
     old_indices_polytope2[:n_simplex_points] = indices_polytope2[:n_simplex_points]
     for k in range(n_simplex_points):
-        old_dot_product_table[k, :k + 1] = dot_product_table[k, :k + 1]
+        old_simplex.dot_product_table[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
     return oldnvs
 
 
 def _reorder_simplex(
-        dot_product_table, indices_polytope1, indices_polytope2, iord,
-        n_simplex_points, old_dot_product_table, old_indices_polytope1,
-        old_indices_polytope2, old_simplex, simplex):
+        simplex, old_simplex, indices_polytope1, indices_polytope2, iord,
+        n_simplex_points, old_indices_polytope1, old_indices_polytope2):
     # If n_simplex_points == 4, rearrange dot_product_table[1, 0],
     # dot_product_table[2, 1] and dot_product_table[3, 0] in non decreasing
     # order
     if n_simplex_points == 4:
         iord[:3] = 0, 1, 2
-        if dot_product_table[2, 0] < dot_product_table[1, 0]:
+        if simplex.dot_product_table[2, 0] < simplex.dot_product_table[1, 0]:
             iord[1] = 2
             iord[2] = 1
         ii = iord[1]
-        if dot_product_table[3, 0] < dot_product_table[ii, 0]:
+        if simplex.dot_product_table[3, 0] < simplex.dot_product_table[ii, 0]:
             iord[3] = iord[2]
             iord[2] = iord[1]
             iord[1] = 3
         else:
             ii = iord[2]
-            if dot_product_table[3, 0] < dot_product_table[ii, 0]:
+            if simplex.dot_product_table[3, 0] < simplex.dot_product_table[ii, 0]:
                 iord[3] = iord[2]
                 iord[2] = 3
             else:
@@ -1090,14 +1064,14 @@ def _reorder_simplex(
             kk = iord[k]
             indices_polytope1[k] = old_indices_polytope1[kk]
             indices_polytope2[k] = old_indices_polytope2[kk]
-            simplex[k] = old_simplex[kk]
+            simplex.simplex[k] = old_simplex.simplex[kk]
             for l in range(k):
                 ll = iord[l]
                 if kk >= ll:
-                    dot_product_table[k, l] = old_dot_product_table[kk, ll]
+                    simplex.dot_product_table[k, l] = old_simplex.dot_product_table[kk, ll]
                 else:
-                    dot_product_table[k, l] = old_dot_product_table[ll, kk]
-            dot_product_table[k, k] = old_dot_product_table[kk, kk]
+                    simplex.dot_product_table[k, l] = old_simplex.dot_product_table[ll, kk]
+            simplex.dot_product_table[k, k] = old_simplex.dot_product_table[kk, kk]
 
 
 def minkowski_sum(vertices1, vertices2):
