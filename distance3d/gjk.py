@@ -41,6 +41,12 @@ def gjk_with_simplex(collider1, collider2):
     ftp://labrea.stanford.edu/cs/robotics/sean/distance/gilbert.c,
     also available from http://realtimecollisiondetection.net/files/gilbert.c
 
+    The original publication describing the algorithm is:
+    E.G. Gilbert, D.W. Johnson, S.S. Keerthi: A fast procedure for computing
+    the distance between complex objects in three-dimensional space, IEEE
+    Journal of Robotics and Automation (1988),
+    https://graphics.stanford.edu/courses/cs448b-00-winter/papers/gilbert.pdf
+
     Parameters
     ----------
     collider1 : ConvexCollider
