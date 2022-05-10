@@ -299,10 +299,9 @@ def _regular_distance_subalgorithm(
             simplex.indices_polytope2[0] = simplex.indices_polytope2[1]
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
-            dstsq = simplex.dot_product_table[1, 1]
             simplex.simplex[0, :] = simplex.simplex[1, :]
-            simplex.dot_product_table[0, 0] = dstsq
-            return dstsq
+            simplex.dot_product_table[0, 0] = simplex.dot_product_table[1, 1]
+            return simplex.dot_product_table[0, 0]
     elif len(simplex) == 3:
         # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
