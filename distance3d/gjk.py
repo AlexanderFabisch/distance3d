@@ -79,11 +79,11 @@ def gjk_with_simplex(collider1, collider2):
 
     # Initialize simplex to difference of first points of the objects
     ncy = 0
-    simplex.n_simplex_points = 1
-    barycentric_coordinates[0] = 1.0
 
-    simplex.simplex[0] = collider1.first_vertex() - collider2.first_vertex()
-    simplex.dot_product_table[0, 0] = np.dot(simplex.simplex[0], simplex.simplex[0])
+    simplex.initialize_with_point(
+        collider1.first_vertex() - collider2.first_vertex())
+
+    barycentric_coordinates[0] = 1.0
 
     lastdstsq = simplex.dot_product_table[0, 0] + simplex.dot_product_table[0, 0] + 1.0
     while True:
@@ -158,11 +158,18 @@ class Simplex:
         - vertices2[indices_polytope2[k]].
     """
     def __init__(self):
-        self.simplex = np.zeros((4, 3), dtype=float)
-        self.dot_product_table = np.zeros((4, 4), dtype=float)
+        self.simplex = np.empty((4, 3), dtype=float)
+        self.dot_product_table = np.empty((4, 4), dtype=float)
         self.n_simplex_points = 0
-        self.indices_polytope1 = np.zeros(4, dtype=int)
-        self.indices_polytope2 = np.zeros(4, dtype=int)
+        self.indices_polytope1 = np.empty(4, dtype=int)
+        self.indices_polytope2 = np.empty(4, dtype=int)
+
+    def initialize_with_point(self, point):
+        self.n_simplex_points = 1
+        self.simplex[0] = point
+        self.dot_product_table[0, 0] = np.dot(self.simplex[0], self.simplex[0])
+        self.indices_polytope1[0] = 0
+        self.indices_polytope2[0] = 0
 
     def copy_from(self, simplex):
         self.n_simplex_points = len(simplex)
