@@ -129,7 +129,7 @@ def gjk_with_simplex(collider1, collider2):
 
         simplex.n_simplex_points = _add_new_point(
             simplex, new_index1, new_index2, new_simplex_point)
-        _save_old_simplex(simplex, old_simplex)
+        old_simplex.save_old_simplex(simplex)
         _reorder_simplex(simplex, old_simplex, iord)
 
     raise RuntimeError("Solution should be found in loop.")
@@ -165,6 +165,14 @@ class Simplex:
         self.n_simplex_points = 0
         self.indices_polytope1 = np.zeros(4, dtype=int)
         self.indices_polytope2 = np.zeros(4, dtype=int)
+
+    def save_old_simplex(self, simplex):
+        self.n_simplex_points = simplex.n_simplex_points
+        self.simplex[:simplex.n_simplex_points] = simplex.simplex[:simplex.n_simplex_points]
+        self.indices_polytope1[:simplex.n_simplex_points] = simplex.indices_polytope1[:simplex.n_simplex_points]
+        self.indices_polytope2[:simplex.n_simplex_points] = simplex.indices_polytope2[:simplex.n_simplex_points]
+        for k in range(simplex.n_simplex_points):
+            self.dot_product_table[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
 
 
 def distance_subalgorithm(
@@ -1003,20 +1011,8 @@ def _add_new_point(simplex, new_index1, new_index2, new_simplex_point):
     return simplex.n_simplex_points
 
 
-def _save_old_simplex(simplex, old_simplex):
-    # Save old values of n_simplex_points, indices_polytope1,
-    # indices_polytope2, simplex and dot_product_table
-    old_simplex.n_simplex_points = simplex.n_simplex_points
-    old_simplex.simplex[:simplex.n_simplex_points] = simplex.simplex[:simplex.n_simplex_points]
-    old_simplex.indices_polytope1[:simplex.n_simplex_points] = simplex.indices_polytope1[:simplex.n_simplex_points]
-    old_simplex.indices_polytope2[:simplex.n_simplex_points] = simplex.indices_polytope2[:simplex.n_simplex_points]
-    for k in range(simplex.n_simplex_points):
-        old_simplex.dot_product_table[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
-
-
 def _reorder_simplex(simplex, old_simplex, iord):
-    # If n_simplex_points == 4, rearrange dot_product_table[1, 0],
-    # dot_product_table[2, 1] and dot_product_table[3, 0] in non decreasing
+    # If n_simplex_points == 4, rearrange dot_product_table in non-decreasing
     # order
     if simplex.n_simplex_points == 4:
         iord[:3] = 0, 1, 2
