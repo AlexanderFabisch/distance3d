@@ -127,7 +127,7 @@ def gjk_with_simplex(collider1, collider2):
         new_simplex_point = new_vertex1 - new_vertex2
 
         simplex.add_new_point(new_index1, new_index2, new_simplex_point)
-        old_simplex.save_old_simplex(simplex)
+        old_simplex.copy_from(simplex)
         if simplex.n_simplex_points == 4:
             _reorder_simplex_nondecreasing_order(simplex, old_simplex)
 
@@ -165,7 +165,7 @@ class Simplex:
         self.indices_polytope1 = np.zeros(4, dtype=int)
         self.indices_polytope2 = np.zeros(4, dtype=int)
 
-    def save_old_simplex(self, simplex):
+    def copy_from(self, simplex):
         self.n_simplex_points = simplex.n_simplex_points
         self.simplex[:simplex.n_simplex_points] = simplex.simplex[:simplex.n_simplex_points]
         self.indices_polytope1[:simplex.n_simplex_points] = simplex.indices_polytope1[:simplex.n_simplex_points]
