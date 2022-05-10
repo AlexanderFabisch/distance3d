@@ -74,7 +74,6 @@ def gjk_with_simplex(collider1, collider2):
     barycentric_coordinates = np.zeros(4, dtype=float)
     simplex = Simplex()
     old_simplex = Simplex()
-    iord = np.zeros(4, dtype=int)
     search_direction = np.zeros(3, dtype=float)
     backup = False
 
@@ -129,7 +128,8 @@ def gjk_with_simplex(collider1, collider2):
 
         simplex.add_new_point(new_index1, new_index2, new_simplex_point)
         old_simplex.save_old_simplex(simplex)
-        _reorder_simplex(simplex, old_simplex, iord)
+        if simplex.n_simplex_points == 4:
+            _reorder_simplex_nondecreasing_order(simplex, old_simplex)
 
     raise RuntimeError("Solution should be found in loop.")
 
@@ -1013,39 +1013,37 @@ def _revert_to_old_simplex(simplex, old_simplex):
     return old_simplex.n_simplex_points
 
 
-def _reorder_simplex(simplex, old_simplex, iord):
-    # If n_simplex_points == 4, rearrange dot_product_table in non-decreasing
-    # order
-    if simplex.n_simplex_points == 4:
-        iord[:3] = 0, 1, 2
-        if simplex.dot_product_table[2, 0] < simplex.dot_product_table[1, 0]:
-            iord[1] = 2
-            iord[2] = 1
-        ii = iord[1]
+def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
+    iord = np.zeros(4, dtype=int)
+    iord[:3] = 0, 1, 2
+    if simplex.dot_product_table[2, 0] < simplex.dot_product_table[1, 0]:
+        iord[1] = 2
+        iord[2] = 1
+    ii = iord[1]
+    if simplex.dot_product_table[3, 0] < simplex.dot_product_table[ii, 0]:
+        iord[3] = iord[2]
+        iord[2] = iord[1]
+        iord[1] = 3
+    else:
+        ii = iord[2]
         if simplex.dot_product_table[3, 0] < simplex.dot_product_table[ii, 0]:
             iord[3] = iord[2]
-            iord[2] = iord[1]
-            iord[1] = 3
+            iord[2] = 3
         else:
-            ii = iord[2]
-            if simplex.dot_product_table[3, 0] < simplex.dot_product_table[ii, 0]:
-                iord[3] = iord[2]
-                iord[2] = 3
+            iord[3] = 3
+    # Reorder indices_polytope1, indices_polytope2 simplex and dot_product_table
+    for k in range(1, simplex.n_simplex_points):
+        kk = iord[k]
+        simplex.indices_polytope1[k] = old_simplex.indices_polytope1[kk]
+        simplex.indices_polytope2[k] = old_simplex.indices_polytope2[kk]
+        simplex.simplex[k] = old_simplex.simplex[kk]
+        for l in range(k):
+            ll = iord[l]
+            if kk >= ll:
+                simplex.dot_product_table[k, l] = old_simplex.dot_product_table[kk, ll]
             else:
-                iord[3] = 3
-        # Reorder indices_polytope1, indices_polytope2 simplex and dot_product_table
-        for k in range(1, simplex.n_simplex_points):
-            kk = iord[k]
-            simplex.indices_polytope1[k] = old_simplex.indices_polytope1[kk]
-            simplex.indices_polytope2[k] = old_simplex.indices_polytope2[kk]
-            simplex.simplex[k] = old_simplex.simplex[kk]
-            for l in range(k):
-                ll = iord[l]
-                if kk >= ll:
-                    simplex.dot_product_table[k, l] = old_simplex.dot_product_table[kk, ll]
-                else:
-                    simplex.dot_product_table[k, l] = old_simplex.dot_product_table[ll, kk]
-            simplex.dot_product_table[k, k] = old_simplex.dot_product_table[kk, kk]
+                simplex.dot_product_table[k, l] = old_simplex.dot_product_table[ll, kk]
+        simplex.dot_product_table[k, k] = old_simplex.dot_product_table[kk, kk]
 
 
 def minkowski_sum(vertices1, vertices2):
