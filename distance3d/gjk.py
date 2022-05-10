@@ -127,7 +127,7 @@ def gjk_with_simplex(collider1, collider2):
         new_index2, new_vertex2 = collider2.support_function(search_direction)
         new_simplex_point = new_vertex1 - new_vertex2
 
-        _add_new_point(simplex, new_index1, new_index2, new_simplex_point)
+        simplex.add_new_point(new_index1, new_index2, new_simplex_point)
         old_simplex.save_old_simplex(simplex)
         _reorder_simplex(simplex, old_simplex, iord)
 
@@ -172,6 +172,26 @@ class Simplex:
         self.indices_polytope2[:simplex.n_simplex_points] = simplex.indices_polytope2[:simplex.n_simplex_points]
         for k in range(simplex.n_simplex_points):
             self.dot_product_table[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
+
+    def add_new_point(self, new_index1, new_index2, new_simplex_point):
+        self._move_first_point_to_last_spot()
+        self._put_new_point_in_first_spot(new_index1, new_index2, new_simplex_point)
+
+    def _move_first_point_to_last_spot(self):
+        self.indices_polytope1[self.n_simplex_points] = self.indices_polytope1[0]
+        self.indices_polytope2[self.n_simplex_points] = self.indices_polytope2[0]
+        self.simplex[self.n_simplex_points] = self.simplex[0]
+        self.dot_product_table[self.n_simplex_points, :self.n_simplex_points] = self.dot_product_table[
+                                                                                :self.n_simplex_points, 0]
+        self.dot_product_table[self.n_simplex_points, self.n_simplex_points] = self.dot_product_table[0, 0]
+
+    def _put_new_point_in_first_spot(self, new_index1, new_index2, new_simplex_point):
+        self.indices_polytope1[0] = new_index1
+        self.indices_polytope2[0] = new_index2
+        self.simplex[0] = new_simplex_point
+        self.n_simplex_points += 1
+        self.dot_product_table[:self.n_simplex_points, 0] = np.dot(
+            self.simplex[:self.n_simplex_points], self.simplex[0])
 
 
 def distance_subalgorithm(
@@ -991,22 +1011,6 @@ def _revert_to_old_simplex(simplex, old_simplex):
     simplex.indices_polytope2[:old_simplex.n_simplex_points] = old_simplex.indices_polytope2[:old_simplex.n_simplex_points]
     simplex.dot_product_table[:old_simplex.n_simplex_points] = old_simplex.dot_product_table[:old_simplex.n_simplex_points]
     return old_simplex.n_simplex_points
-
-
-def _add_new_point(simplex, new_index1, new_index2, new_simplex_point):
-    # Move first point to last spot
-    simplex.indices_polytope1[simplex.n_simplex_points] = simplex.indices_polytope1[0]
-    simplex.indices_polytope2[simplex.n_simplex_points] = simplex.indices_polytope2[0]
-    simplex.simplex[simplex.n_simplex_points] = simplex.simplex[0]
-    simplex.dot_product_table[simplex.n_simplex_points, :simplex.n_simplex_points] = simplex.dot_product_table[:simplex.n_simplex_points, 0]
-    simplex.dot_product_table[simplex.n_simplex_points, simplex.n_simplex_points] = simplex.dot_product_table[0, 0]
-    # Put new point in first spot
-    simplex.indices_polytope1[0] = new_index1
-    simplex.indices_polytope2[0] = new_index2
-    simplex.simplex[0] = new_simplex_point
-    # Update dot product table
-    simplex.n_simplex_points += 1
-    simplex.dot_product_table[:simplex.n_simplex_points, 0] = np.dot(simplex.simplex[:simplex.n_simplex_points], simplex.simplex[0])
 
 
 def _reorder_simplex(simplex, old_simplex, iord):
