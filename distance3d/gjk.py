@@ -265,13 +265,11 @@ def distance_subalgorithm(
 def _regular_distance_subalgorithm(
         simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4):
     if len(simplex) == 1:
-        # case of a single point ...
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
         dstsq = simplex.dot_product_table[0, 0]
         return dstsq
     elif len(simplex) == 2:
-        # case of two points ...
         # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
         if d2[2] <= 0.0:
@@ -299,7 +297,6 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[0, 0] = dstsq
             return dstsq
     elif len(simplex) == 3:
-        # case of three points ...
         # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
         d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
@@ -383,7 +380,6 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
             return np.dot(search_direction, search_direction)
     elif len(simplex) == 4:
-        # case of four points ...
         # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
         d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
@@ -613,13 +609,11 @@ def _backup_procedure(
     zsold = np.empty(3, dtype=float)
     alsd = np.empty(4, dtype=float)
     if len(simplex) == 1:
-        # case of a single point ...
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
         backup = True
         return simplex.dot_product_table[0, 0], backup
     elif len(simplex) == 2:
-        # case of two points ...
         if backup:
             d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
             d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
@@ -651,7 +645,6 @@ def _backup_procedure(
             search_direction[:] = simplex.simplex[1]
             iord[0] = 1
     elif len(simplex) == 3:
-        # case of three points
         if backup:
             d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
             d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
@@ -744,7 +737,6 @@ def _backup_procedure(
                 iord[0] = 2
                 iord[1] = 1
     elif len(simplex) == 4:
-        # case of four points
         if backup:
             d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
             d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
