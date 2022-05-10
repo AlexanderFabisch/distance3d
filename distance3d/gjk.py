@@ -114,7 +114,7 @@ def gjk_with_simplex(collider1, collider2):
 
             backup = True
             if ncy != 1:
-                _revert_to_old_simplex(simplex, old_simplex)
+                simplex.copy_from(old_simplex)
             continue
 
         lastdstsq = dstsq
@@ -169,8 +169,8 @@ class Simplex:
         self.simplex[:simplex.n_simplex_points] = simplex.simplex[:simplex.n_simplex_points]
         self.indices_polytope1[:simplex.n_simplex_points] = simplex.indices_polytope1[:simplex.n_simplex_points]
         self.indices_polytope2[:simplex.n_simplex_points] = simplex.indices_polytope2[:simplex.n_simplex_points]
-        for k in range(simplex.n_simplex_points):
-            self.dot_product_table[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
+        self.dot_product_table[:self.n_simplex_points, :self.n_simplex_points] = simplex.dot_product_table[
+            :self.n_simplex_points, :self.n_simplex_points]
 
     def add_new_point(self, new_index1, new_index2, new_simplex_point):
         self._move_first_point_to_last_spot()
@@ -1002,14 +1002,6 @@ def _backup_procedure(
         simplex.dot_product_table[k, k] = delld[kk, kk]
     backup = True
     return dstsq, backup
-
-
-def _revert_to_old_simplex(simplex, old_simplex):
-    simplex.simplex[:old_simplex.n_simplex_points] = old_simplex.simplex[:old_simplex.n_simplex_points]
-    simplex.indices_polytope1[:old_simplex.n_simplex_points] = old_simplex.indices_polytope1[:old_simplex.n_simplex_points]
-    simplex.indices_polytope2[:old_simplex.n_simplex_points] = old_simplex.indices_polytope2[:old_simplex.n_simplex_points]
-    simplex.dot_product_table[:old_simplex.n_simplex_points] = old_simplex.dot_product_table[:old_simplex.n_simplex_points]
-    simplex.n_simplex_points = old_simplex.n_simplex_points
 
 
 def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
