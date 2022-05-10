@@ -138,14 +138,14 @@ class Simplex:
 
     Attributes
     ----------
+    n_simplex_points : int
+        Number of current simplex points.
+
     simplex : array, shape (n_simplex_points, 3)
       Current simplex.
 
     dot_product_table : array, shape (n_simplex_points, n_simplex_points)
         dot_product_table[i, j] = Inner product of simplex[i] and simplex[j].
-
-    n_simplex_points : int
-        Number of current simplex points.
 
     indices_polytope1 : array, shape (n_simplex_points,)
         Index vector for first polytope. For k = 1, ..., n_simplex_points,
@@ -158,9 +158,9 @@ class Simplex:
         - vertices2[indices_polytope2[k]].
     """
     def __init__(self):
+        self.n_simplex_points = 0
         self.simplex = np.empty((4, 3), dtype=float)
         self.dot_product_table = np.empty((4, 4), dtype=float)
-        self.n_simplex_points = 0
         self.indices_polytope1 = np.empty(4, dtype=int)
         self.indices_polytope2 = np.empty(4, dtype=int)
 
