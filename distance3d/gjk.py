@@ -93,17 +93,17 @@ def gjk_with_simplex(collider1, collider2):
         dstsq, backup = distance_subalgorithm(
             simplex, search_direction, barycentric_coordinates, backup)
 
-        if dstsq >= lastdstsq or simplex.n_simplex_points == 4:
+        if dstsq >= lastdstsq or len(simplex) == 4:
             if backup:
                 closest_point1 = collider1.compute_point(
-                    barycentric_coordinates[:simplex.n_simplex_points],
-                    simplex.indices_polytope1[:simplex.n_simplex_points])
+                    barycentric_coordinates[:len(simplex)],
+                    simplex.indices_polytope1[:len(simplex)])
                 closest_point2 = collider2.compute_point(
-                    barycentric_coordinates[:simplex.n_simplex_points],
-                    simplex.indices_polytope2[:simplex.n_simplex_points])
+                    barycentric_coordinates[:len(simplex)],
+                    simplex.indices_polytope2[:len(simplex)])
 
                 # Make sure intersection has zero distance
-                if simplex.n_simplex_points == 4:
+                if len(simplex) == 4:
                     closest_point1[:] = 0.5 * (closest_point1 + closest_point2)
                     closest_point2[:] = closest_point1
                     distance = 0.0
@@ -127,7 +127,7 @@ def gjk_with_simplex(collider1, collider2):
 
         simplex.add_new_point(new_index1, new_index2, new_simplex_point)
         old_simplex.copy_from(simplex)
-        if simplex.n_simplex_points == 4:
+        if len(simplex) == 4:
             _reorder_simplex_nondecreasing_order(simplex, old_simplex)
 
     raise RuntimeError("Solution should be found in loop.")
@@ -165,10 +165,10 @@ class Simplex:
         self.indices_polytope2 = np.zeros(4, dtype=int)
 
     def copy_from(self, simplex):
-        self.n_simplex_points = simplex.n_simplex_points
-        self.simplex[:simplex.n_simplex_points] = simplex.simplex[:simplex.n_simplex_points]
-        self.indices_polytope1[:simplex.n_simplex_points] = simplex.indices_polytope1[:simplex.n_simplex_points]
-        self.indices_polytope2[:simplex.n_simplex_points] = simplex.indices_polytope2[:simplex.n_simplex_points]
+        self.n_simplex_points = len(simplex)
+        self.simplex[:len(simplex)] = simplex.simplex[:len(simplex)]
+        self.indices_polytope1[:len(simplex)] = simplex.indices_polytope1[:len(simplex)]
+        self.indices_polytope2[:len(simplex)] = simplex.indices_polytope2[:len(simplex)]
         self.dot_product_table[:self.n_simplex_points, :self.n_simplex_points] = simplex.dot_product_table[
             :self.n_simplex_points, :self.n_simplex_points]
 
@@ -191,6 +191,9 @@ class Simplex:
         self.n_simplex_points += 1
         self.dot_product_table[:self.n_simplex_points, 0] = np.dot(
             self.simplex[:self.n_simplex_points], self.simplex[0])
+
+    def __len__(self):
+        return self.n_simplex_points
 
 
 def distance_subalgorithm(
@@ -261,13 +264,13 @@ def distance_subalgorithm(
 
 def _regular_distance_subalgorithm(
         simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4):
-    if simplex.n_simplex_points == 1:
+    if len(simplex) == 1:
         # case of a single point ...
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
         dstsq = simplex.dot_product_table[0, 0]
         return dstsq
-    elif simplex.n_simplex_points == 2:
+    elif len(simplex) == 2:
         # case of two points ...
         # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -295,7 +298,7 @@ def _regular_distance_subalgorithm(
             simplex.simplex[0, :] = simplex.simplex[1, :]
             simplex.dot_product_table[0, 0] = dstsq
             return dstsq
-    elif simplex.n_simplex_points == 3:
+    elif len(simplex) == 3:
         # case of three points ...
         # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -379,7 +382,7 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 1]
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
             return np.dot(search_direction, search_direction)
-    elif simplex.n_simplex_points == 4:
+    elif len(simplex) == 4:
         # case of four points ...
         # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -599,7 +602,7 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[2, 0] = simplex.dot_product_table[3, 2]
             return np.dot(search_direction, search_direction)
     else:
-        raise ValueError("Invalid value for nvs %d given" % simplex.n_simplex_points)
+        raise ValueError("Invalid value for nvs %d given" % len(simplex))
     return None
 
 
@@ -609,13 +612,13 @@ def _backup_procedure(
     iord = np.empty(4, dtype=int)
     zsold = np.empty(3, dtype=float)
     alsd = np.empty(4, dtype=float)
-    if simplex.n_simplex_points == 1:
+    if len(simplex) == 1:
         # case of a single point ...
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
         backup = True
         return simplex.dot_product_table[0, 0], backup
-    elif simplex.n_simplex_points == 2:
+    elif len(simplex) == 2:
         # case of two points ...
         if backup:
             d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -647,7 +650,7 @@ def _backup_procedure(
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
             iord[0] = 1
-    elif simplex.n_simplex_points == 3:
+    elif len(simplex) == 3:
         # case of three points
         if backup:
             d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -740,7 +743,7 @@ def _backup_procedure(
                 search_direction[:] = zsold
                 iord[0] = 2
                 iord[1] = 1
-    elif simplex.n_simplex_points == 4:
+    elif len(simplex) == 4:
         # case of four points
         if backup:
             d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -978,17 +981,17 @@ def _backup_procedure(
                 iord[2] = 2
     # final reordering
     risd = np.empty(4, dtype=int)
-    risd[:simplex.n_simplex_points] = simplex.indices_polytope1[:simplex.n_simplex_points]
+    risd[:len(simplex)] = simplex.indices_polytope1[:len(simplex)]
     rjsd = np.empty(4, dtype=int)
-    rjsd[:simplex.n_simplex_points] = simplex.indices_polytope2[:simplex.n_simplex_points]
+    rjsd[:len(simplex)] = simplex.indices_polytope2[:len(simplex)]
     yd = np.empty((4, 3), dtype=float)
-    yd[:simplex.n_simplex_points] = simplex.simplex[:simplex.n_simplex_points]
+    yd[:len(simplex)] = simplex.simplex[:len(simplex)]
     delld = np.empty((4, 4), dtype=float)
-    for k in range(simplex.n_simplex_points):
+    for k in range(len(simplex)):
         delld[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
 
     simplex.n_simplex_points = nvsd
-    for k in range(simplex.n_simplex_points):
+    for k in range(len(simplex)):
         kk = iord[k]
         simplex.indices_polytope1[k] = risd[kk]
         simplex.indices_polytope2[k] = rjsd[kk]
@@ -1023,7 +1026,7 @@ def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
         else:
             iord[3] = 3
     # Reorder indices_polytope1, indices_polytope2 simplex and dot_product_table
-    for k in range(1, simplex.n_simplex_points):
+    for k in range(1, len(simplex)):
         kk = iord[k]
         simplex.indices_polytope1[k] = old_simplex.indices_polytope1[kk]
         simplex.indices_polytope2[k] = old_simplex.indices_polytope2[kk]
