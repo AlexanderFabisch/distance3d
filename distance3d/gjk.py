@@ -114,8 +114,7 @@ def gjk_with_simplex(collider1, collider2):
 
             backup = True
             if ncy != 1:
-                simplex.n_simplex_points = _revert_to_old_simplex(
-                    simplex, old_simplex)
+                _revert_to_old_simplex(simplex, old_simplex)
             continue
 
         lastdstsq = dstsq
@@ -1010,7 +1009,7 @@ def _revert_to_old_simplex(simplex, old_simplex):
     simplex.indices_polytope1[:old_simplex.n_simplex_points] = old_simplex.indices_polytope1[:old_simplex.n_simplex_points]
     simplex.indices_polytope2[:old_simplex.n_simplex_points] = old_simplex.indices_polytope2[:old_simplex.n_simplex_points]
     simplex.dot_product_table[:old_simplex.n_simplex_points] = old_simplex.dot_product_table[:old_simplex.n_simplex_points]
-    return old_simplex.n_simplex_points
+    simplex.n_simplex_points = old_simplex.n_simplex_points
 
 
 def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
