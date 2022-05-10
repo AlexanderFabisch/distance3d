@@ -334,9 +334,7 @@ def _regular_distance_subalgorithm(
             barycentric_coordinates[0] = d1[4] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
             search_direction[:] = simplex.simplex[2] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[2])
-            simplex.simplex[1, 0] = simplex.simplex[2, 0]
-            simplex.simplex[1, 1] = simplex.simplex[2, 1]
-            simplex.simplex[1, 2] = simplex.simplex[2, 2]
+            simplex.simplex[1] = simplex.simplex[2]
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 0]
             simplex.dot_product_table[1, 1] = simplex.dot_product_table[2, 2]
             return np.dot(search_direction, search_direction)
