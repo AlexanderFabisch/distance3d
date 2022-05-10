@@ -127,8 +127,7 @@ def gjk_with_simplex(collider1, collider2):
         new_index2, new_vertex2 = collider2.support_function(search_direction)
         new_simplex_point = new_vertex1 - new_vertex2
 
-        simplex.n_simplex_points = _add_new_point(
-            simplex, new_index1, new_index2, new_simplex_point)
+        _add_new_point(simplex, new_index1, new_index2, new_simplex_point)
         old_simplex.save_old_simplex(simplex)
         _reorder_simplex(simplex, old_simplex, iord)
 
@@ -1008,7 +1007,6 @@ def _add_new_point(simplex, new_index1, new_index2, new_simplex_point):
     # Update dot product table
     simplex.n_simplex_points += 1
     simplex.dot_product_table[:simplex.n_simplex_points, 0] = np.dot(simplex.simplex[:simplex.n_simplex_points], simplex.simplex[0])
-    return simplex.n_simplex_points
 
 
 def _reorder_simplex(simplex, old_simplex, iord):
