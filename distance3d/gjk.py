@@ -70,14 +70,10 @@ def gjk_with_simplex(collider1, collider2):
         Simplex defined by 4 points of the Minkowski difference between
         vertices of the two colliders.
     """
-    indices_polytope1 = np.array([0, 0, 0, 0], dtype=int)
-    indices_polytope2 = np.array([0, 0, 0, 0], dtype=int)
 
     barycentric_coordinates = np.zeros(4, dtype=float)
     simplex = Simplex()
     old_simplex = Simplex()
-    old_indices_polytope1 = np.zeros(4, dtype=int)
-    old_indices_polytope2 = np.zeros(4, dtype=int)
     iord = np.zeros(4, dtype=int)
     search_direction = np.zeros(3, dtype=float)
     backup = False
@@ -96,17 +92,16 @@ def gjk_with_simplex(collider1, collider2):
 
         # Compute point of minimum norm in the convex hull of the simplex
         dstsq, backup = distance_subalgorithm(
-            simplex, indices_polytope1, indices_polytope2,
-            search_direction, barycentric_coordinates, backup)
+            simplex, search_direction, barycentric_coordinates, backup)
 
         if dstsq >= lastdstsq or simplex.n_simplex_points == 4:
             if backup:
                 closest_point1 = collider1.compute_point(
                     barycentric_coordinates[:simplex.n_simplex_points],
-                    indices_polytope1[:simplex.n_simplex_points])
+                    simplex.indices_polytope1[:simplex.n_simplex_points])
                 closest_point2 = collider2.compute_point(
                     barycentric_coordinates[:simplex.n_simplex_points],
-                    indices_polytope2[:simplex.n_simplex_points])
+                    simplex.indices_polytope2[:simplex.n_simplex_points])
 
                 # Make sure intersection has zero distance
                 if simplex.n_simplex_points == 4:
@@ -121,8 +116,7 @@ def gjk_with_simplex(collider1, collider2):
             backup = True
             if ncy != 1:
                 simplex.n_simplex_points = _revert_to_old_simplex(
-                    simplex, old_simplex, indices_polytope1, indices_polytope2,
-                    old_indices_polytope1, old_indices_polytope2)
+                    simplex, old_simplex)
             continue
 
         lastdstsq = dstsq
@@ -134,16 +128,9 @@ def gjk_with_simplex(collider1, collider2):
         new_simplex_point = new_vertex1 - new_vertex2
 
         simplex.n_simplex_points = _add_new_point(
-            simplex, indices_polytope1, indices_polytope2,
-            new_index1, new_index2, new_simplex_point)
-        old_simplex.n_simplex_points = _save_old_simplex(
-            simplex, old_simplex, indices_polytope1, indices_polytope2,
-            simplex.n_simplex_points, old_indices_polytope1,
-            old_indices_polytope2)
-        _reorder_simplex(
-            simplex, old_simplex, indices_polytope1, indices_polytope2, iord,
-            simplex.n_simplex_points, old_indices_polytope1,
-            old_indices_polytope2)
+            simplex, new_index1, new_index2, new_simplex_point)
+        _save_old_simplex(simplex, old_simplex)
+        _reorder_simplex(simplex, old_simplex, iord)
 
     raise RuntimeError("Solution should be found in loop.")
 
@@ -161,16 +148,27 @@ class Simplex:
 
     n_simplex_points : int
         Number of current simplex points.
+
+    indices_polytope1 : array, shape (n_simplex_points,)
+        Index vector for first polytope. For k = 1, ..., n_simplex_points,
+        simplex[k] = vertices1[indices_polytope1[k]]
+        - vertices2[indices_polytope2[k]].
+
+    indices_polytope2 : array, shape (n_simplex_points,)
+        Index vectors for first and second polytope. For k = 1, ...,
+        n_simplex_points, simplex[k] = vertices1[indices_polytope1[k]]
+        - vertices2[indices_polytope2[k]].
     """
     def __init__(self):
         self.simplex = np.zeros((4, 3), dtype=float)
         self.dot_product_table = np.zeros((4, 4), dtype=float)
         self.n_simplex_points = 0
+        self.indices_polytope1 = np.zeros(4, dtype=int)
+        self.indices_polytope2 = np.zeros(4, dtype=int)
 
 
 def distance_subalgorithm(
-        simplex, old_indices_polytope1, old_indices_polytope2,
-        search_direction, barycentric_coordinates, backup):
+        simplex, search_direction, barycentric_coordinates, backup):
     """Distance subalgorithm.
 
     Implements, in a very efficient way, the distance subalgorithm
@@ -184,24 +182,13 @@ def distance_subalgorithm(
 
     This function also determines an affinely independent subset of the
     points such that search_direction is a near point to the affine hull of
-    the points in the subset. The variables n_simplex_points, simplex,
-    old_indices_polytope1, old_indices_polytope2 and dot_product_table are
-    modified so that, on output, they correspond to this subset of points.
+    the points in the subset. The variable simplex is modified so that, on
+    output, it corresponds to this subset of points.
 
     Parameters
     ----------
     simplex : array, shape (n_simplex_points, 3)
       Current simplex.
-
-    old_indices_polytope1 : array, shape (n_simplex_points,)
-        Index vector for first polytope. For k = 1, ..., n_simplex_points,
-        simplex[k] = vertices1[old_indices_polytope1[k]]
-        - vertices2[old_indices_polytope2[k]].
-
-    old_indices_polytope2 : array, shape (n_simplex_points,)
-        Index vectors for first and second polytope. For k = 1, ...,
-        n_simplex_points, simplex[k] = vertices1[old_indices_polytope1[k]]
-        - vertices2[old_indices_polytope2[k]].
 
     search_direction : array, shape (3,)
         Near point to the convex hull of the points in simplex.
@@ -237,19 +224,17 @@ def distance_subalgorithm(
 
     if not backup:
         dstsqr = _regular_distance_subalgorithm(
-            simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
-            old_indices_polytope1, old_indices_polytope2)
+            simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4)
         if dstsqr is not None:
             return dstsqr, backup
 
     return _backup_procedure(
         simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
-        old_indices_polytope1, old_indices_polytope2, backup)
+        backup)
 
 
 def _regular_distance_subalgorithm(
-        simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
-        old_indices_polytope1, old_indices_polytope2):
+        simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4):
     if simplex.n_simplex_points == 1:
         # case of a single point ...
         barycentric_coordinates[0] = d1[0]
@@ -276,8 +261,8 @@ def _regular_distance_subalgorithm(
         # check optimality of vertex 2
         if d1[2] <= 0.0:
             simplex.n_simplex_points = 1
-            old_indices_polytope1[0] = old_indices_polytope1[1]
-            old_indices_polytope2[0] = old_indices_polytope2[1]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[1]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[1]
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
             dstsq = simplex.dot_product_table[1, 1]
@@ -311,8 +296,8 @@ def _regular_distance_subalgorithm(
         d2[6] = d1[4] * d2[2] + d3[4] * e123
         if not (d1[4] <= 0.0 or d2[6] > 0.0 or d3[4] <= 0.0):
             simplex.n_simplex_points = 2
-            old_indices_polytope1[1] = old_indices_polytope1[2]
-            old_indices_polytope2[1] = old_indices_polytope2[2]
+            simplex.indices_polytope1[1] = simplex.indices_polytope1[2]
+            simplex.indices_polytope2[1] = simplex.indices_polytope2[2]
             sum = d1[4] + d3[4]
             barycentric_coordinates[0] = d1[4] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
@@ -338,8 +323,8 @@ def _regular_distance_subalgorithm(
         # check optimality of vertex 2
         if not (d1[2] > 0.0 or d3[5] > 0.0):
             simplex.n_simplex_points = 1
-            old_indices_polytope1[0] = old_indices_polytope1[1]
-            old_indices_polytope2[0] = old_indices_polytope2[1]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[1]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[1]
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
             simplex.simplex[0, :] = simplex.simplex[1, :]
@@ -348,8 +333,8 @@ def _regular_distance_subalgorithm(
         # check optimality of vertex 3
         if not (d1[4] > 0.0 or d2[5] > 0.0):
             simplex.n_simplex_points = 1
-            old_indices_polytope1[0] = old_indices_polytope1[2]
-            old_indices_polytope2[0] = old_indices_polytope2[2]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[2]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[2]
             barycentric_coordinates[0] = d3[3]
             search_direction[:] = simplex.simplex[2]
             simplex.simplex[0] = simplex.simplex[2]
@@ -358,8 +343,8 @@ def _regular_distance_subalgorithm(
         # check optimality of line segment 2-3
         if not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0):
             simplex.n_simplex_points = 2
-            old_indices_polytope1[0] = old_indices_polytope1[2]
-            old_indices_polytope2[0] = old_indices_polytope2[2]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[2]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[2]
             sum = d2[5] + d3[5]
             barycentric_coordinates[1] = d2[5] / sum
             barycentric_coordinates[0] = 1.0 - barycentric_coordinates[1]
@@ -400,8 +385,8 @@ def _regular_distance_subalgorithm(
         d4[12] = d1[4] * d4[8] + d3[4] * e143
         if not (d1[4] <= 0.0 or d2[6] > 0.0 or d3[4] <= 0.0 or d4[12] > 0.0):
             simplex.n_simplex_points = 2
-            old_indices_polytope1[1] = old_indices_polytope1[2]
-            old_indices_polytope2[1] = old_indices_polytope2[2]
+            simplex.indices_polytope1[1] = simplex.indices_polytope1[2]
+            simplex.indices_polytope2[1] = simplex.indices_polytope2[2]
             sum = d1[4] + d3[4]
             barycentric_coordinates[0] = d1[4] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
@@ -432,8 +417,8 @@ def _regular_distance_subalgorithm(
         d3[12] = d1[8] * d3[4] + d4[8] * e134
         if not (d1[8] <= 0.0 or d2[11] > 0.0 or d3[12] > 0.0 or d4[8] <= 0.0):
             simplex.n_simplex_points = 2
-            old_indices_polytope1[1] = old_indices_polytope1[3]
-            old_indices_polytope2[1] = old_indices_polytope2[3]
+            simplex.indices_polytope1[1] = simplex.indices_polytope1[3]
+            simplex.indices_polytope2[1] = simplex.indices_polytope2[3]
             sum = d1[8] + d4[8]
             barycentric_coordinates[0] = d1[8] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
@@ -450,8 +435,8 @@ def _regular_distance_subalgorithm(
         d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
         if not (d1[11] <= 0.0 or d2[11] <= 0.0 or d3[14] > 0.0 or d4[11] <= 0.0):
             simplex.n_simplex_points = 3
-            old_indices_polytope1[2] = old_indices_polytope1[3]
-            old_indices_polytope2[2] = old_indices_polytope2[3]
+            simplex.indices_polytope1[2] = simplex.indices_polytope1[3]
+            simplex.indices_polytope2[2] = simplex.indices_polytope2[3]
             sum = d1[11] + d2[11] + d4[11]
             barycentric_coordinates[0] = d1[11] / sum
             barycentric_coordinates[1] = d2[11] / sum
@@ -470,8 +455,8 @@ def _regular_distance_subalgorithm(
         d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
         if not (d1[12] <= 0.0 or d2[14] > 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0):
             simplex.n_simplex_points = 3
-            old_indices_polytope1[1] = old_indices_polytope1[3]
-            old_indices_polytope2[1] = old_indices_polytope2[3]
+            simplex.indices_polytope1[1] = simplex.indices_polytope1[3]
+            simplex.indices_polytope2[1] = simplex.indices_polytope2[3]
             sum = d1[12] + d3[12] + d4[12]
             barycentric_coordinates[0] = d1[12] / sum
             barycentric_coordinates[2] = d3[12] / sum
@@ -501,8 +486,8 @@ def _regular_distance_subalgorithm(
         # check optimality of vertex 2
         if not (d1[2] > 0.0 or d3[5] > 0.0 or d4[9] > 0.0):
             simplex.n_simplex_points = 1
-            old_indices_polytope1[0] = old_indices_polytope1[1]
-            old_indices_polytope2[0] = old_indices_polytope2[1]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[1]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[1]
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
             simplex.simplex[0] = simplex.simplex[1]
@@ -511,8 +496,8 @@ def _regular_distance_subalgorithm(
         # check optimality of vertex 3
         if not (d1[4] > 0.0 or d2[5] > 0.0 or d4[10] > 0.0):
             simplex.n_simplex_points = 1
-            old_indices_polytope1[0] = old_indices_polytope1[2]
-            old_indices_polytope2[0] = old_indices_polytope2[2]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[2]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[2]
             barycentric_coordinates[0] = d3[3]
             search_direction[:] = simplex.simplex[2]
             simplex.simplex[0] = simplex.simplex[2]
@@ -521,8 +506,8 @@ def _regular_distance_subalgorithm(
         # check optimality of vertex 4
         if not (d1[8] > 0.0 or d2[9] > 0.0 or d3[10] > 0.0):
             simplex.n_simplex_points = 1
-            old_indices_polytope1[0] = old_indices_polytope1[3]
-            old_indices_polytope2[0] = old_indices_polytope2[3]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[3]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[3]
             barycentric_coordinates[0] = d4[7]
             search_direction[:] = simplex.simplex[3]
             simplex.simplex[0] = simplex.simplex[3]
@@ -531,8 +516,8 @@ def _regular_distance_subalgorithm(
         # check optimality of line segment 2-3
         if not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0 or d4[13] > 0.0):
             simplex.n_simplex_points = 2
-            old_indices_polytope1[0] = old_indices_polytope1[2]
-            old_indices_polytope2[0] = old_indices_polytope2[2]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[2]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[2]
             sum = d2[5] + d3[5]
             barycentric_coordinates[1] = d2[5] / sum
             barycentric_coordinates[0] = 1.0 - barycentric_coordinates[1]
@@ -545,8 +530,8 @@ def _regular_distance_subalgorithm(
         # check optimality of line segment 2-4
         if not (d1[11] > 0.0 or d2[9] <= 0.0 or d3[13] > 0.0 or d4[9] <= 0.0):
             simplex.n_simplex_points = 2
-            old_indices_polytope1[0] = old_indices_polytope1[3]
-            old_indices_polytope2[0] = old_indices_polytope2[3]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[3]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[3]
             sum = d2[9] + d4[9]
             barycentric_coordinates[1] = d2[9] / sum
             barycentric_coordinates[0] = 1.0 - barycentric_coordinates[1]
@@ -558,10 +543,10 @@ def _regular_distance_subalgorithm(
         # check optimality of line segment 3-4
         if not (d1[12] > 0.0 or d2[13] > 0.0 or d3[10] <= 0.0 or d4[10] <= 0.0):
             simplex.n_simplex_points = 2
-            old_indices_polytope1[0] = old_indices_polytope1[2]
-            old_indices_polytope1[1] = old_indices_polytope1[3]
-            old_indices_polytope2[0] = old_indices_polytope2[2]
-            old_indices_polytope2[1] = old_indices_polytope2[3]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[2]
+            simplex.indices_polytope1[1] = simplex.indices_polytope1[3]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[2]
+            simplex.indices_polytope2[1] = simplex.indices_polytope2[3]
             sum = d3[10] + d4[10]
             barycentric_coordinates[0] = d3[10] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
@@ -575,8 +560,8 @@ def _regular_distance_subalgorithm(
         # check optimality of face 2-3-4
         if not (d1[14] > 0.0 or d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0):
             simplex.n_simplex_points = 3
-            old_indices_polytope1[0] = old_indices_polytope1[3]
-            old_indices_polytope2[0] = old_indices_polytope2[3]
+            simplex.indices_polytope1[0] = simplex.indices_polytope1[3]
+            simplex.indices_polytope2[0] = simplex.indices_polytope2[3]
             sum = d2[13] + d3[13] + d4[13]
             barycentric_coordinates[1] = d2[13] / sum
             barycentric_coordinates[2] = d3[13] / sum
@@ -594,7 +579,7 @@ def _regular_distance_subalgorithm(
 
 def _backup_procedure(
         simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
-        old_indices_polytope1, old_indices_polytope2, backup):
+        backup):
     iord = np.empty(4, dtype=int)
     zsold = np.empty(3, dtype=float)
     alsd = np.empty(4, dtype=float)
@@ -967,9 +952,9 @@ def _backup_procedure(
                 iord[2] = 2
     # final reordering
     risd = np.empty(4, dtype=int)
-    risd[:simplex.n_simplex_points] = old_indices_polytope1[:simplex.n_simplex_points]
+    risd[:simplex.n_simplex_points] = simplex.indices_polytope1[:simplex.n_simplex_points]
     rjsd = np.empty(4, dtype=int)
-    rjsd[:simplex.n_simplex_points] = old_indices_polytope2[:simplex.n_simplex_points]
+    rjsd[:simplex.n_simplex_points] = simplex.indices_polytope2[:simplex.n_simplex_points]
     yd = np.empty((4, 3), dtype=float)
     yd[:simplex.n_simplex_points] = simplex.simplex[:simplex.n_simplex_points]
     delld = np.empty((4, 4), dtype=float)
@@ -979,8 +964,8 @@ def _backup_procedure(
     simplex.n_simplex_points = nvsd
     for k in range(simplex.n_simplex_points):
         kk = iord[k]
-        old_indices_polytope1[k] = risd[kk]
-        old_indices_polytope2[k] = rjsd[kk]
+        simplex.indices_polytope1[k] = risd[kk]
+        simplex.indices_polytope2[k] = rjsd[kk]
         simplex.simplex[k] = yd[kk]
         for l in range(k):
             ll = iord[l]
@@ -993,28 +978,24 @@ def _backup_procedure(
     return dstsq, backup
 
 
-def _revert_to_old_simplex(
-        simplex, old_simplex, indices_polytope1, indices_polytope2,
-        old_indices_polytope1, old_indices_polytope2):
+def _revert_to_old_simplex(simplex, old_simplex):
     simplex.simplex[:old_simplex.n_simplex_points] = old_simplex.simplex[:old_simplex.n_simplex_points]
-    indices_polytope1[:old_simplex.n_simplex_points] = old_indices_polytope1[:old_simplex.n_simplex_points]
-    indices_polytope2[:old_simplex.n_simplex_points] = old_indices_polytope2[:old_simplex.n_simplex_points]
+    simplex.indices_polytope1[:old_simplex.n_simplex_points] = old_simplex.indices_polytope1[:old_simplex.n_simplex_points]
+    simplex.indices_polytope2[:old_simplex.n_simplex_points] = old_simplex.indices_polytope2[:old_simplex.n_simplex_points]
     simplex.dot_product_table[:old_simplex.n_simplex_points] = old_simplex.dot_product_table[:old_simplex.n_simplex_points]
     return old_simplex.n_simplex_points
 
 
-def _add_new_point(
-        simplex, indices_polytope1, indices_polytope2, new_index1, new_index2,
-        new_simplex_point):
+def _add_new_point(simplex, new_index1, new_index2, new_simplex_point):
     # Move first point to last spot
-    indices_polytope1[simplex.n_simplex_points] = indices_polytope1[0]
-    indices_polytope2[simplex.n_simplex_points] = indices_polytope2[0]
+    simplex.indices_polytope1[simplex.n_simplex_points] = simplex.indices_polytope1[0]
+    simplex.indices_polytope2[simplex.n_simplex_points] = simplex.indices_polytope2[0]
     simplex.simplex[simplex.n_simplex_points] = simplex.simplex[0]
     simplex.dot_product_table[simplex.n_simplex_points, :simplex.n_simplex_points] = simplex.dot_product_table[:simplex.n_simplex_points, 0]
     simplex.dot_product_table[simplex.n_simplex_points, simplex.n_simplex_points] = simplex.dot_product_table[0, 0]
     # Put new point in first spot
-    indices_polytope1[0] = new_index1
-    indices_polytope2[0] = new_index2
+    simplex.indices_polytope1[0] = new_index1
+    simplex.indices_polytope2[0] = new_index2
     simplex.simplex[0] = new_simplex_point
     # Update dot product table
     simplex.n_simplex_points += 1
@@ -1022,27 +1003,22 @@ def _add_new_point(
     return simplex.n_simplex_points
 
 
-def _save_old_simplex(
-        simplex, old_simplex, indices_polytope1, indices_polytope2,
-        n_simplex_points, old_indices_polytope1, old_indices_polytope2):
+def _save_old_simplex(simplex, old_simplex):
     # Save old values of n_simplex_points, indices_polytope1,
     # indices_polytope2, simplex and dot_product_table
-    oldnvs = n_simplex_points
-    old_simplex.simplex[:n_simplex_points] = simplex.simplex[:n_simplex_points]
-    old_indices_polytope1[:n_simplex_points] = indices_polytope1[:n_simplex_points]
-    old_indices_polytope2[:n_simplex_points] = indices_polytope2[:n_simplex_points]
-    for k in range(n_simplex_points):
+    old_simplex.n_simplex_points = simplex.n_simplex_points
+    old_simplex.simplex[:simplex.n_simplex_points] = simplex.simplex[:simplex.n_simplex_points]
+    old_simplex.indices_polytope1[:simplex.n_simplex_points] = simplex.indices_polytope1[:simplex.n_simplex_points]
+    old_simplex.indices_polytope2[:simplex.n_simplex_points] = simplex.indices_polytope2[:simplex.n_simplex_points]
+    for k in range(simplex.n_simplex_points):
         old_simplex.dot_product_table[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
-    return oldnvs
 
 
-def _reorder_simplex(
-        simplex, old_simplex, indices_polytope1, indices_polytope2, iord,
-        n_simplex_points, old_indices_polytope1, old_indices_polytope2):
+def _reorder_simplex(simplex, old_simplex, iord):
     # If n_simplex_points == 4, rearrange dot_product_table[1, 0],
     # dot_product_table[2, 1] and dot_product_table[3, 0] in non decreasing
     # order
-    if n_simplex_points == 4:
+    if simplex.n_simplex_points == 4:
         iord[:3] = 0, 1, 2
         if simplex.dot_product_table[2, 0] < simplex.dot_product_table[1, 0]:
             iord[1] = 2
@@ -1060,10 +1036,10 @@ def _reorder_simplex(
             else:
                 iord[3] = 3
         # Reorder indices_polytope1, indices_polytope2 simplex and dot_product_table
-        for k in range(1, n_simplex_points):
+        for k in range(1, simplex.n_simplex_points):
             kk = iord[k]
-            indices_polytope1[k] = old_indices_polytope1[kk]
-            indices_polytope2[k] = old_indices_polytope2[kk]
+            simplex.indices_polytope1[k] = old_simplex.indices_polytope1[kk]
+            simplex.indices_polytope2[k] = old_simplex.indices_polytope2[kk]
             simplex.simplex[k] = old_simplex.simplex[kk]
             for l in range(k):
                 ll = iord[l]
