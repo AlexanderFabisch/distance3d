@@ -456,14 +456,12 @@ def _regular_distance_subalgorithm(
         d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
         if not (d1[11] <= 0.0 or d2[11] <= 0.0 or d3[14] > 0.0 or d4[11] <= 0.0):
             simplex.n_simplex_points = 3
-            simplex.indices_polytope1[2] = simplex.indices_polytope1[3]
-            simplex.indices_polytope2[2] = simplex.indices_polytope2[3]
+            simplex.move_vertex(3, 2)
             sum = d1[11] + d2[11] + d4[11]
             barycentric_coordinates[0] = d1[11] / sum
             barycentric_coordinates[1] = d2[11] / sum
             barycentric_coordinates[2] = 1.0 - barycentric_coordinates[0] - barycentric_coordinates[1]
-            search_direction[:] = simplex.simplex[3] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[3]) + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[3])
-            simplex.simplex[2] = simplex.simplex[3]
+            search_direction[:] = simplex.simplex[2] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[2]) + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[2])
             simplex.dot_product_table[2, 0] = simplex.dot_product_table[3, 0]
             simplex.dot_product_table[2, 1] = simplex.dot_product_table[3, 1]
             simplex.dot_product_table[2, 2] = simplex.dot_product_table[3, 3]
@@ -476,14 +474,12 @@ def _regular_distance_subalgorithm(
         d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
         if not (d1[12] <= 0.0 or d2[14] > 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0):
             simplex.n_simplex_points = 3
-            simplex.indices_polytope1[1] = simplex.indices_polytope1[3]
-            simplex.indices_polytope2[1] = simplex.indices_polytope2[3]
+            simplex.move_vertex(3, 1)
             sum = d1[12] + d3[12] + d4[12]
             barycentric_coordinates[0] = d1[12] / sum
             barycentric_coordinates[2] = d3[12] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0] - barycentric_coordinates[2]
-            search_direction[:] = simplex.simplex[3] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[3]) + barycentric_coordinates[2] * (simplex.simplex[2] - simplex.simplex[3])
-            simplex.simplex[1] = simplex.simplex[3]
+            search_direction[:] = simplex.simplex[1] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[1]) + barycentric_coordinates[2] * (simplex.simplex[2] - simplex.simplex[1])
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 0]
             simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
             simplex.dot_product_table[2, 1] = simplex.dot_product_table[3, 2]
@@ -560,14 +556,12 @@ def _regular_distance_subalgorithm(
         # check optimality of face 2-3-4
         if not (d1[14] > 0.0 or d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0):
             simplex.n_simplex_points = 3
-            simplex.indices_polytope1[0] = simplex.indices_polytope1[3]
-            simplex.indices_polytope2[0] = simplex.indices_polytope2[3]
+            simplex.move_vertex(3, 0)
             sum = d2[13] + d3[13] + d4[13]
             barycentric_coordinates[1] = d2[13] / sum
             barycentric_coordinates[2] = d3[13] / sum
             barycentric_coordinates[0] = 1.0 - barycentric_coordinates[1] - barycentric_coordinates[2]
-            search_direction[:] = simplex.simplex[3] + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[3]) + barycentric_coordinates[2] * (simplex.simplex[2] - simplex.simplex[3])
-            simplex.simplex[0] = simplex.simplex[3]
+            search_direction[:] = simplex.simplex[0] + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[0]) + barycentric_coordinates[2] * (simplex.simplex[2] - simplex.simplex[0])
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[3, 3]
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 1]
             simplex.dot_product_table[2, 0] = simplex.dot_product_table[3, 2]
