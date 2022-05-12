@@ -284,8 +284,7 @@ def _regular_distance_subalgorithm(
     if len(simplex) == 1:
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
-        dstsq = simplex.dot_product_table[0, 0]
-        return dstsq
+        return simplex.dot_product_table[0, 0]
     elif len(simplex) == 2:
         # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -537,11 +536,10 @@ def _regular_distance_subalgorithm(
             barycentric_coordinates[1] = d2[5] / sum
             barycentric_coordinates[0] = 1.0 - barycentric_coordinates[1]
             search_direction[:] = simplex.simplex[2] + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[2])
-            dstsq = np.dot(search_direction, search_direction)
             simplex.simplex[0] = simplex.simplex[2]
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 1]
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
-            return dstsq
+            return np.dot(search_direction, search_direction)
         # check optimality of line segment 2-4
         if not (d1[11] > 0.0 or d2[9] <= 0.0 or d3[13] > 0.0 or d4[9] <= 0.0):
             simplex.n_simplex_points = 2
