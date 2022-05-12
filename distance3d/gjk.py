@@ -201,6 +201,8 @@ class Simplex:
 
     def reduce_to_optimal_vertex(self, vertex_index):
         self.n_simplex_points = 1
+        if vertex_index == 0:
+            return
         self.indices_polytope1[0] = self.indices_polytope1[vertex_index]
         self.indices_polytope2[0] = self.indices_polytope2[vertex_index]
         self.simplex[0, :] = self.simplex[vertex_index, :]
@@ -288,7 +290,7 @@ def _regular_distance_subalgorithm(
         # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
         if d2[2] <= 0.0:
-            simplex.n_simplex_points = 1
+            simplex.reduce_to_optimal_vertex(0)
             barycentric_coordinates[0] = d1[0]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
@@ -311,7 +313,7 @@ def _regular_distance_subalgorithm(
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
         d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
         if not (d2[2] > 0.0 or d3[4] > 0.0):
-            simplex.n_simplex_points = 1
+            simplex.reduce_to_optimal_vertex(0)
             barycentric_coordinates[0] = d1[0]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
@@ -385,7 +387,7 @@ def _regular_distance_subalgorithm(
         d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
         d4[8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
         if not (d2[2] > 0.0 or d3[4] > 0.0 or d4[8] > 0.0):
-            simplex.n_simplex_points = 1
+            simplex.reduce_to_optimal_vertex(0)
             barycentric_coordinates[0] = d1[0]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
