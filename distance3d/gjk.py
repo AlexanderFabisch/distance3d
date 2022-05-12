@@ -212,8 +212,11 @@ class Simplex:
         self.indices_polytope2[new_index] = self.indices_polytope2[old_index]
         self.simplex[new_index] = self.simplex[old_index]
 
-    def search_direction_line(self, t):
-        return self.simplex[1] + t * (self.simplex[0] - self.simplex[1])
+    def search_direction_line(self, a):
+        return self.simplex[1] + a * (self.simplex[0] - self.simplex[1])
+
+    def search_direction_face(self, a, b):
+        return self.simplex[2] + a * (self.simplex[0] - self.simplex[2]) + b * (self.simplex[1] - self.simplex[2])
 
     def __len__(self):
         return self.n_simplex_points
@@ -357,7 +360,7 @@ def _regular_distance_subalgorithm(
             barycentric_coordinates[0] = d1[6] / sum
             barycentric_coordinates[1] = d2[6] / sum
             barycentric_coordinates[2] = 1.0 - barycentric_coordinates[0] - barycentric_coordinates[1]
-            search_direction[:] = simplex.simplex[2] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[2]) + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[2])
+            search_direction[:] = simplex.search_direction_face(barycentric_coordinates[0], barycentric_coordinates[1])
             return np.dot(search_direction, search_direction)
         # check optimality of vertex 2
         if not (d1[2] > 0.0 or d3[5] > 0.0):
@@ -433,7 +436,7 @@ def _regular_distance_subalgorithm(
             barycentric_coordinates[0] = d1[6] / sum
             barycentric_coordinates[1] = d2[6] / sum
             barycentric_coordinates[2] = 1.0 - barycentric_coordinates[0] - barycentric_coordinates[1]
-            search_direction[:] = simplex.simplex[2] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[2]) + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[2])
+            search_direction[:] = simplex.search_direction_face(barycentric_coordinates[0], barycentric_coordinates[1])
             return np.dot(search_direction, search_direction)
         # check optimality of line segment 1-4
         e124 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 1]
@@ -464,7 +467,7 @@ def _regular_distance_subalgorithm(
             barycentric_coordinates[0] = d1[11] / sum
             barycentric_coordinates[1] = d2[11] / sum
             barycentric_coordinates[2] = 1.0 - barycentric_coordinates[0] - barycentric_coordinates[1]
-            search_direction[:] = simplex.simplex[2] + barycentric_coordinates[0] * (simplex.simplex[0] - simplex.simplex[2]) + barycentric_coordinates[1] * (simplex.simplex[1] - simplex.simplex[2])
+            search_direction[:] = simplex.search_direction_face(barycentric_coordinates[0], barycentric_coordinates[1])
             simplex.dot_product_table[2, 0] = simplex.dot_product_table[3, 0]
             simplex.dot_product_table[2, 1] = simplex.dot_product_table[3, 1]
             simplex.dot_product_table[2, 2] = simplex.dot_product_table[3, 3]
