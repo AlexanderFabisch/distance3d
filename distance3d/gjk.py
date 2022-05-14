@@ -180,14 +180,14 @@ class Simplex:
             :self.n_simplex_points, :self.n_simplex_points]
 
     def reorder(self, iord, n_simplex_points):
-        indices_polytope1 = np.copy(self.indices_polytope1[:len(self)])
-        indices_polytope2 = np.copy(self.indices_polytope2[:len(self)])
-        simplex = np.copy(self.simplex[:len(self)])
+        indices_polytope1 = np.copy(self.indices_polytope1[:self.n_simplex_points])
+        indices_polytope2 = np.copy(self.indices_polytope2[:self.n_simplex_points])
+        simplex = np.copy(self.simplex[:self.n_simplex_points])
         dot_product_table = np.empty((4, 4), dtype=float)
-        for k in range(len(self)):
+        for k in range(self.n_simplex_points):
             dot_product_table[k, :k + 1] = self.dot_product_table[k, :k + 1]
         self.n_simplex_points = n_simplex_points
-        for k in range(len(self)):
+        for k in range(self.n_simplex_points):
             kk = iord[k]
             self.indices_polytope1[k] = indices_polytope1[kk]
             self.indices_polytope2[k] = indices_polytope2[kk]
