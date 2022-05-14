@@ -441,7 +441,7 @@ def _regular_distance_subalgorithm(
             coords_sum = d1[6] + d2[6] + d3[6]
             barycentric_coordinates[0] = d1[6] / coords_sum
             barycentric_coordinates[1] = d2[6] / coords_sum
-            barycentric_coordinates[2] = 1.0 - barycentric_coordinates[:2].sum()
+            barycentric_coordinates[2] = 1.0 - sum(barycentric_coordinates[:2])
             search_direction[:] = simplex.search_direction_face_201(
                 barycentric_coordinates[0], barycentric_coordinates[1])
             return np.dot(search_direction, search_direction)
@@ -521,7 +521,7 @@ def _regular_distance_subalgorithm(
             coords_sum = d1[6] + d2[6] + d3[6]
             barycentric_coordinates[0] = d1[6] / coords_sum
             barycentric_coordinates[1] = d2[6] / coords_sum
-            barycentric_coordinates[2] = 1.0 - barycentric_coordinates[:2].sum()
+            barycentric_coordinates[2] = 1.0 - sum(barycentric_coordinates[:2])
             search_direction[:] = simplex.search_direction_face_201(
                 barycentric_coordinates[0], barycentric_coordinates[1])
             return np.dot(search_direction, search_direction)
@@ -554,7 +554,7 @@ def _regular_distance_subalgorithm(
             coords_sum = d1[11] + d2[11] + d4[11]
             barycentric_coordinates[0] = d1[11] / coords_sum
             barycentric_coordinates[1] = d2[11] / coords_sum
-            barycentric_coordinates[2] = 1.0 - barycentric_coordinates[:2].sum()
+            barycentric_coordinates[2] = 1.0 - sum(barycentric_coordinates[:2])
             search_direction[:] = simplex.search_direction_face_201(
                 barycentric_coordinates[0], barycentric_coordinates[1])
             simplex.dot_product_table[2, 0] = simplex.dot_product_table[3, 0]
@@ -593,7 +593,7 @@ def _regular_distance_subalgorithm(
             barycentric_coordinates[0] = d1[14] / coords_sum
             barycentric_coordinates[1] = d2[14] / coords_sum
             barycentric_coordinates[2] = d3[14] / coords_sum
-            barycentric_coordinates[3] = 1.0 - barycentric_coordinates[:3].sum()
+            barycentric_coordinates[3] = 1.0 - sum(barycentric_coordinates[:3])
             search_direction[:] = simplex.search_direction_simplex(
                 *barycentric_coordinates)
             return np.dot(search_direction, search_direction)
@@ -660,7 +660,7 @@ def _regular_distance_subalgorithm(
             coords_sum = d2[13] + d3[13] + d4[13]
             barycentric_coordinates[1] = d2[13] / coords_sum
             barycentric_coordinates[2] = d3[13] / coords_sum
-            barycentric_coordinates[0] = 1.0 - barycentric_coordinates[1:3].sum()
+            barycentric_coordinates[0] = 1.0 - sum(barycentric_coordinates[1:3])
             search_direction[:] = simplex.search_direction_face_012(
                 barycentric_coordinates[1], barycentric_coordinates[2])
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[3, 3]
