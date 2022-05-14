@@ -639,8 +639,8 @@ def _backup_procedure(
         simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
         backup):
     ordered_indices = np.empty(4, dtype=int)
-    zsold = np.empty(3, dtype=float)
-    alsd = np.empty(4, dtype=float)
+    search_direction_d = np.empty(3, dtype=float)
+    barycentric_coordinates_d = np.empty(4, dtype=float)
     if len(simplex) == 1:
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
@@ -658,15 +658,15 @@ def _backup_procedure(
         # check line segment 1-2
         if not (d1[2] <= 0.0 or d2[2] <= 0.0):
             sum = d1[2] + d2[2]
-            alsd[0] = d1[2] / sum
-            alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex.simplex[1, :] + alsd[0] * (simplex.simplex[0, :] - simplex.simplex[1, :])
-            dstsqd = zsold[0] * zsold[0] + zsold[1] * zsold[1] + zsold[2] * zsold[2]
+            barycentric_coordinates_d[0] = d1[2] / sum
+            barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
+            search_direction_d[:] = simplex.simplex[1, :] + barycentric_coordinates_d[0] * (simplex.simplex[0, :] - simplex.simplex[1, :])
+            dstsqd = search_direction_d[0] * search_direction_d[0] + search_direction_d[1] * search_direction_d[1] + search_direction_d[2] * search_direction_d[2]
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold[:]
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d[:]
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
         # check vertex 2
@@ -699,44 +699,44 @@ def _backup_procedure(
         # check line segment 1-2
         if not (d1[2] <= 0.0 or d2[2] <= 0.0):
             sum = d1[2] + d2[2]
-            alsd[0] = d1[2] / sum
-            alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex.simplex[1] + alsd[0] * (simplex.simplex[0] - simplex.simplex[1])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d1[2] / sum
+            barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
+            search_direction_d[:] = simplex.simplex[1] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[1])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
         # check line segment 1-3
         if not (d1[4] <= 0.0 or d3[4] <= 0.0):
             sum = d1[4] + d3[4]
-            alsd[0] = d1[4] / sum
-            alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex.simplex[2] + alsd[0] * (simplex.simplex[0] - simplex.simplex[2])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d1[4] / sum
+            barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
+            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[2])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 2
         # check face 1-2-3
         if not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0):
             sum = d1[6] + d2[6] + d3[6]
-            alsd[0] = d1[6] / sum
-            alsd[1] = d2[6] / sum
-            alsd[2] = 1.0 - alsd[0] - alsd[1]
-            zsold[:] = simplex.simplex[2] + alsd[0] * (simplex.simplex[0] - simplex.simplex[2]) + alsd[1] * (simplex.simplex[1] - simplex.simplex[2])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d1[6] / sum
+            barycentric_coordinates_d[1] = d2[6] / sum
+            barycentric_coordinates_d[2] = 1.0 - barycentric_coordinates_d[0] - barycentric_coordinates_d[1]
+            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[2]) + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[2])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 3
-                barycentric_coordinates[:] = alsd
-                search_direction[:] = zsold
+                barycentric_coordinates[:] = barycentric_coordinates_d
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
                 ordered_indices[2] = 2
@@ -757,15 +757,15 @@ def _backup_procedure(
         # check line segment 2-3
         if not (d2[5] <= 0.0 or d3[5] <= 0.0):
             sum = d2[5] + d3[5]
-            alsd[1] = d2[5] / sum
-            alsd[0] = 1.0 - alsd[1]
-            zsold[:] = simplex.simplex[2] + alsd[1] * (simplex.simplex[1] - simplex.simplex[2])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[1] = d2[5] / sum
+            barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1]
+            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[2])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 2
                 ordered_indices[1] = 1
     elif len(simplex) == 4:
@@ -819,107 +819,107 @@ def _backup_procedure(
         # check line segment 1-2
         if not (d1[2] <= 0.0 or d2[2] <= 0.0):
             sum = d1[2] + d2[2]
-            alsd[0] = d1[2] / sum
-            alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex.simplex[1] + alsd[0] * (simplex.simplex[0] - simplex.simplex[1])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d1[2] / sum
+            barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
+            search_direction_d[:] = simplex.simplex[1] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[1])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
         # check line segment 1-3
         if not (d1[4] <= 0.0 or d3[4] <= 0.0):
             sum = d1[4] + d3[4]
-            alsd[0] = d1[4] / sum
-            alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex.simplex[2] + alsd[0] * (simplex.simplex[0] - simplex.simplex[2])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d1[4] / sum
+            barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
+            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[2])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 2
         # check face 1-2-3
         if not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0):
             sum = d1[6] + d2[6] + d3[6]
-            alsd[0] = d1[6] / sum
-            alsd[1] = d2[6] / sum
-            alsd[2] = 1.0 - alsd[0] - alsd[1]
-            zsold[:] = simplex.simplex[2] + alsd[0] * (simplex.simplex[0] - simplex.simplex[2]) + alsd[1] * (simplex.simplex[1] - simplex.simplex[2])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d1[6] / sum
+            barycentric_coordinates_d[1] = d2[6] / sum
+            barycentric_coordinates_d[2] = 1.0 - barycentric_coordinates_d[0] - barycentric_coordinates_d[1]
+            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[2]) + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[2])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 3
-                barycentric_coordinates[:] = alsd
-                search_direction[:] = zsold
+                barycentric_coordinates[:] = barycentric_coordinates_d
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
                 ordered_indices[2] = 2
         # check line segment 1-4
         if not (d1[8] <= 0.0 or d4[8] <= 0.0):
             sum = d1[8] + d4[8]
-            alsd[0] = d1[8] / sum
-            alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex.simplex[3] + alsd[0] * (simplex.simplex[0] - simplex.simplex[3])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d1[8] / sum
+            barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
+            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[3])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 3
         # check face 1-2-4
         if not (d1[11] <= 0.0 or d2[11] <= 0.0 or d4[11] <= 0.0):
             sum = d1[11] + d2[11] + d4[11]
-            alsd[0] = d1[11] / sum
-            alsd[1] = d2[11] / sum
-            alsd[2] = 1.0 - alsd[0] - alsd[1]
-            zsold[:] = simplex.simplex[3] + alsd[0] * (simplex.simplex[0] - simplex.simplex[3]) + alsd[1] * (simplex.simplex[1] - simplex.simplex[3])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d1[11] / sum
+            barycentric_coordinates_d[1] = d2[11] / sum
+            barycentric_coordinates_d[2] = 1.0 - barycentric_coordinates_d[0] - barycentric_coordinates_d[1]
+            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[3]) + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[3])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 3
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
                 ordered_indices[2] = 3
         # check face 1-3-4
         if not (d1[12] <= 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0):
             sum = d1[12] + d3[12] + d4[12]
-            alsd[0] = d1[12] / sum
-            alsd[2] = d3[12] / sum
-            alsd[1] = 1.0 - alsd[0] - alsd[2]
-            zsold[:] = simplex.simplex[3] + alsd[0] * (simplex.simplex[0] - simplex.simplex[3]) + alsd[2] * (simplex.simplex[2] - simplex.simplex[3])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d1[12] / sum
+            barycentric_coordinates_d[2] = d3[12] / sum
+            barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0] - barycentric_coordinates_d[2]
+            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[3]) + barycentric_coordinates_d[2] * (simplex.simplex[2] - simplex.simplex[3])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 3
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 3
                 ordered_indices[2] = 2
         # check the hull of all 4 points
         if not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0):
             sum = d1[14] + d2[14] + d3[14] + d4[14]
-            alsd[0] = d1[14] / sum
-            alsd[1] = d2[14] / sum
-            alsd[2] = d3[14] / sum
-            alsd[3] = 1.0 - alsd[0] - alsd[1] - alsd[2]
-            zsold[:] = alsd[0] * simplex.simplex[0] + alsd[1] * simplex.simplex[1] + alsd[2] * simplex.simplex[2] + alsd[3] * simplex.simplex[3]
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d1[14] / sum
+            barycentric_coordinates_d[1] = d2[14] / sum
+            barycentric_coordinates_d[2] = d3[14] / sum
+            barycentric_coordinates_d[3] = 1.0 - barycentric_coordinates_d[0] - barycentric_coordinates_d[1] - barycentric_coordinates_d[2]
+            search_direction_d[:] = barycentric_coordinates_d[0] * simplex.simplex[0] + barycentric_coordinates_d[1] * simplex.simplex[1] + barycentric_coordinates_d[2] * simplex.simplex[2] + barycentric_coordinates_d[3] * simplex.simplex[3]
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 4
-                barycentric_coordinates[:] = alsd
-                search_direction[:] = zsold
+                barycentric_coordinates[:] = barycentric_coordinates_d
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
                 ordered_indices[2] = 2
@@ -948,58 +948,58 @@ def _backup_procedure(
         # check line segment 2-3
         if not (d2[5] <= 0.0 or d3[5] <= 0.0):
             sum = d2[5] + d3[5]
-            alsd[1] = d2[5] / sum
-            alsd[0] = 1.0 - alsd[1]
-            zsold[:] = simplex.simplex[2] + alsd[1] * (simplex.simplex[1] - simplex.simplex[2])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[1] = d2[5] / sum
+            barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1]
+            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[2])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 2
                 ordered_indices[1] = 1
         # check line segment 2-4
         if not (d2[9] <= 0.0 or d4[9] <= 0.0):
             sum = d2[9] + d4[9]
-            alsd[1] = d2[9] / sum
-            alsd[0] = 1.0 - alsd[1]
-            zsold[:] = simplex.simplex[3] + alsd[1] * (simplex.simplex[1] - simplex.simplex[3])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[1] = d2[9] / sum
+            barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1]
+            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[3])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 3
                 ordered_indices[1] = 1
         # check line segment 3-4
         if not (d3[10] <= 0.0 or d4[10] <= 0.0):
             sum = d3[10] + d4[10]
-            alsd[0] = d3[10] / sum
-            alsd[1] = 1.0 - alsd[0]
-            zsold[:] = simplex.simplex[3] + alsd[0] * (simplex.simplex[2] - simplex.simplex[3])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[0] = d3[10] / sum
+            barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
+            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[0] * (simplex.simplex[2] - simplex.simplex[3])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 2
                 ordered_indices[1] = 3
         # check face 2-3-4
         if not (d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0):
             sum = d2[13] + d3[13] + d4[13]
-            alsd[1] = d2[13] / sum
-            alsd[2] = d3[13] / sum
-            alsd[0] = 1.0 - alsd[1] - alsd[2]
-            zsold[:] = simplex.simplex[3] + alsd[1] * (simplex.simplex[1] - simplex.simplex[3]) + alsd[2] * (simplex.simplex[2] - simplex.simplex[3])
-            dstsqd = np.dot(zsold, zsold)
+            barycentric_coordinates_d[1] = d2[13] / sum
+            barycentric_coordinates_d[2] = d3[13] / sum
+            barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1] - barycentric_coordinates_d[2]
+            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[3]) + barycentric_coordinates_d[2] * (simplex.simplex[2] - simplex.simplex[3])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 3
-                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
-                search_direction[:] = zsold
+                barycentric_coordinates[:n_simplex_points] = barycentric_coordinates_d[:n_simplex_points]
+                search_direction[:] = search_direction_d
                 ordered_indices[0] = 3
                 ordered_indices[1] = 1
                 ordered_indices[2] = 2
