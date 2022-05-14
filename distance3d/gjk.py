@@ -374,42 +374,42 @@ def _regular_distance_subalgorithm(
         search_direction[:] = simplex.simplex[0]
         return simplex.dot_product_table[0, 0]
     elif len(simplex) == 2:
-        # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
-        if d2[2] <= 0.0:
+        vertex_1_optimal = d2[2] <= 0.0
+        if vertex_1_optimal:
             simplex.reduce_to_optimal_vertex(0)
             barycentric_coordinates[0] = d1[0]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
-        # check optimality of line segment 1-2
         d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
-        if not (d1[2] <= 0.0 or d2[2] <= 0.0):
+        line_segment_12_optimal = not (d1[2] <= 0.0 or d2[2] <= 0.0)
+        if line_segment_12_optimal:
             sum = d1[2] + d2[2]
             barycentric_coordinates[0] = d1[2] / sum
             barycentric_coordinates[1] = 1.0 - barycentric_coordinates[0]
             search_direction[:] = simplex.search_direction_line_10(
                 barycentric_coordinates[0])
             return np.dot(search_direction, search_direction)
-        # check optimality of vertex 2
-        if d1[2] <= 0.0:
+        vertex_2_optimal = d1[2] <= 0.0
+        if vertex_2_optimal:
             simplex.reduce_to_optimal_vertex(1)
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
     elif len(simplex) == 3:
-        # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
         d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
-        if not (d2[2] > 0.0 or d3[4] > 0.0):
+        vertex_1_optimal = not (d2[2] > 0.0 or d3[4] > 0.0)
+        if vertex_1_optimal:
             simplex.reduce_to_optimal_vertex(0)
             barycentric_coordinates[0] = d1[0]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
-        # check optimality of line segment 1-2
         e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
         d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
         d3[6] = d1[2] * d3[4] + d2[2] * e132
-        if not (d1[2] <= 0.0 or d2[2] <= 0.0 or d3[6] > 0.0):
+        line_segment_12_optimal = not (d1[2] <= 0.0 or d2[2] <= 0.0 or d3[6] > 0.0)
+        if line_segment_12_optimal:
             simplex.n_simplex_points = 2
             sum = d1[2] + d2[2]
             barycentric_coordinates[0] = d1[2] / sum
@@ -417,11 +417,11 @@ def _regular_distance_subalgorithm(
             search_direction[:] = simplex.search_direction_line_10(
                 barycentric_coordinates[0])
             return np.dot(search_direction, search_direction)
-        # check optimality of line segment 1-3
         e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
         d1[4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
         d2[6] = d1[4] * d2[2] + d3[4] * e123
-        if not (d1[4] <= 0.0 or d2[6] > 0.0 or d3[4] <= 0.0):
+        line_segment_13_optimal = not (d1[4] <= 0.0 or d2[6] > 0.0 or d3[4] <= 0.0)
+        if line_segment_13_optimal:
             simplex.n_simplex_points = 2
             simplex.move_vertex(2, 1)
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 0]
@@ -432,12 +432,12 @@ def _regular_distance_subalgorithm(
             search_direction[:] = simplex.search_direction_line_10(
                 barycentric_coordinates[0])
             return np.dot(search_direction, search_direction)
-        # check optimality of face 123
         e213 = -e123
         d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
         d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
         d1[6] = d2[5] * d1[2] + d3[5] * e213
-        if not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0):
+        face_123_optimal = not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0)
+        if face_123_optimal:
             sum = d1[6] + d2[6] + d3[6]
             barycentric_coordinates[0] = d1[6] / sum
             barycentric_coordinates[1] = d2[6] / sum
@@ -445,20 +445,20 @@ def _regular_distance_subalgorithm(
             search_direction[:] = simplex.search_direction_face_201(
                 barycentric_coordinates[0], barycentric_coordinates[1])
             return np.dot(search_direction, search_direction)
-        # check optimality of vertex 2
-        if not (d1[2] > 0.0 or d3[5] > 0.0):
+        vertex_2_optimal = not (d1[2] > 0.0 or d3[5] > 0.0)
+        if vertex_2_optimal:
             simplex.reduce_to_optimal_vertex(1)
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
-        # check optimality of vertex 3
-        if not (d1[4] > 0.0 or d2[5] > 0.0):
+        vertex_3_optimal = not (d1[4] > 0.0 or d2[5] > 0.0)
+        if vertex_3_optimal:
             simplex.reduce_to_optimal_vertex(2)
             barycentric_coordinates[0] = d3[3]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
-        # check optimality of line segment 2-3
-        if not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0):
+        line_segment_23_optimal = not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0)
+        if line_segment_23_optimal:
             simplex.n_simplex_points = 2
             simplex.move_vertex(2, 0)
             sum = d2[5] + d3[5]
@@ -470,22 +470,22 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
             return np.dot(search_direction, search_direction)
     elif len(simplex) == 4:
-        # check optimality of vertex 1
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
         d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
         d4[8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
-        if not (d2[2] > 0.0 or d3[4] > 0.0 or d4[8] > 0.0):
+        vertex_1_optimal = not (d2[2] > 0.0 or d3[4] > 0.0 or d4[8] > 0.0)
+        if vertex_1_optimal:
             simplex.reduce_to_optimal_vertex(0)
             barycentric_coordinates[0] = d1[0]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
-        # check optimality of line segment 1-2
         e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
         e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
         d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
         d3[6] = d1[2] * d3[4] + d2[2] * e132
         d4[11] = d1[2] * d4[8] + d2[2] * e142
-        if not (d1[2] <= 0.0 or d2[2] <= 0.0 or d3[6] > 0.0 or d4[11] > 0.0):
+        line_segment_12_optimal = not (d1[2] <= 0.0 or d2[2] <= 0.0 or d3[6] > 0.0 or d4[11] > 0.0)
+        if line_segment_12_optimal:
             simplex.n_simplex_points = 2
             sum = d1[2] + d2[2]
             barycentric_coordinates[0] = d1[2] / sum
@@ -493,13 +493,13 @@ def _regular_distance_subalgorithm(
             search_direction[:] = simplex.search_direction_line_10(
                 barycentric_coordinates[0])
             return np.dot(search_direction, search_direction)
-        # check optimality of line segment 1-3
         e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
         e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
         d1[4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
         d2[6] = d1[4] * d2[2] + d3[4] * e123
         d4[12] = d1[4] * d4[8] + d3[4] * e143
-        if not (d1[4] <= 0.0 or d2[6] > 0.0 or d3[4] <= 0.0 or d4[12] > 0.0):
+        line_segment_13_optimal = not (d1[4] <= 0.0 or d2[6] > 0.0 or d3[4] <= 0.0 or d4[12] > 0.0)
+        if line_segment_13_optimal:
             simplex.n_simplex_points = 2
             simplex.move_vertex(2, 1)
             sum = d1[4] + d3[4]
@@ -510,13 +510,13 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 0]
             simplex.dot_product_table[1, 1] = simplex.dot_product_table[2, 2]
             return np.dot(search_direction, search_direction)
-        # check optimality of face 123
         d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
         d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
         e213 = -e123
         d1[6] = d2[5] * d1[2] + d3[5] * e213
         d4[14] = d1[6] * d4[8] + d2[6] * e142 + d3[6] * e143
-        if not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0 or d4[14] > 0.0):
+        face_123_optimal = not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0 or d4[14] > 0.0)
+        if face_123_optimal:
             simplex.n_simplex_points = 3
             sum = d1[6] + d2[6] + d3[6]
             barycentric_coordinates[0] = d1[6] / sum
@@ -525,13 +525,13 @@ def _regular_distance_subalgorithm(
             search_direction[:] = simplex.search_direction_face_201(
                 barycentric_coordinates[0], barycentric_coordinates[1])
             return np.dot(search_direction, search_direction)
-        # check optimality of line segment 1-4
         e124 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 1]
         e134 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 2]
         d1[8] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 0]
         d2[11] = d1[8] * d2[2] + d4[8] * e124
         d3[12] = d1[8] * d3[4] + d4[8] * e134
-        if not (d1[8] <= 0.0 or d2[11] > 0.0 or d3[12] > 0.0 or d4[8] <= 0.0):
+        line_segment_14_optimal = not (d1[8] <= 0.0 or d2[11] > 0.0 or d3[12] > 0.0 or d4[8] <= 0.0)
+        if line_segment_14_optimal:
             simplex.n_simplex_points = 2
             simplex.move_vertex(3, 1)
             sum = d1[8] + d4[8]
@@ -542,13 +542,13 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 0]
             simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
             return np.dot(search_direction, search_direction)
-        # check optimality of face 1-2-4
         d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
         d4[9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
         e214 = -e124
         d1[11] = d2[9] * d1[2] + d4[9] * e214
         d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
-        if not (d1[11] <= 0.0 or d2[11] <= 0.0 or d3[14] > 0.0 or d4[11] <= 0.0):
+        face_124_optimal = not (d1[11] <= 0.0 or d2[11] <= 0.0 or d3[14] > 0.0 or d4[11] <= 0.0)
+        if face_124_optimal:
             simplex.n_simplex_points = 3
             simplex.move_vertex(3, 2)
             sum = d1[11] + d2[11] + d4[11]
@@ -561,13 +561,13 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[2, 1] = simplex.dot_product_table[3, 1]
             simplex.dot_product_table[2, 2] = simplex.dot_product_table[3, 3]
             return np.dot(search_direction, search_direction)
-        # check optimality of face 1-3-4
         d3[10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
         d4[10] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[3, 2]
         e314 = -e134
         d1[12] = d3[10] * d1[4] + d4[10] * e314
         d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
-        if not (d1[12] <= 0.0 or d2[14] > 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0):
+        face_134_optimal = not (d1[12] <= 0.0 or d2[14] > 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0)
+        if face_134_optimal:
             simplex.n_simplex_points = 3
             simplex.move_vertex(3, 1)
             sum = d1[12] + d3[12] + d4[12]
@@ -580,7 +580,6 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
             simplex.dot_product_table[2, 1] = simplex.dot_product_table[3, 2]
             return np.dot(search_direction, search_direction)
-        # check optimality of the hull of all 4 points
         e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
         d4[13] = d2[5] * d4[9] + d3[5] * e243
         e234 = simplex.dot_product_table[3, 1] - simplex.dot_product_table[3, 2]
@@ -588,7 +587,8 @@ def _regular_distance_subalgorithm(
         e324 = -e234
         d2[13] = d3[10] * d2[5] + d4[10] * e324
         d1[14] = d2[13] * d1[2] + d3[13] * e213 + d4[13] * e214
-        if not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0):
+        convex_hull_optimal = not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0)
+        if convex_hull_optimal:
             sum = d1[14] + d2[14] + d3[14] + d4[14]
             barycentric_coordinates[0] = d1[14] / sum
             barycentric_coordinates[1] = d2[14] / sum
@@ -597,26 +597,26 @@ def _regular_distance_subalgorithm(
             search_direction[:] = simplex.search_direction_simplex(
                 *barycentric_coordinates)
             return np.dot(search_direction, search_direction)
-        # check optimality of vertex 2
-        if not (d1[2] > 0.0 or d3[5] > 0.0 or d4[9] > 0.0):
+        vertex_2_optimal = not (d1[2] > 0.0 or d3[5] > 0.0 or d4[9] > 0.0)
+        if vertex_2_optimal:
             simplex.reduce_to_optimal_vertex(1)
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
-        # check optimality of vertex 3
-        if not (d1[4] > 0.0 or d2[5] > 0.0 or d4[10] > 0.0):
+        vertex_3_optimal = not (d1[4] > 0.0 or d2[5] > 0.0 or d4[10] > 0.0)
+        if vertex_3_optimal:
             simplex.reduce_to_optimal_vertex(2)
             barycentric_coordinates[0] = d3[3]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
-        # check optimality of vertex 4
-        if not (d1[8] > 0.0 or d2[9] > 0.0 or d3[10] > 0.0):
+        vertex_4_optimal = not (d1[8] > 0.0 or d2[9] > 0.0 or d3[10] > 0.0)
+        if vertex_4_optimal:
             simplex.reduce_to_optimal_vertex(3)
             barycentric_coordinates[0] = d4[7]
             search_direction[:] = simplex.simplex[0]
             return simplex.dot_product_table[0, 0]
-        # check optimality of line segment 2-3
-        if not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0 or d4[13] > 0.0):
+        line_segment_23_optimal = not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0 or d4[13] > 0.0)
+        if line_segment_23_optimal:
             simplex.n_simplex_points = 2
             simplex.move_vertex(2, 0)
             sum = d2[5] + d3[5]
@@ -627,8 +627,8 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 1]
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
             return np.dot(search_direction, search_direction)
-        # check optimality of line segment 2-4
-        if not (d1[11] > 0.0 or d2[9] <= 0.0 or d3[13] > 0.0 or d4[9] <= 0.0):
+        line_segment_24_optimal = not (d1[11] > 0.0 or d2[9] <= 0.0 or d3[13] > 0.0 or d4[9] <= 0.0)
+        if line_segment_24_optimal:
             simplex.n_simplex_points = 2
             simplex.move_vertex(3, 0)
             sum = d2[9] + d4[9]
@@ -639,8 +639,8 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 1]
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[3, 3]
             return np.dot(search_direction, search_direction)
-        # check optimality of line segment 3-4
-        if not (d1[12] > 0.0 or d2[13] > 0.0 or d3[10] <= 0.0 or d4[10] <= 0.0):
+        line_segment_34_optimal = not (d1[12] > 0.0 or d2[13] > 0.0 or d3[10] <= 0.0 or d4[10] <= 0.0)
+        if line_segment_34_optimal:
             simplex.n_simplex_points = 2
             simplex.move_vertex(2, 0)
             simplex.move_vertex(3, 1)
@@ -653,8 +653,8 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 2]
             simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
             return np.dot(search_direction, search_direction)
-        # check optimality of face 2-3-4
-        if not (d1[14] > 0.0 or d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0):
+        face_234_optimal = not (d1[14] > 0.0 or d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0)
+        if face_234_optimal:
             simplex.n_simplex_points = 3
             simplex.move_vertex(3, 0)
             sum = d2[13] + d3[13] + d4[13]
@@ -690,8 +690,8 @@ def _backup_procedure(
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
         ordered_indices[0] = 0
-        # check line segment 1-2
-        if not (d1[2] <= 0.0 or d2[2] <= 0.0):
+        check_line_segment_12 = not (d1[2] <= 0.0 or d2[2] <= 0.0)
+        if check_line_segment_12:
             sum = d1[2] + d2[2]
             barycentric_coordinates_d[0] = d1[2] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
@@ -705,8 +705,8 @@ def _backup_procedure(
                 search_direction[:] = search_direction_d[:]
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
-        # check vertex 2
-        if simplex.dot_product_table[1, 1] < dstsq:
+        check_vertex_2 = simplex.dot_product_table[1, 1] < dstsq
+        if check_vertex_2:
             dstsq = simplex.dot_product_table[1, 1]
             n_simplex_points = 1
             barycentric_coordinates[0] = d2[1]
@@ -732,8 +732,8 @@ def _backup_procedure(
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
         ordered_indices[0] = 0
-        # check line segment 1-2
-        if not (d1[2] <= 0.0 or d2[2] <= 0.0):
+        check_line_segment_12 = not (d1[2] <= 0.0 or d2[2] <= 0.0)
+        if check_line_segment_12:
             sum = d1[2] + d2[2]
             barycentric_coordinates_d[0] = d1[2] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
@@ -746,8 +746,8 @@ def _backup_procedure(
                 search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
-        # check line segment 1-3
-        if not (d1[4] <= 0.0 or d3[4] <= 0.0):
+        check_line_segment_13 = not (d1[4] <= 0.0 or d3[4] <= 0.0)
+        if check_line_segment_13:
             sum = d1[4] + d3[4]
             barycentric_coordinates_d[0] = d1[4] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
@@ -760,8 +760,8 @@ def _backup_procedure(
                 search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 2
-        # check face 1-2-3
-        if not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0):
+        check_face_123 = not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0)
+        if check_face_123:
             sum = d1[6] + d2[6] + d3[6]
             barycentric_coordinates_d[0] = d1[6] / sum
             barycentric_coordinates_d[1] = d2[6] / sum
@@ -777,22 +777,22 @@ def _backup_procedure(
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
                 ordered_indices[2] = 2
-        # check vertex 2
-        if simplex.dot_product_table[1, 1] < dstsq:
+        check_vertex_2 = simplex.dot_product_table[1, 1] < dstsq
+        if check_vertex_2:
             n_simplex_points = 1
             dstsq = simplex.dot_product_table[1, 1]
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
             ordered_indices[0] = 1
-        # check vertex 3
-        if simplex.dot_product_table[2, 2] < dstsq:
+        check_vertex_3 = simplex.dot_product_table[2, 2] < dstsq
+        if check_vertex_3:
             n_simplex_points = 1
             dstsq = simplex.dot_product_table[2, 2]
             barycentric_coordinates[0] = d3[3]
             search_direction[:] = simplex.simplex[2]
             ordered_indices[0] = 2
-        # check line segment 2-3
-        if not (d2[5] <= 0.0 or d3[5] <= 0.0):
+        check_line_segment_23 = not (d2[5] <= 0.0 or d3[5] <= 0.0)
+        if check_line_segment_23:
             sum = d2[5] + d3[5]
             barycentric_coordinates_d[1] = d2[5] / sum
             barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1]
@@ -853,8 +853,8 @@ def _backup_procedure(
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
         ordered_indices[0] = 0
-        # check line segment 1-2
-        if not (d1[2] <= 0.0 or d2[2] <= 0.0):
+        check_line_segment_12 = not (d1[2] <= 0.0 or d2[2] <= 0.0)
+        if check_line_segment_12:
             sum = d1[2] + d2[2]
             barycentric_coordinates_d[0] = d1[2] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
@@ -867,8 +867,8 @@ def _backup_procedure(
                 search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
-        # check line segment 1-3
-        if not (d1[4] <= 0.0 or d3[4] <= 0.0):
+        check_line_segment_13 = not (d1[4] <= 0.0 or d3[4] <= 0.0)
+        if check_line_segment_13:
             sum = d1[4] + d3[4]
             barycentric_coordinates_d[0] = d1[4] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
@@ -881,8 +881,8 @@ def _backup_procedure(
                 search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 2
-        # check face 1-2-3
-        if not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0):
+        check_face_123 = not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0)
+        if check_face_123:
             sum = d1[6] + d2[6] + d3[6]
             barycentric_coordinates_d[0] = d1[6] / sum
             barycentric_coordinates_d[1] = d2[6] / sum
@@ -898,8 +898,8 @@ def _backup_procedure(
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
                 ordered_indices[2] = 2
-        # check line segment 1-4
-        if not (d1[8] <= 0.0 or d4[8] <= 0.0):
+        check_line_segment_14 = not (d1[8] <= 0.0 or d4[8] <= 0.0)
+        if check_line_segment_14:
             sum = d1[8] + d4[8]
             barycentric_coordinates_d[0] = d1[8] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
@@ -912,8 +912,8 @@ def _backup_procedure(
                 search_direction[:] = search_direction_d
                 ordered_indices[0] = 0
                 ordered_indices[1] = 3
-        # check face 1-2-4
-        if not (d1[11] <= 0.0 or d2[11] <= 0.0 or d4[11] <= 0.0):
+        check_face_124 = not (d1[11] <= 0.0 or d2[11] <= 0.0 or d4[11] <= 0.0)
+        if check_face_124:
             sum = d1[11] + d2[11] + d4[11]
             barycentric_coordinates_d[0] = d1[11] / sum
             barycentric_coordinates_d[1] = d2[11] / sum
@@ -928,8 +928,8 @@ def _backup_procedure(
                 ordered_indices[0] = 0
                 ordered_indices[1] = 1
                 ordered_indices[2] = 3
-        # check face 1-3-4
-        if not (d1[12] <= 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0):
+        check_face_134 = not (d1[12] <= 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0)
+        if check_face_134:
             sum = d1[12] + d3[12] + d4[12]
             barycentric_coordinates_d[0] = d1[12] / sum
             barycentric_coordinates_d[2] = d3[12] / sum
@@ -944,8 +944,8 @@ def _backup_procedure(
                 ordered_indices[0] = 0
                 ordered_indices[1] = 3
                 ordered_indices[2] = 2
-        # check the hull of all 4 points
-        if not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0):
+        check_hull = not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0)
+        if check_hull:
             sum = d1[14] + d2[14] + d3[14] + d4[14]
             barycentric_coordinates_d[0] = d1[14] / sum
             barycentric_coordinates_d[1] = d2[14] / sum
@@ -962,29 +962,29 @@ def _backup_procedure(
                 ordered_indices[1] = 1
                 ordered_indices[2] = 2
                 ordered_indices[3] = 3
-        # check vertex 2
-        if simplex.dot_product_table[1, 1] < dstsq:
+        check_vertex_2 = simplex.dot_product_table[1, 1] < dstsq
+        if check_vertex_2:
             n_simplex_points = 1
             dstsq = simplex.dot_product_table[1, 1]
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
             ordered_indices[0] = 1
-        # check vertex 3
-        if simplex.dot_product_table[2, 2] < dstsq:
+        check_vertex_3 = simplex.dot_product_table[2, 2] < dstsq
+        if check_vertex_3:
             n_simplex_points = 1
             dstsq = simplex.dot_product_table[2, 2]
             barycentric_coordinates[0] = d3[3]
             search_direction[:] = simplex.simplex[2]
             ordered_indices[0] = 2
-        # check vertex 4
-        if simplex.dot_product_table[3, 3] < dstsq:
+        check_vertex_4 = simplex.dot_product_table[3, 3] < dstsq
+        if check_vertex_4:
             n_simplex_points = 1
             dstsq = simplex.dot_product_table[3, 3]
             barycentric_coordinates[0] = d4[7]
             search_direction[:] = simplex.simplex[3]
             ordered_indices[0] = 3
-        # check line segment 2-3
-        if not (d2[5] <= 0.0 or d3[5] <= 0.0):
+        check_line_segment_23 = not (d2[5] <= 0.0 or d3[5] <= 0.0)
+        if check_line_segment_23:
             sum = d2[5] + d3[5]
             barycentric_coordinates_d[1] = d2[5] / sum
             barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1]
@@ -997,8 +997,8 @@ def _backup_procedure(
                 search_direction[:] = search_direction_d
                 ordered_indices[0] = 2
                 ordered_indices[1] = 1
-        # check line segment 2-4
-        if not (d2[9] <= 0.0 or d4[9] <= 0.0):
+        check_line_segment_24 = not (d2[9] <= 0.0 or d4[9] <= 0.0)
+        if check_line_segment_24:
             sum = d2[9] + d4[9]
             barycentric_coordinates_d[1] = d2[9] / sum
             barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1]
@@ -1011,8 +1011,8 @@ def _backup_procedure(
                 search_direction[:] = search_direction_d
                 ordered_indices[0] = 3
                 ordered_indices[1] = 1
-        # check line segment 3-4
-        if not (d3[10] <= 0.0 or d4[10] <= 0.0):
+        check_line_segment_34 = not (d3[10] <= 0.0 or d4[10] <= 0.0)
+        if check_line_segment_34:
             sum = d3[10] + d4[10]
             barycentric_coordinates_d[0] = d3[10] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
@@ -1025,8 +1025,8 @@ def _backup_procedure(
                 search_direction[:] = search_direction_d
                 ordered_indices[0] = 2
                 ordered_indices[1] = 3
-        # check face 2-3-4
-        if not (d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0):
+        check_face_234 = not (d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0)
+        if check_face_234:
             sum = d2[13] + d3[13] + d4[13]
             barycentric_coordinates_d[1] = d2[13] / sum
             barycentric_coordinates_d[2] = d3[13] / sum
