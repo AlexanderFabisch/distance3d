@@ -667,8 +667,6 @@ def _regular_distance_subalgorithm(
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 1]
             simplex.dot_product_table[2, 0] = simplex.dot_product_table[3, 2]
             return np.dot(search_direction, search_direction)
-    else:
-        raise ValueError("Invalid value for nvs %d given" % len(simplex))
     return None
 
 
