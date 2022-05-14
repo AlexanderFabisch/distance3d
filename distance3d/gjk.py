@@ -596,7 +596,7 @@ def _backup_procedure(
             d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
         # check vertex 1
         dstsq = simplex.dot_product_table[0, 0]
-        nvsd = 1
+        n_simplex_points = 1
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
         iord[0] = 0
@@ -609,15 +609,15 @@ def _backup_procedure(
             dstsqd = zsold[0] * zsold[0] + zsold[1] * zsold[1] + zsold[2] * zsold[2]
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 2
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 2
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold[:]
                 iord[0] = 0
                 iord[1] = 1
         # check vertex 2
         if simplex.dot_product_table[1, 1] < dstsq:
             dstsq = simplex.dot_product_table[1, 1]
-            nvsd = 1
+            n_simplex_points = 1
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
             iord[0] = 1
@@ -637,7 +637,7 @@ def _backup_procedure(
             d1[6] = d2[5] * d1[2] + d3[5] * e213
         # check vertex 1
         dstsq = simplex.dot_product_table[0, 0]
-        nvsd = 1
+        n_simplex_points = 1
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
         iord[0] = 0
@@ -650,8 +650,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 2
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 2
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 0
                 iord[1] = 1
@@ -664,8 +664,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 2
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 2
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 0
                 iord[1] = 2
@@ -679,7 +679,7 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 3
+                n_simplex_points = 3
                 barycentric_coordinates[:] = alsd
                 search_direction[:] = zsold
                 iord[0] = 0
@@ -687,14 +687,14 @@ def _backup_procedure(
                 iord[2] = 2
         # check vertex 2
         if simplex.dot_product_table[1, 1] < dstsq:
-            nvsd = 1
+            n_simplex_points = 1
             dstsq = simplex.dot_product_table[1, 1]
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
             iord[0] = 1
         # check vertex 3
         if simplex.dot_product_table[2, 2] < dstsq:
-            nvsd = 1
+            n_simplex_points = 1
             dstsq = simplex.dot_product_table[2, 2]
             barycentric_coordinates[0] = d3[3]
             search_direction[:] = simplex.simplex[2]
@@ -708,8 +708,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 2
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 2
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 2
                 iord[1] = 1
@@ -757,7 +757,7 @@ def _backup_procedure(
             d1[14] = d2[13] * d1[2] + d3[13] * e213 + d4[13] * e214
         # check vertex 1
         dstsq = simplex.dot_product_table[0, 0]
-        nvsd = 1
+        n_simplex_points = 1
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
         iord[0] = 0
@@ -770,8 +770,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 2
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 2
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 0
                 iord[1] = 1
@@ -784,8 +784,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 2
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 2
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 0
                 iord[1] = 2
@@ -799,7 +799,7 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 3
+                n_simplex_points = 3
                 barycentric_coordinates[:] = alsd
                 search_direction[:] = zsold
                 iord[0] = 0
@@ -814,8 +814,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 2
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 2
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 0
                 iord[1] = 3
@@ -829,8 +829,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 3
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 3
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 0
                 iord[1] = 1
@@ -845,8 +845,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 3
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 3
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 0
                 iord[1] = 3
@@ -862,7 +862,7 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 4
+                n_simplex_points = 4
                 barycentric_coordinates[:] = alsd
                 search_direction[:] = zsold
                 iord[0] = 0
@@ -871,21 +871,21 @@ def _backup_procedure(
                 iord[3] = 3
         # check vertex 2
         if simplex.dot_product_table[1, 1] < dstsq:
-            nvsd = 1
+            n_simplex_points = 1
             dstsq = simplex.dot_product_table[1, 1]
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
             iord[0] = 1
         # check vertex 3
         if simplex.dot_product_table[2, 2] < dstsq:
-            nvsd = 1
+            n_simplex_points = 1
             dstsq = simplex.dot_product_table[2, 2]
             barycentric_coordinates[0] = d3[3]
             search_direction[:] = simplex.simplex[2]
             iord[0] = 2
         # check vertex 4
         if simplex.dot_product_table[3, 3] < dstsq:
-            nvsd = 1
+            n_simplex_points = 1
             dstsq = simplex.dot_product_table[3, 3]
             barycentric_coordinates[0] = d4[7]
             search_direction[:] = simplex.simplex[3]
@@ -899,8 +899,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 2
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 2
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 2
                 iord[1] = 1
@@ -913,8 +913,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 2
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 2
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 3
                 iord[1] = 1
@@ -927,8 +927,8 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 2
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 2
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 2
                 iord[1] = 3
@@ -942,18 +942,18 @@ def _backup_procedure(
             dstsqd = np.dot(zsold, zsold)
             if dstsqd < dstsq:
                 dstsq = dstsqd
-                nvsd = 3
-                barycentric_coordinates[:nvsd] = alsd[:nvsd]
+                n_simplex_points = 3
+                barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
                 iord[0] = 3
                 iord[1] = 1
                 iord[2] = 2
 
-    _final_reordering(iord, nvsd, simplex)
+    _final_reordering(iord, n_simplex_points, simplex)
     return dstsq, True
 
 
-def _final_reordering(iord, nvsd, simplex):
+def _final_reordering(iord, n_simplex_points, simplex):
     risd = np.empty(4, dtype=int)
     risd[:len(simplex)] = simplex.indices_polytope1[:len(simplex)]
     rjsd = np.empty(4, dtype=int)
@@ -963,7 +963,7 @@ def _final_reordering(iord, nvsd, simplex):
     delld = np.empty((4, 4), dtype=float)
     for k in range(len(simplex)):
         delld[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
-    simplex.n_simplex_points = nvsd
+    simplex.n_simplex_points = n_simplex_points
     for k in range(len(simplex)):
         kk = iord[k]
         simplex.indices_polytope1[k] = risd[kk]
