@@ -233,17 +233,29 @@ class Simplex:
         self.indices_polytope2[new_index] = self.indices_polytope2[old_index]
         self.simplex[new_index] = self.simplex[old_index]
 
-    def search_direction_line_10(self, a):
-        return self.simplex[1] + a * (self.simplex[0] - self.simplex[1])
-
     def search_direction_line_01(self, a):
         return self.simplex[0] + a * (self.simplex[1] - self.simplex[0])
 
-    def search_direction_face_201(self, a, b):
-        return (
-            self.simplex[2]
-            + a * (self.simplex[0] - self.simplex[2])
-            + b * (self.simplex[1] - self.simplex[2]))
+    def search_direction_line_10(self, a):
+        return self.simplex[1] + a * (self.simplex[0] - self.simplex[1])
+
+    def search_direction_line_12(self, a):
+        return self.simplex[1] + a * (self.simplex[2] - self.simplex[1])
+
+    def search_direction_line_20(self, a):
+        return self.simplex[2] + a * (self.simplex[0] - self.simplex[2])
+
+    def search_direction_line_21(self, a):
+        return self.simplex[2] + a * (self.simplex[1] - self.simplex[2])
+
+    def search_direction_line_30(self, a):
+        return self.simplex[3] + a * (self.simplex[0] - self.simplex[3])
+
+    def search_direction_line_31(self, a):
+        return self.simplex[3] + a * (self.simplex[1] - self.simplex[3])
+
+    def search_direction_line_32(self, a):
+        return self.simplex[3] + a * (self.simplex[2] - self.simplex[3])
 
     def search_direction_face_012(self, a, b):
         return (
@@ -257,8 +269,33 @@ class Simplex:
             + a * (self.simplex[0] - self.simplex[1])
             + b * (self.simplex[2] - self.simplex[1]))
 
+    def search_direction_face_201(self, a, b):
+        return (
+            self.simplex[2]
+            + a * (self.simplex[0] - self.simplex[2])
+            + b * (self.simplex[1] - self.simplex[2]))
+
+    def search_direction_face_301(self, a, b):
+        return (
+            self.simplex[3]
+            + a * (self.simplex[0] - self.simplex[3])
+            + b * (self.simplex[1] - self.simplex[3]))
+
+    def search_direction_face_302(self, a, b):
+        return (
+            self.simplex[3]
+            + a * (self.simplex[0] - self.simplex[3])
+            + b * (self.simplex[2] - self.simplex[3]))
+
+    def search_direction_face_312(self, a, b):
+        return (
+            self.simplex[3]
+            + a * (self.simplex[1] - self.simplex[3])
+            + b * (self.simplex[2] - self.simplex[3]))
+
     def search_direction_simplex(self, a, b, c, d):
-        return a * self.simplex[0] + b * self.simplex[1] + c * self.simplex[2] + d * self.simplex[3]
+        return (a * self.simplex[0] + b * self.simplex[1]
+                + c * self.simplex[2] + d * self.simplex[3])
 
     def __len__(self):
         return self.n_simplex_points
@@ -660,8 +697,9 @@ def _backup_procedure(
             sum = d1[2] + d2[2]
             barycentric_coordinates_d[0] = d1[2] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
-            search_direction_d[:] = simplex.simplex[1, :] + barycentric_coordinates_d[0] * (simplex.simplex[0, :] - simplex.simplex[1, :])
-            dstsqd = search_direction_d[0] * search_direction_d[0] + search_direction_d[1] * search_direction_d[1] + search_direction_d[2] * search_direction_d[2]
+            search_direction_d[:] = simplex.search_direction_line_10(
+                barycentric_coordinates_d[0])
+            dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
                 n_simplex_points = 2
@@ -701,7 +739,7 @@ def _backup_procedure(
             sum = d1[2] + d2[2]
             barycentric_coordinates_d[0] = d1[2] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
-            search_direction_d[:] = simplex.simplex[1] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[1])
+            search_direction_d[:] = simplex.search_direction_line_10(barycentric_coordinates_d[0])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -715,7 +753,7 @@ def _backup_procedure(
             sum = d1[4] + d3[4]
             barycentric_coordinates_d[0] = d1[4] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
-            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[2])
+            search_direction_d[:] = simplex.search_direction_line_20(barycentric_coordinates_d[0])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -730,7 +768,8 @@ def _backup_procedure(
             barycentric_coordinates_d[0] = d1[6] / sum
             barycentric_coordinates_d[1] = d2[6] / sum
             barycentric_coordinates_d[2] = 1.0 - barycentric_coordinates_d[0] - barycentric_coordinates_d[1]
-            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[2]) + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[2])
+            search_direction_d[:] = simplex.search_direction_face_201(
+                barycentric_coordinates_d[0], barycentric_coordinates_d[1])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -759,7 +798,7 @@ def _backup_procedure(
             sum = d2[5] + d3[5]
             barycentric_coordinates_d[1] = d2[5] / sum
             barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1]
-            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[2])
+            search_direction_d[:] = simplex.search_direction_line_21(barycentric_coordinates_d[1])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -821,7 +860,7 @@ def _backup_procedure(
             sum = d1[2] + d2[2]
             barycentric_coordinates_d[0] = d1[2] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
-            search_direction_d[:] = simplex.simplex[1] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[1])
+            search_direction_d[:] = simplex.search_direction_line_10(barycentric_coordinates_d[0])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -835,7 +874,7 @@ def _backup_procedure(
             sum = d1[4] + d3[4]
             barycentric_coordinates_d[0] = d1[4] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
-            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[2])
+            search_direction_d[:] = simplex.search_direction_line_20(barycentric_coordinates_d[0])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -850,7 +889,8 @@ def _backup_procedure(
             barycentric_coordinates_d[0] = d1[6] / sum
             barycentric_coordinates_d[1] = d2[6] / sum
             barycentric_coordinates_d[2] = 1.0 - barycentric_coordinates_d[0] - barycentric_coordinates_d[1]
-            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[2]) + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[2])
+            search_direction_d[:] = simplex.search_direction_face_201(
+                barycentric_coordinates_d[0], barycentric_coordinates_d[1])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -865,7 +905,7 @@ def _backup_procedure(
             sum = d1[8] + d4[8]
             barycentric_coordinates_d[0] = d1[8] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
-            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[3])
+            search_direction_d[:] = simplex.search_direction_line_30(barycentric_coordinates_d[0])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -880,7 +920,7 @@ def _backup_procedure(
             barycentric_coordinates_d[0] = d1[11] / sum
             barycentric_coordinates_d[1] = d2[11] / sum
             barycentric_coordinates_d[2] = 1.0 - barycentric_coordinates_d[0] - barycentric_coordinates_d[1]
-            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[3]) + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[3])
+            search_direction_d[:] = simplex.search_direction_face_301(barycentric_coordinates_d[0], barycentric_coordinates_d[1])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -896,7 +936,7 @@ def _backup_procedure(
             barycentric_coordinates_d[0] = d1[12] / sum
             barycentric_coordinates_d[2] = d3[12] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0] - barycentric_coordinates_d[2]
-            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[0] * (simplex.simplex[0] - simplex.simplex[3]) + barycentric_coordinates_d[2] * (simplex.simplex[2] - simplex.simplex[3])
+            search_direction_d[:] = simplex.search_direction_face_302(barycentric_coordinates_d[0], barycentric_coordinates_d[2])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -913,7 +953,7 @@ def _backup_procedure(
             barycentric_coordinates_d[1] = d2[14] / sum
             barycentric_coordinates_d[2] = d3[14] / sum
             barycentric_coordinates_d[3] = 1.0 - barycentric_coordinates_d[0] - barycentric_coordinates_d[1] - barycentric_coordinates_d[2]
-            search_direction_d[:] = barycentric_coordinates_d[0] * simplex.simplex[0] + barycentric_coordinates_d[1] * simplex.simplex[1] + barycentric_coordinates_d[2] * simplex.simplex[2] + barycentric_coordinates_d[3] * simplex.simplex[3]
+            search_direction_d[:] = simplex.search_direction_simplex(*barycentric_coordinates_d)
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -950,7 +990,7 @@ def _backup_procedure(
             sum = d2[5] + d3[5]
             barycentric_coordinates_d[1] = d2[5] / sum
             barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1]
-            search_direction_d[:] = simplex.simplex[2] + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[2])
+            search_direction_d[:] = simplex.search_direction_line_12(barycentric_coordinates_d[1])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -964,7 +1004,7 @@ def _backup_procedure(
             sum = d2[9] + d4[9]
             barycentric_coordinates_d[1] = d2[9] / sum
             barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1]
-            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[3])
+            search_direction_d[:] = simplex.search_direction_line_31(barycentric_coordinates_d[1])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -978,7 +1018,7 @@ def _backup_procedure(
             sum = d3[10] + d4[10]
             barycentric_coordinates_d[0] = d3[10] / sum
             barycentric_coordinates_d[1] = 1.0 - barycentric_coordinates_d[0]
-            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[0] * (simplex.simplex[2] - simplex.simplex[3])
+            search_direction_d[:] = simplex.search_direction_line_32(barycentric_coordinates_d[0])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
@@ -993,7 +1033,8 @@ def _backup_procedure(
             barycentric_coordinates_d[1] = d2[13] / sum
             barycentric_coordinates_d[2] = d3[13] / sum
             barycentric_coordinates_d[0] = 1.0 - barycentric_coordinates_d[1] - barycentric_coordinates_d[2]
-            search_direction_d[:] = simplex.simplex[3] + barycentric_coordinates_d[1] * (simplex.simplex[1] - simplex.simplex[3]) + barycentric_coordinates_d[2] * (simplex.simplex[2] - simplex.simplex[3])
+            search_direction_d[:] = simplex.search_direction_face_312(
+                barycentric_coordinates_d[1], barycentric_coordinates_d[2])
             dstsqd = np.dot(search_direction_d, search_direction_d)
             if dstsqd < dstsq:
                 dstsq = dstsqd
