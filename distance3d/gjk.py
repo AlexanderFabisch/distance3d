@@ -179,6 +179,27 @@ class Simplex:
         self.dot_product_table[:self.n_simplex_points, :self.n_simplex_points] = simplex.dot_product_table[
             :self.n_simplex_points, :self.n_simplex_points]
 
+    def reorder(self, iord, n_simplex_points):
+        indices_polytope1 = np.copy(self.indices_polytope1[:len(self)])
+        indices_polytope2 = np.copy(self.indices_polytope2[:len(self)])
+        simplex = np.copy(self.simplex[:len(self)])
+        dot_product_table = np.empty((4, 4), dtype=float)
+        for k in range(len(self)):
+            dot_product_table[k, :k + 1] = self.dot_product_table[k, :k + 1]
+        self.n_simplex_points = n_simplex_points
+        for k in range(len(self)):
+            kk = iord[k]
+            self.indices_polytope1[k] = indices_polytope1[kk]
+            self.indices_polytope2[k] = indices_polytope2[kk]
+            self.simplex[k] = simplex[kk]
+            for l in range(k):
+                ll = iord[l]
+                if kk >= ll:
+                    self.dot_product_table[k, l] = dot_product_table[kk, ll]
+                else:
+                    self.dot_product_table[k, l] = dot_product_table[ll, kk]
+            self.dot_product_table[k, k] = dot_product_table[kk, kk]
+
     def add_new_point(self, new_index1, new_index2, new_simplex_point):
         self._move_first_point_to_last_spot()
         self._put_new_point_in_first_spot(new_index1, new_index2, new_simplex_point)
@@ -949,30 +970,8 @@ def _backup_procedure(
                 iord[1] = 1
                 iord[2] = 2
 
-    _final_reordering(simplex, iord, n_simplex_points)
+    simplex.reorder(iord, n_simplex_points)
     return dstsq, True
-
-
-def _final_reordering(simplex, iord, n_simplex_points):
-    indices_polytope1 = np.copy(simplex.indices_polytope1[:len(simplex)])
-    indices_polytope2 = np.copy(simplex.indices_polytope2[:len(simplex)])
-    yd = np.copy(simplex.simplex[:len(simplex)])
-    dot_product_table = np.empty((4, 4), dtype=float)
-    for k in range(len(simplex)):
-        dot_product_table[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
-    simplex.n_simplex_points = n_simplex_points
-    for k in range(len(simplex)):
-        kk = iord[k]
-        simplex.indices_polytope1[k] = indices_polytope1[kk]
-        simplex.indices_polytope2[k] = indices_polytope2[kk]
-        simplex.simplex[k] = yd[kk]
-        for l in range(k):
-            ll = iord[l]
-            if kk >= ll:
-                simplex.dot_product_table[k, l] = dot_product_table[kk, ll]
-            else:
-                simplex.dot_product_table[k, l] = dot_product_table[ll, kk]
-        simplex.dot_product_table[k, k] = dot_product_table[kk, kk]
 
 
 def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
