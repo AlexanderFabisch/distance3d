@@ -179,7 +179,7 @@ class Simplex:
         self.dot_product_table[:self.n_simplex_points, :self.n_simplex_points] = simplex.dot_product_table[
             :self.n_simplex_points, :self.n_simplex_points]
 
-    def reorder(self, iord, n_simplex_points):
+    def reorder(self, ordered_indices, n_simplex_points):
         indices_polytope1 = np.copy(self.indices_polytope1[:self.n_simplex_points])
         indices_polytope2 = np.copy(self.indices_polytope2[:self.n_simplex_points])
         simplex = np.copy(self.simplex[:self.n_simplex_points])
@@ -188,12 +188,12 @@ class Simplex:
             dot_product_table[k, :k + 1] = self.dot_product_table[k, :k + 1]
         self.n_simplex_points = n_simplex_points
         for k in range(self.n_simplex_points):
-            kk = iord[k]
+            kk = ordered_indices[k]
             self.indices_polytope1[k] = indices_polytope1[kk]
             self.indices_polytope2[k] = indices_polytope2[kk]
             self.simplex[k] = simplex[kk]
             for l in range(k):
-                ll = iord[l]
+                ll = ordered_indices[l]
                 if kk >= ll:
                     self.dot_product_table[k, l] = dot_product_table[kk, ll]
                 else:
@@ -604,7 +604,7 @@ def _regular_distance_subalgorithm(
 def _backup_procedure(
         simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
         backup):
-    iord = np.empty(4, dtype=int)
+    ordered_indices = np.empty(4, dtype=int)
     zsold = np.empty(3, dtype=float)
     alsd = np.empty(4, dtype=float)
     if len(simplex) == 1:
@@ -620,7 +620,7 @@ def _backup_procedure(
         n_simplex_points = 1
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
-        iord[0] = 0
+        ordered_indices[0] = 0
         # check line segment 1-2
         if not (d1[2] <= 0.0 or d2[2] <= 0.0):
             sum = d1[2] + d2[2]
@@ -633,15 +633,15 @@ def _backup_procedure(
                 n_simplex_points = 2
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold[:]
-                iord[0] = 0
-                iord[1] = 1
+                ordered_indices[0] = 0
+                ordered_indices[1] = 1
         # check vertex 2
         if simplex.dot_product_table[1, 1] < dstsq:
             dstsq = simplex.dot_product_table[1, 1]
             n_simplex_points = 1
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
-            iord[0] = 1
+            ordered_indices[0] = 1
     elif len(simplex) == 3:
         if backup:
             d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -661,7 +661,7 @@ def _backup_procedure(
         n_simplex_points = 1
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
-        iord[0] = 0
+        ordered_indices[0] = 0
         # check line segment 1-2
         if not (d1[2] <= 0.0 or d2[2] <= 0.0):
             sum = d1[2] + d2[2]
@@ -674,8 +674,8 @@ def _backup_procedure(
                 n_simplex_points = 2
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 0
-                iord[1] = 1
+                ordered_indices[0] = 0
+                ordered_indices[1] = 1
         # check line segment 1-3
         if not (d1[4] <= 0.0 or d3[4] <= 0.0):
             sum = d1[4] + d3[4]
@@ -688,8 +688,8 @@ def _backup_procedure(
                 n_simplex_points = 2
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 0
-                iord[1] = 2
+                ordered_indices[0] = 0
+                ordered_indices[1] = 2
         # check face 1-2-3
         if not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0):
             sum = d1[6] + d2[6] + d3[6]
@@ -703,23 +703,23 @@ def _backup_procedure(
                 n_simplex_points = 3
                 barycentric_coordinates[:] = alsd
                 search_direction[:] = zsold
-                iord[0] = 0
-                iord[1] = 1
-                iord[2] = 2
+                ordered_indices[0] = 0
+                ordered_indices[1] = 1
+                ordered_indices[2] = 2
         # check vertex 2
         if simplex.dot_product_table[1, 1] < dstsq:
             n_simplex_points = 1
             dstsq = simplex.dot_product_table[1, 1]
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
-            iord[0] = 1
+            ordered_indices[0] = 1
         # check vertex 3
         if simplex.dot_product_table[2, 2] < dstsq:
             n_simplex_points = 1
             dstsq = simplex.dot_product_table[2, 2]
             barycentric_coordinates[0] = d3[3]
             search_direction[:] = simplex.simplex[2]
-            iord[0] = 2
+            ordered_indices[0] = 2
         # check line segment 2-3
         if not (d2[5] <= 0.0 or d3[5] <= 0.0):
             sum = d2[5] + d3[5]
@@ -732,8 +732,8 @@ def _backup_procedure(
                 n_simplex_points = 2
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 2
-                iord[1] = 1
+                ordered_indices[0] = 2
+                ordered_indices[1] = 1
     elif len(simplex) == 4:
         if backup:
             d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -781,7 +781,7 @@ def _backup_procedure(
         n_simplex_points = 1
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
-        iord[0] = 0
+        ordered_indices[0] = 0
         # check line segment 1-2
         if not (d1[2] <= 0.0 or d2[2] <= 0.0):
             sum = d1[2] + d2[2]
@@ -794,8 +794,8 @@ def _backup_procedure(
                 n_simplex_points = 2
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 0
-                iord[1] = 1
+                ordered_indices[0] = 0
+                ordered_indices[1] = 1
         # check line segment 1-3
         if not (d1[4] <= 0.0 or d3[4] <= 0.0):
             sum = d1[4] + d3[4]
@@ -808,8 +808,8 @@ def _backup_procedure(
                 n_simplex_points = 2
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 0
-                iord[1] = 2
+                ordered_indices[0] = 0
+                ordered_indices[1] = 2
         # check face 1-2-3
         if not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0):
             sum = d1[6] + d2[6] + d3[6]
@@ -823,9 +823,9 @@ def _backup_procedure(
                 n_simplex_points = 3
                 barycentric_coordinates[:] = alsd
                 search_direction[:] = zsold
-                iord[0] = 0
-                iord[1] = 1
-                iord[2] = 2
+                ordered_indices[0] = 0
+                ordered_indices[1] = 1
+                ordered_indices[2] = 2
         # check line segment 1-4
         if not (d1[8] <= 0.0 or d4[8] <= 0.0):
             sum = d1[8] + d4[8]
@@ -838,8 +838,8 @@ def _backup_procedure(
                 n_simplex_points = 2
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 0
-                iord[1] = 3
+                ordered_indices[0] = 0
+                ordered_indices[1] = 3
         # check face 1-2-4
         if not (d1[11] <= 0.0 or d2[11] <= 0.0 or d4[11] <= 0.0):
             sum = d1[11] + d2[11] + d4[11]
@@ -853,9 +853,9 @@ def _backup_procedure(
                 n_simplex_points = 3
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 0
-                iord[1] = 1
-                iord[2] = 3
+                ordered_indices[0] = 0
+                ordered_indices[1] = 1
+                ordered_indices[2] = 3
         # check face 1-3-4
         if not (d1[12] <= 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0):
             sum = d1[12] + d3[12] + d4[12]
@@ -869,9 +869,9 @@ def _backup_procedure(
                 n_simplex_points = 3
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 0
-                iord[1] = 3
-                iord[2] = 2
+                ordered_indices[0] = 0
+                ordered_indices[1] = 3
+                ordered_indices[2] = 2
         # check the hull of all 4 points
         if not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0):
             sum = d1[14] + d2[14] + d3[14] + d4[14]
@@ -886,31 +886,31 @@ def _backup_procedure(
                 n_simplex_points = 4
                 barycentric_coordinates[:] = alsd
                 search_direction[:] = zsold
-                iord[0] = 0
-                iord[1] = 1
-                iord[2] = 2
-                iord[3] = 3
+                ordered_indices[0] = 0
+                ordered_indices[1] = 1
+                ordered_indices[2] = 2
+                ordered_indices[3] = 3
         # check vertex 2
         if simplex.dot_product_table[1, 1] < dstsq:
             n_simplex_points = 1
             dstsq = simplex.dot_product_table[1, 1]
             barycentric_coordinates[0] = d2[1]
             search_direction[:] = simplex.simplex[1]
-            iord[0] = 1
+            ordered_indices[0] = 1
         # check vertex 3
         if simplex.dot_product_table[2, 2] < dstsq:
             n_simplex_points = 1
             dstsq = simplex.dot_product_table[2, 2]
             barycentric_coordinates[0] = d3[3]
             search_direction[:] = simplex.simplex[2]
-            iord[0] = 2
+            ordered_indices[0] = 2
         # check vertex 4
         if simplex.dot_product_table[3, 3] < dstsq:
             n_simplex_points = 1
             dstsq = simplex.dot_product_table[3, 3]
             barycentric_coordinates[0] = d4[7]
             search_direction[:] = simplex.simplex[3]
-            iord[0] = 3
+            ordered_indices[0] = 3
         # check line segment 2-3
         if not (d2[5] <= 0.0 or d3[5] <= 0.0):
             sum = d2[5] + d3[5]
@@ -923,8 +923,8 @@ def _backup_procedure(
                 n_simplex_points = 2
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 2
-                iord[1] = 1
+                ordered_indices[0] = 2
+                ordered_indices[1] = 1
         # check line segment 2-4
         if not (d2[9] <= 0.0 or d4[9] <= 0.0):
             sum = d2[9] + d4[9]
@@ -937,8 +937,8 @@ def _backup_procedure(
                 n_simplex_points = 2
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 3
-                iord[1] = 1
+                ordered_indices[0] = 3
+                ordered_indices[1] = 1
         # check line segment 3-4
         if not (d3[10] <= 0.0 or d4[10] <= 0.0):
             sum = d3[10] + d4[10]
@@ -951,8 +951,8 @@ def _backup_procedure(
                 n_simplex_points = 2
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 2
-                iord[1] = 3
+                ordered_indices[0] = 2
+                ordered_indices[1] = 3
         # check face 2-3-4
         if not (d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0):
             sum = d2[13] + d3[13] + d4[13]
@@ -966,40 +966,40 @@ def _backup_procedure(
                 n_simplex_points = 3
                 barycentric_coordinates[:n_simplex_points] = alsd[:n_simplex_points]
                 search_direction[:] = zsold
-                iord[0] = 3
-                iord[1] = 1
-                iord[2] = 2
+                ordered_indices[0] = 3
+                ordered_indices[1] = 1
+                ordered_indices[2] = 2
 
-    simplex.reorder(iord, n_simplex_points)
+    simplex.reorder(ordered_indices, n_simplex_points)
     return dstsq, True
 
 
 def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
-    iord = np.zeros(4, dtype=int)
-    iord[:3] = 0, 1, 2
+    ordered_indices = np.zeros(4, dtype=int)
+    ordered_indices[:3] = 0, 1, 2
     if simplex.dot_product_table[2, 0] < simplex.dot_product_table[1, 0]:
-        iord[1] = 2
-        iord[2] = 1
-    ii = iord[1]
+        ordered_indices[1] = 2
+        ordered_indices[2] = 1
+    ii = ordered_indices[1]
     if simplex.dot_product_table[3, 0] < simplex.dot_product_table[ii, 0]:
-        iord[3] = iord[2]
-        iord[2] = iord[1]
-        iord[1] = 3
+        ordered_indices[3] = ordered_indices[2]
+        ordered_indices[2] = ordered_indices[1]
+        ordered_indices[1] = 3
     else:
-        ii = iord[2]
+        ii = ordered_indices[2]
         if simplex.dot_product_table[3, 0] < simplex.dot_product_table[ii, 0]:
-            iord[3] = iord[2]
-            iord[2] = 3
+            ordered_indices[3] = ordered_indices[2]
+            ordered_indices[2] = 3
         else:
-            iord[3] = 3
+            ordered_indices[3] = 3
     # Reorder indices_polytope1, indices_polytope2 simplex and dot_product_table
     for k in range(1, len(simplex)):
-        kk = iord[k]
+        kk = ordered_indices[k]
         simplex.indices_polytope1[k] = old_simplex.indices_polytope1[kk]
         simplex.indices_polytope2[k] = old_simplex.indices_polytope2[kk]
         simplex.simplex[k] = old_simplex.simplex[kk]
         for l in range(k):
-            ll = iord[l]
+            ll = ordered_indices[l]
             if kk >= ll:
                 simplex.dot_product_table[k, l] = old_simplex.dot_product_table[kk, ll]
             else:
