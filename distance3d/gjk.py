@@ -589,8 +589,7 @@ def _backup_procedure(
     if len(simplex) == 1:
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
-        backup = True
-        return simplex.dot_product_table[0, 0], backup
+        return simplex.dot_product_table[0, 0], True
     elif len(simplex) == 2:
         if backup:
             d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -949,7 +948,12 @@ def _backup_procedure(
                 iord[0] = 3
                 iord[1] = 1
                 iord[2] = 2
-    # final reordering
+
+    _final_reordering(iord, nvsd, simplex)
+    return dstsq, True
+
+
+def _final_reordering(iord, nvsd, simplex):
     risd = np.empty(4, dtype=int)
     risd[:len(simplex)] = simplex.indices_polytope1[:len(simplex)]
     rjsd = np.empty(4, dtype=int)
@@ -959,7 +963,6 @@ def _backup_procedure(
     delld = np.empty((4, 4), dtype=float)
     for k in range(len(simplex)):
         delld[k, :k + 1] = simplex.dot_product_table[k, :k + 1]
-
     simplex.n_simplex_points = nvsd
     for k in range(len(simplex)):
         kk = iord[k]
@@ -973,8 +976,6 @@ def _backup_procedure(
             else:
                 simplex.dot_product_table[k, l] = delld[ll, kk]
         simplex.dot_product_table[k, k] = delld[kk, kk]
-    backup = True
-    return dstsq, backup
 
 
 def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
