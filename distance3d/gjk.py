@@ -645,13 +645,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 ordered_indices[:2] = 0, 2
         check_face_123 = not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0)
         if check_face_123:
-            coords_sum = d1[6] + d2[6] + d3[6]
-            solution_d.barycentric_coordinates[0] = d1[6] / coords_sum
-            solution_d.barycentric_coordinates[1] = d2[6] / coords_sum
-            solution_d.barycentric_coordinates[2] = 1.0 - sum(solution_d.barycentric_coordinates[:2])
-            solution_d.search_direction = simplex.search_direction_face(
-                2, 0, 1, solution_d.barycentric_coordinates[0], solution_d.barycentric_coordinates[1])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_face(2, 0, 1, d1[6], d2[6], d3[6], simplex)
             if solution_d.dstsq < solution.dstsq:
                 n_simplex_points = 3
                 solution.copy_from(solution_d, n_simplex_points)
@@ -735,13 +729,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 ordered_indices[:2] = 0, 2
         check_face_123 = not (d1[6] <= 0.0 or d2[6] <= 0.0 or d3[6] <= 0.0)
         if check_face_123:
-            coords_sum = d1[6] + d2[6] + d3[6]
-            solution_d.barycentric_coordinates[0] = d1[6] / coords_sum
-            solution_d.barycentric_coordinates[1] = d2[6] / coords_sum
-            solution_d.barycentric_coordinates[2] = 1.0 - sum(solution_d.barycentric_coordinates[:2])
-            solution_d.search_direction = simplex.search_direction_face(
-                2, 0, 1, solution_d.barycentric_coordinates[0], solution_d.barycentric_coordinates[1])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_face(2, 0, 1, d1[6], d2[6], d3[6], simplex)
             if solution_d.dstsq < solution.dstsq:
                 n_simplex_points = 3
                 solution.copy_from(solution_d, n_simplex_points)
@@ -755,27 +743,14 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 ordered_indices[:2] = 0, 3
         check_face_124 = not (d1[11] <= 0.0 or d2[11] <= 0.0 or d4[11] <= 0.0)
         if check_face_124:
-            coords_sum = d1[11] + d2[11] + d4[11]
-            solution_d.barycentric_coordinates[0] = d1[11] / coords_sum
-            solution_d.barycentric_coordinates[1] = d2[11] / coords_sum
-            solution_d.barycentric_coordinates[2] = 1.0 - sum(solution_d.barycentric_coordinates[:2])
-            solution_d.search_direction = simplex.search_direction_face(
-                3, 0, 1, solution_d.barycentric_coordinates[0], solution_d.barycentric_coordinates[1])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_face(3, 0, 1, d1[11], d2[11], d4[11], simplex)
             if solution_d.dstsq < solution.dstsq:
                 n_simplex_points = 3
                 solution.copy_from(solution_d, n_simplex_points)
                 ordered_indices[:3] = 0, 1, 3
         check_face_134 = not (d1[12] <= 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0)
         if check_face_134:
-            coords_sum = d1[12] + d3[12] + d4[12]
-            solution_d.barycentric_coordinates[0] = d1[12] / coords_sum
-            solution_d.barycentric_coordinates[2] = d3[12] / coords_sum
-            solution_d.barycentric_coordinates[1] = 1.0 - solution_d.barycentric_coordinates[0] - \
-                                                    solution_d.barycentric_coordinates[2]
-            solution_d.search_direction = simplex.search_direction_face(
-                3, 0, 2, solution_d.barycentric_coordinates[0], solution_d.barycentric_coordinates[2])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_face(3, 0, 2, d1[12], d3[12], d4[12], simplex, 0, 2, 1)
             if solution_d.dstsq < solution.dstsq:
                 n_simplex_points = 3
                 solution.copy_from(solution_d, n_simplex_points)
@@ -832,13 +807,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 ordered_indices[:2] = 2, 3
         check_face_234 = not (d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0)
         if check_face_234:
-            coords_sum = d2[13] + d3[13] + d4[13]
-            solution_d.barycentric_coordinates[1] = d2[13] / coords_sum
-            solution_d.barycentric_coordinates[2] = d3[13] / coords_sum
-            solution_d.barycentric_coordinates[0] = 1.0 - sum(solution_d.barycentric_coordinates[1:3])
-            solution_d.search_direction = simplex.search_direction_face(
-                3, 1, 2, solution_d.barycentric_coordinates[1], solution_d.barycentric_coordinates[2])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_face(3, 1, 2, d2[13], d3[13], d4[13], simplex, 1, 2, 0)
             if solution_d.dstsq < solution.dstsq:
                 n_simplex_points = 3
                 solution.copy_from(solution_d, n_simplex_points)
