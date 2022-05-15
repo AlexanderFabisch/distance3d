@@ -75,17 +75,14 @@ def gjk_with_simplex(collider1, collider2):
     old_simplex = Simplex()
     backup = False
 
-    # Initialize simplex to difference of first points of the objects
-    ncy = 0
-
     simplex.initialize_with_point(
         collider1.first_vertex() - collider2.first_vertex())
 
     solution.barycentric_coordinates[0] = 1.0
-
     solution.dstsq = simplex.dot_product_table[0, 0] + simplex.dot_product_table[0, 0] + 1.0
+    iteration = 0
     while True:
-        ncy += 1
+        iteration += 1
 
         # Compute point of minimum norm in the convex hull of the simplex
         new_solution, backup = distance_subalgorithm(simplex, solution, backup)
@@ -110,7 +107,7 @@ def gjk_with_simplex(collider1, collider2):
                 return distance, closest_point1, closest_point2, simplex.simplex
 
             backup = True
-            if ncy != 1:
+            if iteration != 1:
                 simplex.copy_from(old_simplex)
             continue
 
