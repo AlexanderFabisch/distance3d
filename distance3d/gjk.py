@@ -547,23 +547,13 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             simplex.select_face_124()
             solution.from_face(2, 0, 1, d1[11], d2[11], d4[11], simplex)
             return solution
-        d3[10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
-        d4[10] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[3, 2]
-        e314 = -e134
-        d1[12] = d3[10] * d1[4] + d4[10] * e314
-        d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
+        _compute_distances_1(simplex, d1, d2, d3, d4, e123, e124, e134)
         face_134_optimal = not (d1[12] <= 0.0 or d2[14] > 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0)
         if face_134_optimal:
             simplex.select_face_134()
             solution.from_face(1, 0, 2, d1[12], d3[12], d4[12], simplex, 0, 2, 1)
             return solution
-        e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
-        d4[13] = d2[5] * d4[9] + d3[5] * e243
-        e234 = simplex.dot_product_table[3, 1] - simplex.dot_product_table[3, 2]
-        d3[13] = d2[9] * d3[5] + d4[9] * e234
-        e324 = -e234
-        d2[13] = d3[10] * d2[5] + d4[10] * e324
-        d1[14] = d2[13] * d1[2] + d3[13] * e213 + d4[13] * e214
+        _compute_distances_2(simplex, d1, d2, d3, d4, e213, e214)
         convex_hull_optimal = not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0)
         if convex_hull_optimal:
             solution.from_simplex(d1[14], d2[14], d3[14], d4[14], simplex)
@@ -604,6 +594,24 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             solution.from_face(0, 1, 2, d2[13], d3[13], d4[13], simplex, 1, 2, 0)
             return solution
     return None
+
+
+def _compute_distances_1(simplex, d1, d2, d3, d4, e123, e124, e134):
+    d3[10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
+    d4[10] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[3, 2]
+    e314 = -e134
+    d1[12] = d3[10] * d1[4] + d4[10] * e314
+    d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
+
+
+def _compute_distances_2(simplex, d1, d2, d3, d4, e213, e214):
+    e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
+    d4[13] = d2[5] * d4[9] + d3[5] * e243
+    e234 = simplex.dot_product_table[3, 1] - simplex.dot_product_table[3, 2]
+    d3[13] = d2[9] * d3[5] + d4[9] * e234
+    e324 = -e234
+    d2[13] = d3[10] * d2[5] + d4[10] * e324
+    d1[14] = d2[13] * d1[2] + d3[13] * e213 + d4[13] * e214
 
 
 def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
@@ -818,18 +826,8 @@ def _backup_simplex(simplex, d1, d2, d3, d4):
     e214 = -e124
     d1[11] = d2[9] * d1[2] + d4[9] * e214
     d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
-    d3[10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
-    d4[10] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[3, 2]
-    e314 = -e134
-    d1[12] = d3[10] * d1[4] + d4[10] * e314
-    d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
-    e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
-    d4[13] = d2[5] * d4[9] + d3[5] * e243
-    e234 = simplex.dot_product_table[3, 1] - simplex.dot_product_table[3, 2]
-    d3[13] = d2[9] * d3[5] + d4[9] * e234
-    e324 = -e234
-    d2[13] = d3[10] * d2[5] + d4[10] * e324
-    d1[14] = d2[13] * d1[2] + d3[13] * e213 + d4[13] * e214
+    _compute_distances_1(simplex, d1, d2, d3, d4, e123, e124, e134)
+    _compute_distances_2(simplex, d1, d2, d3, d4, e213, e214)
 
 
 def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
