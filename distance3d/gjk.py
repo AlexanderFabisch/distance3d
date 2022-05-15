@@ -242,14 +242,14 @@ class Simplex:
         self.dot_product_table[:self.n_simplex_points, :self.n_simplex_points] = simplex.dot_product_table[
             :self.n_simplex_points, :self.n_simplex_points]
 
-    def reorder(self, ordered_indices, n_simplex_points):
+    def reorder(self, ordered_indices):
         indices_polytope1 = np.copy(self.indices_polytope1[:self.n_simplex_points])
         indices_polytope2 = np.copy(self.indices_polytope2[:self.n_simplex_points])
         simplex = np.copy(self.simplex[:self.n_simplex_points])
         dot_product_table = np.empty((4, 4), dtype=float)
         for k in range(self.n_simplex_points):
             dot_product_table[k, :k + 1] = self.dot_product_table[k, :k + 1]
-        self.n_simplex_points = n_simplex_points
+        self.n_simplex_points = len(ordered_indices)
         for k in range(self.n_simplex_points):
             kk = ordered_indices[k]
             self.indices_polytope1[k] = indices_polytope1[kk]
@@ -758,7 +758,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 solution.copy_from(solution_d, n_simplex_points)
                 ordered_indices[:3] = 3, 1, 2
 
-    simplex.reorder(ordered_indices, n_simplex_points)
+    simplex.reorder(ordered_indices[:n_simplex_points])
     return solution, True
 
 
