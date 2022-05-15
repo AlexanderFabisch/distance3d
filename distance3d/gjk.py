@@ -537,11 +537,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             simplex.select_line_segment_14()
             solution.from_line_segment(1, 0, d1[8], d4[8], simplex)
             return solution
-        d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
-        d4[9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
-        e214 = -e124
-        d1[11] = d2[9] * d1[2] + d4[9] * e214
-        d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
+        e214 = _compute_distances_0(simplex, d1, d2, d3, d4, e124, e132, e134)
         face_124_optimal = not (d1[11] <= 0.0 or d2[11] <= 0.0 or d3[14] > 0.0 or d4[11] <= 0.0)
         if face_124_optimal:
             simplex.select_face_124()
@@ -594,6 +590,15 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             solution.from_face(0, 1, 2, d2[13], d3[13], d4[13], simplex, 1, 2, 0)
             return solution
     return None
+
+
+def _compute_distances_0(simplex, d1, d2, d3, d4, e124, e132, e134):
+    d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
+    d4[9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
+    e214 = -e124
+    d1[11] = d2[9] * d1[2] + d4[9] * e214
+    d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
+    return e214
 
 
 def _compute_distances_1(simplex, d1, d2, d3, d4, e123, e124, e134):
@@ -821,11 +826,7 @@ def _backup_simplex(simplex, d1, d2, d3, d4):
     d1[8] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 0]
     d2[11] = d1[8] * d2[2] + d4[8] * e124
     d3[12] = d1[8] * d3[4] + d4[8] * e134
-    d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
-    d4[9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
-    e214 = -e124
-    d1[11] = d2[9] * d1[2] + d4[9] * e214
-    d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
+    e214 = _compute_distances_0(simplex, d1, d2, d3, d4, e124, e132, e134)
     _compute_distances_1(simplex, d1, d2, d3, d4, e123, e124, e134)
     _compute_distances_2(simplex, d1, d2, d3, d4, e213, e214)
 
