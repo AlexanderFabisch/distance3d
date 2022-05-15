@@ -167,13 +167,16 @@ class Solution:
             vi1, vi2, self.barycentric_coordinates[bci1])
         self.dstsq = np.dot(self.search_direction, self.search_direction)
 
-    def from_face(self, vi1, vi2, vi3, a, b, c, simplex):
+    def from_face(self, vi1, vi2, vi3, a, b, c, simplex, bci1=0, bci2=1, bci3=2):
         coords_sum = a + b + c
-        self.barycentric_coordinates[0] = a / coords_sum
-        self.barycentric_coordinates[1] = b / coords_sum
-        self.barycentric_coordinates[2] = 1.0 - sum(self.barycentric_coordinates[:2])
+        self.barycentric_coordinates[bci1] = a / coords_sum
+        self.barycentric_coordinates[bci2] = b / coords_sum
+        self.barycentric_coordinates[bci3] = (
+            1.0 - self.barycentric_coordinates[bci1]
+            - self.barycentric_coordinates[bci2])
         self.search_direction = simplex.search_direction_face(
-            vi1, vi2, vi3, self.barycentric_coordinates[0], self.barycentric_coordinates[1])
+            vi1, vi2, vi3, self.barycentric_coordinates[bci1],
+            self.barycentric_coordinates[bci2])
         self.dstsq = np.dot(self.search_direction, self.search_direction)
 
     def copy_from(self, solution, n_simplex_points):
