@@ -596,8 +596,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
         return solution, True
     elif len(simplex) == 2:
         if backup:
-            d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
-            d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
+            _backup_line_segments(simplex, d1, d2)
         # check vertex 1
         solution.from_vertex(0, d1[0], simplex)
         n_simplex_points = 1
@@ -616,18 +615,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
             ordered_indices[0] = 1
     elif len(simplex) == 3:
         if backup:
-            d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
-            d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
-            e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
-            d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
-            d3[6] = d1[2] * d3[4] + d2[2] * e132
-            e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
-            d1[4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
-            d2[6] = d1[4] * d2[2] + d3[4] * e123
-            e213 = -e123
-            d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
-            d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
-            d1[6] = d2[5] * d1[2] + d3[5] * e213
+            _backup_faces(d1, d2, d3, simplex)
         # check vertex 1
         n_simplex_points = 1
         solution.from_vertex(0, d1[0], simplex)
@@ -672,46 +660,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 ordered_indices[:2] = 2, 1
     elif len(simplex) == 4:
         if backup:
-            d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
-            d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
-            d4[8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
-            e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
-            e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
-            d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
-            d3[6] = d1[2] * d3[4] + d2[2] * e132
-            d4[11] = d1[2] * d4[8] + d2[2] * e142
-            e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
-            e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
-            d1[4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
-            d2[6] = d1[4] * d2[2] + d3[4] * e123
-            d4[12] = d1[4] * d4[8] + d3[4] * e143
-            d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
-            d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
-            e213 = -e123
-            d1[6] = d2[5] * d1[2] + d3[5] * e213
-            d4[14] = d1[6] * d4[8] + d2[6] * e142 + d3[6] * e143
-            e124 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 1]
-            e134 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 2]
-            d1[8] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 0]
-            d2[11] = d1[8] * d2[2] + d4[8] * e124
-            d3[12] = d1[8] * d3[4] + d4[8] * e134
-            d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
-            d4[9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
-            e214 = -e124
-            d1[11] = d2[9] * d1[2] + d4[9] * e214
-            d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
-            d3[10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
-            d4[10] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[3, 2]
-            e314 = -e134
-            d1[12] = d3[10] * d1[4] + d4[10] * e314
-            d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
-            e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
-            d4[13] = d2[5] * d4[9] + d3[5] * e243
-            e234 = simplex.dot_product_table[3, 1] - simplex.dot_product_table[3, 2]
-            d3[13] = d2[9] * d3[5] + d4[9] * e234
-            e324 = -e234
-            d2[13] = d3[10] * d2[5] + d4[10] * e324
-            d1[14] = d2[13] * d1[2] + d3[13] * e213 + d4[13] * e214
+            _backup_simplex(simplex, d1, d2, d3, d4)
         # check vertex 1
         n_simplex_points = 1
         solution.from_vertex(0, d1[0], simplex)
@@ -811,6 +760,69 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
 
     simplex.reorder(ordered_indices, n_simplex_points)
     return solution, True
+
+
+def _backup_line_segments(simplex, d1, d2):
+    d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
+    d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
+
+
+def _backup_faces(d1, d2, d3, simplex):
+    d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
+    d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
+    e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
+    d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
+    d3[6] = d1[2] * d3[4] + d2[2] * e132
+    e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
+    d1[4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
+    d2[6] = d1[4] * d2[2] + d3[4] * e123
+    e213 = -e123
+    d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
+    d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
+    d1[6] = d2[5] * d1[2] + d3[5] * e213
+
+
+def _backup_simplex(simplex, d1, d2, d3, d4):
+    d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
+    d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
+    d4[8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
+    e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
+    e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
+    d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
+    d3[6] = d1[2] * d3[4] + d2[2] * e132
+    d4[11] = d1[2] * d4[8] + d2[2] * e142
+    e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
+    e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
+    d1[4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
+    d2[6] = d1[4] * d2[2] + d3[4] * e123
+    d4[12] = d1[4] * d4[8] + d3[4] * e143
+    d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
+    d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
+    e213 = -e123
+    d1[6] = d2[5] * d1[2] + d3[5] * e213
+    d4[14] = d1[6] * d4[8] + d2[6] * e142 + d3[6] * e143
+    e124 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 1]
+    e134 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 2]
+    d1[8] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 0]
+    d2[11] = d1[8] * d2[2] + d4[8] * e124
+    d3[12] = d1[8] * d3[4] + d4[8] * e134
+    d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
+    d4[9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
+    e214 = -e124
+    d1[11] = d2[9] * d1[2] + d4[9] * e214
+    d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
+    d3[10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
+    d4[10] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[3, 2]
+    e314 = -e134
+    d1[12] = d3[10] * d1[4] + d4[10] * e314
+    d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
+    e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
+    d4[13] = d2[5] * d4[9] + d3[5] * e243
+    e234 = simplex.dot_product_table[3, 1] - simplex.dot_product_table[3, 2]
+    d3[13] = d2[9] * d3[5] + d4[9] * e234
+    e324 = -e234
+    d2[13] = d3[10] * d2[5] + d4[10] * e324
+    d1[14] = d2[13] * d1[2] + d3[13] * e213 + d4[13] * e214
 
 
 def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
