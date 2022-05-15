@@ -162,7 +162,7 @@ class Solution:
     def from_line_segment(self, vi1, vi2, a, b, simplex, bci1=0, bci2=1):
         coords_sum = a + b
         self.barycentric_coordinates[bci1] = a / coords_sum
-        self.barycentric_coordinates[bci2] = 1.0 - self.barycentric_coordinates[0]
+        self.barycentric_coordinates[bci2] = 1.0 - self.barycentric_coordinates[bci1]
         self.search_direction = simplex.search_direction_line(
             vi1, vi2, self.barycentric_coordinates[bci1])
         self.dstsq = np.dot(self.search_direction, self.search_direction)
@@ -694,12 +694,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
             ordered_indices[0] = 2
         check_line_segment_23 = not (d2[5] <= 0.0 or d3[5] <= 0.0)
         if check_line_segment_23:
-            #solution_d.from_line_segment(2, 1, d2[5], d3[5], simplex, 1, 0)  # TODO
-            coords_sum = d2[5] + d3[5]
-            solution_d.barycentric_coordinates[1] = d2[5] / coords_sum
-            solution_d.barycentric_coordinates[0] = 1.0 - solution_d.barycentric_coordinates[1]
-            solution_d.search_direction = simplex.search_direction_line(2, 1, solution_d.barycentric_coordinates[1])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_line_segment(2, 1, d2[5], d3[5], simplex, 1, 0)
             if solution_d.dstsq < solution.dstsq:
                 n_simplex_points = 2
                 solution.dstsq = solution_d.dstsq
