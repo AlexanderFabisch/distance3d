@@ -159,12 +159,12 @@ class Solution:
         self.search_direction = simplex.simplex[vertex_idx]
         self.dstsq = simplex.dot_product_table[vertex_idx, vertex_idx]
 
-    def from_line_segment(self, vi1, vi2, a, b, simplex):
+    def from_line_segment(self, vi1, vi2, a, b, simplex, bci1=0, bci2=1):
         coords_sum = a + b
-        self.barycentric_coordinates[0] = a / coords_sum
-        self.barycentric_coordinates[1] = 1.0 - self.barycentric_coordinates[0]
+        self.barycentric_coordinates[bci1] = a / coords_sum
+        self.barycentric_coordinates[bci2] = 1.0 - self.barycentric_coordinates[0]
         self.search_direction = simplex.search_direction_line(
-            vi1, vi2, self.barycentric_coordinates[0])
+            vi1, vi2, self.barycentric_coordinates[bci1])
         self.dstsq = np.dot(self.search_direction, self.search_direction)
 
 
@@ -436,12 +436,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         line_segment_12_optimal = not (d1[2] <= 0.0 or d2[2] <= 0.0 or d3[6] > 0.0 or d4[11] > 0.0)
         if line_segment_12_optimal:
             simplex.n_simplex_points = 2
-            coords_sum = d1[2] + d2[2]
-            solution.barycentric_coordinates[0] = d1[2] / coords_sum
-            solution.barycentric_coordinates[1] = 1.0 - solution.barycentric_coordinates[0]
-            solution.search_direction = simplex.search_direction_line(
-                1, 0, solution.barycentric_coordinates[0])
-            solution.dstsq = np.dot(solution.search_direction, solution.search_direction)
+            solution.from_line_segment(1, 0, d1[2], d2[2], simplex)
             return solution
         e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
         e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
@@ -454,12 +449,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             simplex.move_vertex(2, 1)
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 0]
             simplex.dot_product_table[1, 1] = simplex.dot_product_table[2, 2]
-            coords_sum = d1[4] + d3[4]
-            solution.barycentric_coordinates[0] = d1[4] / coords_sum
-            solution.barycentric_coordinates[1] = 1.0 - solution.barycentric_coordinates[0]
-            solution.search_direction = simplex.search_direction_line(
-                1, 0, solution.barycentric_coordinates[0])
-            solution.dstsq = np.dot(solution.search_direction, solution.search_direction)
+            solution.from_line_segment(1, 0, d1[4], d3[4], simplex)
             return solution
         d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
         d3[5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
@@ -488,12 +478,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             simplex.move_vertex(3, 1)
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 0]
             simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
-            coords_sum = d1[8] + d4[8]
-            solution.barycentric_coordinates[0] = d1[8] / coords_sum
-            solution.barycentric_coordinates[1] = 1.0 - solution.barycentric_coordinates[0]
-            solution.search_direction = simplex.search_direction_line(
-                1, 0, solution.barycentric_coordinates[0])
-            solution.dstsq = np.dot(solution.search_direction, solution.search_direction)
+            solution.from_line_segment(1, 0, d1[8], d4[8], simplex)
             return solution
         d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
         d4[9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
@@ -575,12 +560,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             simplex.move_vertex(2, 0)
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 1]
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
-            coords_sum = d2[5] + d3[5]
-            solution.barycentric_coordinates[1] = d2[5] / coords_sum
-            solution.barycentric_coordinates[0] = 1.0 - solution.barycentric_coordinates[1]
-            solution.search_direction = simplex.search_direction_line(
-                0, 1, solution.barycentric_coordinates[1])
-            solution.dstsq = np.dot(solution.search_direction, solution.search_direction)
+            solution.from_line_segment(0, 1, d2[5], d3[5], simplex)
             return solution
         line_segment_24_optimal = not (d1[11] > 0.0 or d2[9] <= 0.0 or d3[13] > 0.0 or d4[9] <= 0.0)
         if line_segment_24_optimal:
@@ -588,12 +568,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             simplex.move_vertex(3, 0)
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 1]
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[3, 3]
-            coords_sum = d2[9] + d4[9]
-            solution.barycentric_coordinates[1] = d2[9] / coords_sum
-            solution.barycentric_coordinates[0] = 1.0 - solution.barycentric_coordinates[1]
-            solution.search_direction = simplex.search_direction_line(
-                0, 1, solution.barycentric_coordinates[1])
-            solution.dstsq = np.dot(solution.search_direction, solution.search_direction)
+            solution.from_line_segment(0, 1, d2[9], d4[9], simplex, 1, 0)
             return solution
         line_segment_34_optimal = not (d1[12] > 0.0 or d2[13] > 0.0 or d3[10] <= 0.0 or d4[10] <= 0.0)
         if line_segment_34_optimal:
@@ -603,12 +578,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
             simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 2]
             simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
-            coords_sum = d3[10] + d4[10]
-            solution.barycentric_coordinates[0] = d3[10] / coords_sum
-            solution.barycentric_coordinates[1] = 1.0 - solution.barycentric_coordinates[0]
-            solution.search_direction = simplex.search_direction_line(
-                1, 0, solution.barycentric_coordinates[0])
-            solution.dstsq = np.dot(solution.search_direction, solution.search_direction)
+            solution.from_line_segment(1, 0, d3[10], d4[10], simplex)
             return solution
         face_234_optimal = not (d1[14] > 0.0 or d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0)
         if face_234_optimal:
@@ -644,12 +614,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
         ordered_indices[0] = 0
         check_line_segment_12 = not (d1[2] <= 0.0 or d2[2] <= 0.0)
         if check_line_segment_12:
-            coords_sum = d1[2] + d2[2]
-            solution_d.barycentric_coordinates[0] = d1[2] / coords_sum
-            solution_d.barycentric_coordinates[1] = 1.0 - solution_d.barycentric_coordinates[0]
-            solution_d.search_direction = simplex.search_direction_line(
-                1, 0, solution_d.barycentric_coordinates[0])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_line_segment(1, 0, d1[2], d2[2], simplex)
             if solution_d.dstsq < solution.dstsq:
                 solution.dstsq = solution_d.dstsq
                 n_simplex_points = 2
@@ -684,11 +649,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
         ordered_indices[0] = 0
         check_line_segment_12 = not (d1[2] <= 0.0 or d2[2] <= 0.0)
         if check_line_segment_12:
-            coords_sum = d1[2] + d2[2]
-            solution_d.barycentric_coordinates[0] = d1[2] / coords_sum
-            solution_d.barycentric_coordinates[1] = 1.0 - solution_d.barycentric_coordinates[0]
-            solution_d.search_direction = simplex.search_direction_line(1, 0, solution_d.barycentric_coordinates[0])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_line_segment(1, 0, d1[2], d2[2], simplex)
             if solution_d.dstsq < solution.dstsq:
                 solution.dstsq = solution_d.dstsq
                 n_simplex_points = 2
@@ -698,11 +659,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 ordered_indices[:2] = 0, 1
         check_line_segment_13 = not (d1[4] <= 0.0 or d3[4] <= 0.0)
         if check_line_segment_13:
-            coords_sum = d1[4] + d3[4]
-            solution_d.barycentric_coordinates[0] = d1[4] / coords_sum
-            solution_d.barycentric_coordinates[1] = 1.0 - solution_d.barycentric_coordinates[0]
-            solution_d.search_direction = simplex.search_direction_line(2, 0, solution_d.barycentric_coordinates[0])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_line_segment(2, 0, d1[4], d3[4], simplex)
             if solution_d.dstsq < solution.dstsq:
                 solution.dstsq = solution_d.dstsq
                 n_simplex_points = 2
@@ -737,6 +694,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
             ordered_indices[0] = 2
         check_line_segment_23 = not (d2[5] <= 0.0 or d3[5] <= 0.0)
         if check_line_segment_23:
+            #solution_d.from_line_segment(2, 1, d2[5], d3[5], simplex, 1, 0)  # TODO
             coords_sum = d2[5] + d3[5]
             solution_d.barycentric_coordinates[1] = d2[5] / coords_sum
             solution_d.barycentric_coordinates[0] = 1.0 - solution_d.barycentric_coordinates[1]
@@ -799,11 +757,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
         ordered_indices[0] = 0
         check_line_segment_12 = not (d1[2] <= 0.0 or d2[2] <= 0.0)
         if check_line_segment_12:
-            coords_sum = d1[2] + d2[2]
-            solution_d.barycentric_coordinates[0] = d1[2] / coords_sum
-            solution_d.barycentric_coordinates[1] = 1.0 - solution_d.barycentric_coordinates[0]
-            solution_d.search_direction = simplex.search_direction_line(1, 0, solution_d.barycentric_coordinates[0])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_line_segment(1, 0, d1[2], d2[2], simplex)
             if solution_d.dstsq < solution.dstsq:
                 solution.dstsq = solution_d.dstsq
                 n_simplex_points = 2
@@ -813,11 +767,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 ordered_indices[:2] = 0, 1
         check_line_segment_13 = not (d1[4] <= 0.0 or d3[4] <= 0.0)
         if check_line_segment_13:
-            coords_sum = d1[4] + d3[4]
-            solution_d.barycentric_coordinates[0] = d1[4] / coords_sum
-            solution_d.barycentric_coordinates[1] = 1.0 - solution_d.barycentric_coordinates[0]
-            solution_d.search_direction = simplex.search_direction_line(2, 0, solution_d.barycentric_coordinates[0])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_line_segment(2, 0, d1[4], d3[4], simplex)
             if solution_d.dstsq < solution.dstsq:
                 solution.dstsq = solution_d.dstsq
                 n_simplex_points = 2
@@ -842,11 +792,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 ordered_indices[:3] = 0, 1, 2
         check_line_segment_14 = not (d1[8] <= 0.0 or d4[8] <= 0.0)
         if check_line_segment_14:
-            coords_sum = d1[8] + d4[8]
-            solution_d.barycentric_coordinates[0] = d1[8] / coords_sum
-            solution_d.barycentric_coordinates[1] = 1.0 - solution_d.barycentric_coordinates[0]
-            solution_d.search_direction = simplex.search_direction_line(3, 0, solution_d.barycentric_coordinates[0])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_line_segment(3, 0, d1[8], d4[8], simplex)
             if solution_d.dstsq < solution.dstsq:
                 solution.dstsq = solution_d.dstsq
                 n_simplex_points = 2
@@ -920,11 +866,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
             ordered_indices[0] = 3
         check_line_segment_23 = not (d2[5] <= 0.0 or d3[5] <= 0.0)
         if check_line_segment_23:
-            coords_sum = d2[5] + d3[5]
-            solution_d.barycentric_coordinates[1] = d2[5] / coords_sum
-            solution_d.barycentric_coordinates[0] = 1.0 - solution_d.barycentric_coordinates[1]
-            solution_d.search_direction = simplex.search_direction_line(1, 2, solution_d.barycentric_coordinates[1])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_line_segment(1, 2, d2[5], d3[5], simplex, 1, 0)
             if solution_d.dstsq < solution.dstsq:
                 solution.dstsq = solution_d.dstsq
                 n_simplex_points = 2
@@ -934,11 +876,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 ordered_indices[:2] = 2, 1
         check_line_segment_24 = not (d2[9] <= 0.0 or d4[9] <= 0.0)
         if check_line_segment_24:
-            coords_sum = d2[9] + d4[9]
-            solution_d.barycentric_coordinates[1] = d2[9] / coords_sum
-            solution_d.barycentric_coordinates[0] = 1.0 - solution_d.barycentric_coordinates[1]
-            solution_d.search_direction = simplex.search_direction_line(3, 1, solution_d.barycentric_coordinates[1])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_line_segment(3, 1, d2[9], d4[9], simplex, 1, 0)
             if solution_d.dstsq < solution.dstsq:
                 solution.dstsq = solution_d.dstsq
                 n_simplex_points = 2
@@ -948,11 +886,7 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 ordered_indices[:2] = 3, 1
         check_line_segment_34 = not (d3[10] <= 0.0 or d4[10] <= 0.0)
         if check_line_segment_34:
-            coords_sum = d3[10] + d4[10]
-            solution_d.barycentric_coordinates[0] = d3[10] / coords_sum
-            solution_d.barycentric_coordinates[1] = 1.0 - solution_d.barycentric_coordinates[0]
-            solution_d.search_direction = simplex.search_direction_line(3, 2, solution_d.barycentric_coordinates[0])
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+            solution_d.from_line_segment(3, 2, d3[10], d4[10], simplex)
             if solution_d.dstsq < solution.dstsq:
                 solution.dstsq = solution_d.dstsq
                 n_simplex_points = 2
