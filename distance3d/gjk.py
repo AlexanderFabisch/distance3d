@@ -527,25 +527,25 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             simplex.n_simplex_points = 3
             solution.from_face(2, 0, 1, d1[6], d2[6], d3[6], simplex)
             return solution
-        e124, e134 = _compute_distances_0(simplex, d1, d2, d3, d4)
+        e124, e134 = _compute_simplex_distances_0(simplex, d1, d2, d3, d4)
         line_segment_14_optimal = not (d1[8] <= 0.0 or d2[11] > 0.0 or d3[12] > 0.0 or d4[8] <= 0.0)
         if line_segment_14_optimal:
             simplex.select_line_segment_14()
             solution.from_line_segment(1, 0, d1[8], d4[8], simplex)
             return solution
-        e214 = _compute_distances_1(simplex, d1, d2, d3, d4, e124, e132, e134)
+        e214 = _compute_simplex_distances_1(simplex, d1, d2, d3, d4, e124, e132, e134)
         face_124_optimal = not (d1[11] <= 0.0 or d2[11] <= 0.0 or d3[14] > 0.0 or d4[11] <= 0.0)
         if face_124_optimal:
             simplex.select_face_124()
             solution.from_face(2, 0, 1, d1[11], d2[11], d4[11], simplex)
             return solution
-        _compute_distances_2(simplex, d1, d2, d3, d4, e123, e124, e134)
+        _compute_simplex_distances_2(simplex, d1, d2, d3, d4, e123, e124, e134)
         face_134_optimal = not (d1[12] <= 0.0 or d2[14] > 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0)
         if face_134_optimal:
             simplex.select_face_134()
             solution.from_face(1, 0, 2, d1[12], d3[12], d4[12], simplex, 0, 2, 1)
             return solution
-        _compute_distances_3(simplex, d1, d2, d3, d4, e213, e214)
+        _compute_simplex_distances_3(simplex, d1, d2, d3, d4, e213, e214)
         convex_hull_optimal = not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0)
         if convex_hull_optimal:
             solution.from_simplex(d1[14], d2[14], d3[14], d4[14], simplex)
@@ -588,7 +588,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
     return None
 
 
-def _compute_distances_0(simplex, d1, d2, d3, d4):
+def _compute_simplex_distances_0(simplex, d1, d2, d3, d4):
     e124 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 1]
     e134 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 2]
     d1[8] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 0]
@@ -597,7 +597,7 @@ def _compute_distances_0(simplex, d1, d2, d3, d4):
     return e124, e134
 
 
-def _compute_distances_1(simplex, d1, d2, d3, d4, e124, e132, e134):
+def _compute_simplex_distances_1(simplex, d1, d2, d3, d4, e124, e132, e134):
     d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
     d4[9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
     e214 = -e124
@@ -606,7 +606,7 @@ def _compute_distances_1(simplex, d1, d2, d3, d4, e124, e132, e134):
     return e214
 
 
-def _compute_distances_2(simplex, d1, d2, d3, d4, e123, e124, e134):
+def _compute_simplex_distances_2(simplex, d1, d2, d3, d4, e123, e124, e134):
     d3[10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
     d4[10] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[3, 2]
     e314 = -e134
@@ -614,7 +614,7 @@ def _compute_distances_2(simplex, d1, d2, d3, d4, e123, e124, e134):
     d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
 
 
-def _compute_distances_3(simplex, d1, d2, d3, d4, e213, e214):
+def _compute_simplex_distances_3(simplex, d1, d2, d3, d4, e213, e214):
     e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
     d4[13] = d2[5] * d4[9] + d3[5] * e243
     e234 = simplex.dot_product_table[3, 1] - simplex.dot_product_table[3, 2]
@@ -826,10 +826,10 @@ def _backup_simplex(simplex, d1, d2, d3, d4):
     e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
     d4[12] = d1[4] * d4[8] + d3[4] * e143
     d4[14] = d1[6] * d4[8] + d2[6] * e142 + d3[6] * e143
-    e124, e134 = _compute_distances_0(simplex, d1, d2, d3, d4)
-    e214 = _compute_distances_1(simplex, d1, d2, d3, d4, e124, e132, e134)
-    _compute_distances_2(simplex, d1, d2, d3, d4, e123, e124, e134)
-    _compute_distances_3(simplex, d1, d2, d3, d4, e213, e214)
+    e124, e134 = _compute_simplex_distances_0(simplex, d1, d2, d3, d4)
+    e214 = _compute_simplex_distances_1(simplex, d1, d2, d3, d4, e124, e132, e134)
+    _compute_simplex_distances_2(simplex, d1, d2, d3, d4, e123, e124, e134)
+    _compute_simplex_distances_3(simplex, d1, d2, d3, d4, e213, e214)
 
 
 def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
