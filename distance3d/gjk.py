@@ -179,6 +179,16 @@ class Solution:
             self.barycentric_coordinates[bci2])
         self.dstsq = np.dot(self.search_direction, self.search_direction)
 
+    def from_simplex(self, a, b, c, d, simplex):
+        coords_sum = a + b + c + d
+        self.barycentric_coordinates[0] = a / coords_sum
+        self.barycentric_coordinates[1] = b / coords_sum
+        self.barycentric_coordinates[2] = c / coords_sum
+        self.barycentric_coordinates[3] = 1.0 - sum(self.barycentric_coordinates[:3])
+        self.search_direction = simplex.search_direction_simplex(
+            self.barycentric_coordinates)
+        self.dstsq = np.dot(self.search_direction, self.search_direction)
+
     def copy_from(self, solution, n_simplex_points):
         self.barycentric_coordinates[:n_simplex_points] = \
             solution.barycentric_coordinates[:n_simplex_points]
@@ -523,14 +533,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         d1[14] = d2[13] * d1[2] + d3[13] * e213 + d4[13] * e214
         convex_hull_optimal = not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0)
         if convex_hull_optimal:
-            coords_sum = d1[14] + d2[14] + d3[14] + d4[14]
-            solution.barycentric_coordinates[0] = d1[14] / coords_sum
-            solution.barycentric_coordinates[1] = d2[14] / coords_sum
-            solution.barycentric_coordinates[2] = d3[14] / coords_sum
-            solution.barycentric_coordinates[3] = 1.0 - sum(solution.barycentric_coordinates[:3])
-            solution.search_direction = simplex.search_direction_simplex(
-                solution.barycentric_coordinates)
-            solution.dstsq = np.dot(solution.search_direction, solution.search_direction)
+            solution.from_simplex(d1[14], d2[14], d3[14], d4[14], simplex)
             return solution
         vertex_2_optimal = not (d1[2] > 0.0 or d3[5] > 0.0 or d4[9] > 0.0)
         if vertex_2_optimal:
@@ -755,16 +758,9 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
                 n_simplex_points = 3
                 solution.copy_from(solution_d, n_simplex_points)
                 ordered_indices[:3] = 0, 3, 2
-        check_hull = not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0)
-        if check_hull:
-            coords_sum = d1[14] + d2[14] + d3[14] + d4[14]
-            solution_d.barycentric_coordinates[0] = d1[14] / coords_sum
-            solution_d.barycentric_coordinates[1] = d2[14] / coords_sum
-            solution_d.barycentric_coordinates[2] = d3[14] / coords_sum
-            solution_d.barycentric_coordinates[3] = 1.0 - sum(solution_d.barycentric_coordinates[:3])
-            solution_d.search_direction = simplex.search_direction_simplex(
-                solution_d.barycentric_coordinates)
-            solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
+        check_convex_hull = not (d1[14] <= 0.0 or d2[14] <= 0.0 or d3[14] <= 0.0 or d4[14] <= 0.0)
+        if check_convex_hull:
+            solution_d.from_simplex(d1[14], d2[14], d3[14], d4[14], simplex)
             if solution_d.dstsq < solution.dstsq:
                 n_simplex_points = 4
                 solution.copy_from(solution_d, n_simplex_points)
