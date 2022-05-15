@@ -154,6 +154,10 @@ class Solution:
         self.search_direction = np.zeros(3, dtype=float)
         self.dstsq = np.inf
 
+    def from_vertex(self, vertex_idx, a, simplex):
+        self.barycentric_coordinates[vertex_idx] = a
+        self.search_direction = simplex.simplex[vertex_idx]
+        self.dstsq = simplex.dot_product_table[vertex_idx, vertex_idx]
 
 class Simplex:
     """Simplex and additional data.
@@ -380,18 +384,14 @@ def distance_subalgorithm(simplex, solution, backup):
 def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
     solution = Solution()
     if len(simplex) == 1:
-        solution.barycentric_coordinates[0] = d1[0]
-        solution.search_direction = simplex.simplex[0]
-        solution.dstsq = simplex.dot_product_table[0, 0]
+        solution.from_vertex(0, d1[0], simplex)
         return solution
     elif len(simplex) == 2:
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
         vertex_1_optimal = d2[2] <= 0.0
         if vertex_1_optimal:
             simplex.reduce_to_optimal_vertex(0)
-            solution.barycentric_coordinates[0] = d1[0]
-            solution.search_direction = simplex.simplex[0]
-            solution.dstsq = simplex.dot_product_table[0, 0]
+            solution.from_vertex(0, d1[0], simplex)
             return solution
         d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
         line_segment_12_optimal = not (d1[2] <= 0.0 or d2[2] <= 0.0)
@@ -406,9 +406,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         vertex_2_optimal = d1[2] <= 0.0
         if vertex_2_optimal:
             simplex.reduce_to_optimal_vertex(1)
-            solution.barycentric_coordinates[0] = d2[1]
-            solution.search_direction = simplex.simplex[0]
-            solution.dstsq = simplex.dot_product_table[0, 0]
+            solution.from_vertex(0, d2[1], simplex)
             return solution
     elif len(simplex) == 3:
         d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
@@ -416,9 +414,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         vertex_1_optimal = not (d2[2] > 0.0 or d3[4] > 0.0)
         if vertex_1_optimal:
             simplex.reduce_to_optimal_vertex(0)
-            solution.barycentric_coordinates[0] = d1[0]
-            solution.search_direction = simplex.simplex[0]
-            solution.dstsq = simplex.dot_product_table[0, 0]
+            solution.from_vertex(0, d1[0], simplex)
             return solution
         e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
         d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
@@ -466,16 +462,12 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         vertex_2_optimal = not (d1[2] > 0.0 or d3[5] > 0.0)
         if vertex_2_optimal:
             simplex.reduce_to_optimal_vertex(1)
-            solution.barycentric_coordinates[0] = d2[1]
-            solution.search_direction = simplex.simplex[0]
-            solution.dstsq = simplex.dot_product_table[0, 0]
+            solution.from_vertex(0, d2[1], simplex)
             return solution
         vertex_3_optimal = not (d1[4] > 0.0 or d2[5] > 0.0)
         if vertex_3_optimal:
             simplex.reduce_to_optimal_vertex(2)
-            solution.barycentric_coordinates[0] = d3[3]
-            solution.search_direction = simplex.simplex[0]
-            solution.dstsq = simplex.dot_product_table[0, 0]
+            solution.from_vertex(0, d3[3], simplex)
             return solution
         line_segment_23_optimal = not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0)
         if line_segment_23_optimal:
@@ -497,9 +489,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         vertex_1_optimal = not (d2[2] > 0.0 or d3[4] > 0.0 or d4[8] > 0.0)
         if vertex_1_optimal:
             simplex.reduce_to_optimal_vertex(0)
-            solution.barycentric_coordinates[0] = d1[0]
-            solution.search_direction = simplex.simplex[0]
-            solution.dstsq = simplex.dot_product_table[0, 0]
+            solution.from_vertex(0, d1[0], simplex)
             return solution
         e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
         e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
@@ -630,23 +620,17 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         vertex_2_optimal = not (d1[2] > 0.0 or d3[5] > 0.0 or d4[9] > 0.0)
         if vertex_2_optimal:
             simplex.reduce_to_optimal_vertex(1)
-            solution.barycentric_coordinates[0] = d2[1]
-            solution.search_direction = simplex.simplex[0]
-            solution.dstsq = simplex.dot_product_table[0, 0]
+            solution.from_vertex(0, d2[1], simplex)
             return solution
         vertex_3_optimal = not (d1[4] > 0.0 or d2[5] > 0.0 or d4[10] > 0.0)
         if vertex_3_optimal:
             simplex.reduce_to_optimal_vertex(2)
-            solution.barycentric_coordinates[0] = d3[3]
-            solution.search_direction = simplex.simplex[0]
-            solution.dstsq = simplex.dot_product_table[0, 0]
+            solution.from_vertex(0, d3[3], simplex)
             return solution
         vertex_4_optimal = not (d1[8] > 0.0 or d2[9] > 0.0 or d3[10] > 0.0)
         if vertex_4_optimal:
             simplex.reduce_to_optimal_vertex(3)
-            solution.barycentric_coordinates[0] = d4[7]
-            solution.search_direction = simplex.simplex[0]
-            solution.dstsq = simplex.dot_product_table[0, 0]
+            solution.from_vertex(0, d4[7], simplex)
             return solution
         line_segment_23_optimal = not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0 or d4[13] > 0.0)
         if line_segment_23_optimal:
