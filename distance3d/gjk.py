@@ -70,11 +70,9 @@ def gjk_with_simplex(collider1, collider2):
         Simplex defined by 4 points of the Minkowski difference between
         vertices of the two colliders.
     """
-
-    barycentric_coordinates = np.zeros(4, dtype=float)
+    solution = Solution()
     simplex = Simplex()
     old_simplex = Simplex()
-    search_direction = np.zeros(3, dtype=float)
     backup = False
 
     # Initialize simplex to difference of first points of the objects
@@ -83,23 +81,22 @@ def gjk_with_simplex(collider1, collider2):
     simplex.initialize_with_point(
         collider1.first_vertex() - collider2.first_vertex())
 
-    barycentric_coordinates[0] = 1.0
+    solution.barycentric_coordinates[0] = 1.0
 
-    lastdstsq = simplex.dot_product_table[0, 0] + simplex.dot_product_table[0, 0] + 1.0
+    solution.dstsq = simplex.dot_product_table[0, 0] + simplex.dot_product_table[0, 0] + 1.0
     while True:
         ncy += 1
 
         # Compute point of minimum norm in the convex hull of the simplex
-        dstsq, backup = distance_subalgorithm(
-            simplex, search_direction, barycentric_coordinates, backup)
+        dstsq, backup = distance_subalgorithm(simplex, solution, backup)
 
-        if dstsq >= lastdstsq or len(simplex) == 4:
+        if dstsq >= solution.dstsq or len(simplex) == 4:
             if backup:
                 closest_point1 = collider1.compute_point(
-                    barycentric_coordinates[:len(simplex)],
+                    solution.barycentric_coordinates[:len(simplex)],
                     simplex.indices_polytope1[:len(simplex)])
                 closest_point2 = collider2.compute_point(
-                    barycentric_coordinates[:len(simplex)],
+                    solution.barycentric_coordinates[:len(simplex)],
                     simplex.indices_polytope2[:len(simplex)])
 
                 # Make sure intersection has zero distance
@@ -117,12 +114,12 @@ def gjk_with_simplex(collider1, collider2):
                 simplex.copy_from(old_simplex)
             continue
 
-        lastdstsq = dstsq
+        solution.dstsq = dstsq
 
         # Find new supporting point in direction -search_direction:
         # s_(A-B)(-search_direction) = s_A(-search_direction) - s_B(search_direction)
-        new_index1, new_vertex1 = collider1.support_function(-search_direction)
-        new_index2, new_vertex2 = collider2.support_function(search_direction)
+        new_index1, new_vertex1 = collider1.support_function(-solution.search_direction)
+        new_index2, new_vertex2 = collider2.support_function(solution.search_direction)
         new_simplex_point = new_vertex1 - new_vertex2
 
         simplex.add_new_point(new_index1, new_index2, new_simplex_point)
@@ -131,6 +128,31 @@ def gjk_with_simplex(collider1, collider2):
             _reorder_simplex_nondecreasing_order(simplex, old_simplex)
 
     raise RuntimeError("Solution should be found in loop.")
+
+
+class Solution:
+    """Represents current best solution and search direction.
+
+    Attributes
+    ----------
+    search_direction : array, shape (3,)
+        Near point to the convex hull of the points in simplex.
+
+    barycentric_coordinates : array, shape (n_simplex_points,)
+        The barycentric coordinates of search_direction, i.e.,
+        search_direction = barycentric_coordinates[0]*simplex[1] + ...
+        + barycentric_coordinates(n_simplex_points)*simplex[n_simplex_points-1],
+        barycentric_coordinates[k] > 0.0 for k=0,...,n_simplex_points-1, and,
+        barycentric_coordinates[0] + ...
+        + barycentric_coordinates[n_simplex_points-1] = 1.0.
+
+    dstsq : float
+        Squared distance to origin.
+    """
+    def __init__(self):
+        self.barycentric_coordinates = np.zeros(4, dtype=float)
+        self.search_direction = np.zeros(3, dtype=float)
+        self.dstsq = np.inf
 
 
 class Simplex:
@@ -301,8 +323,7 @@ class Simplex:
         return self.n_simplex_points
 
 
-def distance_subalgorithm(
-        simplex, search_direction, barycentric_coordinates, backup):
+def distance_subalgorithm(simplex, solution, backup):
     """Distance subalgorithm.
 
     Implements, in a very efficient way, the distance subalgorithm
@@ -324,16 +345,8 @@ def distance_subalgorithm(
     simplex : array, shape (n_simplex_points, 3)
       Current simplex.
 
-    search_direction : array, shape (3,)
-        Near point to the convex hull of the points in simplex.
-
-    barycentric_coordinates : array, shape (n_simplex_points,)
-        The barycentric coordinates of search_direction, i.e.,
-        search_direction = barycentric_coordinates[0]*simplex[1] + ...
-        + barycentric_coordinates(n_simplex_points)*simplex[n_simplex_points-1],
-        barycentric_coordinates[k] > 0.0 for k=0,...,n_simplex_points-1, and,
-        barycentric_coordinates[0] + ...
-        + barycentric_coordinates[n_simplex_points-1] = 1.0.
+    solution : Solution
+        Represents current best solution and search direction.
 
     backup : bool
         Perform backup procedure.
@@ -358,17 +371,16 @@ def distance_subalgorithm(
 
     if not backup:
         dstsqr = _regular_distance_subalgorithm(
-            simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4)
+            simplex, solution, d1, d2, d3, d4)
         if dstsqr is not None:
             return dstsqr, backup
 
-    return _backup_procedure(
-        simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
-        backup)
+    return _backup_procedure(simplex, solution, d1, d2, d3, d4, backup)
 
 
-def _regular_distance_subalgorithm(
-        simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4):
+def _regular_distance_subalgorithm(simplex, solution, d1, d2, d3, d4):
+    barycentric_coordinates = solution.barycentric_coordinates
+    search_direction = solution.search_direction
     if len(simplex) == 1:
         barycentric_coordinates[0] = d1[0]
         search_direction[:] = simplex.simplex[0]
@@ -670,9 +682,9 @@ def _regular_distance_subalgorithm(
     return None
 
 
-def _backup_procedure(
-        simplex, barycentric_coordinates, search_direction, d1, d2, d3, d4,
-        backup):
+def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
+    barycentric_coordinates = solution.barycentric_coordinates
+    search_direction = solution.search_direction
     ordered_indices = np.empty(4, dtype=int)
     search_direction_d = np.empty(3, dtype=float)
     barycentric_coordinates_d = np.empty(4, dtype=float)
