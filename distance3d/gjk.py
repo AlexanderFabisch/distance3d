@@ -112,18 +112,20 @@ def gjk_with_simplex(collider1, collider2):
 
         solution = new_solution
 
-        # Find new supporting point in direction -search_direction:
-        # s_(A-B)(-search_direction) = s_A(-search_direction) - s_B(search_direction)
-        new_index1, new_vertex1 = collider1.support_function(-solution.search_direction)
-        new_index2, new_vertex2 = collider2.support_function(solution.search_direction)
-        new_simplex_point = new_vertex1 - new_vertex2
+        _find_new_supporting_point(collider1, collider2, simplex, solution)
 
-        simplex.add_new_point(new_index1, new_index2, new_simplex_point)
         old_simplex.copy_from(simplex)
         if len(simplex) == 4:
             _reorder_simplex_nondecreasing_order(simplex, old_simplex)
 
     raise RuntimeError("Solution should be found in loop.")
+
+
+def _find_new_supporting_point(collider1, collider2, simplex, solution):
+    new_index1, new_vertex1 = collider1.support_function(-solution.search_direction)
+    new_index2, new_vertex2 = collider2.support_function(solution.search_direction)
+    new_simplex_point = new_vertex1 - new_vertex2
+    simplex.add_new_point(new_index1, new_index2, new_simplex_point)
 
 
 class Solution:
