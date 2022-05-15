@@ -277,9 +277,8 @@ class Simplex:
             + a * (self.simplex[vi2] - self.simplex[vi1])
             + b * (self.simplex[vi3] - self.simplex[vi1]))
 
-    def search_direction_simplex(self, a, b, c, d):
-        return (a * self.simplex[0] + b * self.simplex[1]
-                + c * self.simplex[2] + d * self.simplex[3])
+    def search_direction_simplex(self, barycentric_coordinates):
+        return barycentric_coordinates.dot(self.simplex)
 
     def __len__(self):
         return self.n_simplex_points
@@ -567,7 +566,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             solution.barycentric_coordinates[2] = d3[14] / coords_sum
             solution.barycentric_coordinates[3] = 1.0 - sum(solution.barycentric_coordinates[:3])
             solution.search_direction = simplex.search_direction_simplex(
-                *(solution.barycentric_coordinates))
+                solution.barycentric_coordinates)
             solution.dstsq = np.dot(solution.search_direction, solution.search_direction)
             return solution
         vertex_2_optimal = not (d1[2] > 0.0 or d3[5] > 0.0 or d4[9] > 0.0)
@@ -910,7 +909,8 @@ def _backup_procedure(simplex, solution, d1, d2, d3, d4, backup):
             solution_d.barycentric_coordinates[1] = d2[14] / coords_sum
             solution_d.barycentric_coordinates[2] = d3[14] / coords_sum
             solution_d.barycentric_coordinates[3] = 1.0 - sum(solution_d.barycentric_coordinates[:3])
-            solution_d.search_direction = simplex.search_direction_simplex(*(solution_d.barycentric_coordinates))
+            solution_d.search_direction = simplex.search_direction_simplex(
+                solution_d.barycentric_coordinates)
             solution_d.dstsq = np.dot(solution_d.search_direction, solution_d.search_direction)
             if solution_d.dstsq < solution.dstsq:
                 solution.dstsq = solution_d.dstsq
