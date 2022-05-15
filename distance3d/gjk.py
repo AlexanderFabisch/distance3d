@@ -308,6 +308,59 @@ class Simplex:
     def search_direction_simplex(self, barycentric_coordinates):
         return barycentric_coordinates.dot(self.simplex)
 
+    def select_line_segment_13(self):
+        self.n_simplex_points = 2
+        self.move_vertex(2, 1)
+        self.dot_product_table[1, 0] = self.dot_product_table[2, 0]
+        self.dot_product_table[1, 1] = self.dot_product_table[2, 2]
+
+    def select_line_segment_14(self):
+        self.n_simplex_points = 2
+        self.move_vertex(3, 1)
+        self.dot_product_table[1, 0] = self.dot_product_table[3, 0]
+        self.dot_product_table[1, 1] = self.dot_product_table[3, 3]
+
+    def select_line_segment_23(self):
+        self.n_simplex_points = 2
+        self.move_vertex(2, 0)
+        self.dot_product_table[1, 0] = self.dot_product_table[2, 1]
+        self.dot_product_table[0, 0] = self.dot_product_table[2, 2]
+
+    def select_line_segment_24(self):
+        self.n_simplex_points = 2
+        self.move_vertex(3, 0)
+        self.dot_product_table[1, 0] = self.dot_product_table[3, 1]
+        self.dot_product_table[0, 0] = self.dot_product_table[3, 3]
+
+    def select_line_segment_34(self):
+        self.n_simplex_points = 2
+        self.move_vertex(2, 0)
+        self.move_vertex(3, 1)
+        self.dot_product_table[0, 0] = self.dot_product_table[2, 2]
+        self.dot_product_table[1, 0] = self.dot_product_table[3, 2]
+        self.dot_product_table[1, 1] = self.dot_product_table[3, 3]
+
+    def select_face_124(self):
+        self.n_simplex_points = 3
+        self.move_vertex(3, 2)
+        self.dot_product_table[2, 0] = self.dot_product_table[3, 0]
+        self.dot_product_table[2, 1] = self.dot_product_table[3, 1]
+        self.dot_product_table[2, 2] = self.dot_product_table[3, 3]
+
+    def select_face_134(self):
+        self.n_simplex_points = 3
+        self.move_vertex(3, 1)
+        self.dot_product_table[1, 0] = self.dot_product_table[3, 0]
+        self.dot_product_table[1, 1] = self.dot_product_table[3, 3]
+        self.dot_product_table[2, 1] = self.dot_product_table[3, 2]
+
+    def select_face_234(self):
+        self.n_simplex_points = 3
+        self.move_vertex(3, 0)
+        self.dot_product_table[0, 0] = self.dot_product_table[3, 3]
+        self.dot_product_table[1, 0] = self.dot_product_table[3, 1]
+        self.dot_product_table[2, 0] = self.dot_product_table[3, 2]
+
     def __len__(self):
         return self.n_simplex_points
 
@@ -409,10 +462,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         d2[6] = d1[4] * d2[2] + d3[4] * e123
         line_segment_13_optimal = not (d1[4] <= 0.0 or d2[6] > 0.0 or d3[4] <= 0.0)
         if line_segment_13_optimal:
-            simplex.n_simplex_points = 2
-            simplex.move_vertex(2, 1)
-            simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 0]
-            simplex.dot_product_table[1, 1] = simplex.dot_product_table[2, 2]
+            simplex.select_line_segment_13()
             solution.from_line_segment(1, 0, d1[4], d3[4], simplex)
             return solution
         e213 = -e123
@@ -435,10 +485,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             return solution
         line_segment_23_optimal = not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0)
         if line_segment_23_optimal:
-            simplex.n_simplex_points = 2
-            simplex.move_vertex(2, 0)
-            simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 1]
-            simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
+            simplex.select_line_segment_23()
             solution.from_line_segment(0, 1, d2[5], d3[5], simplex)
             return solution
     elif len(simplex) == 4:
@@ -467,10 +514,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         d4[12] = d1[4] * d4[8] + d3[4] * e143
         line_segment_13_optimal = not (d1[4] <= 0.0 or d2[6] > 0.0 or d3[4] <= 0.0 or d4[12] > 0.0)
         if line_segment_13_optimal:
-            simplex.n_simplex_points = 2
-            simplex.move_vertex(2, 1)
-            simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 0]
-            simplex.dot_product_table[1, 1] = simplex.dot_product_table[2, 2]
+            simplex.select_line_segment_13()
             solution.from_line_segment(1, 0, d1[4], d3[4], simplex)
             return solution
         d2[5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
@@ -490,10 +534,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         d3[12] = d1[8] * d3[4] + d4[8] * e134
         line_segment_14_optimal = not (d1[8] <= 0.0 or d2[11] > 0.0 or d3[12] > 0.0 or d4[8] <= 0.0)
         if line_segment_14_optimal:
-            simplex.n_simplex_points = 2
-            simplex.move_vertex(3, 1)
-            simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 0]
-            simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
+            simplex.select_line_segment_14()
             solution.from_line_segment(1, 0, d1[8], d4[8], simplex)
             return solution
         d2[9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
@@ -503,11 +544,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         d3[14] = d1[11] * d3[4] + d2[11] * e132 + d4[11] * e134
         face_124_optimal = not (d1[11] <= 0.0 or d2[11] <= 0.0 or d3[14] > 0.0 or d4[11] <= 0.0)
         if face_124_optimal:
-            simplex.n_simplex_points = 3
-            simplex.move_vertex(3, 2)
-            simplex.dot_product_table[2, 0] = simplex.dot_product_table[3, 0]
-            simplex.dot_product_table[2, 1] = simplex.dot_product_table[3, 1]
-            simplex.dot_product_table[2, 2] = simplex.dot_product_table[3, 3]
+            simplex.select_face_124()
             solution.from_face(2, 0, 1, d1[11], d2[11], d4[11], simplex)
             return solution
         d3[10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
@@ -517,11 +554,7 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
         d2[14] = d1[12] * d2[2] + d3[12] * e123 + d4[12] * e124
         face_134_optimal = not (d1[12] <= 0.0 or d2[14] > 0.0 or d3[12] <= 0.0 or d4[12] <= 0.0)
         if face_134_optimal:
-            simplex.n_simplex_points = 3
-            simplex.move_vertex(3, 1)
-            simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 0]
-            simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
-            simplex.dot_product_table[2, 1] = simplex.dot_product_table[3, 2]
+            simplex.select_face_134()
             solution.from_face(1, 0, 2, d1[12], d3[12], d4[12], simplex, 0, 2, 1)
             return solution
         e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
@@ -552,37 +585,22 @@ def _regular_distance_subalgorithm(simplex, d1, d2, d3, d4):
             return solution
         line_segment_23_optimal = not (d1[6] > 0.0 or d2[5] <= 0.0 or d3[5] <= 0.0 or d4[13] > 0.0)
         if line_segment_23_optimal:
-            simplex.n_simplex_points = 2
-            simplex.move_vertex(2, 0)
-            simplex.dot_product_table[1, 0] = simplex.dot_product_table[2, 1]
-            simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
+            simplex.select_line_segment_23()
             solution.from_line_segment(0, 1, d2[5], d3[5], simplex)
             return solution
         line_segment_24_optimal = not (d1[11] > 0.0 or d2[9] <= 0.0 or d3[13] > 0.0 or d4[9] <= 0.0)
         if line_segment_24_optimal:
-            simplex.n_simplex_points = 2
-            simplex.move_vertex(3, 0)
-            simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 1]
-            simplex.dot_product_table[0, 0] = simplex.dot_product_table[3, 3]
+            simplex.select_line_segment_24()
             solution.from_line_segment(0, 1, d2[9], d4[9], simplex, 1, 0)
             return solution
         line_segment_34_optimal = not (d1[12] > 0.0 or d2[13] > 0.0 or d3[10] <= 0.0 or d4[10] <= 0.0)
         if line_segment_34_optimal:
-            simplex.n_simplex_points = 2
-            simplex.move_vertex(2, 0)
-            simplex.move_vertex(3, 1)
-            simplex.dot_product_table[0, 0] = simplex.dot_product_table[2, 2]
-            simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 2]
-            simplex.dot_product_table[1, 1] = simplex.dot_product_table[3, 3]
+            simplex.select_line_segment_34()
             solution.from_line_segment(1, 0, d3[10], d4[10], simplex)
             return solution
         face_234_optimal = not (d1[14] > 0.0 or d2[13] <= 0.0 or d3[13] <= 0.0 or d4[13] <= 0.0)
         if face_234_optimal:
-            simplex.n_simplex_points = 3
-            simplex.move_vertex(3, 0)
-            simplex.dot_product_table[0, 0] = simplex.dot_product_table[3, 3]
-            simplex.dot_product_table[1, 0] = simplex.dot_product_table[3, 1]
-            simplex.dot_product_table[2, 0] = simplex.dot_product_table[3, 2]
+            simplex.select_face_234()
             solution.from_face(0, 1, 2, d2[13], d3[13], d4[13], simplex, 1, 2, 0)
             return solution
     return None
