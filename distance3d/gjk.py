@@ -84,7 +84,6 @@ def gjk_with_simplex(collider1, collider2):
     while True:
         iteration += 1
 
-        # Compute point of minimum norm in the convex hull of the simplex
         new_solution, backup = distance_subalgorithm(simplex, solution, backup)
 
         if new_solution.dstsq >= solution.dstsq or len(simplex) == 4:
@@ -96,8 +95,8 @@ def gjk_with_simplex(collider1, collider2):
                     solution.barycentric_coordinates[:len(simplex)],
                     simplex.indices_polytope2[:len(simplex)])
 
-                # Make sure intersection has zero distance
                 if len(simplex) == 4:
+                    # Make sure intersection has zero distance
                     closest_point1[:] = 0.5 * (closest_point1 + closest_point2)
                     closest_point2[:] = closest_point1
                     distance = 0.0
@@ -364,6 +363,8 @@ class Simplex:
 
 def distance_subalgorithm(simplex, solution, backup):
     """Distance subalgorithm.
+
+    Computes point of minimum norm in the convex hull of the simplex.
 
     Implements, in a very efficient way, the distance subalgorithm
     of finding the near point to the convex hull of four or less points
