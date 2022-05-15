@@ -320,8 +320,8 @@ def distance_subalgorithm(simplex, solution, backup):
 
     Returns
     -------
-    dstsq : float
-        Squared distance.
+    solution : Solution
+        Current solution.
 
     backup : int
         Perform backup procedure.
