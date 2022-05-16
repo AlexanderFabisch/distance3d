@@ -492,6 +492,32 @@ class BarycentricCoordinates:
         self.d2[13] = self.d3[10] * self.d2[5] + self.d4[10] * e324
         self.d1[14] = self.d2[13] * self.d1[2] + self.d3[13] * e213 + self.d4[13] * e214
 
+    def backup_line_segments(self, simplex):
+        self.d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
+        self.d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
+
+    def backup_faces(self, simplex):
+        self.backup_line_segments(simplex)
+        self.d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
+        e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
+        self.d3[6] = self.d1[2] * self.d3[4] + self.d2[2] * e132
+        e123 = self.face_coordinates_2(simplex)
+        e213 = self.face_coordinates_3(simplex, e123)
+        return e132, e123, e213
+
+    def backup_simplex(self, simplex):
+        e132, e123, e213 = self.backup_faces(simplex)
+        self.d4[8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
+        e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
+        self.d4[11] = self.d1[2] * self.d4[8] + self.d2[2] * e142
+        e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
+        self.d4[12] = self.d1[4] * self.d4[8] + self.d3[4] * e143
+        self.d4[14] = self.d1[6] * self.d4[8] + self.d2[6] * e142 + self.d3[6] * e143
+        e124, e134 = self.compute_simplex_distances_0(simplex)
+        e214 = self.compute_simplex_distances_1(simplex, e124, e132, e134)
+        self.compute_simplex_distances_2(simplex, e123, e124, e134)
+        self.compute_simplex_distances_3(simplex, e213, e214)
+
 
 def _regular_distance_subalgorithm(simplex, d):
     if len(simplex) == 1:
@@ -694,7 +720,7 @@ def _backup_procedure(simplex, solution, d, backup):
 def _backup_procedure_line_segment(
         simplex, backup, d, ordered_indices, solution, solution_d):
     if backup:
-        _backup_line_segments(simplex, d)
+        d.backup_line_segments(simplex)
     # check vertex 1
     solution.from_vertex(simplex, 0, d.d1[0])
     n_simplex_points = 1
@@ -717,7 +743,7 @@ def _backup_procedure_line_segment(
 def _backup_procedure_face(
         simplex, backup, d, ordered_indices, solution, solution_d):
     if backup:
-        _backup_faces(simplex, d)
+        d.backup_faces(simplex)
     # check vertex 1
     n_simplex_points = 1
     solution.from_vertex(simplex, 0, d.d1[0])
@@ -766,7 +792,7 @@ def _backup_procedure_face(
 def _backup_procedure_simplex(
         simplex, backup, d, ordered_indices, solution, solution_d):
     if backup:
-        _backup_simplex(simplex, d)
+        d.backup_simplex(simplex)
     # check vertex 1
     n_simplex_points = 1
     solution.from_vertex(simplex, 0, d.d1[0])
@@ -864,35 +890,6 @@ def _backup_procedure_simplex(
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:3] = 3, 1, 2
     return n_simplex_points
-
-
-def _backup_line_segments(simplex, d):
-    d.d2[2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
-    d.d1[2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
-
-
-def _backup_faces(simplex, d):
-    _backup_line_segments(simplex, d)
-    d.d3[4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
-    e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
-    d.d3[6] = d.d1[2] * d.d3[4] + d.d2[2] * e132
-    e123 = d.face_coordinates_2(simplex)
-    e213 = d.face_coordinates_3(simplex, e123)
-    return e132, e123, e213
-
-
-def _backup_simplex(simplex, d):
-    e132, e123, e213 = _backup_faces(simplex, d)
-    d.d4[8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
-    e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
-    d.d4[11] = d.d1[2] * d.d4[8] + d.d2[2] * e142
-    e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
-    d.d4[12] = d.d1[4] * d.d4[8] + d.d3[4] * e143
-    d.d4[14] = d.d1[6] * d.d4[8] + d.d2[6] * e142 + d.d3[6] * e143
-    e124, e134 = d.compute_simplex_distances_0(simplex)
-    e214 = d.compute_simplex_distances_1(simplex, e124, e132, e134)
-    d.compute_simplex_distances_2(simplex, e123, e124, e134)
-    d.compute_simplex_distances_3(simplex, e213, e214)
 
 
 def _reorder_simplex_nondecreasing_order(simplex, old_simplex):
