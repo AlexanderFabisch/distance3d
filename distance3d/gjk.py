@@ -542,6 +542,27 @@ class BarycentricCoordinates:
         self.compute_simplex_distances_2(simplex, e123, e124, e134)
         self.compute_simplex_distances_3(simplex, e213, e214)
 
+    def vertex_0_of_face_optimal(self):
+        return not (self.d[1, 2] > 0.0 or self.d[2, 4] > 0.0)
+
+    def line_segment_01_of_face_optimal(self):
+        return not (self.d[0, 2] <= 0.0 or self.d[1, 2] <= 0.0 or self.d[2, 6] > 0.0)
+
+    def line_segment_02_of_face_optimal(self):
+        return not (self.d[0, 4] <= 0.0 or self.d[1, 6] > 0.0 or self.d[2, 4] <= 0.0)
+
+    def face_012_of_face_optimal(self):
+        return not (self.d[0, 6] <= 0.0 or self.d[1, 6] <= 0.0 or self.d[2, 6] <= 0.0)
+
+    def vertex_2_of_face_optimal(self):
+        return not (self.d[0, 2] > 0.0 or self.d[2, 5] > 0.0)
+
+    def vertex_3_of_face_optimal(self):
+        return not (self.d[0, 4] > 0.0 or self.d[1, 5] > 0.0)
+
+    def line_segment_12_of_face_optimal(self):
+        return not (self.d[0, 6] > 0.0 or self.d[1, 5] <= 0.0 or self.d[2, 5] <= 0.0)
+
     def vertex_0_of_simplex_optimal(self):
         return not (self.d[1, 2] > 0.0 or self.d[2, 4] > 0.0
                     or self.d[3, 8] > 0.0)
@@ -641,40 +662,33 @@ def _distance_subalgorithm_line_segment(simplex, d):
 def _distance_subalgorithm_face(simplex, d):
     solution = Solution()
     d.face_coordinates_0(simplex)
-    vertex_0_optimal = not (d.d[1, 2] > 0.0 or d.d[2, 4] > 0.0)
-    if vertex_0_optimal:
+    if d.vertex_0_of_face_optimal():
         simplex.select_vertex(0)
         solution.from_vertex(simplex, 0, d.d[0, 0])
         return solution
     d.face_coordinates_1(simplex)
-    line_segment_01_optimal = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0 or d.d[2, 6] > 0.0)
-    if line_segment_01_optimal:
+    if d.line_segment_01_of_face_optimal():
         simplex.select_line_segment(0, 1)
         solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         return solution
     e123 = d.face_coordinates_2(simplex)
-    line_segment_02_optimal = not (d.d[0, 4] <= 0.0 or d.d[1, 6] > 0.0 or d.d[2, 4] <= 0.0)
-    if line_segment_02_optimal:
+    if d.line_segment_02_of_face_optimal():
         simplex.select_line_segment(0, 2)
         solution.from_line_segment(simplex, 1, 0, d.d[0, 4], d.d[2, 4])
         return solution
     d.face_coordinates_3(simplex, e123)
-    face_012_optimal = not (d.d[0, 6] <= 0.0 or d.d[1, 6] <= 0.0 or d.d[2, 6] <= 0.0)
-    if face_012_optimal:
+    if d.face_012_of_face_optimal():
         solution.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         return solution
-    vertex_2_optimal = not (d.d[0, 2] > 0.0 or d.d[2, 5] > 0.0)
-    if vertex_2_optimal:
+    if d.vertex_2_of_face_optimal():
         simplex.select_vertex(1)
         solution.from_vertex(simplex, 0, d.d[1, 1])
         return solution
-    vertex_3_optimal = not (d.d[0, 4] > 0.0 or d.d[1, 5] > 0.0)
-    if vertex_3_optimal:
+    if d.vertex_3_of_face_optimal():
         simplex.select_vertex(2)
         solution.from_vertex(simplex, 0, d.d[2, 3])
         return solution
-    line_segment_12_optimal = not (d.d[0, 6] > 0.0 or d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0)
-    if line_segment_12_optimal:
+    if d.line_segment_12_of_face_optimal():
         simplex.select_line_segment(2, 1)
         solution.from_line_segment(simplex, 0, 1, d.d[1, 5], d.d[2, 5])
         return solution
