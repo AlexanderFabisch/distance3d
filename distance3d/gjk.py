@@ -649,7 +649,7 @@ def _distance_subalgorithm_face(simplex, d):
     d.face_coordinates_1(simplex)
     line_segment_01_optimal = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0 or d.d[2, 6] > 0.0)
     if line_segment_01_optimal:
-        simplex.n_simplex_points = 2
+        simplex.select_line_segment(0, 1)
         solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         return solution
     e123 = d.face_coordinates_2(simplex)
@@ -690,7 +690,7 @@ def _distance_subalgorithm_simplex(simplex, d):
         return solution
     e132, e142 = d.simplex_coordinates_1(simplex)
     if d.line_segment_01_of_simplex_optimal():
-        simplex.n_simplex_points = 2
+        simplex.select_line_segment(0, 1)
         solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         return solution
     e123, e143 = d.simplex_coordinates_2(simplex)
@@ -700,7 +700,7 @@ def _distance_subalgorithm_simplex(simplex, d):
         return solution
     e213 = d.simplex_coordinates_3(simplex, e123, e142, e143)
     if d.face_012_of_simplex_optimal():
-        simplex.n_simplex_points = 3
+        simplex.select_face(0, 1, 2)
         solution.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         return solution
     e124, e134 = d.compute_simplex_distances_0(simplex)
