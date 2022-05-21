@@ -331,7 +331,7 @@ class Simplex:
             self.dot_product_table[2, 2] = self.dot_product_table[k, k]
 
     def reorder_simplex_nondecreasing_order(self, old_simplex):
-        ordered_indices = np.zeros(4, dtype=int)
+        ordered_indices = np.empty(4, dtype=int)
         ordered_indices[:3] = 0, 1, 2
         if self.dot_product_table[2, 0] < self.dot_product_table[1, 0]:
             ordered_indices[1] = 2
