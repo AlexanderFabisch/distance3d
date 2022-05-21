@@ -12,6 +12,9 @@ def test_select_line_segment():
     simplex.dot_product_table = simplex.simplex.dot(simplex.simplex.T)
     simplex.indices_polytope1 = np.arange(4, dtype=int)
     simplex.indices_polytope2 = np.arange(4, dtype=int)
+    for i in range(1, 4):
+        for j in range(i + 1, 4):
+            simplex.dot_product_table[i, j] = float("nan")
 
     assert_dot_product_table(simplex)
 
@@ -35,6 +38,9 @@ def test_select_face():
     simplex.dot_product_table = simplex.simplex.dot(simplex.simplex.T)
     simplex.indices_polytope1 = np.arange(4, dtype=int)
     simplex.indices_polytope2 = np.arange(4, dtype=int)
+    for i in range(1, 4):
+        for j in range(i + 1, 4):
+            simplex.dot_product_table[i, j] = float("nan")
 
     assert_dot_product_table(simplex)
 
