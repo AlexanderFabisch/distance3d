@@ -103,21 +103,18 @@ def gjk_with_simplex(collider1, collider2):
                     distance = math.sqrt(new_solution.dstsq)
 
                 return distance, closest_point1, closest_point2, simplex.simplex
+            else:
+                backup = True
+                if iteration != 1:
+                    simplex.copy_from(old_simplex)
+        else:
+            solution = new_solution
 
-            backup = True
-            if iteration != 1:
-                simplex.copy_from(old_simplex)
-            continue
+            _find_new_supporting_point(collider1, collider2, simplex, solution)
 
-        solution = new_solution
-
-        _find_new_supporting_point(collider1, collider2, simplex, solution)
-
-        old_simplex.copy_from(simplex)
-        if len(simplex) == 4:
-            _reorder_simplex_nondecreasing_order(simplex, old_simplex)
-
-    raise RuntimeError("Solution should be found in loop.")
+            old_simplex.copy_from(simplex)
+            if len(simplex) == 4:
+                _reorder_simplex_nondecreasing_order(simplex, old_simplex)
 
 
 def _find_new_supporting_point(collider1, collider2, simplex, solution):
