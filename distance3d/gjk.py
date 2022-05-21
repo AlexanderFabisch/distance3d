@@ -242,23 +242,11 @@ class Simplex:
             :self.n_simplex_points, :self.n_simplex_points]
 
     def reorder(self, ordered_indices):
-        indices_polytope1 = np.copy(self.indices_polytope1[:self.n_simplex_points])
-        indices_polytope2 = np.copy(self.indices_polytope2[:self.n_simplex_points])
-        simplex = np.copy(self.simplex[:self.n_simplex_points])
-        dot_product_table = np.empty((4, 4), dtype=float)
-        for k in range(self.n_simplex_points):
-            dot_product_table[k, :k + 1] = self.dot_product_table[k, :k + 1]
         self.n_simplex_points = len(ordered_indices)
-        for k in range(self.n_simplex_points):
-            kk = ordered_indices[k]
-            self.indices_polytope1[k] = indices_polytope1[kk]
-            self.indices_polytope2[k] = indices_polytope2[kk]
-            self.simplex[k] = simplex[kk]
-            for l in range(k):
-                ll = ordered_indices[l]
-                ind1, ind2 = (kk, ll) if kk >= ll else (ll, kk)
-                self.dot_product_table[k, l] = dot_product_table[ind1, ind2]
-            self.dot_product_table[k, k] = dot_product_table[kk, kk]
+        self.indices_polytope1[:self.n_simplex_points] = self.indices_polytope1[ordered_indices]
+        self.indices_polytope2[:self.n_simplex_points] = self.indices_polytope2[ordered_indices]
+        self.simplex[:self.n_simplex_points] = self.simplex[ordered_indices]
+        self.dot_product_table = self.simplex.dot(self.simplex.T)
 
     def add_new_point(self, new_index1, new_index2, new_simplex_point):
         self._move_first_point_to_last_spot()
