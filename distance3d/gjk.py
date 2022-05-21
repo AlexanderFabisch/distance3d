@@ -207,6 +207,7 @@ class Simplex:
 
     dot_product_table : array, shape (n_simplex_points, n_simplex_points)
         dot_product_table[i, j] = Inner product of simplex[i] and simplex[j].
+        Note that only elements i >= j are used.
 
     indices_polytope1 : array, shape (n_simplex_points,)
         Index vector for first polytope. For k = 1, ..., n_simplex_points,
@@ -317,26 +318,29 @@ class Simplex:
             self.dot_product_table[1, 0] = self.dot_product_table[j, i]
             self.dot_product_table[1, 1] = self.dot_product_table[j, j]
 
-    def select_face_013(self):
+    def select_face(self, i, j, k):
         self.n_simplex_points = 3
-        self.move_vertex(3, 2)
-        self.dot_product_table[2, 0] = self.dot_product_table[3, 0]
-        self.dot_product_table[2, 1] = self.dot_product_table[3, 1]
-        self.dot_product_table[2, 2] = self.dot_product_table[3, 3]
-
-    def select_face_023(self):
-        self.n_simplex_points = 3
-        self.move_vertex(3, 1)
-        self.dot_product_table[1, 0] = self.dot_product_table[3, 0]
-        self.dot_product_table[1, 1] = self.dot_product_table[3, 3]
-        self.dot_product_table[2, 1] = self.dot_product_table[3, 2]
-
-    def select_face_123(self):
-        self.n_simplex_points = 3
-        self.move_vertex(3, 0)
-        self.dot_product_table[0, 0] = self.dot_product_table[3, 3]
-        self.dot_product_table[1, 0] = self.dot_product_table[3, 1]
-        self.dot_product_table[2, 0] = self.dot_product_table[3, 2]
+        if i != 0:
+            self.move_vertex(i, 0)
+            self.dot_product_table[0, 0] = self.dot_product_table[i, i]
+            idx1, idx2 = (i, j) if i < j else (j, i)
+            self.dot_product_table[1, 0] = self.dot_product_table[idx1, idx2]
+            idx1, idx2 = (i, k) if i < k else (k, i)
+            self.dot_product_table[2, 0] = self.dot_product_table[idx1, idx2]
+        if j != 1:
+            self.move_vertex(j, 1)
+            idx1, idx2 = (i, j) if i < j else (j, i)
+            self.dot_product_table[1, 0] = self.dot_product_table[idx1, idx2]
+            self.dot_product_table[1, 1] = self.dot_product_table[j, j]
+            idx1, idx2 = (j, k) if k < j else (k, j)
+            self.dot_product_table[2, 1] = self.dot_product_table[idx1, idx2]
+        if k != 2:
+            self.move_vertex(k, 2)
+            idx1, idx2 = (i, k) if k < i else (k, i)
+            self.dot_product_table[2, 0] = self.dot_product_table[idx1, idx2]
+            idx1, idx2 = (j, k) if k < j else (k, j)
+            self.dot_product_table[2, 1] = self.dot_product_table[idx1, idx2]
+            self.dot_product_table[2, 2] = self.dot_product_table[k, k]
 
     def reorder_simplex_nondecreasing_order(self, old_simplex):
         ordered_indices = np.zeros(4, dtype=int)
@@ -660,13 +664,13 @@ def _distance_subalgorithm_simplex(simplex, d):
     e214 = d.compute_simplex_distances_1(simplex, e124, e132, e134)
     face_124_optimal = not (d.d[0, 11] <= 0.0 or d.d[1, 11] <= 0.0 or d.d[2, 14] > 0.0 or d.d[3, 11] <= 0.0)
     if face_124_optimal:
-        simplex.select_face_013()
+        simplex.select_face(0, 1, 3)
         solution.from_face(simplex, 2, 0, 1, d.d[0, 11], d.d[1, 11], d.d[3, 11])
         return solution
     d.compute_simplex_distances_2(simplex, e123, e124, e134)
     face_134_optimal = not (d.d[0, 12] <= 0.0 or d.d[1, 14] > 0.0 or d.d[2, 12] <= 0.0 or d.d[3, 12] <= 0.0)
     if face_134_optimal:
-        simplex.select_face_023()
+        simplex.select_face(0, 3, 2)
         solution.from_face(simplex, 1, 0, 2, d.d[0, 12], d.d[2, 12], d.d[3, 12], 0, 2, 1)
         return solution
     d.compute_simplex_distances_3(simplex, e213, e214)
@@ -706,7 +710,7 @@ def _distance_subalgorithm_simplex(simplex, d):
         return solution
     face_234_optimal = not (d.d[0, 14] > 0.0 or d.d[1, 13] <= 0.0 or d.d[2, 13] <= 0.0 or d.d[3, 13] <= 0.0)
     if face_234_optimal:
-        simplex.select_face_123()
+        simplex.select_face(3, 1, 2)
         solution.from_face(simplex, 0, 1, 2, d.d[1, 13], d.d[2, 13], d.d[3, 13], 1, 2, 0)
         return solution
     return None
