@@ -542,6 +542,9 @@ class BarycentricCoordinates:
         self.compute_simplex_distances_2(simplex, e123, e124, e134)
         self.compute_simplex_distances_3(simplex, e213, e214)
 
+    def line_segment_01_of_line_segment_optimal(self):
+        return not (self.d[0, 2] <= 0.0 or self.d[1, 2] <= 0.0)
+
     def vertex_0_of_face_optimal(self):
         return not (self.d[1, 2] > 0.0 or self.d[2, 4] > 0.0)
 
@@ -647,8 +650,7 @@ def _distance_subalgorithm_line_segment(simplex, d):
         solution.from_vertex(simplex, 0, d.d[0, 0])
         return solution
     d.d[0, 2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
-    line_segment_01_optimal = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
-    if line_segment_01_optimal:
+    if d.line_segment_01_of_line_segment_optimal():
         solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         return solution
     vertex_2_optimal = d.d[0, 2] <= 0.0
@@ -795,8 +797,7 @@ def _backup_procedure_line_segment(simplex, backup, d, solution, solution_d):
     solution.from_vertex(simplex, 0, d.d[0, 0])
     n_simplex_points = 1
     ordered_indices[0] = 0
-    check_line_segment_01 = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
-    if check_line_segment_01:
+    if d.line_segment_01_of_line_segment_optimal():
         solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
@@ -818,8 +819,7 @@ def _backup_procedure_face(simplex, backup, d, solution, solution_d):
     n_simplex_points = 1
     solution.from_vertex(simplex, 0, d.d[0, 0])
     ordered_indices[0] = 0
-    check_line_segment_01 = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
-    if check_line_segment_01:
+    if d.line_segment_01_of_line_segment_optimal():
         solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
@@ -868,8 +868,7 @@ def _backup_procedure_simplex(
     n_simplex_points = 1
     solution.from_vertex(simplex, 0, d.d[0, 0])
     ordered_indices[0] = 0
-    check_line_segment_01 = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
-    if check_line_segment_01:
+    if d.line_segment_01_of_line_segment_optimal():
         solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
