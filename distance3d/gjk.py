@@ -256,10 +256,8 @@ class Simplex:
             self.simplex[k] = simplex[kk]
             for l in range(k):
                 ll = ordered_indices[l]
-                if kk >= ll:
-                    self.dot_product_table[k, l] = dot_product_table[kk, ll]
-                else:
-                    self.dot_product_table[k, l] = dot_product_table[ll, kk]
+                ind1, ind2 = (kk, ll) if kk >= ll else (ll, kk)
+                self.dot_product_table[k, l] = dot_product_table[ind1, ind2]
             self.dot_product_table[k, k] = dot_product_table[kk, kk]
 
     def add_new_point(self, new_index1, new_index2, new_simplex_point):
