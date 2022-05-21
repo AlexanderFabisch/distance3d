@@ -550,7 +550,8 @@ def _regular_distance_subalgorithm(simplex, d):
         return _distance_subalgorithm_line_segment(simplex, d)
     elif len(simplex) == 3:
         return _distance_subalgorithm_face(simplex, d)
-    elif len(simplex) == 4:
+    else:
+        assert len(simplex) == 4
         return _distance_subalgorithm_simplex(simplex, d)
 
 
