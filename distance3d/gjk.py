@@ -456,6 +456,34 @@ class BarycentricCoordinates:
         self.d[0, 6] = self.d[1, 5] * self.d[0, 2] + self.d[2, 5] * e213
         return e213
 
+    def simplex_coordinates_0(self, simplex):
+        self.face_coordinates_0(simplex)
+        self.d[3, 8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
+
+    def simplex_coordinates_1(self, simplex):
+        e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
+        e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
+        self.d[0, 2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
+        self.d[2, 6] = self.d[0, 2] * self.d[2, 4] + self.d[1, 2] * e132
+        self.d[3, 11] = self.d[0, 2] * self.d[3, 8] + self.d[1, 2] * e142
+        return e132, e142
+
+    def simplex_coordinates_2(self, simplex):
+        e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
+        e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
+        self.d[0, 4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
+        self.d[1, 6] = self.d[0, 4] * self.d[1, 2] + self.d[2, 4] * e123
+        self.d[3, 12] = self.d[0, 4] * self.d[3, 8] + self.d[2, 4] * e143
+        return e123, e143
+
+    def simplex_coordinates_3(self, simplex, e123, e142, e143):
+        self.d[1, 5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
+        self.d[2, 5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
+        e213 = -e123
+        self.d[0, 6] = self.d[1, 5] * self.d[0, 2] + self.d[2, 5] * e213
+        self.d[3, 14] = self.d[0, 6] * self.d[3, 8] + self.d[1, 6] * e142 + self.d[2, 6] * e143
+        return e213
+
     def compute_simplex_distances_0(self, simplex):
         e124 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 1]
         e134 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 2]
@@ -655,35 +683,22 @@ def _distance_subalgorithm_face(simplex, d):
 
 def _distance_subalgorithm_simplex(simplex, d):
     solution = Solution()
-    d.face_coordinates_0(simplex)
-    d.d[3, 8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
+    d.simplex_coordinates_0(simplex)
     if d.vertex_0_of_simplex_optimal():
         simplex.select_vertex(0)
         solution.from_vertex(simplex, 0, d.d[0, 0])
         return solution
-    e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
-    e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
-    d.d[0, 2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
-    d.d[2, 6] = d.d[0, 2] * d.d[2, 4] + d.d[1, 2] * e132
-    d.d[3, 11] = d.d[0, 2] * d.d[3, 8] + d.d[1, 2] * e142
+    e132, e142 = d.simplex_coordinates_1(simplex)
     if d.line_segment_01_of_simplex_optimal():
         simplex.n_simplex_points = 2
         solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         return solution
-    e123 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[2, 1]
-    e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
-    d.d[0, 4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
-    d.d[1, 6] = d.d[0, 4] * d.d[1, 2] + d.d[2, 4] * e123
-    d.d[3, 12] = d.d[0, 4] * d.d[3, 8] + d.d[2, 4] * e143
+    e123, e143 = d.simplex_coordinates_2(simplex)
     if d.line_segment_02_of_simplex_optimal():
         simplex.select_line_segment(0, 2)
         solution.from_line_segment(simplex, 1, 0, d.d[0, 4], d.d[2, 4])
         return solution
-    d.d[1, 5] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 1]
-    d.d[2, 5] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[2, 1]
-    e213 = -e123
-    d.d[0, 6] = d.d[1, 5] * d.d[0, 2] + d.d[2, 5] * e213
-    d.d[3, 14] = d.d[0, 6] * d.d[3, 8] + d.d[1, 6] * e142 + d.d[2, 6] * e143
+    e213 = d.simplex_coordinates_3(simplex, e123, e142, e143)
     if d.face_012_of_simplex_optimal():
         simplex.n_simplex_points = 3
         solution.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
