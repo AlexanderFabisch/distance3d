@@ -4,6 +4,36 @@ from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
 
+def test_select_line_segment():
+    simplex = gjk.Simplex()
+    simplex.n_simplex_points = 4
+    random_state = np.random.RandomState(23)
+    simplex.simplex[:, :] = random_state.randn(*simplex.simplex.shape)
+    simplex.dot_product_table = simplex.simplex.dot(simplex.simplex.T)
+    simplex.indices_polytope1 = np.arange(4, dtype=int)
+    simplex.indices_polytope2 = np.arange(4, dtype=int)
+
+    assert_dot_product_table(simplex)
+
+    simplex_backup = gjk.Simplex()
+    simplex_backup.copy_from(simplex)
+
+    for i in range(4):
+        for j in range(1, 4):
+            if i == j:
+                continue
+            simplex.copy_from(simplex_backup)
+            simplex.select_line_segment(i, j)
+            assert_dot_product_table(simplex)
+
+
+def assert_dot_product_table(simplex):
+    for i in range(simplex.n_simplex_points):
+        for j in range(i + 1):
+            assert approx(simplex.dot_product_table[i, j]) == np.dot(
+                simplex.simplex[i], simplex.simplex[j])
+
+
 def test_gjk_boxes():
     box2origin = np.eye(4)
     size = np.ones(3)
