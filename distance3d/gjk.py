@@ -73,13 +73,13 @@ def gjk_with_simplex(collider1, collider2):
     solution = Solution()
     simplex = Simplex()
     old_simplex = Simplex()
-    backup = False
 
     simplex.initialize_with_point(
         collider1.first_vertex() - collider2.first_vertex())
     solution.initialize(simplex)
 
     iteration = 0
+    backup = False
     while True:
         iteration += 1
 
