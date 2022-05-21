@@ -27,6 +27,30 @@ def test_select_line_segment():
             assert_dot_product_table(simplex)
 
 
+def test_select_face():
+    simplex = gjk.Simplex()
+    simplex.n_simplex_points = 4
+    random_state = np.random.RandomState(24)
+    simplex.simplex[:, :] = random_state.randn(*simplex.simplex.shape)
+    simplex.dot_product_table = simplex.simplex.dot(simplex.simplex.T)
+    simplex.indices_polytope1 = np.arange(4, dtype=int)
+    simplex.indices_polytope2 = np.arange(4, dtype=int)
+
+    assert_dot_product_table(simplex)
+
+    simplex_backup = gjk.Simplex()
+    simplex_backup.copy_from(simplex)
+
+    for i in range(4):
+        for j in range(1, 4):
+            for k in range(2, 4):
+                if i == j or i == k or j == k:
+                    continue
+                simplex.copy_from(simplex_backup)
+                simplex.select_face(i, j, k)
+                assert_dot_product_table(simplex)
+
+
 def assert_dot_product_table(simplex):
     for i in range(simplex.n_simplex_points):
         for j in range(i + 1):
