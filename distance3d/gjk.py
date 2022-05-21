@@ -327,7 +327,7 @@ class Simplex:
             self.dot_product_table[0, 0] = self.dot_product_table[i, i]
             idx1, idx2 = (j, i) if i < j else (i, j)
             self.dot_product_table[1, 0] = self.dot_product_table[idx1, idx2]
-            idx1, idx2 = (k, i) if i < k else (i, j)
+            idx1, idx2 = (k, i) if i < k else (i, k)
             self.dot_product_table[2, 0] = self.dot_product_table[idx1, idx2]
         if j != 1:
             self.move_vertex(j, 1)
