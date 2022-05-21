@@ -783,14 +783,14 @@ def _backup_procedure(simplex, solution, d, backup):
         n_simplex_points, ordered_indices = _backup_procedure_simplex(
             simplex, backup, d, solution, solution_d)
 
-    simplex.reorder(ordered_indices[:n_simplex_points])
+    simplex.reorder(ordered_indices)
     return solution, True
 
 
 def _backup_procedure_line_segment(simplex, backup, d, solution, solution_d):
     if backup:
         d.backup_line_segments(simplex)
-    ordered_indices = np.empty(4, dtype=int)
+    ordered_indices = np.empty(2, dtype=int)
     # check vertex 1
     solution.from_vertex(simplex, 0, d.d[0, 0])
     n_simplex_points = 1
@@ -807,13 +807,13 @@ def _backup_procedure_line_segment(simplex, backup, d, solution, solution_d):
         n_simplex_points = 1
         solution.from_vertex(simplex, 1, d.d[1, 1])
         ordered_indices[0] = 1
-    return n_simplex_points, ordered_indices
+    return n_simplex_points, ordered_indices[:n_simplex_points]
 
 
 def _backup_procedure_face(simplex, backup, d, solution, solution_d):
     if backup:
         d.backup_faces(simplex)
-    ordered_indices = np.empty(4, dtype=int)
+    ordered_indices = np.empty(3, dtype=int)
     # check vertex 1
     n_simplex_points = 1
     solution.from_vertex(simplex, 0, d.d[0, 0])
@@ -856,7 +856,7 @@ def _backup_procedure_face(simplex, backup, d, solution, solution_d):
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 2, 1
-    return n_simplex_points, ordered_indices
+    return n_simplex_points, ordered_indices[:n_simplex_points]
 
 
 def _backup_procedure_simplex(
@@ -959,7 +959,7 @@ def _backup_procedure_simplex(
             n_simplex_points = 3
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:3] = 3, 1, 2
-    return n_simplex_points, ordered_indices
+    return n_simplex_points, ordered_indices[:n_simplex_points]
 
 
 def minkowski_sum(vertices1, vertices2):
