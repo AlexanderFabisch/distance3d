@@ -713,7 +713,8 @@ def _backup_procedure(simplex, solution, d, backup):
     elif len(simplex) == 3:
         n_simplex_points = _backup_procedure_face(
             simplex, backup, d, ordered_indices, solution, solution_d)
-    elif len(simplex) == 4:
+    else:
+        assert len(simplex) == 4
         n_simplex_points = _backup_procedure_simplex(
             simplex, backup, d, ordered_indices, solution,
             solution_d)
