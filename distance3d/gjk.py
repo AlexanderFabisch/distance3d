@@ -514,6 +514,10 @@ class BarycentricCoordinates:
         self.compute_simplex_distances_2(simplex, e123, e124, e134)
         self.compute_simplex_distances_3(simplex, e213, e214)
 
+    def convex_hull_optimal(self):
+        return not (self.d[0, 14] <= 0.0 or self.d[1, 14] <= 0.0
+                    or self.d[2, 14] <= 0.0 or self.d[3, 14] <= 0.0)
+
 
 def _regular_distance_subalgorithm(simplex, d):
     if len(simplex) == 1:
@@ -651,8 +655,7 @@ def _distance_subalgorithm_simplex(simplex, d):
         solution.from_face(simplex, 1, 0, 2, d.d[0, 12], d.d[2, 12], d.d[3, 12], 0, 2, 1)
         return solution
     d.compute_simplex_distances_3(simplex, e213, e214)
-    convex_hull_optimal = not (d.d[0, 14] <= 0.0 or d.d[1, 14] <= 0.0 or d.d[2, 14] <= 0.0 or d.d[3, 14] <= 0.0)
-    if convex_hull_optimal:
+    if d.convex_hull_optimal():
         solution.from_simplex(simplex, d.d[0, 14], d.d[1, 14], d.d[2, 14], d.d[3, 14])
         return solution
     vertex_1_optimal = not (d.d[0, 2] > 0.0 or d.d[2, 5] > 0.0 or d.d[3, 9] > 0.0)
@@ -837,8 +840,7 @@ def _backup_procedure_simplex(
             n_simplex_points = 3
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:3] = 0, 3, 2
-    check_convex_hull = not (d.d[0, 14] <= 0.0 or d.d[1, 14] <= 0.0 or d.d[2, 14] <= 0.0 or d.d[3, 14] <= 0.0)
-    if check_convex_hull:
+    if d.convex_hull_optimal():
         solution_d.from_simplex(simplex, d.d[0, 14], d.d[1, 14], d.d[2, 14], d.d[3, 14])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 4
