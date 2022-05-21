@@ -311,22 +311,11 @@ class Simplex:
         if i != 0:
             self.move_vertex(i, 0)
             self.dot_product_table[0, 0] = self.dot_product_table[i, i]
+            self.dot_product_table[1, 0] = self.dot_product_table[j, i]
         if j != 1:
             self.move_vertex(j, 1)
             self.dot_product_table[1, 0] = self.dot_product_table[j, i]
             self.dot_product_table[1, 1] = self.dot_product_table[j, j]
-
-    def select_line_segment_12(self):
-        self.n_simplex_points = 2
-        self.move_vertex(2, 0)
-        self.dot_product_table[1, 0] = self.dot_product_table[2, 1]
-        self.dot_product_table[0, 0] = self.dot_product_table[2, 2]
-
-    def select_line_segment_13(self):
-        self.n_simplex_points = 2
-        self.move_vertex(3, 0)
-        self.dot_product_table[1, 0] = self.dot_product_table[3, 1]
-        self.dot_product_table[0, 0] = self.dot_product_table[3, 3]
 
     def select_face_013(self):
         self.n_simplex_points = 3
@@ -617,7 +606,7 @@ def _distance_subalgorithm_face(simplex, d):
         return solution
     line_segment_23_optimal = not (d.d[0, 6] > 0.0 or d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0)
     if line_segment_23_optimal:
-        simplex.select_line_segment_12()
+        simplex.select_line_segment(2, 1)
         solution.from_line_segment(simplex, 0, 1, d.d[1, 5], d.d[2, 5])
         return solution
     return None
@@ -702,12 +691,12 @@ def _distance_subalgorithm_simplex(simplex, d):
         return solution
     line_segment_23_optimal = not (d.d[0, 6] > 0.0 or d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0 or d.d[3, 13] > 0.0)
     if line_segment_23_optimal:
-        simplex.select_line_segment_12()
+        simplex.select_line_segment(2, 1)
         solution.from_line_segment(simplex, 0, 1, d.d[1, 5], d.d[2, 5])
         return solution
     line_segment_24_optimal = not (d.d[0, 11] > 0.0 or d.d[1, 9] <= 0.0 or d.d[2, 13] > 0.0 or d.d[3, 9] <= 0.0)
     if line_segment_24_optimal:
-        simplex.select_line_segment_13()
+        simplex.select_line_segment(3, 1)
         solution.from_line_segment(simplex, 0, 1, d.d[1, 9], d.d[3, 9], 1, 0)
         return solution
     line_segment_34_optimal = not (d.d[0, 12] > 0.0 or d.d[1, 13] > 0.0 or d.d[2, 10] <= 0.0 or d.d[3, 10] <= 0.0)
