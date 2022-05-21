@@ -114,7 +114,7 @@ def gjk_with_simplex(collider1, collider2):
 
             old_simplex.copy_from(simplex)
             if len(simplex) == 4:
-                simplex.reorder_simplex_nondecreasing_order(old_simplex)
+                simplex.reorder_nondecreasing_order(old_simplex)
 
 
 def _find_new_supporting_point(collider1, collider2, simplex, solution):
@@ -330,7 +330,22 @@ class Simplex:
             self.dot_product_table[2, 1] = self.dot_product_table[idx1, idx2]
             self.dot_product_table[2, 2] = self.dot_product_table[k, k]
 
-    def reorder_simplex_nondecreasing_order(self, old_simplex):
+    def reorder_nondecreasing_order(self, old_simplex):
+        ordered_indices = self._nondecreasing_ordered_indices()
+        for k in range(1, len(self)):
+            kk = ordered_indices[k]
+            self.indices_polytope1[k] = old_simplex.indices_polytope1[kk]
+            self.indices_polytope2[k] = old_simplex.indices_polytope2[kk]
+            self.simplex[k] = old_simplex.simplex[kk]
+            for l in range(k):
+                ll = ordered_indices[l]
+                if kk >= ll:
+                    self.dot_product_table[k, l] = old_simplex.dot_product_table[kk, ll]
+                else:
+                    self.dot_product_table[k, l] = old_simplex.dot_product_table[ll, kk]
+            self.dot_product_table[k, k] = old_simplex.dot_product_table[kk, kk]
+
+    def _nondecreasing_ordered_indices(self):
         ordered_indices = np.empty(4, dtype=int)
         ordered_indices[:3] = 0, 1, 2
         if self.dot_product_table[2, 0] < self.dot_product_table[1, 0]:
@@ -348,19 +363,7 @@ class Simplex:
                 ordered_indices[2] = 3
             else:
                 ordered_indices[3] = 3
-        # Reorder indices_polytope1, indices_polytope2 simplex and dot_product_table
-        for k in range(1, len(self)):
-            kk = ordered_indices[k]
-            self.indices_polytope1[k] = old_simplex.indices_polytope1[kk]
-            self.indices_polytope2[k] = old_simplex.indices_polytope2[kk]
-            self.simplex[k] = old_simplex.simplex[kk]
-            for l in range(k):
-                ll = ordered_indices[l]
-                if kk >= ll:
-                    self.dot_product_table[k, l] = old_simplex.dot_product_table[kk, ll]
-                else:
-                    self.dot_product_table[k, l] = old_simplex.dot_product_table[ll, kk]
-            self.dot_product_table[k, k] = old_simplex.dot_product_table[kk, kk]
+        return ordered_indices
 
     def __len__(self):
         return self.n_simplex_points
