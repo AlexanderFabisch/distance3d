@@ -77,9 +77,8 @@ def gjk_with_simplex(collider1, collider2):
 
     simplex.initialize_with_point(
         collider1.first_vertex() - collider2.first_vertex())
+    solution.initialize(simplex)
 
-    solution.barycentric_coordinates[0] = 1.0
-    solution.dstsq = simplex.dot_product_table[0, 0] + simplex.dot_product_table[0, 0] + 1.0
     iteration = 0
     while True:
         iteration += 1
@@ -192,6 +191,10 @@ class Solution:
             solution.barycentric_coordinates[:n_simplex_points]
         self.search_direction = solution.search_direction
         self.dstsq = solution.dstsq
+
+    def initialize(self, simplex):
+        self.barycentric_coordinates[0] = 1.0
+        self.dstsq = simplex.dot_product_table[0, 0] + simplex.dot_product_table[0, 0] + 1.0
 
 
 class Simplex:
