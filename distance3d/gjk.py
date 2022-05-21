@@ -557,14 +557,14 @@ def _regular_distance_subalgorithm(simplex, d):
 def _distance_subalgorithm_line_segment(simplex, d):
     solution = Solution()
     d.d[1, 2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
-    vertex_1_optimal = d.d[1, 2] <= 0.0
-    if vertex_1_optimal:
+    vertex_0_optimal = d.d[1, 2] <= 0.0
+    if vertex_0_optimal:
         simplex.reduce_to_optimal_vertex(0)
         solution.from_vertex(simplex, 0, d.d[0, 0])
         return solution
     d.d[0, 2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
-    line_segment_12_optimal = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
-    if line_segment_12_optimal:
+    line_segment_01_optimal = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
+    if line_segment_01_optimal:
         solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         return solution
     vertex_2_optimal = d.d[0, 2] <= 0.0
@@ -578,26 +578,26 @@ def _distance_subalgorithm_line_segment(simplex, d):
 def _distance_subalgorithm_face(simplex, d):
     solution = Solution()
     d.face_coordinates_0(simplex)
-    vertex_1_optimal = not (d.d[1, 2] > 0.0 or d.d[2, 4] > 0.0)
-    if vertex_1_optimal:
+    vertex_0_optimal = not (d.d[1, 2] > 0.0 or d.d[2, 4] > 0.0)
+    if vertex_0_optimal:
         simplex.reduce_to_optimal_vertex(0)
         solution.from_vertex(simplex, 0, d.d[0, 0])
         return solution
     d.face_coordinates_1(simplex)
-    line_segment_12_optimal = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0 or d.d[2, 6] > 0.0)
-    if line_segment_12_optimal:
+    line_segment_01_optimal = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0 or d.d[2, 6] > 0.0)
+    if line_segment_01_optimal:
         simplex.n_simplex_points = 2
         solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         return solution
     e123 = d.face_coordinates_2(simplex)
-    line_segment_13_optimal = not (d.d[0, 4] <= 0.0 or d.d[1, 6] > 0.0 or d.d[2, 4] <= 0.0)
-    if line_segment_13_optimal:
+    line_segment_02_optimal = not (d.d[0, 4] <= 0.0 or d.d[1, 6] > 0.0 or d.d[2, 4] <= 0.0)
+    if line_segment_02_optimal:
         simplex.select_line_segment(0, 2)
         solution.from_line_segment(simplex, 1, 0, d.d[0, 4], d.d[2, 4])
         return solution
     d.face_coordinates_3(simplex, e123)
-    face_123_optimal = not (d.d[0, 6] <= 0.0 or d.d[1, 6] <= 0.0 or d.d[2, 6] <= 0.0)
-    if face_123_optimal:
+    face_012_optimal = not (d.d[0, 6] <= 0.0 or d.d[1, 6] <= 0.0 or d.d[2, 6] <= 0.0)
+    if face_012_optimal:
         solution.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         return solution
     vertex_2_optimal = not (d.d[0, 2] > 0.0 or d.d[2, 5] > 0.0)
@@ -610,8 +610,8 @@ def _distance_subalgorithm_face(simplex, d):
         simplex.reduce_to_optimal_vertex(2)
         solution.from_vertex(simplex, 0, d.d[2, 3])
         return solution
-    line_segment_23_optimal = not (d.d[0, 6] > 0.0 or d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0)
-    if line_segment_23_optimal:
+    line_segment_12_optimal = not (d.d[0, 6] > 0.0 or d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0)
+    if line_segment_12_optimal:
         simplex.select_line_segment(2, 1)
         solution.from_line_segment(simplex, 0, 1, d.d[1, 5], d.d[2, 5])
         return solution
@@ -622,8 +622,8 @@ def _distance_subalgorithm_simplex(simplex, d):
     solution = Solution()
     d.face_coordinates_0(simplex)
     d.d[3, 8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
-    vertex_1_optimal = not (d.d[1, 2] > 0.0 or d.d[2, 4] > 0.0 or d.d[3, 8] > 0.0)
-    if vertex_1_optimal:
+    vertex_0_optimal = not (d.d[1, 2] > 0.0 or d.d[2, 4] > 0.0 or d.d[3, 8] > 0.0)
+    if vertex_0_optimal:
         simplex.reduce_to_optimal_vertex(0)
         solution.from_vertex(simplex, 0, d.d[0, 0])
         return solution
@@ -632,8 +632,8 @@ def _distance_subalgorithm_simplex(simplex, d):
     d.d[0, 2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
     d.d[2, 6] = d.d[0, 2] * d.d[2, 4] + d.d[1, 2] * e132
     d.d[3, 11] = d.d[0, 2] * d.d[3, 8] + d.d[1, 2] * e142
-    line_segment_12_optimal = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0 or d.d[2, 6] > 0.0 or d.d[3, 11] > 0.0)
-    if line_segment_12_optimal:
+    line_segment_01_optimal = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0 or d.d[2, 6] > 0.0 or d.d[3, 11] > 0.0)
+    if line_segment_01_optimal:
         simplex.n_simplex_points = 2
         solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         return solution
@@ -642,8 +642,8 @@ def _distance_subalgorithm_simplex(simplex, d):
     d.d[0, 4] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[2, 0]
     d.d[1, 6] = d.d[0, 4] * d.d[1, 2] + d.d[2, 4] * e123
     d.d[3, 12] = d.d[0, 4] * d.d[3, 8] + d.d[2, 4] * e143
-    line_segment_13_optimal = not (d.d[0, 4] <= 0.0 or d.d[1, 6] > 0.0 or d.d[2, 4] <= 0.0 or d.d[3, 12] > 0.0)
-    if line_segment_13_optimal:
+    line_segment_02_optimal = not (d.d[0, 4] <= 0.0 or d.d[1, 6] > 0.0 or d.d[2, 4] <= 0.0 or d.d[3, 12] > 0.0)
+    if line_segment_02_optimal:
         simplex.select_line_segment(0, 2)
         solution.from_line_segment(simplex, 1, 0, d.d[0, 4], d.d[2, 4])
         return solution
@@ -652,26 +652,26 @@ def _distance_subalgorithm_simplex(simplex, d):
     e213 = -e123
     d.d[0, 6] = d.d[1, 5] * d.d[0, 2] + d.d[2, 5] * e213
     d.d[3, 14] = d.d[0, 6] * d.d[3, 8] + d.d[1, 6] * e142 + d.d[2, 6] * e143
-    face_123_optimal = not (d.d[0, 6] <= 0.0 or d.d[1, 6] <= 0.0 or d.d[2, 6] <= 0.0 or d.d[3, 14] > 0.0)
-    if face_123_optimal:
+    face_012_optimal = not (d.d[0, 6] <= 0.0 or d.d[1, 6] <= 0.0 or d.d[2, 6] <= 0.0 or d.d[3, 14] > 0.0)
+    if face_012_optimal:
         simplex.n_simplex_points = 3
         solution.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         return solution
     e124, e134 = d.compute_simplex_distances_0(simplex)
-    line_segment_14_optimal = not (d.d[0, 8] <= 0.0 or d.d[1, 11] > 0.0 or d.d[2, 12] > 0.0 or d.d[3, 8] <= 0.0)
-    if line_segment_14_optimal:
+    line_segment_03_optimal = not (d.d[0, 8] <= 0.0 or d.d[1, 11] > 0.0 or d.d[2, 12] > 0.0 or d.d[3, 8] <= 0.0)
+    if line_segment_03_optimal:
         simplex.select_line_segment(0, 3)
         solution.from_line_segment(simplex, 1, 0, d.d[0, 8], d.d[3, 8])
         return solution
     e214 = d.compute_simplex_distances_1(simplex, e124, e132, e134)
-    face_124_optimal = not (d.d[0, 11] <= 0.0 or d.d[1, 11] <= 0.0 or d.d[2, 14] > 0.0 or d.d[3, 11] <= 0.0)
-    if face_124_optimal:
+    face_013_optimal = not (d.d[0, 11] <= 0.0 or d.d[1, 11] <= 0.0 or d.d[2, 14] > 0.0 or d.d[3, 11] <= 0.0)
+    if face_013_optimal:
         simplex.select_face(0, 1, 3)
         solution.from_face(simplex, 2, 0, 1, d.d[0, 11], d.d[1, 11], d.d[3, 11])
         return solution
     d.compute_simplex_distances_2(simplex, e123, e124, e134)
-    face_134_optimal = not (d.d[0, 12] <= 0.0 or d.d[1, 14] > 0.0 or d.d[2, 12] <= 0.0 or d.d[3, 12] <= 0.0)
-    if face_134_optimal:
+    face_023_optimal = not (d.d[0, 12] <= 0.0 or d.d[1, 14] > 0.0 or d.d[2, 12] <= 0.0 or d.d[3, 12] <= 0.0)
+    if face_023_optimal:
         simplex.select_face(0, 3, 2)
         solution.from_face(simplex, 1, 0, 2, d.d[0, 12], d.d[2, 12], d.d[3, 12], 0, 2, 1)
         return solution
@@ -680,38 +680,38 @@ def _distance_subalgorithm_simplex(simplex, d):
     if convex_hull_optimal:
         solution.from_simplex(simplex, d.d[0, 14], d.d[1, 14], d.d[2, 14], d.d[3, 14])
         return solution
-    vertex_2_optimal = not (d.d[0, 2] > 0.0 or d.d[2, 5] > 0.0 or d.d[3, 9] > 0.0)
-    if vertex_2_optimal:
+    vertex_1_optimal = not (d.d[0, 2] > 0.0 or d.d[2, 5] > 0.0 or d.d[3, 9] > 0.0)
+    if vertex_1_optimal:
         simplex.reduce_to_optimal_vertex(1)
         solution.from_vertex(simplex, 0, d.d[1, 1])
         return solution
-    vertex_3_optimal = not (d.d[0, 4] > 0.0 or d.d[1, 5] > 0.0 or d.d[3, 10] > 0.0)
-    if vertex_3_optimal:
+    vertex_2_optimal = not (d.d[0, 4] > 0.0 or d.d[1, 5] > 0.0 or d.d[3, 10] > 0.0)
+    if vertex_2_optimal:
         simplex.reduce_to_optimal_vertex(2)
         solution.from_vertex(simplex, 0, d.d[2, 3])
         return solution
-    vertex_4_optimal = not (d.d[0, 8] > 0.0 or d.d[1, 9] > 0.0 or d.d[2, 10] > 0.0)
-    if vertex_4_optimal:
+    vertex_3_optimal = not (d.d[0, 8] > 0.0 or d.d[1, 9] > 0.0 or d.d[2, 10] > 0.0)
+    if vertex_3_optimal:
         simplex.reduce_to_optimal_vertex(3)
         solution.from_vertex(simplex, 0, d.d[3, 7])
         return solution
-    line_segment_23_optimal = not (d.d[0, 6] > 0.0 or d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0 or d.d[3, 13] > 0.0)
-    if line_segment_23_optimal:
+    line_segment_12_optimal = not (d.d[0, 6] > 0.0 or d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0 or d.d[3, 13] > 0.0)
+    if line_segment_12_optimal:
         simplex.select_line_segment(2, 1)
         solution.from_line_segment(simplex, 0, 1, d.d[1, 5], d.d[2, 5])
         return solution
-    line_segment_24_optimal = not (d.d[0, 11] > 0.0 or d.d[1, 9] <= 0.0 or d.d[2, 13] > 0.0 or d.d[3, 9] <= 0.0)
-    if line_segment_24_optimal:
+    line_segment_13_optimal = not (d.d[0, 11] > 0.0 or d.d[1, 9] <= 0.0 or d.d[2, 13] > 0.0 or d.d[3, 9] <= 0.0)
+    if line_segment_13_optimal:
         simplex.select_line_segment(3, 1)
         solution.from_line_segment(simplex, 0, 1, d.d[1, 9], d.d[3, 9], 1, 0)
         return solution
-    line_segment_34_optimal = not (d.d[0, 12] > 0.0 or d.d[1, 13] > 0.0 or d.d[2, 10] <= 0.0 or d.d[3, 10] <= 0.0)
-    if line_segment_34_optimal:
+    line_segment_23_optimal = not (d.d[0, 12] > 0.0 or d.d[1, 13] > 0.0 or d.d[2, 10] <= 0.0 or d.d[3, 10] <= 0.0)
+    if line_segment_23_optimal:
         simplex.select_line_segment(2, 3)
         solution.from_line_segment(simplex, 1, 0, d.d[2, 10], d.d[3, 10])
         return solution
-    face_234_optimal = not (d.d[0, 14] > 0.0 or d.d[1, 13] <= 0.0 or d.d[2, 13] <= 0.0 or d.d[3, 13] <= 0.0)
-    if face_234_optimal:
+    face_123_optimal = not (d.d[0, 14] > 0.0 or d.d[1, 13] <= 0.0 or d.d[2, 13] <= 0.0 or d.d[3, 13] <= 0.0)
+    if face_123_optimal:
         simplex.select_face(3, 1, 2)
         solution.from_face(simplex, 0, 1, 2, d.d[1, 13], d.d[2, 13], d.d[3, 13], 1, 2, 0)
         return solution
@@ -748,8 +748,8 @@ def _backup_procedure_line_segment(
     solution.from_vertex(simplex, 0, d.d[0, 0])
     n_simplex_points = 1
     ordered_indices[0] = 0
-    check_line_segment_12 = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
-    if check_line_segment_12:
+    check_line_segment_01 = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
+    if check_line_segment_01:
         solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
@@ -771,22 +771,22 @@ def _backup_procedure_face(
     n_simplex_points = 1
     solution.from_vertex(simplex, 0, d.d[0, 0])
     ordered_indices[0] = 0
-    check_line_segment_12 = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
-    if check_line_segment_12:
+    check_line_segment_01 = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
+    if check_line_segment_01:
         solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 0, 1
-    check_line_segment_13 = not (d.d[0, 4] <= 0.0 or d.d[2, 4] <= 0.0)
-    if check_line_segment_13:
+    check_line_segment_02 = not (d.d[0, 4] <= 0.0 or d.d[2, 4] <= 0.0)
+    if check_line_segment_02:
         solution_d.from_line_segment(simplex, 2, 0, d.d[0, 4], d.d[2, 4])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 0, 2
-    check_face_123 = not (d.d[0, 6] <= 0.0 or d.d[1, 6] <= 0.0 or d.d[2, 6] <= 0.0)
-    if check_face_123:
+    check_face_012 = not (d.d[0, 6] <= 0.0 or d.d[1, 6] <= 0.0 or d.d[2, 6] <= 0.0)
+    if check_face_012:
         solution_d.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 3
@@ -802,8 +802,8 @@ def _backup_procedure_face(
         n_simplex_points = 1
         solution.from_vertex(simplex, 2, d.d[2, 3])
         ordered_indices[0] = 2
-    check_line_segment_23 = not (d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0)
-    if check_line_segment_23:
+    check_line_segment_12 = not (d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0)
+    if check_line_segment_12:
         solution_d.from_line_segment(simplex, 2, 1, d.d[1, 5], d.d[2, 5], 1, 0)
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
@@ -820,43 +820,43 @@ def _backup_procedure_simplex(
     n_simplex_points = 1
     solution.from_vertex(simplex, 0, d.d[0, 0])
     ordered_indices[0] = 0
-    check_line_segment_12 = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
-    if check_line_segment_12:
+    check_line_segment_01 = not (d.d[0, 2] <= 0.0 or d.d[1, 2] <= 0.0)
+    if check_line_segment_01:
         solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 0, 1
-    check_line_segment_13 = not (d.d[0, 4] <= 0.0 or d.d[2, 4] <= 0.0)
-    if check_line_segment_13:
+    check_line_segment_02 = not (d.d[0, 4] <= 0.0 or d.d[2, 4] <= 0.0)
+    if check_line_segment_02:
         solution_d.from_line_segment(simplex, 2, 0, d.d[0, 4], d.d[2, 4])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 0, 2
-    check_face_123 = not (d.d[0, 6] <= 0.0 or d.d[1, 6] <= 0.0 or d.d[2, 6] <= 0.0)
-    if check_face_123:
+    check_face_012 = not (d.d[0, 6] <= 0.0 or d.d[1, 6] <= 0.0 or d.d[2, 6] <= 0.0)
+    if check_face_012:
         solution_d.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 3
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:3] = 0, 1, 2
-    check_line_segment_14 = not (d.d[0, 8] <= 0.0 or d.d[3, 8] <= 0.0)
-    if check_line_segment_14:
+    check_line_segment_03 = not (d.d[0, 8] <= 0.0 or d.d[3, 8] <= 0.0)
+    if check_line_segment_03:
         solution_d.from_line_segment(simplex, 3, 0, d.d[0, 8], d.d[3, 8])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 0, 3
-    check_face_124 = not (d.d[0, 11] <= 0.0 or d.d[1, 11] <= 0.0 or d.d[3, 11] <= 0.0)
-    if check_face_124:
+    check_face_013 = not (d.d[0, 11] <= 0.0 or d.d[1, 11] <= 0.0 or d.d[3, 11] <= 0.0)
+    if check_face_013:
         solution_d.from_face(simplex, 3, 0, 1, d.d[0, 11], d.d[1, 11], d.d[3, 11])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 3
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:3] = 0, 1, 3
-    check_face_134 = not (d.d[0, 12] <= 0.0 or d.d[2, 12] <= 0.0 or d.d[3, 12] <= 0.0)
-    if check_face_134:
+    check_face_023 = not (d.d[0, 12] <= 0.0 or d.d[2, 12] <= 0.0 or d.d[3, 12] <= 0.0)
+    if check_face_023:
         solution_d.from_face(simplex, 3, 0, 2, d.d[0, 12], d.d[2, 12], d.d[3, 12], 0, 2, 1)
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 3
@@ -884,29 +884,29 @@ def _backup_procedure_simplex(
         n_simplex_points = 1
         solution.from_vertex(simplex, 3, d.d[3, 7])
         ordered_indices[0] = 3
-    check_line_segment_23 = not (d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0)
-    if check_line_segment_23:
+    check_line_segment_12 = not (d.d[1, 5] <= 0.0 or d.d[2, 5] <= 0.0)
+    if check_line_segment_12:
         solution_d.from_line_segment(simplex, 1, 2, d.d[1, 5], d.d[2, 5], 1, 0)
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 2, 1
-    check_line_segment_24 = not (d.d[1, 9] <= 0.0 or d.d[3, 9] <= 0.0)
-    if check_line_segment_24:
+    check_line_segment_13 = not (d.d[1, 9] <= 0.0 or d.d[3, 9] <= 0.0)
+    if check_line_segment_13:
         solution_d.from_line_segment(simplex, 3, 1, d.d[1, 9], d.d[3, 9], 1, 0)
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 3, 1
-    check_line_segment_34 = not (d.d[2, 10] <= 0.0 or d.d[3, 10] <= 0.0)
-    if check_line_segment_34:
+    check_line_segment_23 = not (d.d[2, 10] <= 0.0 or d.d[3, 10] <= 0.0)
+    if check_line_segment_23:
         solution_d.from_line_segment(simplex, 3, 2, d.d[2, 10], d.d[3, 10])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 2, 3
-    check_face_234 = not (d.d[1, 13] <= 0.0 or d.d[2, 13] <= 0.0 or d.d[3, 13] <= 0.0)
-    if check_face_234:
+    check_face_123 = not (d.d[1, 13] <= 0.0 or d.d[2, 13] <= 0.0 or d.d[3, 13] <= 0.0)
+    if check_face_123:
         solution_d.from_face(simplex, 3, 1, 2, d.d[1, 13], d.d[2, 13], d.d[3, 13], 1, 2, 0)
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 3
