@@ -561,7 +561,7 @@ class BarycentricCoordinates:
         return not (self.d[1, 2] > 0.0 or self.d[2, 4] > 0.0)
 
     def line_segment_01_of_face_optimal(self):
-        return not (self.d[0, 2] <= 0.0 or self.d[1, 2] <= 0.0 or self.d[2, 6] > 0.0)
+        return self.line_segment_01_of_line_segment_optimal() and not self.d[2, 6] > 0.0
 
     def line_segment_02_of_face_optimal(self):
         return not (self.d[0, 4] <= 0.0 or self.d[1, 6] > 0.0 or self.d[2, 4] <= 0.0)
@@ -579,64 +579,49 @@ class BarycentricCoordinates:
         return not (self.d[0, 6] > 0.0 or self.d[1, 5] <= 0.0 or self.d[2, 5] <= 0.0)
 
     def vertex_0_of_simplex_optimal(self):
-        return not (self.d[1, 2] > 0.0 or self.d[2, 4] > 0.0
-                    or self.d[3, 8] > 0.0)
+        return self.vertex_0_of_face_optimal() and not self.d[3, 8] > 0.0
 
     def line_segment_01_of_simplex_optimal(self):
-        return not (self.d[0, 2] <= 0.0 or self.d[1, 2] <= 0.0
-                    or self.d[2, 6] > 0.0 or self.d[3, 11] > 0.0)
+        return self.line_segment_01_of_face_optimal() and not self.d[3, 11] > 0.0
 
     def line_segment_02_of_simplex_optimal(self):
-        return not (self.d[0, 4] <= 0.0 or self.d[1, 6] > 0.0
-                    or self.d[2, 4] <= 0.0 or self.d[3, 12] > 0.0)
+        return self.line_segment_02_of_face_optimal() and not self.d[3, 12] > 0.0
 
     def face_012_of_simplex_optimal(self):
-        return not (self.d[0, 6] <= 0.0 or self.d[1, 6] <= 0.0
-                    or self.d[2, 6] <= 0.0 or self.d[3, 14] > 0.0)
+        return self.face_012_of_face_optimal() and not self.d[3, 14] > 0.0
 
     def line_segment_03_of_simplex_optimal(self):
-        return not (self.d[0, 8] <= 0.0 or self.d[1, 11] > 0.0
-                    or self.d[2, 12] > 0.0 or self.d[3, 8] <= 0.0)
+        return not (self.d[0, 8] <= 0.0 or self.d[1, 11] > 0.0 or self.d[2, 12] > 0.0 or self.d[3, 8] <= 0.0)
 
     def face_013_of_simplex_optimal(self):
-        return not (self.d[0, 11] <= 0.0 or self.d[1, 11] <= 0.0
-                    or self.d[2, 14] > 0.0 or self.d[3, 11] <= 0.0)
+        return not (self.d[0, 11] <= 0.0 or self.d[1, 11] <= 0.0 or self.d[2, 14] > 0.0 or self.d[3, 11] <= 0.0)
 
     def face_023_of_simplex_optimal(self):
-        return not (self.d[0, 12] <= 0.0 or self.d[1, 14] > 0.0
-                    or self.d[2, 12] <= 0.0 or self.d[3, 12] <= 0.0)
+        return not (self.d[0, 12] <= 0.0 or self.d[1, 14] > 0.0 or self.d[2, 12] <= 0.0 or self.d[3, 12] <= 0.0)
 
     def convex_hull_of_simplex_optimal(self):
-        return not (self.d[0, 14] <= 0.0 or self.d[1, 14] <= 0.0
-                    or self.d[2, 14] <= 0.0 or self.d[3, 14] <= 0.0)
+        return not (self.d[0, 14] <= 0.0 or self.d[1, 14] <= 0.0 or self.d[2, 14] <= 0.0 or self.d[3, 14] <= 0.0)
 
     def vertex_1_of_simplex_optimal(self):
-        return not (self.d[0, 2] > 0.0 or self.d[2, 5] > 0.0
-                    or self.d[3, 9] > 0.0)
+        return self.vertex_2_of_face_optimal() and not self.d[3, 9] > 0.0
 
     def vertex_2_of_simplex_optimal(self):
-        return not (self.d[0, 4] > 0.0 or self.d[1, 5] > 0.0
-                    or self.d[3, 10] > 0.0)
+        return self.vertex_3_of_face_optimal() and not self.d[3, 10] > 0.0
 
     def vertex_3_of_simplex_optimal(self):
-        return not (self.d[0, 8] > 0.0 or self.d[1, 9] > 0.0
-                    or self.d[2, 10] > 0.0)
+        return not (self.d[0, 8] > 0.0 or self.d[1, 9] > 0.0 or self.d[2, 10] > 0.0)
 
     def line_segment_12_of_simplex_optimal(self):
-        return not (self.d[0, 6] > 0.0 or self.d[1, 5] <= 0.0
-                    or self.d[2, 5] <= 0.0 or self.d[3, 13] > 0.0)
+        return self.line_segment_12_of_face_optimal() and not self.d[3, 13] > 0.0
 
     def line_segment_13_of_simplex_optimal(self):
-        return not (self.d[0, 11] > 0.0 or self.d[1, 9] <= 0.0
-                    or self.d[2, 13] > 0.0 or self.d[3, 9] <= 0.0)
+        return not (self.d[0, 11] > 0.0 or self.d[1, 9] <= 0.0 or self.d[2, 13] > 0.0 or self.d[3, 9] <= 0.0)
 
     def line_segment_23_of_simplex_optimal(self):
-        return not (self.d[0, 12] > 0.0 or self.d[1, 13] > 0.0
-                    or self.d[2, 10] <= 0.0 or self.d[3, 10] <= 0.0)
+        return not (self.d[0, 12] > 0.0 or self.d[1, 13] > 0.0 or self.d[2, 10] <= 0.0 or self.d[3, 10] <= 0.0)
 
     def face_123_of_simplex_optimal(self):
-        return not (self.d[0, 14] > 0.0 or self.d[1, 13] <= 0.0
-                    or self.d[2, 13] <= 0.0 or self.d[3, 13] <= 0.0)
+        return not (self.d[0, 14] > 0.0 or self.d[1, 13] <= 0.0 or self.d[2, 13] <= 0.0 or self.d[3, 13] <= 0.0)
 
 
 def _regular_distance_subalgorithm(simplex, d):
