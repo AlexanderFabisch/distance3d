@@ -859,8 +859,7 @@ def _backup_procedure_face(simplex, backup, d, solution, solution_d):
     return ordered_indices[:n_simplex_points]
 
 
-def _backup_procedure_simplex(
-        simplex, backup, d, solution, solution_d):
+def _backup_procedure_simplex(simplex, backup, d, solution, solution_d):
     if backup:
         d.backup_simplex(simplex)
     ordered_indices = np.empty(4, dtype=int)
