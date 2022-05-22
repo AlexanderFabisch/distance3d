@@ -434,13 +434,19 @@ class BarycentricCoordinates:
         self.d[2, 3] = 1.0
         self.d[3, 7] = 1.0
 
-    def face_coordinates_0(self, simplex):
+    def line_segment_coordinates_0(self, simplex):
         self.d[1, 2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
+
+    def line_segment_coordinates_1(self, simplex):
+        self.d[0, 2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
+
+    def face_coordinates_0(self, simplex):
+        self.line_segment_coordinates_0(simplex)
         self.d[2, 4] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[2, 0]
 
     def face_coordinates_1(self, simplex):
         e132 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[2, 1]
-        self.d[0, 2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
+        self.line_segment_coordinates_1(simplex)
         self.d[2, 6] = self.d[0, 2] * self.d[2, 4] + self.d[1, 2] * e132
 
     def face_coordinates_2(self, simplex):
@@ -542,8 +548,14 @@ class BarycentricCoordinates:
         self.simplex_coordinates_6(simplex, e123, e124, e134)
         self.simplex_coordinates_7(simplex, e213, e214)
 
+    def vertex_0_of_line_segment_optimal(self):
+        return self.d[1, 2] <= 0.0
+
     def line_segment_01_of_line_segment_optimal(self):
         return not (self.d[0, 2] <= 0.0 or self.d[1, 2] <= 0.0)
+
+    def vertex_1_of_line_segment_optimal(self):
+        return self.d[0, 2] <= 0.0
 
     def vertex_0_of_face_optimal(self):
         return not (self.d[1, 2] > 0.0 or self.d[2, 4] > 0.0)
@@ -643,18 +655,16 @@ def _regular_distance_subalgorithm(simplex, d):
 
 def _distance_subalgorithm_line_segment(simplex, d):
     solution = Solution()
-    d.d[1, 2] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[1, 0]
-    vertex_0_optimal = d.d[1, 2] <= 0.0
-    if vertex_0_optimal:
+    d.line_segment_coordinates_0(simplex)
+    if d.vertex_0_of_line_segment_optimal():
         simplex.select_vertex(0)
         solution.from_vertex(simplex, 0, d.d[0, 0])
         return solution
-    d.d[0, 2] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[1, 0]
+    d.line_segment_coordinates_1(simplex)
     if d.line_segment_01_of_line_segment_optimal():
         solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         return solution
-    vertex_2_optimal = d.d[0, 2] <= 0.0
-    if vertex_2_optimal:
+    if d.vertex_1_of_line_segment_optimal():
         simplex.select_vertex(1)
         solution.from_vertex(simplex, 0, d.d[1, 1])
         return solution
