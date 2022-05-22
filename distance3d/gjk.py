@@ -552,7 +552,7 @@ class BarycentricCoordinates:
         return self.d[1, 2] <= 0.0
 
     def line_segment_01_of_line_segment_optimal(self):
-        return not (self.d[0, 2] <= 0.0 or self.d[1, 2] <= 0.0)
+        return not (self.vertex_1_of_line_segment_optimal() or self.vertex_0_of_line_segment_optimal())
 
     def vertex_1_of_line_segment_optimal(self):
         return self.d[0, 2] <= 0.0
