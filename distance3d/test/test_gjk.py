@@ -266,6 +266,22 @@ def test_gjk_points():
         assert approx(dist) == np.linalg.norm(closest_point2 - closest_point1)
 
 
+def test_gjk_point_subset():
+    random_state = np.random.RandomState(333)
+
+    for _ in range(50):
+        vertices1 = random_state.rand(15, 3)
+        convex1 = colliders.Convex(vertices1)
+        vertices2 = vertices1[::2]
+        convex2 = colliders.Convex(vertices2)
+        dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+            convex1, convex2)
+        assert approx(dist) == 0.0
+        assert_array_almost_equal(closest_point1, closest_point2)
+        assert closest_point1 in vertices1
+        assert closest_point2 in vertices2
+
+
 def test_gjk_triangle_to_triangle():
     random_state = np.random.RandomState(81)
     for _ in range(10):
