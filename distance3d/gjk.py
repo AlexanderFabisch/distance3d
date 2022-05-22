@@ -484,7 +484,7 @@ class BarycentricCoordinates:
         self.d[3, 14] = self.d[0, 6] * self.d[3, 8] + self.d[1, 6] * e142 + self.d[2, 6] * e143
         return e213
 
-    def compute_simplex_distances_0(self, simplex):
+    def simplex_coordinates_4(self, simplex):
         e124 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 1]
         e134 = simplex.dot_product_table[3, 0] - simplex.dot_product_table[3, 2]
         self.d[0, 8] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 0]
@@ -492,7 +492,7 @@ class BarycentricCoordinates:
         self.d[2, 12] = self.d[0, 8] * self.d[2, 4] + self.d[3, 8] * e134
         return e124, e134
 
-    def compute_simplex_distances_1(self, simplex, e124, e132, e134):
+    def simplex_coordinates_5(self, simplex, e124, e132, e134):
         self.d[1, 9] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 1]
         self.d[3, 9] = simplex.dot_product_table[1, 1] - simplex.dot_product_table[3, 1]
         e214 = -e124
@@ -500,14 +500,14 @@ class BarycentricCoordinates:
         self.d[2, 14] = self.d[0, 11] * self.d[2, 4] + self.d[1, 11] * e132 + self.d[3, 11] * e134
         return e214
 
-    def compute_simplex_distances_2(self, simplex, e123, e124, e134):
+    def simplex_coordinates_6(self, simplex, e123, e124, e134):
         self.d[2, 10] = simplex.dot_product_table[3, 3] - simplex.dot_product_table[3, 2]
         self.d[3, 10] = simplex.dot_product_table[2, 2] - simplex.dot_product_table[3, 2]
         e314 = -e134
         self.d[0, 12] = self.d[2, 10] * self.d[0, 4] + self.d[3, 10] * e314
         self.d[1, 14] = self.d[0, 12] * self.d[1, 2] + self.d[2, 12] * e123 + self.d[3, 12] * e124
 
-    def compute_simplex_distances_3(self, simplex, e213, e214):
+    def simplex_coordinates_7(self, simplex, e213, e214):
         e243 = simplex.dot_product_table[2, 1] - simplex.dot_product_table[3, 2]
         self.d[3, 13] = self.d[1, 5] * self.d[3, 9] + self.d[2, 5] * e243
         e234 = simplex.dot_product_table[3, 1] - simplex.dot_product_table[3, 2]
@@ -537,10 +537,10 @@ class BarycentricCoordinates:
         e143 = simplex.dot_product_table[2, 0] - simplex.dot_product_table[3, 2]
         self.d[3, 12] = self.d[0, 4] * self.d[3, 8] + self.d[2, 4] * e143
         self.d[3, 14] = self.d[0, 6] * self.d[3, 8] + self.d[1, 6] * e142 + self.d[2, 6] * e143
-        e124, e134 = self.compute_simplex_distances_0(simplex)
-        e214 = self.compute_simplex_distances_1(simplex, e124, e132, e134)
-        self.compute_simplex_distances_2(simplex, e123, e124, e134)
-        self.compute_simplex_distances_3(simplex, e213, e214)
+        e124, e134 = self.simplex_coordinates_4(simplex)
+        e214 = self.simplex_coordinates_5(simplex, e124, e132, e134)
+        self.simplex_coordinates_6(simplex, e123, e124, e134)
+        self.simplex_coordinates_7(simplex, e213, e214)
 
     def line_segment_01_of_line_segment_optimal(self):
         return not (self.d[0, 2] <= 0.0 or self.d[1, 2] <= 0.0)
@@ -719,22 +719,22 @@ def _distance_subalgorithm_simplex(simplex, d):
         simplex.select_face(0, 1, 2)
         solution.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         return solution
-    e124, e134 = d.compute_simplex_distances_0(simplex)
+    e124, e134 = d.simplex_coordinates_4(simplex)
     if d.line_segment_03_of_simplex_optimal():
         simplex.select_line_segment(0, 3)
         solution.from_line_segment(simplex, 1, 0, d.d[0, 8], d.d[3, 8])
         return solution
-    e214 = d.compute_simplex_distances_1(simplex, e124, e132, e134)
+    e214 = d.simplex_coordinates_5(simplex, e124, e132, e134)
     if d.face_013_of_simplex_optimal():
         simplex.select_face(0, 1, 3)
         solution.from_face(simplex, 2, 0, 1, d.d[0, 11], d.d[1, 11], d.d[3, 11])
         return solution
-    d.compute_simplex_distances_2(simplex, e123, e124, e134)
+    d.simplex_coordinates_6(simplex, e123, e124, e134)
     if d.face_023_of_simplex_optimal():
         simplex.select_face(0, 3, 2)
         solution.from_face(simplex, 1, 0, 2, d.d[0, 12], d.d[2, 12], d.d[3, 12], 0, 2, 1)
         return solution
-    d.compute_simplex_distances_3(simplex, e213, e214)
+    d.simplex_coordinates_7(simplex, e213, e214)
     if d.convex_hull_of_simplex_optimal():
         solution.from_simplex(simplex, d.d[0, 14], d.d[1, 14], d.d[2, 14], d.d[3, 14])
         return solution
