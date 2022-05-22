@@ -664,11 +664,11 @@ def _distance_subalgorithm_line_segment(simplex, d):
     if d.line_segment_01_of_line_segment_optimal():
         solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         return solution
-    if d.vertex_1_of_line_segment_optimal():
+    else:
+        assert d.vertex_1_of_line_segment_optimal()
         simplex.select_vertex(1)
         solution.from_vertex(simplex, 0, d.d[1, 1])
         return solution
-    return None
 
 
 def _distance_subalgorithm_face(simplex, d):
