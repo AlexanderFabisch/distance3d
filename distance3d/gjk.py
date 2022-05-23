@@ -165,9 +165,7 @@ class Solution:
         coords_sum = a + b + c
         self.barycentric_coordinates[bci1] = a / coords_sum
         self.barycentric_coordinates[bci2] = b / coords_sum
-        self.barycentric_coordinates[bci3] = (
-            1.0 - self.barycentric_coordinates[bci1]
-            - self.barycentric_coordinates[bci2])
+        self.barycentric_coordinates[bci3] = c / coords_sum
         self.search_direction = simplex.search_direction_face(
             vi1, vi2, vi3, self.barycentric_coordinates[bci1],
             self.barycentric_coordinates[bci2])
@@ -178,7 +176,7 @@ class Solution:
         self.barycentric_coordinates[0] = a / coords_sum
         self.barycentric_coordinates[1] = b / coords_sum
         self.barycentric_coordinates[2] = c / coords_sum
-        self.barycentric_coordinates[3] = 1.0 - sum(self.barycentric_coordinates[:3])
+        self.barycentric_coordinates[3] = d / coords_sum
         self.search_direction = simplex.search_direction_simplex(
             self.barycentric_coordinates)
         self.dstsq = np.dot(self.search_direction, self.search_direction)
