@@ -172,11 +172,11 @@ class Solution:
         self.dstsq = np.dot(self.search_direction, self.search_direction)
 
     def from_simplex(self, simplex, a, b, c, d):
-        coords_sum = a + b + c + d
-        self.barycentric_coordinates[0] = a / coords_sum
-        self.barycentric_coordinates[1] = b / coords_sum
-        self.barycentric_coordinates[2] = c / coords_sum
-        self.barycentric_coordinates[3] = d / coords_sum
+        self.barycentric_coordinates[0] = a
+        self.barycentric_coordinates[1] = b
+        self.barycentric_coordinates[2] = c
+        self.barycentric_coordinates[3] = d
+        self.barycentric_coordinates /= a + b + c + d
         self.search_direction = simplex.search_direction_simplex(
             self.barycentric_coordinates)
         self.dstsq = np.dot(self.search_direction, self.search_direction)
