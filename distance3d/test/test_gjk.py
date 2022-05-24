@@ -160,6 +160,54 @@ def test_face_optimal_point():
     assert_array_almost_equal(simplex.simplex[2], [0, 0, 1])
     assert barycentric_coordinates.vertex_2_of_face_optimal()
 
+    simplex = gjk.Simplex()
+    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
+    simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
+
+    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates.face_coordinates_0(simplex)
+    barycentric_coordinates.face_coordinates_1(simplex)
+    e123 = barycentric_coordinates.face_coordinates_2(simplex)
+    barycentric_coordinates.face_coordinates_3(simplex, e123)
+    assert barycentric_coordinates.line_segment_01_of_face_optimal()
+
+    simplex = gjk.Simplex()
+    simplex.initialize_with_point(np.array([1, 0, 1], dtype=float))
+    simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
+    simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
+
+    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates.face_coordinates_0(simplex)
+    barycentric_coordinates.face_coordinates_1(simplex)
+    e123 = barycentric_coordinates.face_coordinates_2(simplex)
+    barycentric_coordinates.face_coordinates_3(simplex, e123)
+    assert barycentric_coordinates.line_segment_12_of_face_optimal()
+
+    simplex = gjk.Simplex()
+    simplex.initialize_with_point(np.array([0, 0, 2], dtype=float))
+    simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
+    simplex.add_new_point(2, 2, np.array([-1, 0, 1], dtype=float))
+
+    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates.face_coordinates_0(simplex)
+    barycentric_coordinates.face_coordinates_1(simplex)
+    e123 = barycentric_coordinates.face_coordinates_2(simplex)
+    barycentric_coordinates.face_coordinates_3(simplex, e123)
+    assert barycentric_coordinates.line_segment_02_of_face_optimal()
+
+    simplex = gjk.Simplex()
+    simplex.initialize_with_point(np.array([0, 1, 1], dtype=float))
+    simplex.add_new_point(1, 1, np.array([1, -1, 1], dtype=float))
+    simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
+
+    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates.face_coordinates_0(simplex)
+    barycentric_coordinates.face_coordinates_1(simplex)
+    e123 = barycentric_coordinates.face_coordinates_2(simplex)
+    barycentric_coordinates.face_coordinates_3(simplex, e123)
+    assert barycentric_coordinates.face_012_of_face_optimal()
+
 
 def test_gjk_boxes():
     box2origin = np.eye(4)
