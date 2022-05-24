@@ -567,10 +567,10 @@ class BarycentricCoordinates:
     def face_012_of_face_optimal(self):
         return not (self.d[0, 6] <= 0.0 or self.d[1, 6] <= 0.0 or self.d[2, 6] <= 0.0)
 
-    def vertex_2_of_face_optimal(self):
+    def vertex_1_of_face_optimal(self):
         return not (self.d[0, 2] > 0.0 or self.d[2, 5] > 0.0)
 
-    def vertex_3_of_face_optimal(self):
+    def vertex_2_of_face_optimal(self):
         return not (self.d[0, 4] > 0.0 or self.d[1, 5] > 0.0)
 
     def line_segment_12_of_face_optimal(self):
@@ -601,10 +601,10 @@ class BarycentricCoordinates:
         return not (self.d[0, 14] <= 0.0 or self.d[1, 14] <= 0.0 or self.d[2, 14] <= 0.0 or self.d[3, 14] <= 0.0)
 
     def vertex_1_of_tetrahedron_optimal(self):
-        return self.vertex_2_of_face_optimal() and not self.d[3, 9] > 0.0
+        return self.vertex_1_of_face_optimal() and not self.d[3, 9] > 0.0
 
     def vertex_2_of_tetrahedron_optimal(self):
-        return self.vertex_3_of_face_optimal() and not self.d[3, 10] > 0.0
+        return self.vertex_2_of_face_optimal() and not self.d[3, 10] > 0.0
 
     def vertex_3_of_tetrahedron_optimal(self):
         return not (self.d[0, 8] > 0.0 or self.d[1, 9] > 0.0 or self.d[2, 10] > 0.0)
@@ -702,11 +702,11 @@ def _distance_subalgorithm_face(simplex, d):
     if d.face_012_of_face_optimal():
         solution.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         return solution
-    if d.vertex_2_of_face_optimal():
+    if d.vertex_1_of_face_optimal():
         simplex.select_vertex(1)
         solution.from_vertex(simplex, 0, d.d[1, 1])
         return solution
-    if d.vertex_3_of_face_optimal():
+    if d.vertex_2_of_face_optimal():
         simplex.select_vertex(2)
         solution.from_vertex(simplex, 0, d.d[2, 3])
         return solution
