@@ -228,6 +228,7 @@ class Simplex:
         self.n_simplex_points = 1
         self.simplex[0] = point
         self.dot_product_table[0, 0] = np.dot(self.simplex[0], self.simplex[0])
+        # TODO indices might not be correct, depends on Collider implementation
         self.indices_polytope1[0] = 0
         self.indices_polytope2[0] = 0
 
