@@ -216,7 +216,7 @@ class ConvexCollider(abc.ABC):
 
     @abc.abstractmethod
     def first_vertex(self):
-        """Get any vertex from collider to initialize GJK algorithm.
+        """Get vertex with index 0 from collider to initialize GJK algorithm.
 
         Returns
         -------
