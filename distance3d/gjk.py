@@ -354,12 +354,10 @@ class Simplex:
 
 
 def distance_subalgorithm(simplex, solution, backup):
-    """Distance subalgorithm.
+    """Johnson's distance subalgorithm.
 
-    Computes point of minimum norm in the convex hull of the simplex.
-
-    Implements, in a very efficient way, the distance subalgorithm
-    of finding the near point to the convex hull of four or less points
+    Implements, in a very efficient way, the distance subalgorithm of finding
+    the point of minimum norm in the convex hull of four or less points
     in 3D space. The procedure and its efficient FORTRAN implementation
     are both due to D.W. Johnson. Although this subroutine is quite long,
     only a very small part of it will be executed on each call. Refer to
@@ -791,6 +789,13 @@ def _distance_subalgorithm_tetrahedron(simplex, d):
 
 
 def _backup_procedure(simplex, solution, d, backup):
+    """Backup procedure.
+
+    Johnson's distance subalgorithm is affected by rounding errors in floating
+    point operations in cases of degenerate simplices. This backup procedure
+    addresses the problem. It will always succeed, but is computationally more
+    expensive.
+    """
     solution_d = Solution()
     if len(simplex) == 1:
         solution.from_vertex(simplex, 0, d.d[0, 0])
