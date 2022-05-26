@@ -788,7 +788,7 @@ def _distance_subalgorithm_tetrahedron(simplex, d):
     return None
 
 
-def backup_procedure(simplex, solution, d, backup):
+def backup_procedure(simplex, solution, d, backup=True):
     """Backup procedure.
 
     Johnson's distance subalgorithm is affected by rounding errors in floating
