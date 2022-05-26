@@ -86,8 +86,9 @@ def gjk_with_simplex(collider1, collider2):
         new_solution, backup = distance_subalgorithm_with_backup_procedure(
             simplex, solution, backup)
 
-        converged = new_solution.dstsq >= solution.dstsq or len(simplex) == 4
-        if converged:
+        no_improvement = new_solution.dstsq >= solution.dstsq
+        simplex_is_tetrahedron = len(simplex) == 4
+        if no_improvement or simplex_is_tetrahedron:
             if backup:
                 closest_point1 = collider1.compute_point(
                     solution.barycentric_coordinates[:len(simplex)],
@@ -96,7 +97,7 @@ def gjk_with_simplex(collider1, collider2):
                     solution.barycentric_coordinates[:len(simplex)],
                     simplex.indices_polytope2[:len(simplex)])
 
-                if len(simplex) == 4:
+                if simplex_is_tetrahedron:
                     # Make sure intersection has zero distance
                     closest_point1[:] = 0.5 * (closest_point1 + closest_point2)
                     closest_point2[:] = closest_point1
