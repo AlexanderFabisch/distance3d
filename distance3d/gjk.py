@@ -796,26 +796,25 @@ def backup_procedure(simplex, solution, d, backup):
     addresses the problem. It will always succeed, but is computationally more
     expensive.
     """
-    solution_d = Solution()
     if len(simplex) == 1:
         solution.from_vertex(simplex, 0, d.d[0, 0])
         return solution, True
     elif len(simplex) == 2:
         ordered_indices = _backup_procedure_line_segment(
-            simplex, backup, d, solution, solution_d)
+            simplex, backup, d, solution)
     elif len(simplex) == 3:
         ordered_indices = _backup_procedure_face(
-            simplex, backup, d, solution, solution_d)
+            simplex, backup, d, solution)
     else:
         assert len(simplex) == 4
         ordered_indices = _backup_procedure_tetrahedron(
-            simplex, backup, d, solution, solution_d)
+            simplex, backup, d, solution)
 
     simplex.reorder(ordered_indices)
     return solution, True
 
 
-def _backup_procedure_line_segment(simplex, backup, d, solution, solution_d):
+def _backup_procedure_line_segment(simplex, backup, d, solution):
     if backup:
         d.backup_line_segments(simplex)
     ordered_indices = np.empty(2, dtype=int)
@@ -824,6 +823,7 @@ def _backup_procedure_line_segment(simplex, backup, d, solution, solution_d):
     n_simplex_points = 1
     ordered_indices[0] = 0
     if d.line_segment_01_of_line_segment_optimal():
+        solution_d = Solution()
         solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         if solution_d.dstsq < solution.dstsq:
             n_simplex_points = 2
@@ -837,7 +837,7 @@ def _backup_procedure_line_segment(simplex, backup, d, solution, solution_d):
     return ordered_indices[:n_simplex_points]
 
 
-def _backup_procedure_face(simplex, backup, d, solution, solution_d):
+def _backup_procedure_face(simplex, backup, d, solution):
     if backup:
         d.backup_faces(simplex)
     ordered_indices = np.empty(3, dtype=int)
@@ -845,6 +845,7 @@ def _backup_procedure_face(simplex, backup, d, solution, solution_d):
     n_simplex_points = 1
     solution.from_vertex(simplex, 0, d.d[0, 0])
     ordered_indices[0] = 0
+    solution_d = Solution()
     if d.line_segment_01_of_line_segment_optimal():
         solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         if solution_d.dstsq < solution.dstsq:
@@ -882,7 +883,7 @@ def _backup_procedure_face(simplex, backup, d, solution, solution_d):
     return ordered_indices[:n_simplex_points]
 
 
-def _backup_procedure_tetrahedron(simplex, backup, d, solution, solution_d):
+def _backup_procedure_tetrahedron(simplex, backup, d, solution):
     if backup:
         d.backup_simplex(simplex)
     ordered_indices = np.empty(4, dtype=int)
@@ -890,6 +891,7 @@ def _backup_procedure_tetrahedron(simplex, backup, d, solution, solution_d):
     n_simplex_points = 1
     solution.from_vertex(simplex, 0, d.d[0, 0])
     ordered_indices[0] = 0
+    solution_d = Solution()
     if d.line_segment_01_of_line_segment_optimal():
         solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
         if solution_d.dstsq < solution.dstsq:
