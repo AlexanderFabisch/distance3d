@@ -76,7 +76,6 @@ def gjk_with_simplex(collider1, collider2):
 
     simplex.initialize_with_point(
         collider1.first_vertex() - collider2.first_vertex())
-    solution.initialize(simplex)
 
     iteration = 0
     backup = False
@@ -147,17 +146,14 @@ class Solution:
         Squared distance to origin.
     """
     def __init__(self):
-        self.barycentric_coordinates = np.zeros(4, dtype=float)
-        self.search_direction = np.zeros(3, dtype=float)
+        self.barycentric_coordinates = np.empty(4, dtype=float)
+        self.barycentric_coordinates[0] = 1.0
+        self.search_direction = np.empty(3, dtype=float)
         self.distance_squared = np.inf
 
     @property
     def distance(self):
         return math.sqrt(self.distance_squared)
-
-    def initialize(self, simplex):
-        self.barycentric_coordinates[0] = 1.0
-        self.distance_squared = simplex.dot_product_table[0, 0] + simplex.dot_product_table[0, 0] + 1.0
 
     def from_vertex(self, simplex, vertex_idx, a):
         self.barycentric_coordinates[vertex_idx] = a
