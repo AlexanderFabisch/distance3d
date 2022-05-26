@@ -281,11 +281,10 @@ class Simplex:
     def search_direction_tetrahedron(self, barycentric_coordinates):
         return barycentric_coordinates.dot(self.points)
 
-    def select_vertex(self, vertex_index):
+    def select_vertex(self, i):
         self.n_simplex_points = 1
-        self.move_vertex(vertex_index, 0)
-        self.dot_product_table[0, 0] = self.dot_product_table[
-            vertex_index, vertex_index]
+        self.move_vertex(i, 0)
+        self.dot_product_table[0, 0] = self.dot_product_table[i, i]
 
     def select_line_segment(self, i, j):
         self.n_simplex_points = 2
