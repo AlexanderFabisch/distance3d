@@ -366,13 +366,13 @@ def distance_subalgorithm_with_backup_procedure(simplex, solution, backup=False)
     """
     d = BarycentricCoordinates()
 
-    if not backup:
+    if backup:
+        return backup_procedure(simplex, solution, d, backup), True
+    else:
         try:
-            return distance_subalgorithm(simplex, d), backup
+            return distance_subalgorithm(simplex, d), False
         except np.linalg.LinAlgError:
-            pass
-
-    return backup_procedure(simplex, solution, d, backup), True
+            return backup_procedure(simplex, solution, d, backup), True
 
 
 class BarycentricCoordinates:
