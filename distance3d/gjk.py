@@ -367,9 +367,10 @@ def distance_subalgorithm_with_backup_procedure(simplex, solution, backup=False)
     d = BarycentricCoordinates()
 
     if not backup:
-        new_solution = distance_subalgorithm(simplex, d)
-        if new_solution is not None:
-            return new_solution, backup
+        try:
+            return distance_subalgorithm(simplex, d), backup
+        except np.linalg.LinAlgError:
+            pass
 
     return backup_procedure(simplex, solution, d, backup)
 
@@ -689,7 +690,7 @@ def _distance_subalgorithm_face(simplex, d):
         simplex.select_line_segment(2, 1)
         solution.from_line_segment(simplex, [1, 0], d.d[1, 5], d.d[2, 5])
         return solution
-    return None
+    raise np.linalg.LinAlgError("Numerical problem, backup procedure required")
 
 
 def _distance_subalgorithm_tetrahedron(simplex, d):
@@ -761,7 +762,7 @@ def _distance_subalgorithm_tetrahedron(simplex, d):
         simplex.select_face(3, 1, 2)
         solution.from_face(simplex, [1, 2, 0], d.d[2, 13], d.d[3, 13], d.d[1, 13])
         return solution
-    return None
+    raise np.linalg.LinAlgError("Numerical problem, backup procedure required")
 
 
 def backup_procedure(simplex, solution, d, backup=True):
