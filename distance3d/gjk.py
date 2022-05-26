@@ -175,12 +175,8 @@ class Solution:
         self.search_direction = self.barycentric_coordinates[:3].dot(simplex.points[vi])
         self.distance_squared = np.dot(self.search_direction, self.search_direction)
 
-    def from_tetrahedron(self, simplex, a, b, c, d):
-        self.barycentric_coordinates[0] = a
-        self.barycentric_coordinates[1] = b
-        self.barycentric_coordinates[2] = c
-        self.barycentric_coordinates[3] = d
-        self.barycentric_coordinates /= a + b + c + d
+    def from_tetrahedron(self, simplex, barycentric_coordinates):
+        self.barycentric_coordinates[:] = barycentric_coordinates / sum(barycentric_coordinates)
         self.search_direction = self.barycentric_coordinates.dot(simplex.points)
         self.distance_squared = np.dot(self.search_direction, self.search_direction)
 
@@ -735,7 +731,7 @@ def _distance_subalgorithm_tetrahedron(simplex, d):
         return solution
     d.tetrahedron_coordinates_7(simplex, e213, e214)
     if d.convex_hull_of_tetrahedron_optimal():
-        solution.from_tetrahedron(simplex, d.d[0, 14], d.d[1, 14], d.d[2, 14], d.d[3, 14])
+        solution.from_tetrahedron(simplex, d.d[:, 14])
         return solution
     if d.vertex_1_of_tetrahedron_optimal():
         simplex.select_vertex(1)
@@ -909,7 +905,7 @@ def _backup_procedure_tetrahedron(simplex, backup, d, solution):
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:3] = 0, 3, 2
     if d.convex_hull_of_tetrahedron_optimal():
-        solution_d.from_tetrahedron(simplex, d.d[0, 14], d.d[1, 14], d.d[2, 14], d.d[3, 14])
+        solution_d.from_tetrahedron(simplex, d.d[:, 14])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 4
             solution.copy_from(solution_d, n_simplex_points)
