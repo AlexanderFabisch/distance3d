@@ -511,7 +511,7 @@ class BarycentricCoordinates:
         e213 = self.face_coordinates_3(simplex, e123)
         return e132, e123, e213
 
-    def backup_simplex(self, simplex):
+    def backup_tetrahedron(self, simplex):
         e132, e123, e213 = self.backup_faces(simplex)
         self.d[3, 8] = simplex.dot_product_table[0, 0] - simplex.dot_product_table[3, 0]
         e142 = simplex.dot_product_table[1, 0] - simplex.dot_product_table[3, 1]
@@ -865,7 +865,7 @@ def _backup_procedure_face(simplex, backup, d, solution):
 
 def _backup_procedure_tetrahedron(simplex, backup, d, solution):
     if backup:
-        d.backup_simplex(simplex)
+        d.backup_tetrahedron(simplex)
     ordered_indices = np.empty(4, dtype=int)
     # check vertex 1
     n_simplex_points = 1
