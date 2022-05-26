@@ -352,7 +352,7 @@ class Simplex:
         return self.n_simplex_points
 
 
-def distance_subalgorithm_with_backup_procedure(simplex, solution, backup):
+def distance_subalgorithm_with_backup_procedure(simplex, solution, backup=False):
     """Johnson's distance subalgorithm.
 
     Implements, in a very efficient way, the distance subalgorithm of finding
@@ -377,7 +377,7 @@ def distance_subalgorithm_with_backup_procedure(simplex, solution, backup):
     solution : Solution
         Represents current best solution and search direction.
 
-    backup : bool
+    backup : bool, optional (default: False)
         Perform backup procedure.
 
     Returns
