@@ -74,8 +74,8 @@ def gjk_with_simplex(collider1, collider2):
     simplex = Simplex()
     old_simplex = Simplex()
 
-    simplex.initialize_with_point(
-        collider1.first_vertex() - collider2.first_vertex())
+    simplex.set_first_point(
+        0, 0, collider1.first_vertex() - collider2.first_vertex())
 
     iteration = 0
     backup = False
@@ -227,12 +227,13 @@ class Simplex:
         self.indices_polytope1 = np.empty(4, dtype=int)
         self.indices_polytope2 = np.empty(4, dtype=int)
 
-    def initialize_with_point(self, point):
-        self.n_simplex_points = 1
-        self.points[0] = point
-        self.dot_product_table[0, 0] = np.dot(self.points[0], self.points[0])
-        self.indices_polytope1[0] = 0
-        self.indices_polytope2[0] = 0
+    def set_first_point(self, new_index1, new_index2, new_simplex_point):
+        self.indices_polytope1[0] = new_index1
+        self.indices_polytope2[0] = new_index2
+        self.points[0] = new_simplex_point
+        self.n_simplex_points += 1
+        self.dot_product_table[:self.n_simplex_points, 0] = np.dot(
+            self.points[:self.n_simplex_points], self.points[0])
 
     def copy_from(self, simplex):
         self.n_simplex_points = len(simplex)
@@ -251,7 +252,7 @@ class Simplex:
 
     def add_new_point(self, new_index1, new_index2, new_simplex_point):
         self._move_first_point_to_last_spot()
-        self._put_new_point_in_first_spot(new_index1, new_index2, new_simplex_point)
+        self.set_first_point(new_index1, new_index2, new_simplex_point)
 
     def _move_first_point_to_last_spot(self):
         self.indices_polytope1[self.n_simplex_points] = self.indices_polytope1[0]
@@ -260,14 +261,6 @@ class Simplex:
         self.dot_product_table[self.n_simplex_points, :self.n_simplex_points] = self.dot_product_table[
                                                                                 :self.n_simplex_points, 0]
         self.dot_product_table[self.n_simplex_points, self.n_simplex_points] = self.dot_product_table[0, 0]
-
-    def _put_new_point_in_first_spot(self, new_index1, new_index2, new_simplex_point):
-        self.indices_polytope1[0] = new_index1
-        self.indices_polytope2[0] = new_index2
-        self.points[0] = new_simplex_point
-        self.n_simplex_points += 1
-        self.dot_product_table[:self.n_simplex_points, 0] = np.dot(
-            self.points[:self.n_simplex_points], self.points[0])
 
     def move_vertex(self, old_index, new_index):
         if old_index == new_index:

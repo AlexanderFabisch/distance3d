@@ -93,7 +93,7 @@ def test_simplex_reorder():
 
 def test_vertex_optimal_point():
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
 
     solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
         simplex, gjk.Solution(), False)
@@ -105,7 +105,7 @@ def test_vertex_optimal_point():
 
 def test_vertex_optimal_point_backup():
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
 
     solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
         simplex, gjk.Solution(), True)
@@ -117,7 +117,7 @@ def test_vertex_optimal_point_backup():
 
 def test_line_segment_optimal_point():
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
 
     barycentric_coordinates = gjk.BarycentricCoordinates()
@@ -133,7 +133,7 @@ def test_line_segment_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
 
     barycentric_coordinates = gjk.BarycentricCoordinates()
@@ -149,7 +149,7 @@ def test_line_segment_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
 
     barycentric_coordinates = gjk.BarycentricCoordinates()
@@ -167,7 +167,7 @@ def test_line_segment_optimal_point():
 
 def test_line_segment_optimal_point_backup():
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
 
     barycentric_coordinates = gjk.BarycentricCoordinates()
@@ -183,7 +183,7 @@ def test_line_segment_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
 
     barycentric_coordinates = gjk.BarycentricCoordinates()
@@ -199,7 +199,7 @@ def test_line_segment_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
 
     barycentric_coordinates = gjk.BarycentricCoordinates()
@@ -217,7 +217,7 @@ def test_line_segment_optimal_point_backup():
 
 def test_face_optimal_point():
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 1], dtype=float))
 
@@ -237,7 +237,7 @@ def test_face_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
 
@@ -257,7 +257,7 @@ def test_face_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
 
@@ -277,7 +277,7 @@ def test_face_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
 
@@ -296,7 +296,7 @@ def test_face_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
 
@@ -315,7 +315,7 @@ def test_face_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, 0, 1], dtype=float))
 
@@ -334,7 +334,7 @@ def test_face_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 1, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
 
@@ -356,7 +356,7 @@ def test_face_optimal_point():
 
 def test_face_optimal_point_backup():
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 1], dtype=float))
 
@@ -376,7 +376,7 @@ def test_face_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
 
@@ -396,7 +396,7 @@ def test_face_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
 
@@ -416,7 +416,7 @@ def test_face_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
 
@@ -435,7 +435,7 @@ def test_face_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
 
@@ -454,7 +454,7 @@ def test_face_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, 0, 1], dtype=float))
 
@@ -473,7 +473,7 @@ def test_face_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 1, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
 
@@ -495,7 +495,7 @@ def test_face_optimal_point_backup():
 
 def test_tetrahedron_optimal_point():
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 4], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 3], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 1], dtype=float))
@@ -519,7 +519,7 @@ def test_tetrahedron_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
@@ -543,7 +543,7 @@ def test_tetrahedron_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 4], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
@@ -567,7 +567,7 @@ def test_tetrahedron_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
@@ -591,7 +591,7 @@ def test_tetrahedron_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
@@ -615,7 +615,7 @@ def test_tetrahedron_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
@@ -639,7 +639,7 @@ def test_tetrahedron_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
@@ -663,7 +663,7 @@ def test_tetrahedron_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
@@ -687,7 +687,7 @@ def test_tetrahedron_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
@@ -711,7 +711,7 @@ def test_tetrahedron_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
@@ -735,7 +735,7 @@ def test_tetrahedron_optimal_point():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, -1, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
@@ -760,7 +760,7 @@ def test_tetrahedron_optimal_point():
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, -1, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
@@ -785,7 +785,7 @@ def test_tetrahedron_optimal_point():
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
@@ -810,7 +810,7 @@ def test_tetrahedron_optimal_point():
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, -1, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 2, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 2], dtype=float))
@@ -835,7 +835,7 @@ def test_tetrahedron_optimal_point():
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, -1, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 2, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, -3], dtype=float))
@@ -862,7 +862,7 @@ def test_tetrahedron_optimal_point():
 
 def test_tetrahedron_optimal_point_backup():
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 4], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 3], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 1], dtype=float))
@@ -886,7 +886,7 @@ def test_tetrahedron_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
@@ -910,7 +910,7 @@ def test_tetrahedron_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 4], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
@@ -934,7 +934,7 @@ def test_tetrahedron_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([0, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
@@ -958,7 +958,7 @@ def test_tetrahedron_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
@@ -982,7 +982,7 @@ def test_tetrahedron_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
@@ -1006,7 +1006,7 @@ def test_tetrahedron_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
@@ -1030,7 +1030,7 @@ def test_tetrahedron_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
@@ -1054,7 +1054,7 @@ def test_tetrahedron_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([-1, 0, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
@@ -1078,7 +1078,7 @@ def test_tetrahedron_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
@@ -1102,7 +1102,7 @@ def test_tetrahedron_optimal_point_backup():
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, -1, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
@@ -1127,7 +1127,7 @@ def test_tetrahedron_optimal_point_backup():
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, -1, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
@@ -1152,7 +1152,7 @@ def test_tetrahedron_optimal_point_backup():
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, 0, 2], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
@@ -1177,7 +1177,7 @@ def test_tetrahedron_optimal_point_backup():
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, -1, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 2, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 2], dtype=float))
@@ -1202,7 +1202,7 @@ def test_tetrahedron_optimal_point_backup():
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
     simplex = gjk.Simplex()
-    simplex.initialize_with_point(np.array([1, -1, 1], dtype=float))
+    simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 2, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, -3], dtype=float))
