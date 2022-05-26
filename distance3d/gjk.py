@@ -104,7 +104,7 @@ def gjk_with_simplex(collider1, collider2):
                 else:
                     distance = new_solution.distance
 
-                return distance, closest_point1, closest_point2, simplex.simplex
+                return distance, closest_point1, closest_point2, simplex.points
             else:
                 backup = True
                 if iteration != 1:
@@ -157,7 +157,7 @@ class Solution:
 
     def from_vertex(self, simplex, vertex_idx, a):
         self.barycentric_coordinates[vertex_idx] = a
-        self.search_direction = simplex.simplex[vertex_idx]
+        self.search_direction = simplex.points[vertex_idx]
         self.distance_squared = simplex.dot_product_table[vertex_idx, vertex_idx]
 
     def from_line_segment(self, simplex, vi1, vi2, a, b, bci1=0, bci2=1):
@@ -203,7 +203,7 @@ class Simplex:
     n_simplex_points : int
         Number of current simplex points.
 
-    simplex : array, shape (n_simplex_points, 3)
+    points : array, shape (n_simplex_points, 3)
       Current simplex.
 
     dot_product_table : array, shape (n_simplex_points, n_simplex_points)
@@ -222,21 +222,21 @@ class Simplex:
     """
     def __init__(self):
         self.n_simplex_points = 0
-        self.simplex = np.empty((4, 3), dtype=float)
+        self.points = np.empty((4, 3), dtype=float)
         self.dot_product_table = np.empty((4, 4), dtype=float)
         self.indices_polytope1 = np.empty(4, dtype=int)
         self.indices_polytope2 = np.empty(4, dtype=int)
 
     def initialize_with_point(self, point):
         self.n_simplex_points = 1
-        self.simplex[0] = point
-        self.dot_product_table[0, 0] = np.dot(self.simplex[0], self.simplex[0])
+        self.points[0] = point
+        self.dot_product_table[0, 0] = np.dot(self.points[0], self.points[0])
         self.indices_polytope1[0] = 0
         self.indices_polytope2[0] = 0
 
     def copy_from(self, simplex):
         self.n_simplex_points = len(simplex)
-        self.simplex[:len(simplex)] = simplex.simplex[:len(simplex)]
+        self.points[:len(simplex)] = simplex.points[:len(simplex)]
         self.indices_polytope1[:len(simplex)] = simplex.indices_polytope1[:len(simplex)]
         self.indices_polytope2[:len(simplex)] = simplex.indices_polytope2[:len(simplex)]
         self.dot_product_table[:self.n_simplex_points, :self.n_simplex_points] = simplex.dot_product_table[
@@ -246,8 +246,8 @@ class Simplex:
         self.n_simplex_points = len(ordered_indices)
         self.indices_polytope1[:self.n_simplex_points] = self.indices_polytope1[ordered_indices]
         self.indices_polytope2[:self.n_simplex_points] = self.indices_polytope2[ordered_indices]
-        self.simplex[:self.n_simplex_points] = self.simplex[ordered_indices]
-        self.dot_product_table = self.simplex.dot(self.simplex.T)
+        self.points[:self.n_simplex_points] = self.points[ordered_indices]
+        self.dot_product_table = self.points.dot(self.points.T)
 
     def add_new_point(self, new_index1, new_index2, new_simplex_point):
         self._move_first_point_to_last_spot()
@@ -256,7 +256,7 @@ class Simplex:
     def _move_first_point_to_last_spot(self):
         self.indices_polytope1[self.n_simplex_points] = self.indices_polytope1[0]
         self.indices_polytope2[self.n_simplex_points] = self.indices_polytope2[0]
-        self.simplex[self.n_simplex_points] = self.simplex[0]
+        self.points[self.n_simplex_points] = self.points[0]
         self.dot_product_table[self.n_simplex_points, :self.n_simplex_points] = self.dot_product_table[
                                                                                 :self.n_simplex_points, 0]
         self.dot_product_table[self.n_simplex_points, self.n_simplex_points] = self.dot_product_table[0, 0]
@@ -264,29 +264,29 @@ class Simplex:
     def _put_new_point_in_first_spot(self, new_index1, new_index2, new_simplex_point):
         self.indices_polytope1[0] = new_index1
         self.indices_polytope2[0] = new_index2
-        self.simplex[0] = new_simplex_point
+        self.points[0] = new_simplex_point
         self.n_simplex_points += 1
         self.dot_product_table[:self.n_simplex_points, 0] = np.dot(
-            self.simplex[:self.n_simplex_points], self.simplex[0])
+            self.points[:self.n_simplex_points], self.points[0])
 
     def move_vertex(self, old_index, new_index):
         if old_index == new_index:
             return
         self.indices_polytope1[new_index] = self.indices_polytope1[old_index]
         self.indices_polytope2[new_index] = self.indices_polytope2[old_index]
-        self.simplex[new_index] = self.simplex[old_index]
+        self.points[new_index] = self.points[old_index]
 
     def search_direction_line(self, vi1, vi2, a):
-        return self.simplex[vi1] + a * (self.simplex[vi2] - self.simplex[vi1])
+        return self.points[vi1] + a * (self.points[vi2] - self.points[vi1])
 
     def search_direction_face(self, vi1, vi2, vi3, a, b):
         return (
-            self.simplex[vi1]
-            + a * (self.simplex[vi2] - self.simplex[vi1])
-            + b * (self.simplex[vi3] - self.simplex[vi1]))
+            self.points[vi1]
+            + a * (self.points[vi2] - self.points[vi1])
+            + b * (self.points[vi3] - self.points[vi1]))
 
     def search_direction_tetrahedron(self, barycentric_coordinates):
-        return barycentric_coordinates.dot(self.simplex)
+        return barycentric_coordinates.dot(self.points)
 
     def select_vertex(self, vertex_index):
         self.n_simplex_points = 1

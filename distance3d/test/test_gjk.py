@@ -8,8 +8,8 @@ def test_select_line_segment():
     simplex = gjk.Simplex()
     simplex.n_simplex_points = 4
     random_state = np.random.RandomState(23)
-    simplex.simplex[:, :] = random_state.randn(*simplex.simplex.shape)
-    simplex.dot_product_table = simplex.simplex.dot(simplex.simplex.T)
+    simplex.points[:, :] = random_state.randn(*simplex.points.shape)
+    simplex.dot_product_table = simplex.points.dot(simplex.points.T)
     simplex.indices_polytope1 = np.arange(4, dtype=int)
     simplex.indices_polytope2 = np.arange(4, dtype=int)
     for i in range(1, 4):
@@ -34,8 +34,8 @@ def test_select_face():
     simplex = gjk.Simplex()
     simplex.n_simplex_points = 4
     random_state = np.random.RandomState(24)
-    simplex.simplex[:, :] = random_state.randn(*simplex.simplex.shape)
-    simplex.dot_product_table = simplex.simplex.dot(simplex.simplex.T)
+    simplex.points[:, :] = random_state.randn(*simplex.points.shape)
+    simplex.dot_product_table = simplex.points.dot(simplex.points.T)
     simplex.indices_polytope1 = np.arange(4, dtype=int)
     simplex.indices_polytope2 = np.arange(4, dtype=int)
     for i in range(1, 4):
@@ -61,15 +61,15 @@ def assert_dot_product_table(simplex):
     for i in range(simplex.n_simplex_points):
         for j in range(i + 1):
             assert approx(simplex.dot_product_table[i, j]) == np.dot(
-                simplex.simplex[i], simplex.simplex[j])
+                simplex.points[i], simplex.points[j])
 
 
 def test_simplex_reorder():
     simplex = gjk.Simplex()
     simplex.n_simplex_points = 4
     random_state = np.random.RandomState(24)
-    simplex.simplex[:, :] = random_state.randn(*simplex.simplex.shape)
-    simplex.dot_product_table = simplex.simplex.dot(simplex.simplex.T)
+    simplex.points[:, :] = random_state.randn(*simplex.points.shape)
+    simplex.dot_product_table = simplex.points.dot(simplex.points.T)
     simplex.indices_polytope1 = np.arange(4, dtype=int)
     simplex.indices_polytope2 = np.arange(4, dtype=int)
     for i in range(1, 4):
@@ -226,7 +226,7 @@ def test_face_optimal_point():
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
-    assert_array_almost_equal(simplex.simplex[0], [0, 0, 1])
+    assert_array_almost_equal(simplex.points[0], [0, 0, 1])
     assert barycentric_coordinates.vertex_0_of_face_optimal()
 
     solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
@@ -246,7 +246,7 @@ def test_face_optimal_point():
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
-    assert_array_almost_equal(simplex.simplex[1], [0, 0, 1])
+    assert_array_almost_equal(simplex.points[1], [0, 0, 1])
     assert barycentric_coordinates.vertex_1_of_face_optimal()
 
     solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
@@ -266,7 +266,7 @@ def test_face_optimal_point():
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
-    assert_array_almost_equal(simplex.simplex[2], [0, 0, 1])
+    assert_array_almost_equal(simplex.points[2], [0, 0, 1])
     assert barycentric_coordinates.vertex_2_of_face_optimal()
 
     solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
@@ -365,7 +365,7 @@ def test_face_optimal_point_backup():
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
-    assert_array_almost_equal(simplex.simplex[0], [0, 0, 1])
+    assert_array_almost_equal(simplex.points[0], [0, 0, 1])
     assert barycentric_coordinates.vertex_0_of_face_optimal()
 
     solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
@@ -385,7 +385,7 @@ def test_face_optimal_point_backup():
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
-    assert_array_almost_equal(simplex.simplex[1], [0, 0, 1])
+    assert_array_almost_equal(simplex.points[1], [0, 0, 1])
     assert barycentric_coordinates.vertex_1_of_face_optimal()
 
     solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
@@ -405,7 +405,7 @@ def test_face_optimal_point_backup():
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
-    assert_array_almost_equal(simplex.simplex[2], [0, 0, 1])
+    assert_array_almost_equal(simplex.points[2], [0, 0, 1])
     assert barycentric_coordinates.vertex_2_of_face_optimal()
 
     solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
