@@ -372,7 +372,7 @@ def distance_subalgorithm_with_backup_procedure(simplex, solution, backup=False)
         except np.linalg.LinAlgError:
             pass
 
-    return backup_procedure(simplex, solution, d, backup)
+    return backup_procedure(simplex, solution, d, backup), True
 
 
 class BarycentricCoordinates:
@@ -775,7 +775,7 @@ def backup_procedure(simplex, solution, d, backup=True):
     """
     if len(simplex) == 1:
         solution.from_vertex(simplex, 0)
-        return solution, True
+        return solution
     elif len(simplex) == 2:
         ordered_indices = _backup_procedure_line_segment(
             simplex, backup, d, solution)
@@ -788,7 +788,7 @@ def backup_procedure(simplex, solution, d, backup=True):
             simplex, backup, d, solution)
 
     simplex.reorder(ordered_indices)
-    return solution, True
+    return solution
 
 
 def _backup_procedure_line_segment(simplex, backup, d, solution):
