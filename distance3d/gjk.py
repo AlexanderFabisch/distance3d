@@ -254,7 +254,7 @@ class Simplex:
                                                                                 :self.n_simplex_points, 0]
         self.dot_product_table[self.n_simplex_points, self.n_simplex_points] = self.dot_product_table[0, 0]
 
-    def move_vertex(self, old_index, new_index):
+    def _move_vertex(self, old_index, new_index):
         if old_index == new_index:
             return
         self.indices_polytope1[new_index] = self.indices_polytope1[old_index]
@@ -263,18 +263,18 @@ class Simplex:
 
     def select_vertex(self, i):
         self.n_simplex_points = 1
-        self.move_vertex(i, 0)
+        self._move_vertex(i, 0)
         self.dot_product_table[0, 0] = self.dot_product_table[i, i]
 
     def select_line_segment(self, i, j):
         self.n_simplex_points = 2
         if i != 0:
-            self.move_vertex(i, 0)
+            self._move_vertex(i, 0)
             self.dot_product_table[0, 0] = self.dot_product_table[i, i]
             idx1, idx2 = (j, i) if i < j else (i, j)
             self.dot_product_table[1, 0] = self.dot_product_table[idx1, idx2]
         if j != 1:
-            self.move_vertex(j, 1)
+            self._move_vertex(j, 1)
             idx1, idx2 = (j, i) if i < j else (i, j)
             self.dot_product_table[1, 0] = self.dot_product_table[idx1, idx2]
             self.dot_product_table[1, 1] = self.dot_product_table[j, j]
@@ -282,21 +282,21 @@ class Simplex:
     def select_face(self, i, j, k):
         self.n_simplex_points = 3
         if i != 0:
-            self.move_vertex(i, 0)
+            self._move_vertex(i, 0)
             self.dot_product_table[0, 0] = self.dot_product_table[i, i]
             idx1, idx2 = (j, i) if i < j else (i, j)
             self.dot_product_table[1, 0] = self.dot_product_table[idx1, idx2]
             idx1, idx2 = (k, i) if i < k else (i, k)
             self.dot_product_table[2, 0] = self.dot_product_table[idx1, idx2]
         if j != 1:
-            self.move_vertex(j, 1)
+            self._move_vertex(j, 1)
             idx1, idx2 = (j, i) if i < j else (i, j)
             self.dot_product_table[1, 0] = self.dot_product_table[idx1, idx2]
             self.dot_product_table[1, 1] = self.dot_product_table[j, j]
             idx1, idx2 = (j, k) if k < j else (k, j)
             self.dot_product_table[2, 1] = self.dot_product_table[idx1, idx2]
         if k != 2:
-            self.move_vertex(k, 2)
+            self._move_vertex(k, 2)
             idx1, idx2 = (i, k) if k < i else (k, i)
             self.dot_product_table[2, 0] = self.dot_product_table[idx1, idx2]
             idx1, idx2 = (j, k) if k < j else (k, j)
