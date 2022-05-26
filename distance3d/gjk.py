@@ -155,10 +155,10 @@ class Solution:
     def distance(self):
         return math.sqrt(self.distance_squared)
 
-    def from_vertex(self, simplex, vertex_idx, a):
-        self.barycentric_coordinates[vertex_idx] = a
-        self.search_direction = simplex.points[vertex_idx]
-        self.distance_squared = simplex.dot_product_table[vertex_idx, vertex_idx]
+    def from_vertex(self, simplex, vi):
+        self.barycentric_coordinates[0] = 1.0
+        self.search_direction = simplex.points[vi]
+        self.distance_squared = simplex.dot_product_table[vi, vi]
 
     def from_line_segment(self, simplex, vi, a, b):
         coords_sum = a + b
@@ -627,7 +627,7 @@ def distance_subalgorithm(simplex, d):
     """Johnson's distance subalgorithm."""
     if len(simplex) == 1:
         solution = Solution()
-        solution.from_vertex(simplex, 0, d.d[0, 0])
+        solution.from_vertex(simplex, 0)
         return solution
     elif len(simplex) == 2:
         return _distance_subalgorithm_line_segment(simplex, d)
@@ -643,7 +643,7 @@ def _distance_subalgorithm_line_segment(simplex, d):
     d.line_segment_coordinates_0(simplex)
     if d.vertex_0_of_line_segment_optimal():
         simplex.select_vertex(0)
-        solution.from_vertex(simplex, 0, d.d[0, 0])
+        solution.from_vertex(simplex, 0)
         return solution
     d.line_segment_coordinates_1(simplex)
     if d.line_segment_01_of_line_segment_optimal():
@@ -652,7 +652,7 @@ def _distance_subalgorithm_line_segment(simplex, d):
     else:
         assert d.vertex_1_of_line_segment_optimal()
         simplex.select_vertex(1)
-        solution.from_vertex(simplex, 0, d.d[1, 1])
+        solution.from_vertex(simplex, 0)
         return solution
 
 
@@ -661,7 +661,7 @@ def _distance_subalgorithm_face(simplex, d):
     d.face_coordinates_0(simplex)
     if d.vertex_0_of_face_optimal():
         simplex.select_vertex(0)
-        solution.from_vertex(simplex, 0, d.d[0, 0])
+        solution.from_vertex(simplex, 0)
         return solution
     d.face_coordinates_1(simplex)
     if d.line_segment_01_of_face_optimal():
@@ -679,11 +679,11 @@ def _distance_subalgorithm_face(simplex, d):
         return solution
     if d.vertex_1_of_face_optimal():
         simplex.select_vertex(1)
-        solution.from_vertex(simplex, 0, d.d[1, 1])
+        solution.from_vertex(simplex, 0)
         return solution
     if d.vertex_2_of_face_optimal():
         simplex.select_vertex(2)
-        solution.from_vertex(simplex, 0, d.d[2, 3])
+        solution.from_vertex(simplex, 0)
         return solution
     if d.line_segment_12_of_face_optimal():
         simplex.select_line_segment(2, 1)
@@ -697,7 +697,7 @@ def _distance_subalgorithm_tetrahedron(simplex, d):
     d.tetrahedron_coordinates_0(simplex)
     if d.vertex_0_of_tetrahedron_optimal():
         simplex.select_vertex(0)
-        solution.from_vertex(simplex, 0, d.d[0, 0])
+        solution.from_vertex(simplex, 0)
         return solution
     e132, e142 = d.tetrahedron_coordinates_1(simplex)
     if d.line_segment_01_of_tetrahedron_optimal():
@@ -735,15 +735,15 @@ def _distance_subalgorithm_tetrahedron(simplex, d):
         return solution
     if d.vertex_1_of_tetrahedron_optimal():
         simplex.select_vertex(1)
-        solution.from_vertex(simplex, 0, d.d[1, 1])
+        solution.from_vertex(simplex, 0)
         return solution
     if d.vertex_2_of_tetrahedron_optimal():
         simplex.select_vertex(2)
-        solution.from_vertex(simplex, 0, d.d[2, 3])
+        solution.from_vertex(simplex, 0)
         return solution
     if d.vertex_3_of_tetrahedron_optimal():
         simplex.select_vertex(3)
-        solution.from_vertex(simplex, 0, d.d[3, 7])
+        solution.from_vertex(simplex, 0)
         return solution
     if d.line_segment_12_of_tetrahedron_optimal():
         simplex.select_line_segment(2, 1)
@@ -773,7 +773,7 @@ def backup_procedure(simplex, solution, d, backup=True):
     expensive.
     """
     if len(simplex) == 1:
-        solution.from_vertex(simplex, 0, d.d[0, 0])
+        solution.from_vertex(simplex, 0)
         return solution, True
     elif len(simplex) == 2:
         ordered_indices = _backup_procedure_line_segment(
@@ -795,7 +795,7 @@ def _backup_procedure_line_segment(simplex, backup, d, solution):
         d.backup_line_segments(simplex)
     ordered_indices = np.empty(2, dtype=int)
     # check vertex 1
-    solution.from_vertex(simplex, 0, d.d[0, 0])
+    solution.from_vertex(simplex, 0)
     n_simplex_points = 1
     ordered_indices[0] = 0
     if d.line_segment_01_of_line_segment_optimal():
@@ -808,7 +808,7 @@ def _backup_procedure_line_segment(simplex, backup, d, solution):
     check_vertex_2 = simplex.dot_product_table[1, 1] < solution.distance_squared
     if check_vertex_2:
         n_simplex_points = 1
-        solution.from_vertex(simplex, 1, d.d[1, 1])
+        solution.from_vertex(simplex, 1)
         ordered_indices[0] = 1
     return ordered_indices[:n_simplex_points]
 
@@ -819,7 +819,7 @@ def _backup_procedure_face(simplex, backup, d, solution):
     ordered_indices = np.empty(3, dtype=int)
     # check vertex 1
     n_simplex_points = 1
-    solution.from_vertex(simplex, 0, d.d[0, 0])
+    solution.from_vertex(simplex, 0)
     ordered_indices[0] = 0
     solution_d = Solution()
     if d.line_segment_01_of_line_segment_optimal():
@@ -843,12 +843,12 @@ def _backup_procedure_face(simplex, backup, d, solution):
     check_vertex_2 = simplex.dot_product_table[1, 1] < solution.distance_squared
     if check_vertex_2:
         n_simplex_points = 1
-        solution.from_vertex(simplex, 1, d.d[1, 1])
+        solution.from_vertex(simplex, 1)
         ordered_indices[0] = 1
     check_vertex_3 = simplex.dot_product_table[2, 2] < solution.distance_squared
     if check_vertex_3:
         n_simplex_points = 1
-        solution.from_vertex(simplex, 2, d.d[2, 3])
+        solution.from_vertex(simplex, 2)
         ordered_indices[0] = 2
     if d.check_line_segment_12_of_face():
         solution_d.from_line_segment(simplex, [1, 2], d.d[2, 5], d.d[1, 5])
@@ -865,7 +865,7 @@ def _backup_procedure_tetrahedron(simplex, backup, d, solution):
     ordered_indices = np.empty(4, dtype=int)
     # check vertex 1
     n_simplex_points = 1
-    solution.from_vertex(simplex, 0, d.d[0, 0])
+    solution.from_vertex(simplex, 0)
     ordered_indices[0] = 0
     solution_d = Solution()
     if d.line_segment_01_of_line_segment_optimal():
@@ -913,17 +913,17 @@ def _backup_procedure_tetrahedron(simplex, backup, d, solution):
     check_vertex_2 = simplex.dot_product_table[1, 1] < solution.distance_squared
     if check_vertex_2:
         n_simplex_points = 1
-        solution.from_vertex(simplex, 1, d.d[1, 1])
+        solution.from_vertex(simplex, 1)
         ordered_indices[0] = 1
     check_vertex_3 = simplex.dot_product_table[2, 2] < solution.distance_squared
     if check_vertex_3:
         n_simplex_points = 1
-        solution.from_vertex(simplex, 2, d.d[2, 3])
+        solution.from_vertex(simplex, 2)
         ordered_indices[0] = 2
     check_vertex_4 = simplex.dot_product_table[3, 3] < solution.distance_squared
     if check_vertex_4:
         n_simplex_points = 1
-        solution.from_vertex(simplex, 3, d.d[3, 7])
+        solution.from_vertex(simplex, 3)
         ordered_indices[0] = 3
     if d.check_line_segment_12_of_face():
         solution_d.from_line_segment(simplex, [2, 1], d.d[2, 5], d.d[1, 5])
