@@ -164,8 +164,7 @@ class Solution:
         coords_sum = a + b
         self.barycentric_coordinates[bci1] = a / coords_sum
         self.barycentric_coordinates[bci2] = 1.0 - self.barycentric_coordinates[bci1]
-        self.search_direction = simplex.search_direction_line(
-            vi1, vi2, self.barycentric_coordinates[bci1])
+        self.search_direction = simplex.points[vi1] + self.barycentric_coordinates[bci1] * (simplex.points[vi2] - simplex.points[vi1])
         self.distance_squared = np.dot(self.search_direction, self.search_direction)
 
     def from_face(self, simplex, vi1, vi2, vi3, a, b, c, bci1=0, bci2=1, bci3=2):
@@ -173,9 +172,10 @@ class Solution:
         self.barycentric_coordinates[bci1] = a / coords_sum
         self.barycentric_coordinates[bci2] = b / coords_sum
         self.barycentric_coordinates[bci3] = c / coords_sum
-        self.search_direction = simplex.search_direction_face(
-            vi1, vi2, vi3, self.barycentric_coordinates[bci1],
-            self.barycentric_coordinates[bci2])
+        self.search_direction = (
+            simplex.points[vi1]
+            + self.barycentric_coordinates[bci1] * (simplex.points[vi2] - simplex.points[vi1])
+            + self.barycentric_coordinates[bci2] * (simplex.points[vi3] - simplex.points[vi1]))
         self.distance_squared = np.dot(self.search_direction, self.search_direction)
 
     def from_tetrahedron(self, simplex, a, b, c, d):
@@ -184,8 +184,7 @@ class Solution:
         self.barycentric_coordinates[2] = c
         self.barycentric_coordinates[3] = d
         self.barycentric_coordinates /= a + b + c + d
-        self.search_direction = simplex.search_direction_tetrahedron(
-            self.barycentric_coordinates)
+        self.search_direction = self.barycentric_coordinates.dot(simplex.points)
         self.distance_squared = np.dot(self.search_direction, self.search_direction)
 
     def copy_from(self, solution, n_simplex_points):
@@ -268,18 +267,6 @@ class Simplex:
         self.indices_polytope1[new_index] = self.indices_polytope1[old_index]
         self.indices_polytope2[new_index] = self.indices_polytope2[old_index]
         self.points[new_index] = self.points[old_index]
-
-    def search_direction_line(self, vi1, vi2, a):
-        return self.points[vi1] + a * (self.points[vi2] - self.points[vi1])
-
-    def search_direction_face(self, vi1, vi2, vi3, a, b):
-        return (
-            self.points[vi1]
-            + a * (self.points[vi2] - self.points[vi1])
-            + b * (self.points[vi3] - self.points[vi1]))
-
-    def search_direction_tetrahedron(self, barycentric_coordinates):
-        return barycentric_coordinates.dot(self.points)
 
     def select_vertex(self, i):
         self.n_simplex_points = 1
