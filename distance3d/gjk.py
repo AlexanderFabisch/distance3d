@@ -83,7 +83,7 @@ def gjk_with_simplex(collider1, collider2):
     while True:
         iteration += 1
 
-        new_solution, backup = distance_subalgorithm(simplex, solution, backup)
+        new_solution, backup = distance_subalgorithm_with_backup_procedure(simplex, solution, backup)
 
         if new_solution.dstsq >= solution.dstsq or len(simplex) == 4:
             if backup:
@@ -352,7 +352,7 @@ class Simplex:
         return self.n_simplex_points
 
 
-def distance_subalgorithm(simplex, solution, backup):
+def distance_subalgorithm_with_backup_procedure(simplex, solution, backup):
     """Johnson's distance subalgorithm.
 
     Implements, in a very efficient way, the distance subalgorithm of finding
@@ -391,11 +391,11 @@ def distance_subalgorithm(simplex, solution, backup):
     d = BarycentricCoordinates()
 
     if not backup:
-        new_solution = _regular_distance_subalgorithm(simplex, d)
+        new_solution = distance_subalgorithm(simplex, d)
         if new_solution is not None:
             return new_solution, backup
 
-    return _backup_procedure(simplex, solution, d, backup)
+    return backup_procedure(simplex, solution, d, backup)
 
 
 class BarycentricCoordinates:
@@ -647,7 +647,8 @@ class BarycentricCoordinates:
         return not (self.d[1, 13] <= 0.0 or self.d[2, 13] <= 0.0 or self.d[3, 13] <= 0.0)
 
 
-def _regular_distance_subalgorithm(simplex, d):
+def distance_subalgorithm(simplex, d):
+    """Johnson's distance subalgorithm."""
     if len(simplex) == 1:
         solution = Solution()
         solution.from_vertex(simplex, 0, d.d[0, 0])
@@ -787,7 +788,7 @@ def _distance_subalgorithm_tetrahedron(simplex, d):
     return None
 
 
-def _backup_procedure(simplex, solution, d, backup):
+def backup_procedure(simplex, solution, d, backup):
     """Backup procedure.
 
     Johnson's distance subalgorithm is affected by rounding errors in floating
