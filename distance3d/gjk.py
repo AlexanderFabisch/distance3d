@@ -83,9 +83,11 @@ def gjk_with_simplex(collider1, collider2):
     while True:
         iteration += 1
 
-        new_solution, backup = distance_subalgorithm_with_backup_procedure(simplex, solution, backup)
+        new_solution, backup = distance_subalgorithm_with_backup_procedure(
+            simplex, solution, backup)
 
-        if new_solution.dstsq >= solution.dstsq or len(simplex) == 4:
+        converged = new_solution.dstsq >= solution.dstsq or len(simplex) == 4
+        if converged:
             if backup:
                 closest_point1 = collider1.compute_point(
                     solution.barycentric_coordinates[:len(simplex)],
@@ -100,7 +102,7 @@ def gjk_with_simplex(collider1, collider2):
                     closest_point2[:] = closest_point1
                     distance = 0.0
                 else:
-                    distance = math.sqrt(new_solution.dstsq)
+                    distance = new_solution.distance
 
                 return distance, closest_point1, closest_point2, simplex.simplex
             else:
@@ -147,6 +149,10 @@ class Solution:
         self.barycentric_coordinates = np.zeros(4, dtype=float)
         self.search_direction = np.zeros(3, dtype=float)
         self.dstsq = np.inf
+
+    @property
+    def distance(self):
+        return math.sqrt(self.dstsq)
 
     def initialize(self, simplex):
         self.barycentric_coordinates[0] = 1.0
