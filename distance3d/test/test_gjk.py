@@ -99,7 +99,7 @@ def test_vertex_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
 
@@ -111,7 +111,7 @@ def test_vertex_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
 
@@ -129,7 +129,7 @@ def test_line_segment_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -145,7 +145,7 @@ def test_line_segment_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -161,7 +161,7 @@ def test_line_segment_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
 
@@ -179,7 +179,7 @@ def test_line_segment_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -195,7 +195,7 @@ def test_line_segment_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -211,7 +211,7 @@ def test_line_segment_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
 
@@ -233,7 +233,7 @@ def test_face_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -253,7 +253,7 @@ def test_face_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -273,7 +273,7 @@ def test_face_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -292,7 +292,7 @@ def test_face_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -311,7 +311,7 @@ def test_face_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -330,7 +330,7 @@ def test_face_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -349,7 +349,7 @@ def test_face_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [0.25, 0.5, 0.25])
 
@@ -372,7 +372,7 @@ def test_face_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -392,7 +392,7 @@ def test_face_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -412,7 +412,7 @@ def test_face_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -431,7 +431,7 @@ def test_face_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -450,7 +450,7 @@ def test_face_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -469,7 +469,7 @@ def test_face_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -488,7 +488,7 @@ def test_face_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [0.25, 0.5, 0.25])
 
@@ -515,7 +515,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -539,7 +539,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -563,7 +563,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -587,7 +587,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -611,7 +611,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -635,7 +635,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -659,7 +659,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -683,7 +683,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -707,7 +707,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -731,7 +731,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -755,7 +755,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
@@ -780,7 +780,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
@@ -805,7 +805,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
@@ -830,7 +830,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
@@ -855,7 +855,7 @@ def test_tetrahedron_optimal_point():
         simplex, gjk.Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 0])
-    assert approx(solution.dstsq) == 0
+    assert approx(solution.distance_squared) == 0
     assert_array_almost_equal(
         solution.barycentric_coordinates, np.ones(4) / 4.0)
 
@@ -882,7 +882,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -906,7 +906,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -930,7 +930,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -954,7 +954,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
     simplex = gjk.Simplex()
@@ -978,7 +978,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -1002,7 +1002,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -1026,7 +1026,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -1050,7 +1050,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -1074,7 +1074,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -1098,7 +1098,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
     simplex = gjk.Simplex()
@@ -1122,7 +1122,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
@@ -1147,7 +1147,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
@@ -1172,7 +1172,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
@@ -1197,7 +1197,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
-    assert approx(solution.dstsq) == 1
+    assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
@@ -1222,7 +1222,7 @@ def test_tetrahedron_optimal_point_backup():
         simplex, gjk.Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 0])
-    assert approx(solution.dstsq) == 0
+    assert approx(solution.distance_squared) == 0
     assert_array_almost_equal(
         solution.barycentric_coordinates, np.ones(4) / 4.0)
 
