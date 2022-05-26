@@ -164,9 +164,7 @@ class Solution:
         coords_sum = a + b
         self.barycentric_coordinates[0] = a / coords_sum
         self.barycentric_coordinates[1] = 1.0 - self.barycentric_coordinates[0]
-        self.search_direction = (
-            self.barycentric_coordinates[0] * simplex.points[vi0]
-            + self.barycentric_coordinates[1] * simplex.points[vi1])
+        self.search_direction = self.barycentric_coordinates[:2].dot(simplex.points[[vi0, vi1]])
         self.distance_squared = np.dot(self.search_direction, self.search_direction)
 
     def from_face(self, simplex, vi0, vi1, vi2, a, b, c):
@@ -174,10 +172,7 @@ class Solution:
         self.barycentric_coordinates[0] = a / coords_sum
         self.barycentric_coordinates[1] = b / coords_sum
         self.barycentric_coordinates[2] = c / coords_sum
-        self.search_direction = (
-            self.barycentric_coordinates[0] * simplex.points[vi0]
-            + self.barycentric_coordinates[1] * simplex.points[vi1]
-            + self.barycentric_coordinates[2] * simplex.points[vi2])
+        self.search_direction = self.barycentric_coordinates[:3].dot(simplex.points[[vi0, vi1, vi2]])
         self.distance_squared = np.dot(self.search_direction, self.search_direction)
 
     def from_tetrahedron(self, simplex, a, b, c, d):
