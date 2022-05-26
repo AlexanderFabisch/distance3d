@@ -160,22 +160,24 @@ class Solution:
         self.search_direction = simplex.points[vertex_idx]
         self.distance_squared = simplex.dot_product_table[vertex_idx, vertex_idx]
 
-    def from_line_segment(self, simplex, vi1, vi2, a, b, bci1=0, bci2=1):
+    def from_line_segment(self, simplex, vi0, vi1, a, b, bci0=0, bci1=1):
         coords_sum = a + b
-        self.barycentric_coordinates[bci1] = a / coords_sum
-        self.barycentric_coordinates[bci2] = 1.0 - self.barycentric_coordinates[bci1]
-        self.search_direction = simplex.points[vi1] + self.barycentric_coordinates[bci1] * (simplex.points[vi2] - simplex.points[vi1])
+        self.barycentric_coordinates[bci0] = a / coords_sum
+        self.barycentric_coordinates[bci1] = 1.0 - self.barycentric_coordinates[bci0]
+        self.search_direction = (
+            self.barycentric_coordinates[bci0] * simplex.points[vi0]
+            + self.barycentric_coordinates[bci1] * simplex.points[vi1])
         self.distance_squared = np.dot(self.search_direction, self.search_direction)
 
-    def from_face(self, simplex, vi1, vi2, vi3, a, b, c, bci1=0, bci2=1, bci3=2):
+    def from_face(self, simplex, vi0, vi1, vi2, a, b, c, bci0=0, bci1=1, bci2=2):
         coords_sum = a + b + c
-        self.barycentric_coordinates[bci1] = a / coords_sum
-        self.barycentric_coordinates[bci2] = b / coords_sum
-        self.barycentric_coordinates[bci3] = c / coords_sum
+        self.barycentric_coordinates[bci0] = a / coords_sum
+        self.barycentric_coordinates[bci1] = b / coords_sum
+        self.barycentric_coordinates[bci2] = c / coords_sum
         self.search_direction = (
-            simplex.points[vi1]
-            + self.barycentric_coordinates[bci1] * (simplex.points[vi2] - simplex.points[vi1])
-            + self.barycentric_coordinates[bci2] * (simplex.points[vi3] - simplex.points[vi1]))
+            self.barycentric_coordinates[bci0] * simplex.points[vi0]
+            + self.barycentric_coordinates[bci1] * simplex.points[vi1]
+            + self.barycentric_coordinates[bci2] * simplex.points[vi2])
         self.distance_squared = np.dot(self.search_direction, self.search_direction)
 
     def from_tetrahedron(self, simplex, a, b, c, d):
@@ -654,7 +656,7 @@ def _distance_subalgorithm_line_segment(simplex, d):
         return solution
     d.line_segment_coordinates_1(simplex)
     if d.line_segment_01_of_line_segment_optimal():
-        solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
+        solution.from_line_segment(simplex, 0, 1, d.d[0, 2], d.d[1, 2])
         return solution
     else:
         assert d.vertex_1_of_line_segment_optimal()
@@ -673,16 +675,16 @@ def _distance_subalgorithm_face(simplex, d):
     d.face_coordinates_1(simplex)
     if d.line_segment_01_of_face_optimal():
         simplex.select_line_segment(0, 1)
-        solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
+        solution.from_line_segment(simplex, 0, 1, d.d[0, 2], d.d[1, 2])
         return solution
     e123 = d.face_coordinates_2(simplex)
     if d.line_segment_02_of_face_optimal():
         simplex.select_line_segment(0, 2)
-        solution.from_line_segment(simplex, 1, 0, d.d[0, 4], d.d[2, 4])
+        solution.from_line_segment(simplex, 0, 1, d.d[0, 4], d.d[2, 4])
         return solution
     d.face_coordinates_3(simplex, e123)
     if d.face_012_of_face_optimal():
-        solution.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
+        solution.from_face(simplex, 0, 1, 2, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         return solution
     if d.vertex_1_of_face_optimal():
         simplex.select_vertex(1)
@@ -694,7 +696,7 @@ def _distance_subalgorithm_face(simplex, d):
         return solution
     if d.line_segment_12_of_face_optimal():
         simplex.select_line_segment(2, 1)
-        solution.from_line_segment(simplex, 0, 1, d.d[1, 5], d.d[2, 5])
+        solution.from_line_segment(simplex, 1, 0, d.d[1, 5], d.d[2, 5])
         return solution
     return None
 
@@ -709,32 +711,32 @@ def _distance_subalgorithm_tetrahedron(simplex, d):
     e132, e142 = d.tetrahedron_coordinates_1(simplex)
     if d.line_segment_01_of_tetrahedron_optimal():
         simplex.select_line_segment(0, 1)
-        solution.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
+        solution.from_line_segment(simplex, 0, 1, d.d[0, 2], d.d[1, 2])
         return solution
     e123, e143 = d.tetrahedron_coordinates_2(simplex)
     if d.line_segment_02_of_tetrahedron_optimal():
         simplex.select_line_segment(0, 2)
-        solution.from_line_segment(simplex, 1, 0, d.d[0, 4], d.d[2, 4])
+        solution.from_line_segment(simplex, 0, 1, d.d[0, 4], d.d[2, 4])
         return solution
     e213 = d.tetrahedron_coordinates_3(simplex, e123, e142, e143)
     if d.face_012_of_tetrahedron_optimal():
         simplex.select_face(0, 1, 2)
-        solution.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
+        solution.from_face(simplex, 0, 1, 2, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         return solution
     e124, e134 = d.tetrahedron_coordinates_4(simplex)
     if d.line_segment_03_of_tetrahedron_optimal():
         simplex.select_line_segment(0, 3)
-        solution.from_line_segment(simplex, 1, 0, d.d[0, 8], d.d[3, 8])
+        solution.from_line_segment(simplex, 0, 1, d.d[0, 8], d.d[3, 8])
         return solution
     e214 = d.tetrahedron_coordinates_5(simplex, e124, e132, e134)
     if d.face_013_of_tetrahedron_optimal():
         simplex.select_face(0, 1, 3)
-        solution.from_face(simplex, 2, 0, 1, d.d[0, 11], d.d[1, 11], d.d[3, 11])
+        solution.from_face(simplex, 0, 1, 2, d.d[0, 11], d.d[1, 11], d.d[3, 11])
         return solution
     d.tetrahedron_coordinates_6(simplex, e123, e124, e134)
     if d.face_023_of_tetrahedron_optimal():
         simplex.select_face(0, 3, 2)
-        solution.from_face(simplex, 1, 0, 2, d.d[0, 12], d.d[2, 12], d.d[3, 12], 0, 2, 1)
+        solution.from_face(simplex, 0, 2, 1, d.d[0, 12], d.d[2, 12], d.d[3, 12], 0, 2, 1)
         return solution
     d.tetrahedron_coordinates_7(simplex, e213, e214)
     if d.convex_hull_of_tetrahedron_optimal():
@@ -754,19 +756,19 @@ def _distance_subalgorithm_tetrahedron(simplex, d):
         return solution
     if d.line_segment_12_of_tetrahedron_optimal():
         simplex.select_line_segment(2, 1)
-        solution.from_line_segment(simplex, 0, 1, d.d[1, 5], d.d[2, 5])
+        solution.from_line_segment(simplex, 1, 0, d.d[1, 5], d.d[2, 5])
         return solution
     if d.line_segment_13_of_tetrahedron_optimal():
         simplex.select_line_segment(3, 1)
-        solution.from_line_segment(simplex, 0, 1, d.d[1, 9], d.d[3, 9], 1, 0)
+        solution.from_line_segment(simplex, 1, 0, d.d[1, 9], d.d[3, 9], 1, 0)
         return solution
     if d.line_segment_23_of_tetrahedron_optimal():
         simplex.select_line_segment(2, 3)
-        solution.from_line_segment(simplex, 1, 0, d.d[2, 10], d.d[3, 10])
+        solution.from_line_segment(simplex, 0, 1, d.d[2, 10], d.d[3, 10])
         return solution
     if d.face_123_of_tetrahedron_optimal():
         simplex.select_face(3, 1, 2)
-        solution.from_face(simplex, 0, 1, 2, d.d[1, 13], d.d[2, 13], d.d[3, 13], 1, 2, 0)
+        solution.from_face(simplex, 1, 2, 0, d.d[1, 13], d.d[2, 13], d.d[3, 13], 1, 2, 0)
         return solution
     return None
 
@@ -807,7 +809,7 @@ def _backup_procedure_line_segment(simplex, backup, d, solution):
     ordered_indices[0] = 0
     if d.line_segment_01_of_line_segment_optimal():
         solution_d = Solution()
-        solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
+        solution_d.from_line_segment(simplex, 0, 1, d.d[0, 2], d.d[1, 2])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
@@ -830,19 +832,19 @@ def _backup_procedure_face(simplex, backup, d, solution):
     ordered_indices[0] = 0
     solution_d = Solution()
     if d.line_segment_01_of_line_segment_optimal():
-        solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
+        solution_d.from_line_segment(simplex, 0, 1, d.d[0, 2], d.d[1, 2])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 0, 1
     if d.check_line_segment_02_of_face():
-        solution_d.from_line_segment(simplex, 2, 0, d.d[0, 4], d.d[2, 4])
+        solution_d.from_line_segment(simplex, 0, 2, d.d[0, 4], d.d[2, 4])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 0, 2
     if d.check_face_012_of_face():
-        solution_d.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
+        solution_d.from_face(simplex, 0, 1, 2, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 3
             solution.copy_from(solution_d, n_simplex_points)
@@ -858,7 +860,7 @@ def _backup_procedure_face(simplex, backup, d, solution):
         solution.from_vertex(simplex, 2, d.d[2, 3])
         ordered_indices[0] = 2
     if d.check_line_segment_12_of_face():
-        solution_d.from_line_segment(simplex, 2, 1, d.d[1, 5], d.d[2, 5], 1, 0)
+        solution_d.from_line_segment(simplex, 1, 2, d.d[1, 5], d.d[2, 5], 1, 0)
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
@@ -876,37 +878,37 @@ def _backup_procedure_tetrahedron(simplex, backup, d, solution):
     ordered_indices[0] = 0
     solution_d = Solution()
     if d.line_segment_01_of_line_segment_optimal():
-        solution_d.from_line_segment(simplex, 1, 0, d.d[0, 2], d.d[1, 2])
+        solution_d.from_line_segment(simplex, 0, 1, d.d[0, 2], d.d[1, 2])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 0, 1
     if d.check_line_segment_02_of_face():
-        solution_d.from_line_segment(simplex, 2, 0, d.d[0, 4], d.d[2, 4])
+        solution_d.from_line_segment(simplex, 0, 2, d.d[0, 4], d.d[2, 4])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 0, 2
     if d.check_face_012_of_face():
-        solution_d.from_face(simplex, 2, 0, 1, d.d[0, 6], d.d[1, 6], d.d[2, 6])
+        solution_d.from_face(simplex, 0, 1, 2, d.d[0, 6], d.d[1, 6], d.d[2, 6])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 3
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:3] = 0, 1, 2
     if d.check_line_segment_03_of_tetrahedron():
-        solution_d.from_line_segment(simplex, 3, 0, d.d[0, 8], d.d[3, 8])
+        solution_d.from_line_segment(simplex, 0, 3, d.d[0, 8], d.d[3, 8])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 0, 3
     if d.check_face_013_of_tetrahedron():
-        solution_d.from_face(simplex, 3, 0, 1, d.d[0, 11], d.d[1, 11], d.d[3, 11])
+        solution_d.from_face(simplex, 0, 1, 3, d.d[0, 11], d.d[1, 11], d.d[3, 11])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 3
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:3] = 0, 1, 3
     if d.check_face_023_of_tetrahedron():
-        solution_d.from_face(simplex, 3, 0, 2, d.d[0, 12], d.d[2, 12], d.d[3, 12], 0, 2, 1)
+        solution_d.from_face(simplex, 0, 2, 3, d.d[0, 12], d.d[2, 12], d.d[3, 12], 0, 2, 1)
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 3
             solution.copy_from(solution_d, n_simplex_points)
@@ -933,25 +935,25 @@ def _backup_procedure_tetrahedron(simplex, backup, d, solution):
         solution.from_vertex(simplex, 3, d.d[3, 7])
         ordered_indices[0] = 3
     if d.check_line_segment_12_of_face():
-        solution_d.from_line_segment(simplex, 1, 2, d.d[1, 5], d.d[2, 5], 1, 0)
+        solution_d.from_line_segment(simplex, 2, 1, d.d[1, 5], d.d[2, 5], 1, 0)
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 2, 1
     if d.check_line_segment_13_of_tetrahedron():
-        solution_d.from_line_segment(simplex, 3, 1, d.d[1, 9], d.d[3, 9], 1, 0)
+        solution_d.from_line_segment(simplex, 1, 3, d.d[1, 9], d.d[3, 9], 1, 0)
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 3, 1
     if d.check_line_segment_23_of_tetrahedron():
-        solution_d.from_line_segment(simplex, 3, 2, d.d[2, 10], d.d[3, 10])
+        solution_d.from_line_segment(simplex, 2, 3, d.d[2, 10], d.d[3, 10])
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 2
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:2] = 2, 3
     if d.check_face_123_of_tetrahedron():
-        solution_d.from_face(simplex, 3, 1, 2, d.d[1, 13], d.d[2, 13], d.d[3, 13], 1, 2, 0)
+        solution_d.from_face(simplex, 1, 2, 3, d.d[1, 13], d.d[2, 13], d.d[3, 13], 1, 2, 0)
         if solution_d.distance_squared < solution.distance_squared:
             n_simplex_points = 3
             solution.copy_from(solution_d, n_simplex_points)
