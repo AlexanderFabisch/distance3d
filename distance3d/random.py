@@ -260,7 +260,8 @@ def rand_capsule(random_state, center_scale=1.0, radius_scale=1.0,
     return capsule2origin, radius, height
 
 
-def rand_ellipsoid(random_state, min_radius=0.0):
+def rand_ellipsoid(
+        random_state, center_scale=1.0, min_radius=0.0, radius_scale=1.0):
     """Sample ellipsoid.
 
     Parameters
@@ -268,8 +269,14 @@ def rand_ellipsoid(random_state, min_radius=0.0):
     random_state : np.random.RandomState
         Random number generator.
 
+    center_scale : float, optional (default: 1)
+        Scaling factor for center.
+
     min_radius : float, optional (default: 0)
         Minimum radius of ellipsoid.
+
+    radius_scale : float, optional (default: 1)
+        Scaling factor for radii.
 
     Returns
     -------
@@ -280,7 +287,8 @@ def rand_ellipsoid(random_state, min_radius=0.0):
         Radii of the ellipsoid within (min_radius, min_radius + 1].
     """
     ellipsoid2origin = pt.random_transform(random_state)
-    radii = min_radius + 1.0 - random_state.rand(3)
+    ellipsoid2origin[:3, 3] *= center_scale
+    radii = min_radius + (1.0 - random_state.rand(3)) * radius_scale
     return ellipsoid2origin, radii
 
 
