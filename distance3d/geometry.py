@@ -1,6 +1,7 @@
 """Tools for geometric computations."""
 import math
 from itertools import product
+import numba
 import numpy as np
 from .utils import norm_vector
 
@@ -150,6 +151,7 @@ def convert_box_to_vertices(box2origin, size):
     return box2origin[:3, 3] + (BOX_COORDS * size).dot(box2origin[:3, :3].T)
 
 
+@numba.jit(cache=True, boundscheck=False)
 def cylinder_extreme_along_direction(
         search_direction, cylinder2origin, radius, length):
     """Compute extreme point of cylinder along a direction.
@@ -195,6 +197,7 @@ def cylinder_extreme_along_direction(
     return cylinder2origin[:3, 3] + np.dot(cylinder2origin[:3, :3], local_vertex)
 
 
+@numba.jit(cache=True, boundscheck=False)
 def capsule_extreme_along_direction(
         search_direction, capsule2origin, radius, height):
     """Compute extreme point of cylinder along a direction.
