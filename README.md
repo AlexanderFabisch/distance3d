@@ -36,7 +36,7 @@ Install dependencies with
 
 Run unit tests with
 
-    pytest
+    NUMBA_DISABLE_JIT=1 pytest
 
 You will find the coverage report in `htmlcov/index.html`.
 
