@@ -16,5 +16,5 @@ def distance_random_point_to_triangle(random_state, triangle_points):
 
 times = timeit.repeat(partial(
     distance_random_point_to_triangle, random_state=random_state,
-    triangle_points=triangle_points), repeat=10, number=10000)
+    triangle_points=triangle_points), repeat=100, number=10000)
 print(f"Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
