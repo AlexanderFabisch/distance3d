@@ -266,6 +266,30 @@ def ellipsoid_extreme_along_direction(
     return ellipsoid2origin[:3, 3] + np.dot(ellipsoid2origin[:3, :3], local_vertex)
 
 
+def box_extreme_along_direction(search_direction, box2origin, half_lengths):
+    """Compute extreme point of box along a direction.
+
+    Parameters
+    ----------
+    search_direction : array, shape (3,)
+        Search direction.
+
+    box2origin : array, shape (4, 4)
+        Pose of the box.
+
+    half_lengths : array, shape (3,)
+        Half lengths of the box along its axes.
+
+    Returns
+    -------
+    extreme_point : array, shape (3,)
+        Extreme point along search direction.
+    """
+    local_dir = np.dot(box2origin[:3, :3].T, search_direction)
+    local_vertex = np.sign(local_dir) * half_lengths
+    return box2origin[:3, 3] + np.dot(box2origin[:3, :3], local_vertex)
+
+
 def hesse_normal_form(plane_point, plane_normal):
     """Computes Hesse normal form of a plane.
 
