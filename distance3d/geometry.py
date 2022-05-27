@@ -2,6 +2,7 @@
 import math
 from itertools import product
 import numpy as np
+from .utils import norm_vector
 
 
 def convert_rectangle_to_segment(rectangle_center, rectangle_extents, i0, i1):
@@ -194,30 +195,6 @@ def cylinder_extreme_along_direction(
     return cylinder2origin[:3, 3] + np.dot(cylinder2origin[:3, :3], local_vertex)
 
 
-def box_extreme_along_direction(search_direction, box2origin, half_lengths):
-    """Compute extreme point of box along a direction.
-
-    Parameters
-    ----------
-    search_direction : array, shape (3,)
-        Search direction.
-
-    box2origin : array, shape (4, 4)
-        Pose of the box.
-
-    half_lengths : array, shape (3,)
-        Half lengths of the box along its axes.
-
-    Returns
-    -------
-    extreme_point : array, shape (3,)
-        Extreme point along search direction.
-    """
-    local_dir = np.dot(box2origin[:3, :3].T, search_direction)
-    local_vertex = np.sign(local_dir) * half_lengths
-    return box2origin[:3, 3] + np.dot(box2origin[:3, :3], local_vertex)
-
-
 def capsule_extreme_along_direction(
         search_direction, capsule2origin, radius, height):
     """Compute extreme point of cylinder along a direction.
@@ -262,6 +239,31 @@ def capsule_extreme_along_direction(
         local_vertex[2] -= 0.5 * height
 
     return capsule2origin[:3, 3] + np.dot(capsule2origin[:3, :3], local_vertex)
+
+
+def ellipsoid_extreme_along_direction(
+        search_direction, ellipsoid2origin, radii):
+    """Compute extreme point of ellipsoid along a direction.
+
+    Parameters
+    ----------
+    search_direction : array, shape (3,)
+        Search direction.
+
+    ellipsoid2origin : array, shape (4, 4)
+        Pose of the ellipsoid.
+
+    radii : array, shape (3,)
+        Radii of the ellipsoid.
+
+    Returns
+    -------
+    extreme_point : array, shape (3,)
+        Extreme point along search direction.
+    """
+    local_dir = np.dot(ellipsoid2origin[:3, :3].T, search_direction)
+    local_vertex = norm_vector(local_dir * radii) * radii
+    return ellipsoid2origin[:3, 3] + np.dot(ellipsoid2origin[:3, :3], local_vertex)
 
 
 def hesse_normal_form(plane_point, plane_normal):

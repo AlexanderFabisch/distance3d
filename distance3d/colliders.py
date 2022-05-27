@@ -6,10 +6,10 @@ from pytransform3d import urdf
 import pytransform3d.visualizer as pv
 from .geometry import (
     capsule_extreme_along_direction, cylinder_extreme_along_direction,
-    convert_box_to_vertices)
+    convert_box_to_vertices, ellipsoid_extreme_along_direction)
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
-    capsule_aabb)
+    capsule_aabb, ellipsoid_aabb)
 from .urdf_utils import self_collision_whitelists
 from aabbtree import AABB, AABBTree
 
@@ -536,4 +536,50 @@ class Sphere(ConvexCollider):
 
     def aabb(self):
         mins, maxs = sphere_aabb(self.c, self.radius)
+        return AABB(np.array([mins, maxs]).T)
+
+
+class Ellipsoid(ConvexCollider):
+    """Wraps ellipsoid for GJK algorithm.
+
+    Parameters
+    ----------
+    ellipsoid2origin : array, shape (4, 4)
+        Pose of the ellipsoid.
+
+    radii : array, shape (3,)
+        Radii of the ellipsoid.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
+    def __init__(self, ellipsoid2origin, radii, artist=None):
+        super(Ellipsoid, self).__init__([], artist)
+        self.ellipsoid2origin = ellipsoid2origin
+        self.radii = radii
+
+    def make_artist(self, c=None):
+        self.artist_ = pv.Ellipsoid(
+            radii=self.radii, A2B=self.ellipsoid2origin, c=c)
+
+    def first_vertex(self):
+        vertex = self.ellipsoid2origin[:3, 3] + self.radii[2] * self.ellipsoid2origin[:3, 2]
+        self.vertices_.append(vertex)
+        return vertex
+
+    def support_function(self, search_direction):
+        vertex = ellipsoid_extreme_along_direction(
+            search_direction, self.ellipsoid2origin, self.radii)
+        vertex_idx = len(self.vertices_)
+        self.vertices_.append(vertex)
+        return vertex_idx, vertex
+
+    def update_pose(self, pose):
+        self.ellipsoid2origin = pose
+        self.vertices_ = []
+        if self.artist_ is not None:
+            self.artist_.set_data(pose)
+
+    def aabb(self):
+        mins, maxs = ellipsoid_aabb(self.ellipsoid2origin, self.radii)
         return AABB(np.array([mins, maxs]).T)

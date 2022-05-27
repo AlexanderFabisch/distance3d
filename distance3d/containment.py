@@ -1,4 +1,5 @@
 """Containment methods compute bounding volumes."""
+import math
 import numpy as np
 from .geometry import convert_box_to_vertices
 
@@ -120,3 +121,26 @@ def capsule_aabb(capsule2origin, radius, height):
     """
     extent = 0.5 * height * np.abs(capsule2origin[:3, 2]) + radius
     return capsule2origin[:3, 3] - extent, capsule2origin[:3, 3] + extent
+
+
+def ellipsoid_aabb(ellipsoid2origin, radii):
+    """Compute axis-aligned bounding box of a capsule.
+
+    Parameters
+    ----------
+    ellipsoid2origin : array, shape (4, 4)
+        Pose of the ellipsoid.
+
+    radii : array, shape (3,)
+        Radii of the ellipsoid.
+
+    Returns
+    -------
+    mins : array, shape (3,)
+        Minimum coordinates.
+
+    maxs : array, shape (3,)
+        Maximum coordinates.
+    """
+    extent = max(radii)
+    return ellipsoid2origin[:3, 3] - extent, ellipsoid2origin[:3, 3] + extent
