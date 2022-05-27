@@ -1,4 +1,6 @@
 import math
+
+import numba
 import numpy as np
 from ..geometry import line_from_pluecker
 from ._line import point_to_line
@@ -6,6 +8,7 @@ from ._plane import plane_intersects_plane
 from ..utils import norm_vector
 
 
+@numba.jit(cache=True)
 def point_to_disk(point, center, radius, normal):
     """Compute the shortest distance between point and disk.
 
