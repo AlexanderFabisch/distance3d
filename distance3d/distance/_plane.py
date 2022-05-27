@@ -1,11 +1,13 @@
 import math
 
 import numpy as np
+import numba
 from ..geometry import (
     hesse_normal_form, convert_segment_to_line, line_from_pluecker,
     convert_rectangle_to_vertices, convert_box_to_vertices)
 
 
+@numba.jit(cache=True)
 def point_to_plane(point, plane_point, plane_normal, signed=False):
     """Compute the shortest distance between a point and a plane.
 
