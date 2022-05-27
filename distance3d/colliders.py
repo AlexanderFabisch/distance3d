@@ -90,7 +90,7 @@ class BoundingVolumeHierarchy:
                 length=obj.length)
         else:
             assert isinstance(obj, urdf.Mesh)
-            collider = Mesh(obj.filename, A2B, obj.scale)
+            collider = MeshGraph(obj.filename, A2B, obj.scale)
         if make_artists:
             collider.make_artist()
         return collider
@@ -380,6 +380,41 @@ class Mesh(Convex):
     def update_pose(self, pose):
         self.artist_.set_data(pose)
         self.vertices_ = np.asarray(self.artist_.mesh.vertices)
+
+
+class MeshGraph(Mesh):
+    def __init__(self, filename, A2B, scale=1.0, artist=None):
+        super(MeshGraph, self).__init__(filename, A2B, scale, artist)
+        indices1 = []
+        indices2 = []
+        dists = []
+        for i, j, k in np.asarray(self.artist_.mesh.triangles):
+            indices1.append(i)
+            indices2.append(j)
+            dists.append(np.linalg.norm(self.vertices_[i] - self.vertices_[j]))
+            indices1.append(i)
+            indices2.append(k)
+            dists.append(np.linalg.norm(self.vertices_[i] - self.vertices_[k]))
+            indices1.append(j)
+            indices2.append(k)
+            dists.append(np.linalg.norm(self.vertices_[j] - self.vertices_[k]))
+        import scipy.sparse as sp
+        self.connections = sp.csr_matrix((dists, (indices1, indices2)))
+
+    def support_function(self, search_direction):
+        idx = 0
+        l = search_direction.dot(self.vertices_[idx])
+        converged = False
+        while not converged:
+            updated = False
+            for connected_idx in self.connections[idx].indices:
+                l2 = search_direction.dot(self.vertices_[connected_idx])
+                if l2 > l:
+                    l = l2
+                    idx = connected_idx
+                    updated = True
+            converged = not updated
+        return idx, self.vertices_[idx]
 
 
 class Cylinder(ConvexCollider):
