@@ -25,6 +25,6 @@ jobs:
         python -m pip install -e .[test]
     - name: Test
       run: |
-        pytest
+        NUMBA_DISABLE_JIT=1 pytest
     - name: Codecov
       uses: codecov/codecov-action@v1.3.2
