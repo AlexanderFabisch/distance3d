@@ -1,14 +1,13 @@
 """
-==================================
-Distance between capsules with GJK
-==================================
+====================================
+Distance between ellipsoids with GJK
+====================================
 """
 print(__doc__)
 import time
 import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.plot_utils as ppu
-import pytransform3d.transformations as pt
 from distance3d import gjk, colliders
 from distance3d import random
 from distance3d import plotting
