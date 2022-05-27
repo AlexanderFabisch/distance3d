@@ -7,7 +7,7 @@ from ._line import _line_to_line_segment
 from ._rectangle import line_segment_to_rectangle
 
 
-@numba.jit
+@numba.jit(cache=True)
 def point_to_triangle(point, triangle_points):
     """Compute the shortest distance between point and triangle.
 
