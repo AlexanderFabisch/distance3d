@@ -1,4 +1,5 @@
 import math
+import numba
 import numpy as np
 
 
@@ -27,6 +28,7 @@ def point_to_line(point, line_point, line_direction):
     return _point_to_line(point, line_point, line_direction)[:2]
 
 
+@numba.jit(cache=True)
 def _point_to_line(point, line_point, line_direction):
     diff = point - line_point
     t = np.dot(line_direction, diff)
@@ -36,6 +38,7 @@ def _point_to_line(point, line_point, line_direction):
     return np.linalg.norm(diff), closest_point_line, t
 
 
+@numba.jit(cache=True)
 def point_to_line_segment(point, segment_start, segment_end):
     """Compute the shortest distance between point and line segment.
 
@@ -108,6 +111,7 @@ def line_to_line(line_point1, line_direction1, line_point2, line_direction2,
         epsilon)[:3]
 
 
+@numba.njit(cache=True)
 def _line_to_line(line_point1, line_direction1, line_point2, line_direction2,
                   epsilon=1e-6):
     diff = line_point1 - line_point2
@@ -226,6 +230,7 @@ def _line_to_line_segment(
     return np.linalg.norm(closest_point2 - closest_point1), closest_point1, closest_point2, t, s
 
 
+@numba.jit(cache=True)
 def line_segment_to_line_segment(
         segment_start1, segment_end1, segment_start2, segment_end2, epsilon=1e-6):
     """Compute the shortest distance between two line segments.
