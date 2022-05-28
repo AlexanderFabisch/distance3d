@@ -2,7 +2,7 @@ import numpy as np
 from ..geometry import (
     convert_rectangle_to_segment, convert_segment_to_line)
 from ._line import _line_to_line_segment
-import pytransform3d.rotations as pr
+from ..utils import plane_basis_from_normal
 
 
 def point_to_rectangle(point, rectangle_center, rectangle_axes,
@@ -144,7 +144,7 @@ def _line_intersects_rectangle(
         # The line and rectangle are not parallel, so the line intersects
         # the plane of the rectangle.
         diff = line_point - rectangle_center
-        u, v = pr.plane_basis_from_normal(line_direction)
+        u, v = plane_basis_from_normal(line_direction)
         udd = rectangle_axes.dot(u)
         vdd = rectangle_axes.dot(v)
         uddiff = u.dot(diff)

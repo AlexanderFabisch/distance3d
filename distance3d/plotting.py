@@ -4,6 +4,7 @@ import numpy as np
 from mpl_toolkits import mplot3d
 import pytransform3d.plot_utils as ppu
 import pytransform3d.rotations as pr
+from .utils import plane_basis_from_normal
 
 
 def plot_line(ax, line_point, line_direction, length=10):
@@ -173,7 +174,7 @@ def plot_circle(ax, center, radius, normal, show_normal=False,
         Color of surface.
     """
     ax.scatter(center[0], center[1], center[2])
-    u, v = pr.plane_basis_from_normal(normal)
+    u, v = plane_basis_from_normal(normal)
     R = np.column_stack((u, v, normal))
     circle = np.array([
         center + R.dot(pr.matrix_from_angle(2, angle)).dot([radius, 0, 0])
@@ -329,7 +330,7 @@ def plot_plane(
     color : str
         Color of faces.
     """
-    x_axis, y_axis = pr.plane_basis_from_normal(plane_normal)
+    x_axis, y_axis = plane_basis_from_normal(plane_normal)
     vertices = np.array([
         plane_point + s * x_axis + s * y_axis,
         plane_point - s * x_axis + s * y_axis,

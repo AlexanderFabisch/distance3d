@@ -1,7 +1,7 @@
 import numpy as np
 import numba
 import pytransform3d.rotations as pr
-from ..utils import norm_vector, MAX_FLOAT
+from ..utils import norm_vector, MAX_FLOAT, plane_basis_from_normal
 from ..geometry import convert_segment_to_line, convert_rectangle_to_segment
 from ._line import _line_to_line_segment
 from ._rectangle import line_segment_to_rectangle
@@ -123,16 +123,20 @@ def line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6):
     return _line_to_triangle(line_point, line_direction, triangle_points, epsilon)[:3]
 
 
-def _line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6):
+@numba.njit(numba.types.Tuple(
+    (numba.float64, numba.float64[:], numba.float64[:], numba.float64))
+    (numba.float64[:], numba.float64[:], numba.float64[:, :], numba.float64),
+    cache=True)
+def _line_to_triangle(line_point, line_direction, triangle_points, epsilon):
     # Test if line intersects triangle. If so, the squared distance is zero.
-    edge = np.array([triangle_points[1] - triangle_points[0],
-                     triangle_points[2] - triangle_points[0]])
+    edge = np.row_stack((triangle_points[1] - triangle_points[0],
+                         triangle_points[2] - triangle_points[0]))
     normal = norm_vector(np.cross(edge[0], edge[1]))
     if abs(normal.dot(line_direction)) > epsilon:
         # The line and triangle are not parallel, so the line intersects
         # the plane of the triangle.
         diff = line_point - triangle_points[0]
-        u, v = pr.plane_basis_from_normal(line_direction)
+        u, v = plane_basis_from_normal(line_direction)
         ude = edge.dot(u)
         vde = edge.dot(v)
         uddiff = u.dot(diff)
