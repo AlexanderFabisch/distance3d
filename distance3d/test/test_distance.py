@@ -400,8 +400,8 @@ def test_line_to_plane():
     assert_array_almost_equal(closest_point_line, np.array([0, 0, 0]))
     assert_array_almost_equal(closest_point_line, closest_point_plane)
 
-    line_point = np.array([0, 0, 1])
-    line_direction = np.array([0, 0, 1])
+    line_point = np.array([0, 0, 1], dtype=float)
+    line_direction = np.array([0, 0, 1], dtype=float)
     dist, closest_point_line, closest_point_plane = line_to_plane(
         line_point, line_direction, plane_point, plane_normal)
     assert approx(dist) == 0
@@ -409,15 +409,15 @@ def test_line_to_plane():
     assert_array_almost_equal(closest_point_line, closest_point_plane)
 
     line_point = np.array([0, 0, 1])
-    line_direction = norm_vector(np.array([1, 1, 0]))
+    line_direction = norm_vector(np.array([1, 1, 0], dtype=float))
     dist, closest_point_line, closest_point_plane = line_to_plane(
         line_point, line_direction, plane_point, plane_normal)
     assert approx(dist) == 1
     assert_array_almost_equal(closest_point_line, np.array([0, 0, 1]))
     assert_array_almost_equal(closest_point_plane, np.array([0, 0, 0]))
 
-    line_point = np.array([0, 0, 1])
-    line_direction = norm_vector(np.array([1, 1, 1]))
+    line_point = np.array([0, 0, 1], dtype=float)
+    line_direction = norm_vector(np.array([1, 1, 1], dtype=float))
     dist, closest_point_line, closest_point_plane = line_to_plane(
         line_point, line_direction, plane_point, plane_normal)
     assert approx(dist) == 0
