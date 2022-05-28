@@ -17,12 +17,11 @@ import math
 import numpy as np
 
 
-def _line_to_box(line_point, line_direction, box2origin, size, origin2box=None):
+def _line_to_box(line_point, line_direction, box2origin, size):
     box_half_size = 0.5 * size
 
     # compute coordinates of line in box coordinate system
-    if origin2box is None:
-        origin2box = np.linalg.inv(box2origin)
+    origin2box = np.linalg.inv(box2origin)
     point_in_box = origin2box[:3, 3] + origin2box[:3, :3].dot(line_point)
     direction_in_box = origin2box[:3, :3].dot(line_direction)
 
