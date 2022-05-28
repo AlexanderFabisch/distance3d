@@ -3,7 +3,7 @@ import pytransform3d.rotations as pr
 import pytransform3d.transformations as pt
 from distance3d.containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
-    capsule_aabb)
+    capsule_aabb, ellipsoid_aabb)
 from distance3d.geometry import (
     cylinder_extreme_along_direction, capsule_extreme_along_direction)
 from distance3d import random
@@ -117,3 +117,42 @@ def capsule_aabb_slow(capsule2origin, radius, height):
     ))
     maxs = np.max(positive_vertices, axis=0)
     return mins, maxs
+
+
+def test_ellipsoid_aabb():
+    ellipsoid2origin = np.eye(4)
+    radii = np.ones(3)
+    mins, maxs = ellipsoid_aabb(ellipsoid2origin, radii)
+    assert_array_almost_equal(mins, -radii)
+    assert_array_almost_equal(maxs, radii)
+
+    radii = np.array([0.2, 1.0, 0.5])
+    mins, maxs = ellipsoid_aabb(ellipsoid2origin, radii)
+    assert_array_almost_equal(mins, -radii)
+    assert_array_almost_equal(maxs, radii)
+
+    ellipsoid2origin = np.array([
+        [1, 0, 0, 0],
+        [0, 0, -1, 0],
+        [0, 1, 0, 0],
+        [0, 0, 0, 1]
+    ])
+    mins, maxs = ellipsoid_aabb(ellipsoid2origin, radii)
+    assert_array_almost_equal(mins, [-0.2, -0.5, -1])
+    assert_array_almost_equal(maxs, [0.2, 0.5, 1])
+
+    ellipsoid2origin = pt.transform_from(
+        R=pr.active_matrix_from_extrinsic_euler_xyz([0.2, 0.3, 0.5]),
+        p=np.zeros(3)
+    )
+    mins, maxs = ellipsoid_aabb(ellipsoid2origin, radii)
+    assert_array_almost_equal(mins, [-0.376639, -0.83155, -0.491812])
+    assert_array_almost_equal(maxs, [0.376639, 0.83155, 0.491812])
+
+    ellipsoid2origin = pt.transform_from(
+        R=pr.active_matrix_from_extrinsic_euler_xyz([0.2, 0.3, 0.5]),
+        p=np.array([-0.3, 0.8, 0.4])
+    )
+    mins, maxs = ellipsoid_aabb(ellipsoid2origin, radii)
+    assert_array_almost_equal(mins, [-0.676639, -0.03155, -0.091812])
+    assert_array_almost_equal(maxs, [0.076639, 1.63155, 0.891812])
