@@ -1468,7 +1468,7 @@ def test_gjk_ellipsoids():
             closest_point1, ellipsoid2origin2, radii2)
         dist21, closest_point21 = distance.point_to_ellipsoid(
             closest_point2, ellipsoid2origin1, radii1)
-        assert approx(dist, dist12)
+        assert approx(dist) == dist12
         assert_array_almost_equal(closest_point2, closest_point12)
-        assert approx(dist, dist21)
+        assert approx(dist) == dist21
         assert_array_almost_equal(closest_point1, closest_point21)
