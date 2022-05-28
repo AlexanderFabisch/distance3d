@@ -7,7 +7,8 @@ or a plane and GJK is slower when one of the objects is a point or a line
 segment.
 
 In the following table an X indicates that the distance computation between
-two geometric objects is implemented.
+two geometric objects is implemented. G means the pair of shapes is covered
+by GJK.
 
 .. raw:: html
 
@@ -65,8 +66,8 @@ two geometric objects is implemented.
         <td>X</td>
         <td>-</td>
         <td>X</td>
-        <td>-</td>
-        <td>-</td>
+        <td>G</td>
+        <td>G</td>
       </tr>
       <tr>
         <td>plane</td>
@@ -92,9 +93,9 @@ two geometric objects is implemented.
         <td>X</td>
         <td>-</td>
         <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
+        <td>G</td>
+        <td>G</td>
+        <td>G</td>
       </tr>
       <tr>
         <td>rectangle</td>
@@ -103,12 +104,12 @@ two geometric objects is implemented.
         <td>X</td>
         <td>X</td>
         <td>X</td>
+        <td>G</td>
         <td>-</td>
         <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
+        <td>G</td>
+        <td>G</td>
+        <td>G</td>
       </tr>
       <tr>
         <td>circle</td>
@@ -145,12 +146,12 @@ two geometric objects is implemented.
         <td>X</td>
         <td>X</td>
         <td>-</td>
+        <td>G</td>
         <td>-</td>
         <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
+        <td>G</td>
+        <td>G</td>
+        <td>G</td>
       </tr>
       <tr>
         <td>ellipsoid</td>
@@ -159,12 +160,12 @@ two geometric objects is implemented.
         <td>-</td>
         <td>X</td>
         <td>-</td>
+        <td>G</td>
         <td>-</td>
         <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
+        <td>G</td>
+        <td>G</td>
+        <td>G</td>
       </tr>
       <tr>
         <td>cylinder</td>
@@ -173,12 +174,12 @@ two geometric objects is implemented.
         <td>-</td>
         <td>-</td>
         <td>-</td>
+        <td>G</td>
         <td>-</td>
         <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
+        <td>G</td>
+        <td>G</td>
+        <td>G</td>
       </tr>
     </table>
 """
