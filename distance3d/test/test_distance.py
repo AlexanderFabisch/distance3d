@@ -17,21 +17,21 @@ from numpy.testing import assert_array_almost_equal
 
 
 def test_point_to_line():
-    line_point = np.array([0, 0, 0])
-    line_direction = np.array([1, 0, 0])
+    line_point = np.array([0, 0, 0], dtype=float)
+    line_direction = np.array([1, 0, 0], dtype=float)
 
     distance, closest_point_line = point_to_line(
         line_point, line_point, line_direction)
     assert distance == 0.0
     assert_array_almost_equal(closest_point_line, line_point)
 
-    point = np.array([1, 1, 0])
+    point = np.array([1, 1, 0], dtype=float)
     distance, closest_point_line = point_to_line(
         point, line_point, line_direction)
     assert distance == 1.0
     assert_array_almost_equal(closest_point_line, np.array([1, 0, 0]))
 
-    point = np.array([1, -1, 0])
+    point = np.array([1, -1, 0], dtype=float)
     distance, closest_point_line = point_to_line(
         point, line_point, line_direction)
     assert distance == 1.0
@@ -39,8 +39,8 @@ def test_point_to_line():
 
 
 def test_point_to_line_segment():
-    segment_start = np.array([0, 0, 0])
-    segment_end = np.array([1, 0, 0])
+    segment_start = np.array([0, 0, 0], dtype=float)
+    segment_end = np.array([1, 0, 0], dtype=float)
 
     distance, closest_point_line = point_to_line_segment(
         0.5 * (segment_start + segment_end), segment_start, segment_end)
@@ -59,12 +59,12 @@ def test_point_to_line_segment():
     assert_array_almost_equal(closest_point_line, segment_end)
 
     distance, closest_point_line = point_to_line_segment(
-        np.array([-1, 0, 0]), segment_start, segment_end)
+        np.array([-1, 0, 0], dtype=float), segment_start, segment_end)
     assert distance == 1.0
     assert_array_almost_equal(closest_point_line, segment_start)
 
     distance, closest_point_line = point_to_line_segment(
-        np.array([2, 0, 0]), segment_start, segment_end)
+        np.array([2, 0, 0], dtype=float), segment_start, segment_end)
     assert distance == 1.0
     assert_array_almost_equal(closest_point_line, segment_end)
 
@@ -657,45 +657,45 @@ def test_line_to_box():
 
 
 def test_line_segment_to_line_segment():
-    segment_start1 = np.array([0, 0, 0])
-    segment_end1 = np.array([1, 0, 0])
+    segment_start1 = np.array([0, 0, 0], dtype=float)
+    segment_end1 = np.array([1, 0, 0], dtype=float)
     dist, closest_point1, closest_point2 = line_segment_to_line_segment(
         segment_start1, segment_end1, segment_start1, segment_end1)
     assert approx(dist) == 0
 
-    segment_start2 = np.array([0, 1, 0])
-    segment_end2 = np.array([1, 1, 0])
+    segment_start2 = np.array([0, 1, 0], dtype=float)
+    segment_end2 = np.array([1, 1, 0], dtype=float)
     dist, closest_point1, closest_point2 = line_segment_to_line_segment(
         segment_start1, segment_end1, segment_start2, segment_end2)
     assert approx(dist) == 1
     assert approx(np.linalg.norm(closest_point2 - closest_point1)) == 1
 
-    segment_start2 = np.array([1, 0, 0])
-    segment_end2 = np.array([2, 0, 0])
+    segment_start2 = np.array([1, 0, 0], dtype=float)
+    segment_end2 = np.array([2, 0, 0], dtype=float)
     dist, closest_point1, closest_point2 = line_segment_to_line_segment(
         segment_start1, segment_end1, segment_start2, segment_end2)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point1, np.array([1, 0, 0]))
     assert_array_almost_equal(closest_point1, closest_point2)
 
-    segment_start2 = np.array([0.5, -0.5, 0])
-    segment_end2 = np.array([0.5, 0.5, 0])
+    segment_start2 = np.array([0.5, -0.5, 0], dtype=float)
+    segment_end2 = np.array([0.5, 0.5, 0], dtype=float)
     dist, closest_point1, closest_point2 = line_segment_to_line_segment(
         segment_start1, segment_end1, segment_start2, segment_end2)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point1, np.array([0.5, 0, 0]))
     assert_array_almost_equal(closest_point1, closest_point2)
 
-    segment_start2 = np.array([-0.5, -0.5, 0])
-    segment_end2 = np.array([-0.5, 0.5, 0])
+    segment_start2 = np.array([-0.5, -0.5, 0], dtype=float)
+    segment_end2 = np.array([-0.5, 0.5, 0], dtype=float)
     dist, closest_point1, closest_point2 = line_segment_to_line_segment(
         segment_start1, segment_end1, segment_start2, segment_end2)
     assert approx(dist) == 0.5
     assert_array_almost_equal(closest_point1, np.array([0, 0, 0]))
     assert_array_almost_equal(closest_point2, np.array([-0.5, 0, 0]))
 
-    segment_start2 = np.array([0.5, 0, 0])
-    segment_end2 = np.array([0.5, 0, 0])
+    segment_start2 = np.array([0.5, 0, 0], dtype=float)
+    segment_end2 = np.array([0.5, 0, 0], dtype=float)
     dist, closest_point1, closest_point2 = line_segment_to_line_segment(
         segment_start1, segment_end1, segment_start2, segment_end2)
     assert approx(dist) == 0
