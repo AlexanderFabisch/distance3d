@@ -99,6 +99,7 @@ API Reference
    ~distance3d.containment.box_aabb
    ~distance3d.containment.cylinder_aabb
    ~distance3d.containment.capsule_aabb
+   ~distance3d.containment.ellipsoid_aabb
 
 
 :mod:`distance3d.epa`
