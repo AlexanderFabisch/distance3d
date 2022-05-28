@@ -1451,3 +1451,24 @@ def test_gjk_triangle_to_rectangle():
             closest_point_triangle, closest_point_triangle2)
         assert_array_almost_equal(
             closest_point_rectangle, closest_point_rectangle2)
+
+
+def test_gjk_ellipsoids():
+    random_state = np.random.RandomState(83)
+    for _ in range(10):
+        ellipsoid2origin1, radii1 = random.rand_ellipsoid(
+            random_state, center_scale=2.0)
+        ellipsoid2origin2, radii2 = random.rand_ellipsoid(
+            random_state, center_scale=2.0)
+        dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
+            colliders.Ellipsoid(ellipsoid2origin1, radii1),
+            colliders.Ellipsoid(ellipsoid2origin2, radii2))
+
+        dist12, closest_point12 = distance.point_to_ellipsoid(
+            closest_point1, ellipsoid2origin2, radii2)
+        dist21, closest_point21 = distance.point_to_ellipsoid(
+            closest_point2, ellipsoid2origin1, radii1)
+        assert approx(dist, dist12)
+        assert_array_almost_equal(closest_point2, closest_point12)
+        assert approx(dist, dist21)
+        assert_array_almost_equal(closest_point1, closest_point21)
