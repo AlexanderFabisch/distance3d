@@ -1,5 +1,4 @@
 """Containment methods compute bounding volumes."""
-import math
 import numpy as np
 from .geometry import convert_box_to_vertices
 
