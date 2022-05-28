@@ -230,7 +230,6 @@ def _line_to_line_segment(
     return np.linalg.norm(closest_point2 - closest_point1), closest_point1, closest_point2, t, s
 
 
-@numba.jit(cache=True)
 def line_segment_to_line_segment(
         segment_start1, segment_end1, segment_start2, segment_end2, epsilon=1e-6):
     """Compute the shortest distance between two line segments.
@@ -267,6 +266,16 @@ def line_segment_to_line_segment(
     closest_point_segment2 : array, shape (3,)
         Closest point on second line segment.
     """
+    return _line_segment_to_line_segment(
+        segment_start1, segment_end1, segment_start2, segment_end2, epsilon)
+
+
+@numba.njit(numba.types.Tuple(
+    (numba.float64, numba.float64[:], numba.float64[:]))
+                (numba.float64[:], numba.float64[:], numba.float64[:],
+                 numba.float64[:], numba.float64), cache=True)
+def _line_segment_to_line_segment(
+        segment_start1, segment_end1, segment_start2, segment_end2, epsilon):
     # Segment direction vectors
     d1 = segment_end1 - segment_start1
     d2 = segment_end2 - segment_start2
