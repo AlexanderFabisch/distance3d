@@ -1,13 +1,14 @@
 import numpy as np
 import numba
-import pytransform3d.rotations as pr
 from ..utils import norm_vector, MAX_FLOAT, plane_basis_from_normal
 from ..geometry import convert_segment_to_line, convert_rectangle_to_segment
 from ._line import _line_to_line_segment
 from ._rectangle import line_segment_to_rectangle
 
 
-@numba.jit(cache=True)
+@numba.njit(numba.types.Tuple(
+    (numba.float64, numba.float64[:]))(numba.float64[:], numba.float64[:, :]),
+    cache=True)
 def point_to_triangle(point, triangle_points):
     """Compute the shortest distance between point and triangle.
 
