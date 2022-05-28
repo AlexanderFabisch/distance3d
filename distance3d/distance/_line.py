@@ -192,9 +192,12 @@ def line_to_line_segment(
 
 
 # modified version of line segment to line segment
+@numba.njit(numba.types.Tuple(
+    (numba.float64, numba.float64[:], numba.float64[:], numba.float64, numba.float64))
+    (numba.float64[:], numba.float64[:], numba.float64[:],
+     numba.float64[:], numba.float64), cache=True)
 def _line_to_line_segment(
-        line_point, line_direction, segment_start, segment_end,
-        epsilon=1e-6):
+        line_point, line_direction, segment_start, segment_end, epsilon):
     # Segment direction vectors
     d = segment_end - segment_start
 
@@ -205,7 +208,7 @@ def _line_to_line_segment(
     if a < epsilon and e < epsilon:
         # Both segments degenerate into points
         return (np.linalg.norm(line_point - segment_start),
-                segment_start, line_point)
+                segment_start, line_point, 0.0, 0.0)
 
     r = segment_start - line_point
     f = np.dot(line_direction, r)

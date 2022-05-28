@@ -123,7 +123,7 @@ def _line_to_rectangle(
             segment_end, segment_start = convert_rectangle_to_segment(
                 rectangle_center, rectangle_extents, i0, i1)
             dist, closest_point_line, closest_point_segment, l_closest, s_closest = _line_to_line_segment(
-                line_point, line_direction, segment_start, segment_end, epsilon=epsilon)
+                line_point, line_direction, segment_start, segment_end, epsilon)
 
             if dist < best_dist:
                 best_closest_point_line = closest_point_line

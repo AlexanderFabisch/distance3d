@@ -168,7 +168,7 @@ def _line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6)
     while i1 < 3:
         distance, closest_point_line, closest_point_segment, t, _ = _line_to_line_segment(
             line_point, line_direction, triangle_points[i0], triangle_points[i1],
-            epsilon=epsilon)
+            epsilon)
 
         if distance < best_distance:
             best_closest_point_line = closest_point_line
