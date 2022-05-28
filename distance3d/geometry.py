@@ -151,7 +151,10 @@ def convert_box_to_vertices(box2origin, size):
     return box2origin[:3, 3] + (BOX_COORDS * size).dot(box2origin[:3, :3].T)
 
 
-@numba.jit(cache=True, boundscheck=False)
+@numba.jit(
+    numba.float64[:](numba.float64[:], numba.float64[:, :], numba.float64,
+                     numba.float64),
+    cache=True, boundscheck=False)
 def cylinder_extreme_along_direction(
         search_direction, cylinder2origin, radius, length):
     """Compute extreme point of cylinder along a direction.
@@ -197,7 +200,10 @@ def cylinder_extreme_along_direction(
     return cylinder2origin[:3, 3] + np.dot(cylinder2origin[:3, :3], local_vertex)
 
 
-@numba.jit(cache=True, boundscheck=False)
+@numba.jit(
+    numba.float64[:](numba.float64[:], numba.float64[:, :], numba.float64,
+                     numba.float64),
+    cache=True, boundscheck=False)
 def capsule_extreme_along_direction(
         search_direction, capsule2origin, radius, height):
     """Compute extreme point of cylinder along a direction.
@@ -244,6 +250,9 @@ def capsule_extreme_along_direction(
     return capsule2origin[:3, 3] + np.dot(capsule2origin[:3, :3], local_vertex)
 
 
+@numba.jit(
+    numba.float64[:](numba.float64[:], numba.float64[:, :], numba.float64[:]),
+    cache=True, boundscheck=False)
 def ellipsoid_extreme_along_direction(
         search_direction, ellipsoid2origin, radii):
     """Compute extreme point of ellipsoid along a direction.
@@ -269,6 +278,9 @@ def ellipsoid_extreme_along_direction(
     return ellipsoid2origin[:3, 3] + np.dot(ellipsoid2origin[:3, :3], local_vertex)
 
 
+@numba.jit(
+    numba.float64[:](numba.float64[:], numba.float64[:, :], numba.float64[:]),
+    cache=True, boundscheck=False)
 def box_extreme_along_direction(search_direction, box2origin, half_lengths):
     """Compute extreme point of box along a direction.
 
