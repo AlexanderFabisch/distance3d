@@ -41,7 +41,6 @@ plotting.plot_aabb(ax, mins, maxs)
 aabb4 = aabbtree.AABB(np.array([mins, maxs]).T)
 
 ellipsoid2origin, radii = random.rand_ellipsoid(random_state)
-ellipsoid2origin, radii = random.rand_ellipsoid(random_state)
 mins, maxs = containment.ellipsoid_aabb(ellipsoid2origin, radii)
 ppu.plot_ellipsoid(ax, radii, ellipsoid2origin, wireframe=False, alpha=0.5)
 plotting.plot_aabb(ax, mins, maxs)
