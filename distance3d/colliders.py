@@ -6,7 +6,8 @@ from pytransform3d import urdf
 import pytransform3d.visualizer as pv
 from .geometry import (
     capsule_extreme_along_direction, cylinder_extreme_along_direction,
-    convert_box_to_vertices, ellipsoid_extreme_along_direction)
+    convert_box_to_vertices, ellipsoid_extreme_along_direction,
+    hill_climb_mesh_extreme)
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb, ellipsoid_aabb)
@@ -439,36 +440,29 @@ class MeshGraph(Convex):
     def __init__(self, vertices, triangles, artist=None):
         super(Convex, self).__init__(vertices, artist)
         self.triangles_ = triangles
-        indices1 = []
-        indices2 = []
-        dists = []
+        self.first_idx = np.min(self.triangles_)
+        import numba
+        connections = {}
         for i, j, k in np.asarray(self.triangles_):
-            indices1.append(i)
-            indices2.append(j)
-            dists.append(np.linalg.norm(self.vertices_[i] - self.vertices_[j]))
-            indices1.append(i)
-            indices2.append(k)
-            dists.append(np.linalg.norm(self.vertices_[i] - self.vertices_[k]))
-            indices1.append(j)
-            indices2.append(k)
-            dists.append(np.linalg.norm(self.vertices_[j] - self.vertices_[k]))
-        import scipy.sparse as sp
-        self.connections = sp.csr_matrix((dists, (indices1, indices2)))
+            if i not in connections:
+                connections[i] = set()
+            if j not in connections:
+                connections[j] = set()
+            if k not in connections:
+                connections[k] = set()
+            connections[i].add(j)
+            connections[i].add(k)
+            connections[j].add(i)
+            connections[j].add(k)
+            connections[k].add(i)
+            connections[k].add(j)
+        self.connections = numba.typed.Dict.empty(numba.int64, numba.int64[:])
+        for idx, connected_indices in connections.items():
+            self.connections[idx] = np.asarray(list(connected_indices), dtype=int)
 
     def support_function(self, search_direction):
-        idx = 0
-        l = search_direction.dot(self.vertices_[idx])
-        converged = False
-        while not converged:
-            updated = False
-            for connected_idx in self.connections[idx].indices:
-                l2 = search_direction.dot(self.vertices_[connected_idx])
-                if l2 > l:
-                    l = l2
-                    idx = connected_idx
-                    updated = True
-            converged = not updated
-        return idx, self.vertices_[idx]
+        return hill_climb_mesh_extreme(
+            search_direction, self.first_idx, self.vertices_, self.connections)
 
     def make_artist(self, c=None):
         self.artist_ = TriangleMesh(self.vertices_, self.triangles_, c=c)

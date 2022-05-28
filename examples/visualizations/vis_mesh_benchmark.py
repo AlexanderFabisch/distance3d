@@ -24,7 +24,7 @@ box_frames = list(range(200))
 fast_transform_manager_initialization(tm, box_frames, "base")
 for i in box_frames:
     _, _, vertices, triangles = randn_convex(
-        random_state, n_points=500, center_scale=2.0, std=0.1,
+        random_state, n_points=10000, center_scale=2.0, std=0.1,
         return_indices=True)
     collider = MeshGraph(vertices, triangles)
     collider.make_artist(c=(0, 1, 0))
