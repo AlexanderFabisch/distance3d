@@ -142,12 +142,8 @@ def ellipsoid_aabb(ellipsoid2origin, radii):
     maxs : array, shape (3,)
         Maximum coordinates.
     """
-    RT = ellipsoid2origin[:3, :3].T
-    x_extent = RT[:, 0] * radii
-    x_extent *= radii / np.linalg.norm(x_extent)
-    y_extent = RT[:, 1] * radii
-    y_extent *= radii / np.linalg.norm(y_extent)
-    z_extent = RT[:, 2] * radii
-    z_extent *= radii / np.linalg.norm(z_extent)
-    extent = np.max(np.row_stack((x_extent, y_extent, z_extent)).dot(ellipsoid2origin[:3, :3].T), axis=0)
+    extents = ellipsoid2origin[:3, :3] * radii[np.newaxis]
+    extents /= np.linalg.norm(extents, axis=0)
+    extents *= radii[np.newaxis]
+    extent = np.max(np.dot(ellipsoid2origin[:3, :3], extents.T), axis=0)
     return ellipsoid2origin[:3, 3] - extent, ellipsoid2origin[:3, 3] + extent
