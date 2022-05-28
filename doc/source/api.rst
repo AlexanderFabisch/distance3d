@@ -73,11 +73,12 @@ API Reference
    ~distance3d.colliders.BoundingVolumeHierarchy
    ~distance3d.colliders.ConvexCollider
    ~distance3d.colliders.Convex
-   ~distance3d.colliders.Box
    ~distance3d.colliders.Mesh
+   ~distance3d.colliders.Box
    ~distance3d.colliders.Cylinder
-   ~distance3d.colliders.Capsule
    ~distance3d.colliders.Sphere
+   ~distance3d.colliders.Capsule
+   ~distance3d.colliders.Ellipsoid
 
 
 :mod:`distance3d.containment`
@@ -152,8 +153,10 @@ API Reference
    ~distance3d.geometry.convert_box_to_face
    ~distance3d.geometry.convert_segment_to_line
    ~distance3d.geometry.convert_box_to_vertices
+   ~distance3d.geometry.box_extreme_along_direction
    ~distance3d.geometry.cylinder_extreme_along_direction
    ~distance3d.geometry.capsule_extreme_along_direction
+   ~distance3d.geometry.ellipsoid_extreme_along_direction
    ~distance3d.geometry.hesse_normal_form
    ~distance3d.geometry.line_from_pluecker
 
