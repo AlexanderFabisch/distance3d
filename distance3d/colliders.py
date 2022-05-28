@@ -382,13 +382,67 @@ class Mesh(Convex):
         self.vertices_ = np.asarray(self.artist_.mesh.vertices)
 
 
-class MeshGraph(Mesh):
-    def __init__(self, filename, A2B, scale=1.0, artist=None):
-        super(MeshGraph, self).__init__(filename, A2B, scale, artist)
+class TriangleMesh(pv.Artist):
+    """Triangle mesh.
+
+    Parameters
+    ----------
+    TODO
+
+    c : array-like, shape (n_vertices, 3) or (3,), optional (default: None)
+        Color(s)
+    """
+    def __init__(self, vertices, triangles, c=None):
+        import open3d as o3d
+        self.mesh = o3d.geometry.TriangleMesh()
+        self.mesh.vertices = o3d.utility.Vector3dVector(np.asarray(vertices))
+        self.mesh.triangles = o3d.utility.Vector3iVector(np.asarray(triangles))
+        self.mesh.compute_vertex_normals()
+        if c is not None:
+            n_vertices = len(self.mesh.vertices)
+            colors = np.zeros((n_vertices, 3))
+            colors[:] = c
+            self.mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
+        self.A2B = None
+        self.set_data(np.eye(4))
+
+    def set_data(self, A2B):
+        """Update data.
+
+        Parameters
+        ----------
+        A2B : array-like, shape (4, 4)
+            Center of the mesh.
+        """
+        import pytransform3d.transformations as pt
+        previous_A2B = self.A2B
+        if previous_A2B is None:
+            previous_A2B = np.eye(4)
+        self.A2B = A2B
+
+        self.mesh.transform(pt.invert_transform(previous_A2B, check=False))
+        self.mesh.transform(self.A2B)
+
+    @property
+    def geometries(self):
+        """Expose geometries.
+
+        Returns
+        -------
+        geometries : list
+            List of geometries that can be added to the visualizer.
+        """
+        return [self.mesh]
+
+
+class MeshGraph(Convex):
+    def __init__(self, vertices, triangles, artist=None):
+        super(Convex, self).__init__(vertices, artist)
+        self.triangles_ = triangles
         indices1 = []
         indices2 = []
         dists = []
-        for i, j, k in np.asarray(self.artist_.mesh.triangles):
+        for i, j, k in np.asarray(self.triangles_):
             indices1.append(i)
             indices2.append(j)
             dists.append(np.linalg.norm(self.vertices_[i] - self.vertices_[j]))
@@ -415,6 +469,24 @@ class MeshGraph(Mesh):
                     updated = True
             converged = not updated
         return idx, self.vertices_[idx]
+
+    def make_artist(self, c=None):
+        self.artist_ = TriangleMesh(self.vertices_, self.triangles_, c=c)
+
+    def first_vertex(self):
+        return self.vertices_[0]
+
+    def compute_point(self, barycentric_coordinates, indices):
+        return np.dot(barycentric_coordinates, self.vertices_[indices])
+
+    def update_pose(self, vertices):
+        self.vertices_ = vertices
+        if self.artist_ is not None:
+            self.artist_.set_data(self.vertices_)
+
+    def aabb(self):
+        mins, maxs = axis_aligned_bounding_box(self.vertices_)
+        return AABB(np.array([mins, maxs]).T)
 
 
 class Cylinder(ConvexCollider):
