@@ -310,6 +310,21 @@ def box_extreme_along_direction(search_direction, box2origin, half_lengths):
 
 
 @numba.njit(cache=True)
+def hill_climb_mesh_extreme(search_direction, start_idx, vertices, connections):
+    best_idx = start_idx
+    converged = False
+    while not converged:
+        updated = False
+        for connected_idx in connections[best_idx]:
+            projected_length = search_direction.dot(vertices[connected_idx] - vertices[best_idx])
+            if projected_length > 0.0:
+                best_idx = connected_idx
+                updated = True
+        converged = not updated
+    return best_idx, vertices[best_idx]
+
+
+@numba.njit(cache=True)
 def hesse_normal_form(plane_point, plane_normal):
     """Computes Hesse normal form of a plane.
 
