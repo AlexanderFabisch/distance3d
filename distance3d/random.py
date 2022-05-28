@@ -284,7 +284,7 @@ def rand_ellipsoid(
         Pose of the ellipsoid.
 
     radii : array, shape (3,)
-        Radii of the ellipsoid within (min_radius, min_radius + 1].
+        Radii of the ellipsoid within (min_radius, min_radius + radius_scale].
     """
     ellipsoid2origin = pt.random_transform(random_state)
     ellipsoid2origin[:3, 3] *= center_scale
