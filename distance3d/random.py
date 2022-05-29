@@ -361,8 +361,11 @@ def rand_sphere(random_state, center_scale=1.0, radius_scale=1.0):
     return center, radius
 
 
-def randn_convex(random_state, n_points=10, center_scale=1.0, std=1.0, return_indices=False):
+def randn_convex(random_state, n_points=10, center_scale=1.0, min_radius=1.0,
+                 radius_scale=1.0):
     """Sample convex mesh.
+
+    We randomly sample points from the surface of an ellipsoid.
 
     Parameters
     ----------
@@ -375,27 +378,30 @@ def randn_convex(random_state, n_points=10, center_scale=1.0, std=1.0, return_in
     center_scale : float, optional (default: 1)
         Scaling factor for center.
 
-    std : float, optional (default: 1)
-        Standard deviation of normal distribution.
+    min_radius : float, optional (default: 1)
+        Minimum distance of vertices to the origin of the mesh.
 
-    return_indices : bool, optional (default: False)
-        Return indices of vertices in faces and all points.
+    radius_scale : float, optional (default: 1)
+        Scaling factor for the distance to the origin of the mesh.
 
     Returns
     -------
-    vertices : array, shape (n_convex_points, 3)
+    mesh2origin : array, shape (4, 4)
+        Pose of the mesh.
+
+    vertices : array, shape (n_vertices, 3), optional
         Vertices of the convex mesh.
 
-    faces : array, shape (n_triangles, 3, 3)
-        Vertices organized as triangles.
-
-    points : array, shape (n_points,), optional
-        All points that have been sampled from normal distribution.
-
-    indices : array, shape (n_triangles, 3), optional
-        Indices of points forming the simplical facets of the convex hull.
+    triangles : array, shape (n_triangles, 3)
+        Vertex indices of faces.
     """
-    points = random_state.randn(n_points, 3) * std
+    phis = random_state.rand(n_points) * np.pi
+    thetas = random_state.rand(n_points) * 2 * np.pi
+    x = np.sin(phis) * np.cos(thetas)
+    y = np.sin(phis) * np.sin(thetas)
+    z = np.cos(phis)
+    radii = min_radius + (1.0 - random_state.rand(3)) * radius_scale
+    points = np.column_stack((x, y, z)) * radii[np.newaxis]
     ch = ConvexHull(points)
     simplices = ch.simplices
     faces = np.array([points[[i, j, k]] for i, j, k in simplices])
@@ -409,11 +415,6 @@ def randn_convex(random_state, n_points=10, center_scale=1.0, std=1.0, return_in
             faces[face_idx] = faces[face_idx, reordered_indices]
             simplices[face_idx] = simplices[face_idx, reordered_indices]
 
-    center = random_state.randn(1, 3) * center_scale
-    points += center
-    faces += center
-    vertices = points[ch.vertices]
-    ret = [vertices, faces]
-    if return_indices:
-        ret.extend([ch.points, simplices])
-    return ret
+    mesh2origin = pt.random_transform(random_state)
+    mesh2origin[:3, 3] *= center_scale
+    return mesh2origin, points, simplices
