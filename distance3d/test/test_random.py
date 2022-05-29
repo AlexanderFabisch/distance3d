@@ -113,4 +113,5 @@ def test_randn_convex():
     mesh2origin, vertices, triangles = randn_convex(random_state, n_points)
     pt.assert_transform(mesh2origin)
     assert len(vertices) == n_points
-    assert triangles.ndom == 3
+    assert np.min(triangles) == 0
+    assert np.max(triangles) == len(vertices) - 1
