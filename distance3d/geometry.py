@@ -133,6 +133,7 @@ def convert_segment_to_line(segment_start, segment_end):
 BOX_COORDS = np.array(list(product([-0.5, 0.5], repeat=3)))
 
 
+@numba.njit(cache=True)
 def convert_box_to_vertices(box2origin, size):
     """Convert box to vertices.
 
