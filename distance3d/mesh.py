@@ -15,16 +15,14 @@ class MeshHillClimber:
                 connections[j] = set()
             if k not in connections:
                 connections[k] = set()
-            connections[i].add(j)
-            connections[i].add(k)
-            connections[j].add(i)
-            connections[j].add(k)
-            connections[k].add(i)
-            connections[k].add(j)
+            connections[i].update((j, k))
+            connections[j].update((i, k))
+            connections[k].update((i, j))
 
         self.connections = numba.typed.Dict.empty(numba.int64, numba.int64[:])
         for idx, connected_indices in connections.items():
-            self.connections[idx] = np.asarray(list(connected_indices), dtype=int)
+            self.connections[idx] = np.fromiter(
+                connected_indices, dtype=int, count=len(connected_indices))
 
         self.first_idx = np.min(triangles)
 
@@ -37,7 +35,8 @@ class MeshHillClimber:
         idx = hill_climb_mesh_extreme(
             search_direction_in_mesh, self.first_idx, self.vertices,
             self.connections)
-        return idx, self.mesh2origin[:3, 3] + np.dot(self.mesh2origin[:3, :3], self.vertices[idx])
+        return idx, self.mesh2origin[:3, 3] + np.dot(
+            self.mesh2origin[:3, :3], self.vertices[idx])
 
 
 @numba.njit(
@@ -74,4 +73,5 @@ class MeshSupportFunction:
         search_direction_in_mesh = np.dot(
             self.mesh2origin[:3, :3].T, search_direction)
         idx = np.argmax(self.vertices.dot(search_direction_in_mesh))
-        return idx, self.mesh2origin[:3, 3] + np.dot(self.mesh2origin[:3, :3], self.vertices[idx])
+        return idx, self.mesh2origin[:3, 3] + np.dot(
+            self.mesh2origin[:3, :3], self.vertices[idx])
