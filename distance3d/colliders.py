@@ -405,11 +405,11 @@ class MeshGraph(Convex):
         super(Convex, self).__init__(vertices, artist)
         self.mesh2origin = mesh2origin
         self.triangles = triangles
-        self.mesh_hill_climber = MeshHillClimber(
+        self.support_function = MeshHillClimber(
             mesh2origin, vertices, triangles)
 
     def support_function(self, search_direction):
-        return self.mesh_hill_climber(search_direction)
+        return self.support_function(search_direction)
 
     def make_artist(self, c=None):
         self.artist_ = VisualMesh(
@@ -427,7 +427,7 @@ class MeshGraph(Convex):
 
     def update_pose(self, mesh2origin):
         self.mesh2origin = mesh2origin
-        self.mesh_hill_climber.update_pose(mesh2origin)
+        self.support_function.update_pose(mesh2origin)
         if self.artist_ is not None:
             self.artist_.set_data(mesh2origin)
 
