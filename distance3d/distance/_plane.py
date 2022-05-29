@@ -141,6 +141,13 @@ def line_segment_to_plane(
     closest_point_plane : array, shape (3,)
         Closest point on plane.
     """
+    return _line_segment_to_plane(
+        segment_start, segment_end, plane_point, plane_normal, epsilon)
+
+
+@numba.jit(cache=True)
+def _line_segment_to_plane(
+        segment_start, segment_end, plane_point, plane_normal, epsilon):
     segment_direction, segment_length = convert_segment_to_line(
         segment_start, segment_end)
     line_intersects, t = _line_to_plane(
@@ -158,8 +165,8 @@ def line_segment_to_plane(
     else:
         closest_point_segment = segment_start
 
-    dist, closest_point_plane = point_to_plane(
-        closest_point_segment, plane_point, plane_normal)
+    dist, closest_point_plane = _point_to_plane(
+        closest_point_segment, plane_point, plane_normal, False)
     return dist, closest_point_segment, closest_point_plane
 
 
@@ -247,14 +254,15 @@ def plane_to_triangle(plane_point, plane_normal, triangle_points):
     return _plane_to_convex_hull_points(plane_point, plane_normal, triangle_points)
 
 
+@numba.njit(cache=True)
 def _plane_to_convex_hull_points(plane_point, plane_normal, points):
-    ts = np.dot(points - plane_point[np.newaxis], plane_normal)
+    ts = np.dot(points - plane_point.reshape(1, -1), plane_normal)
     min_idx = np.argmin(ts)
     max_idx = np.argmax(ts)
 
     if ts[min_idx] * ts[max_idx] < 0:  # on opposite sides, intersection
-        return line_segment_to_plane(
-            points[min_idx], points[max_idx], plane_point, plane_normal)
+        return _line_segment_to_plane(
+            points[min_idx], points[max_idx], plane_point, plane_normal, 1e-6)
 
     closest_idx = np.argmin(np.abs(ts))
     closest_point = points[closest_idx]
