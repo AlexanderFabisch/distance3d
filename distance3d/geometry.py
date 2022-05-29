@@ -305,6 +305,7 @@ def box_extreme_along_direction(search_direction, box2origin, half_lengths):
     return box2origin[:3, 3] + np.dot(box2origin[:3, :3], local_vertex)
 
 
+@numba.njit(cache=True)
 def hesse_normal_form(plane_point, plane_normal):
     """Computes Hesse normal form of a plane.
 

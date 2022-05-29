@@ -92,8 +92,13 @@ def line_to_plane(
     return dist, line_point, closest_point_plane
 
 
+@numba.njit(
+    numba.types.Tuple((numba.boolean, numba.float64))
+    (numba.float64[:], numba.float64[:], numba.float64[:], numba.float64[:],
+     numba.float64),
+    cache=False)
 def _line_to_plane(line_point, line_direction, plane_point, plane_normal,
-                   epsilon=1e-6):
+                   epsilon):
     length_of_dir_projected_on_normal = np.dot(line_direction, plane_normal)
     if length_of_dir_projected_on_normal * length_of_dir_projected_on_normal < epsilon:
         # line parallel to plane
