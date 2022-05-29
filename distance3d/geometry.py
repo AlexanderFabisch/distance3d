@@ -103,6 +103,7 @@ def convert_box_to_face(box2origin, size, i, sign):
     return face_center, face_axes, face_lengths
 
 
+@numba.njit(cache=True)
 def convert_segment_to_line(segment_start, segment_end):
     """Convert line segment to line.
 
