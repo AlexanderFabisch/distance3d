@@ -2,7 +2,7 @@ import timeit
 from functools import partial
 import numpy as np
 from distance3d.distance import triangle_to_triangle
-from distance3d import random, gjk, geometry
+from distance3d import random, gjk
 
 
 random_state = np.random.RandomState(0)
