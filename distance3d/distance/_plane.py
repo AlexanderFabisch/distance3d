@@ -7,7 +7,6 @@ from ..geometry import (
     convert_rectangle_to_vertices, convert_box_to_vertices)
 
 
-@numba.jit(cache=True)
 def point_to_plane(point, plane_point, plane_normal, signed=False):
     """Compute the shortest distance between a point and a plane.
 
@@ -34,6 +33,14 @@ def point_to_plane(point, plane_point, plane_normal, signed=False):
     closest_point_plane : array, shape (3,)
         Closest point on plane.
     """
+    return _point_to_plane(point, plane_point, plane_normal, signed)
+
+
+@numba.jit(
+    numba.types.Tuple((numba.float64, numba.float64[:]))
+    (numba.float64[:], numba.float64[:], numba.float64[:], numba.boolean),
+    cache=True)
+def _point_to_plane(point, plane_point, plane_normal, signed):
     t = np.dot(plane_normal, point - plane_point)
     closest_point_plane = point - t * plane_normal
     if not signed:
