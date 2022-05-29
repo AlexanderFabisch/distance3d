@@ -343,6 +343,7 @@ def plane_to_box(plane_point, plane_normal, box2origin, size):
     return _plane_to_convex_hull_points(plane_point, plane_normal, points)
 
 
+@numba.njit(cache=True)
 def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
     """Compute the shortest distance between a plane and an ellipsoid.
 
@@ -394,6 +395,7 @@ def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
     return dist, closest_point_plane, closest_point_ellipsoid
 
 
+@numba.njit(cache=True)
 def _ellipsoid_quadric_matrix(ellipsoid2origin, radii):
     R_scaled = ellipsoid2origin[:3, :3] / radii
     return R_scaled.dot(R_scaled.T)
