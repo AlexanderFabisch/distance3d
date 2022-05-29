@@ -18,7 +18,7 @@ class Mesh(pv.Artist):
     triangles : array, shape (n_triangles, 3)
         Indices of vertices that form triangles of the mesh.
 
-    c : array-like, shape (n_vertices, 3) or (3,), optional (default: None)
+    c : array-like, shape (3,), optional (default: None)
         Color(s)
     """
     def __init__(self, mesh2origin, vertices, triangles, c=None):
@@ -27,10 +27,7 @@ class Mesh(pv.Artist):
         self.mesh.triangles = o3d.utility.Vector3iVector(triangles)
         self.mesh.compute_vertex_normals()
         if c is not None:
-            n_vertices = len(self.mesh.vertices)
-            colors = np.zeros((n_vertices, 3))
-            colors[:] = c
-            self.mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
+            self.mesh.paint_uniform_color(c)
         self.mesh2origin = None
         self.set_data(mesh2origin)
 
