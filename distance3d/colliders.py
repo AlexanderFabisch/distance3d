@@ -12,6 +12,7 @@ from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb, ellipsoid_aabb)
 from .urdf_utils import self_collision_whitelists
+from .visualization import Mesh as VisualMesh
 from aabbtree import AABB, AABBTree
 
 
@@ -383,67 +384,18 @@ class Mesh(Convex):
         self.vertices_ = np.asarray(self.artist_.mesh.vertices)
 
 
-class TriangleMesh(pv.Artist):
-    """Triangle mesh.
-
-    Parameters
-    ----------
-    TODO
-
-    c : array-like, shape (n_vertices, 3) or (3,), optional (default: None)
-        Color(s)
-    """
-    def __init__(self, vertices, triangles, c=None):
-        import open3d as o3d
-        self.mesh = o3d.geometry.TriangleMesh()
-        self.mesh.vertices = o3d.utility.Vector3dVector(np.asarray(vertices))
-        self.mesh.triangles = o3d.utility.Vector3iVector(np.asarray(triangles))
-        self.mesh.compute_vertex_normals()
-        if c is not None:
-            n_vertices = len(self.mesh.vertices)
-            colors = np.zeros((n_vertices, 3))
-            colors[:] = c
-            self.mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
-        self.A2B = None
-        self.set_data(np.eye(4))
-
-    def set_data(self, A2B):
-        """Update data.
-
-        Parameters
-        ----------
-        A2B : array-like, shape (4, 4)
-            Center of the mesh.
-        """
-        import pytransform3d.transformations as pt
-        previous_A2B = self.A2B
-        if previous_A2B is None:
-            previous_A2B = np.eye(4)
-        self.A2B = A2B
-
-        self.mesh.transform(pt.invert_transform(previous_A2B, check=False))
-        self.mesh.transform(self.A2B)
-
-    @property
-    def geometries(self):
-        """Expose geometries.
-
-        Returns
-        -------
-        geometries : list
-            List of geometries that can be added to the visualizer.
-        """
-        return [self.mesh]
-
-
 class MeshGraph(Convex):
-    def __init__(self, vertices, triangles, artist=None):
-        super(Convex, self).__init__(vertices, artist)
-        self.triangles_ = triangles
-        self.first_idx = np.min(self.triangles_)
+    def __init__(self, mesh2origin, vertices, triangles, artist=None):
+        points = mesh2origin[np.newaxis, :3, 3] + np.dot(vertices, mesh2origin[:3, :3].T)
+        super(Convex, self).__init__(points, artist)
+        self.mesh2origin = mesh2origin
+        self.vertices = vertices
+        self.triangles = triangles
+
+        self.first_idx = np.min(self.triangles)
         import numba
         connections = {}
-        for i, j, k in np.asarray(self.triangles_):
+        for i, j, k in np.asarray(self.triangles):
             if i not in connections:
                 connections[i] = set()
             if j not in connections:
@@ -465,7 +417,8 @@ class MeshGraph(Convex):
             search_direction, self.first_idx, self.vertices_, self.connections)
 
     def make_artist(self, c=None):
-        self.artist_ = TriangleMesh(self.vertices_, self.triangles_, c=c)
+        self.artist_ = VisualMesh(
+            self.mesh2origin, self.vertices, self.triangles, c=c)
 
     def first_vertex(self):
         return self.vertices_[0]
@@ -473,13 +426,13 @@ class MeshGraph(Convex):
     def compute_point(self, barycentric_coordinates, indices):
         return np.dot(barycentric_coordinates, self.vertices_[indices])
 
-    def update_pose(self, vertices):
-        self.vertices_ = vertices
+    def update_pose(self, mesh2origin):
+        self.vertices_ = mesh2origin[np.newaxis, :3, 3] + np.dot(self.vertices, mesh2origin[:3, :3].T)
         if self.artist_ is not None:
-            self.artist_.set_data(self.vertices_)
+            self.artist_.set_data(mesh2origin)
 
     def aabb(self):
-        mins, maxs = axis_aligned_bounding_box(self.vertices_)
+        mins, maxs = axis_aligned_bounding_box(self.vertices_)  # TODO graph search
         return AABB(np.array([mins, maxs]).T)
 
 
