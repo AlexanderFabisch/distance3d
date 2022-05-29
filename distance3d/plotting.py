@@ -4,6 +4,7 @@ import numpy as np
 from mpl_toolkits import mplot3d
 import pytransform3d.plot_utils as ppu
 import pytransform3d.rotations as pr
+import pytransform3d.transformations as pt
 from .utils import plane_basis_from_normal
 
 
@@ -222,7 +223,7 @@ def plot_aabb(ax, mins, maxs, alpha=1.0, color="r"):
     ppu.plot_box(ax=ax, A2B=box2origin, size=size, wireframe=True, alpha=alpha, color=color)
 
 
-def plot_convex(ax, vertices, faces, alpha=0.5, color="b"):
+def plot_convex(ax, mesh2origin, vertices, triangles, alpha=0.5, color="b"):
     """Plot convex mesh.
 
     Parameters
@@ -230,11 +231,14 @@ def plot_convex(ax, vertices, faces, alpha=0.5, color="b"):
     ax : Matplotlib 3d axis
         A matplotlib 3d axis.
 
-    vertices : array, shape (n_convex_points, 3)
+    mesh2origin : array, shape (4, 4)
+        Pose of the mesh.
+
+    vertices : array, shape (n_points, 3)
         Vertices of the convex mesh.
 
-    faces : array, shape (n_triangles, 3, 3)
-        Vertices organized as triangles.
+    triangles : array, shape (n_triangles, 3)
+        Vertex indices of faces.
 
     alpha : float, optional (default: 0.5)
         Alpha value of faces.
@@ -242,7 +246,9 @@ def plot_convex(ax, vertices, faces, alpha=0.5, color="b"):
     color : str
         Color of faces.
     """
-    ax.scatter(vertices[:, 0], vertices[:, 1], vertices[:, 2], color="red")
+    points = pt.transform(mesh2origin, pt.vectors_to_points(vertices))[:, :3]
+    ax.scatter(points[:, 0], points[:, 1], points[:, 2], color="red")
+    faces = np.array([points[[i, j, k]] for i, j, k in triangles])
     surface = mplot3d.art3d.Poly3DCollection(faces)
     surface.set_facecolor(color)
     surface.set_alpha(alpha)

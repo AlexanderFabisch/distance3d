@@ -110,10 +110,7 @@ def test_rand_sphere():
 def test_randn_convex():
     random_state = np.random.RandomState(111)
     n_points = 10
-    vertices, faces = randn_convex(random_state, n_points)
-    assert len(vertices) <= n_points
-
-    vertices, faces, points, triangles = randn_convex(
-        random_state, n_points, return_indices=True)
-    assert len(faces) == len(triangles)
-    assert len(points) == n_points
+    mesh2origin, vertices, triangles = randn_convex(random_state, n_points)
+    pt.assert_transform(mesh2origin)
+    assert len(vertices) == n_points
+    assert triangles.ndom == 3
