@@ -1,6 +1,5 @@
 import numpy as np
 import pytransform3d.visualizer as pv
-import pytransform3d.transformations as pt
 import open3d as o3d
 
 
@@ -44,7 +43,7 @@ class Mesh(pv.Artist):
             previous_mesh2origin = np.eye(4)
         self.mesh2origin = mesh2origin
 
-        self.mesh.transform(pt.invert_transform(previous_mesh2origin, check=False))
+        self.mesh.transform(np.linalg.inv(previous_mesh2origin))
         self.mesh.transform(self.mesh2origin)
 
     @property
