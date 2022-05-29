@@ -385,6 +385,22 @@ class Mesh(Convex):
 
 
 class MeshGraph(Convex):
+    """Wraps mesh for GJK and use triangles for hill climbing.
+
+    Parameters
+    ----------
+    mesh2origin : array, shape (4, 4)
+        Pose of the mesh.
+
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    triangles : array, shape (n_triangles, 3)
+        Indices of vertices that form triangles of the mesh.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
     def __init__(self, mesh2origin, vertices, triangles, artist=None):
         super(Convex, self).__init__(vertices, artist)
         self.mesh2origin = mesh2origin
