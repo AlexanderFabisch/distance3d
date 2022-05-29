@@ -395,7 +395,7 @@ class MeshGraph(Convex):
         self.first_idx = np.min(self.triangles)
         import numba
         connections = {}
-        for i, j, k in np.asarray(self.triangles):
+        for i, j, k in self.triangles:
             if i not in connections:
                 connections[i] = set()
             if j not in connections:
