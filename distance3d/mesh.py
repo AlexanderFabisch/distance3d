@@ -48,15 +48,14 @@ def hill_climb_mesh_extreme(search_direction, start_idx, vertices, connections):
     best_idx = start_idx
     converged = False
     while not converged:
-        updated = False
+        converged = True
         for connected_idx in connections[best_idx]:
             vertex_diff = np.ascontiguousarray(
                 vertices[connected_idx] - vertices[best_idx])
             projected_length = search_direction.dot(vertex_diff)
             if projected_length > 0.0:
                 best_idx = connected_idx
-                updated = True
-        converged = not updated
+                converged = False
     return best_idx
 
 
