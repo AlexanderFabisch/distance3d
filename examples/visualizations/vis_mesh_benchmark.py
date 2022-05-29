@@ -20,11 +20,11 @@ bvh = BoundingVolumeHierarchy(tm, "base")
 random_state = np.random.RandomState(32)
 
 timer = Timer()
-box_frames = list(range(300))
+box_frames = list(range(20))
 fast_transform_manager_initialization(tm, box_frames, "base")
 for i in box_frames:
     mesh2origin, vertices, triangles = randn_convex(
-        random_state, n_points=1000, center_scale=1.0, min_radius=0.1,
+        random_state, n_points=5000, center_scale=0.5, min_radius=0.1,
         radius_scale=0.1)
     collider = MeshGraph(mesh2origin, vertices, triangles)
     collider.make_artist(c=(0, 1, 0))
