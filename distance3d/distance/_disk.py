@@ -8,7 +8,10 @@ from ._plane import plane_intersects_plane
 from ..utils import norm_vector
 
 
-@numba.jit(cache=True)
+@numba.jit(
+    numba.types.Tuple((numba.float64, numba.float64[:]))
+    (numba.float64[:], numba.float64[:], numba.float64, numba.float64[:]),
+    cache=True)
 def point_to_disk(point, center, radius, normal):
     """Compute the shortest distance between point and disk.
 
@@ -48,7 +51,7 @@ def point_to_disk(point, center, radius, normal):
     """
     # signed distance from point to plane of disk
     diff = point - center
-    dist_to_plane = diff.dot(normal)
+    dist_to_plane = np.dot(diff, normal)
 
     # projection of P - C onto plane is Q - C = P - C - dist_to_plane * normal
     diff_in_plane = diff - dist_to_plane * normal
