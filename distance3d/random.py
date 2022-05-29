@@ -397,24 +397,30 @@ def randn_convex(random_state, n_points=10, center_scale=1.0, min_radius=1.0,
     """
     phis = random_state.rand(n_points) * np.pi
     thetas = random_state.rand(n_points) * 2 * np.pi
-    x = np.sin(phis) * np.cos(thetas)
-    y = np.sin(phis) * np.sin(thetas)
+    sin_phis = np.sin(phis)
+    x = sin_phis * np.cos(thetas)
+    y = sin_phis * np.sin(thetas)
     z = np.cos(phis)
     radii = min_radius + (1.0 - random_state.rand(3)) * radius_scale
     points = np.column_stack((x, y, z)) * radii[np.newaxis]
     ch = ConvexHull(points)
+
     simplices = ch.simplices
     faces = np.array([points[[i, j, k]] for i, j, k in simplices])
-
-    reordered_indices = np.array([2, 1, 0], dtype=int)
-    for face_idx in range(len(faces)):
-        if pr.angle_between_vectors(
-                np.cross(faces[face_idx, 2] - faces[face_idx, 0],
-                         faces[face_idx, 1] - faces[face_idx, 0]),
-                np.mean(faces[face_idx], axis=0)) < 0.5 * np.pi:
-            faces[face_idx] = faces[face_idx, reordered_indices]
-            simplices[face_idx] = simplices[face_idx, reordered_indices]
+    A = faces[:, 2] - faces[:, 0]
+    B = faces[:, 1] - faces[:, 0]
+    C = np.cross(A, B)
+    centers = np.mean(faces, axis=1)
+    angles = angle_between_vectors(C, centers)
+    indices = np.where(angles < 0.5 * np.pi)[0]
+    simplices[indices] = simplices[indices, ::-1]
 
     mesh2origin = pt.random_transform(random_state)
     mesh2origin[:3, 3] *= center_scale
     return mesh2origin, points, simplices
+
+
+def angle_between_vectors(A, B):
+    return np.arccos(
+        np.clip(np.sum(A * B, axis=1) / (np.linalg.norm(A, axis=1) * np.linalg.norm(B, axis=1)),
+                -1.0, 1.0))

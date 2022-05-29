@@ -1,4 +1,5 @@
 import timeit
+import time
 from functools import partial
 import numpy as np
 from distance3d import random
@@ -22,7 +23,10 @@ print(f"Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 random_state = np.random.RandomState(0)
 mesh2origin, vertices, triangles = random.randn_convex(random_state, n_points=50000)
 
+start = time.time()
 support_function = MeshHillClimber(mesh2origin, vertices, triangles)
+end = time.time()
+print(end - start)
 times = timeit.repeat(partial(
     run_support_function, random_state=random_state,
     support_function=support_function), repeat=10, number=1000)
