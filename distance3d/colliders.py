@@ -6,13 +6,13 @@ from pytransform3d import urdf
 import pytransform3d.visualizer as pv
 from .geometry import (
     capsule_extreme_along_direction, cylinder_extreme_along_direction,
-    convert_box_to_vertices, ellipsoid_extreme_along_direction,
-    hill_climb_mesh_extreme)
+    convert_box_to_vertices, ellipsoid_extreme_along_direction)
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb, ellipsoid_aabb)
 from .urdf_utils import self_collision_whitelists
 from .visualization import Mesh as VisualMesh
+from .mesh import MeshHillClimber, MeshSupportFunction
 from aabbtree import AABB, AABBTree
 
 
@@ -386,53 +386,40 @@ class Mesh(Convex):
 
 class MeshGraph(Convex):
     def __init__(self, mesh2origin, vertices, triangles, artist=None):
-        points = mesh2origin[np.newaxis, :3, 3] + np.dot(vertices, mesh2origin[:3, :3].T)
-        super(Convex, self).__init__(points, artist)
+        super(Convex, self).__init__(vertices, artist)
         self.mesh2origin = mesh2origin
-        self.vertices = vertices
         self.triangles = triangles
-
-        self.first_idx = np.min(self.triangles)
-        connections = {}
-        for i, j, k in self.triangles:
-            if i not in connections:
-                connections[i] = set()
-            if j not in connections:
-                connections[j] = set()
-            if k not in connections:
-                connections[k] = set()
-            connections[i].add(j)
-            connections[i].add(k)
-            connections[j].add(i)
-            connections[j].add(k)
-            connections[k].add(i)
-            connections[k].add(j)
-        import numba
-        self.connections = numba.typed.Dict.empty(numba.int64, numba.int64[:])
-        for idx, connected_indices in connections.items():
-            self.connections[idx] = np.asarray(list(connected_indices), dtype=int)
+        self.mesh_hill_climber = MeshHillClimber(
+            mesh2origin, vertices, triangles)
 
     def support_function(self, search_direction):
-        return hill_climb_mesh_extreme(
-            search_direction, self.first_idx, self.vertices_, self.connections)
+        return self.mesh_hill_climber(search_direction)
 
     def make_artist(self, c=None):
         self.artist_ = VisualMesh(
-            self.mesh2origin, self.vertices, self.triangles, c=c)
+            self.mesh2origin, self.vertices_, self.triangles, c=c)
 
     def first_vertex(self):
-        return self.vertices_[0]
+        return self.mesh2origin[:3, 3] + np.dot(
+            self.mesh2origin[:3, :3], self.vertices_[0])
 
     def compute_point(self, barycentric_coordinates, indices):
-        return np.dot(barycentric_coordinates, self.vertices_[indices])
+        vertices_in_mesh = self.vertices_[indices]
+        vertices_in_origin = self.mesh2origin[np.newaxis, :3, 3] + np.dot(
+            vertices_in_mesh, self.mesh2origin[:3, :3].T)
+        return np.dot(barycentric_coordinates, vertices_in_origin)
 
     def update_pose(self, mesh2origin):
-        self.vertices_ = mesh2origin[np.newaxis, :3, 3] + np.dot(self.vertices, mesh2origin[:3, :3].T)
+        self.mesh2origin = mesh2origin
+        self.mesh_hill_climber.update_pose(mesh2origin)
         if self.artist_ is not None:
             self.artist_.set_data(mesh2origin)
 
     def aabb(self):
-        mins, maxs = axis_aligned_bounding_box(self.vertices_)  # TODO graph search
+        # TODO graph search
+        mins, maxs = axis_aligned_bounding_box(
+            self.mesh2origin[np.newaxis, :3, 3] + np.dot(
+                self.vertices_, self.mesh2origin[:3, :3].T))
         return AABB(np.array([mins, maxs]).T)
 
 
