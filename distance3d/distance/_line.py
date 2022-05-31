@@ -29,8 +29,8 @@ def point_to_line(point, line_point, line_direction):
 
 
 @numba.njit(
-    numba.types.Tuple((numba.float64, numba.float64[:], numba.float64))
-    (numba.float64[:], numba.float64[:], numba.float64[:]),
+    numba.types.Tuple((numba.float64, numba.float64[::1], numba.float64))
+    (numba.float64[::1], numba.float64[::1], numba.float64[::1]),
     cache=True)
 def _point_to_line(point, line_point, line_direction):
     diff = point - line_point
@@ -42,8 +42,8 @@ def _point_to_line(point, line_point, line_direction):
 
 
 @numba.njit(
-    numba.types.Tuple((numba.float64, numba.float64[:]))
-    (numba.float64[:], numba.float64[:], numba.float64[:]),
+    numba.types.Tuple((numba.float64, numba.float64[::1]))
+    (numba.float64[::1], numba.float64[::1], numba.float64[::1]),
     cache=True)
 def point_to_line_segment(point, segment_start, segment_end):
     """Compute the shortest distance between point and line segment.
@@ -118,10 +118,10 @@ def line_to_line(line_point1, line_direction1, line_point2, line_direction2,
 
 
 @numba.njit(
-    numba.types.Tuple((numba.float64, numba.float64[:], numba.float64[:],
+    numba.types.Tuple((numba.float64, numba.float64[::1], numba.float64[::1],
                        numba.float64, numba.float64))
-    (numba.float64[:], numba.float64[:], numba.float64[:], numba.float64[:],
-     numba.float64),
+    (numba.float64[::1], numba.float64[::1], numba.float64[::1],
+     numba.float64[::1], numba.float64),
     cache=True)
 def _line_to_line(line_point1, line_direction1, line_point2, line_direction2,
                   epsilon):
@@ -193,9 +193,9 @@ def line_to_line_segment(
 
 # modified version of line segment to line segment
 @numba.njit(numba.types.Tuple(
-    (numba.float64, numba.float64[:], numba.float64[:], numba.float64, numba.float64))
-    (numba.float64[:], numba.float64[:], numba.float64[:],
-     numba.float64[:], numba.float64), cache=True)
+    (numba.float64, numba.float64[::1], numba.float64[::1], numba.float64, numba.float64))
+    (numba.float64[::1], numba.float64[::1], numba.float64[::1],
+     numba.float64[::1], numba.float64), cache=True)
 def _line_to_line_segment(
         line_point, line_direction, segment_start, segment_end, epsilon):
     # Segment direction vectors

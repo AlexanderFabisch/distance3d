@@ -126,7 +126,7 @@ def line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6):
 
 @numba.njit(numba.types.Tuple(
     (numba.float64, numba.float64[:], numba.float64[:], numba.float64))
-    (numba.float64[:], numba.float64[:], numba.float64[:, :], numba.float64),
+    (numba.float64[::1], numba.float64[::1], numba.float64[:, ::1], numba.float64),
     cache=True)
 def _line_to_triangle(line_point, line_direction, triangle_points, epsilon):
     # Test if line intersects triangle. If so, the squared distance is zero.
