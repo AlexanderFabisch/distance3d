@@ -70,25 +70,25 @@ def test_point_to_line_segment():
 
 
 def test_point_to_plane():
-    point = np.array([0, 0, 0])
-    plane_point = np.array([0, 0, 0])
-    plane_normal = np.array([0, 0, 1])
+    point = np.array([0, 0, 0], dtype=float)
+    plane_point = np.array([0, 0, 0], dtype=float)
+    plane_normal = np.array([0, 0, 1], dtype=float)
     dist, closest_point_on_plane = point_to_plane(
         point, plane_point, plane_normal)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point_on_plane, np.array([0, 0, 0]))
 
-    point = np.array([0, 0, 1])
-    plane_point = np.array([0, 0, 0])
-    plane_normal = np.array([0, 0, 1])
+    point = np.array([0, 0, 1], dtype=float)
+    plane_point = np.array([0, 0, 0], dtype=float)
+    plane_normal = np.array([0, 0, 1], dtype=float)
     dist, closest_point_on_plane = point_to_plane(
         point, plane_point, plane_normal)
     assert approx(dist) == 1
     assert_array_almost_equal(closest_point_on_plane, np.array([0, 0, 0]))
 
-    point = np.array([0, 0, -1])
-    plane_point = np.array([0, 0, 0])
-    plane_normal = np.array([0, 0, 1])
+    point = np.array([0, 0, -1], dtype=float)
+    plane_point = np.array([0, 0, 0], dtype=float)
+    plane_normal = np.array([0, 0, 1], dtype=float)
     dist, closest_point_on_plane = point_to_plane(
         point, plane_point, plane_normal)
     assert approx(dist) == 1
@@ -222,25 +222,25 @@ def test_point_to_circle():
 
 
 def test_point_to_disk():
-    point = np.array([0, 0, 0])
-    center = np.array([0, 0, 0])
-    normal = np.array([0, 0, 1])
+    point = np.array([0, 0, 0], dtype=float)
+    center = np.array([0, 0, 0], dtype=float)
+    normal = np.array([0, 0, 1], dtype=float)
     radius = 1.0
     dist, closest_point_circle = point_to_disk(point, center, radius, normal)
     assert approx(dist) == 0.0
     assert_array_almost_equal(closest_point_circle, point)
 
-    point = np.array([0, 0, 1])
+    point = np.array([0, 0, 1], dtype=float)
     dist, closest_point_circle = point_to_disk(point, center, radius, normal)
     assert approx(dist, abs=1e-7) == 1.0
     assert_array_almost_equal(closest_point_circle, np.array([0, 0, 0]))
 
-    point = np.array([0, 1, 1])
+    point = np.array([0, 1, 1], dtype=float)
     dist, closest_point_circle = point_to_disk(point, center, radius, normal)
     assert approx(dist, abs=1e-7) == 1.0
     assert_array_almost_equal(closest_point_circle, np.array([0, 1, 0]))
 
-    point = np.array([0, 2, -1])
+    point = np.array([0, 2, -1], dtype=float)
     dist, closest_point_circle = point_to_disk(point, center, radius, normal)
     assert approx(dist, abs=1e-7) == np.sqrt(2)
     assert_array_almost_equal(closest_point_circle, np.array([0, 1, 0]))
@@ -389,11 +389,11 @@ def test_line_to_line():
 
 
 def test_line_to_plane():
-    plane_point = np.array([0, 0, 0])
-    plane_normal = np.array([0, 0, 1])
+    plane_point = np.array([0, 0, 0], dtype=float)
+    plane_normal = np.array([0, 0, 1], dtype=float)
 
-    line_point = np.array([0, 0, 0])
-    line_direction = np.array([0, 0, 1])
+    line_point = np.array([0, 0, 0], dtype=float)
+    line_direction = np.array([0, 0, 1], dtype=float)
     dist, closest_point_line, closest_point_plane = line_to_plane(
         line_point, line_direction, plane_point, plane_normal)
     assert approx(dist) == 0
@@ -408,7 +408,7 @@ def test_line_to_plane():
     assert_array_almost_equal(closest_point_line, np.array([0, 0, 0]))
     assert_array_almost_equal(closest_point_line, closest_point_plane)
 
-    line_point = np.array([0, 0, 1])
+    line_point = np.array([0, 0, 1], dtype=float)
     line_direction = norm_vector(np.array([1, 1, 0], dtype=float))
     dist, closest_point_line, closest_point_plane = line_to_plane(
         line_point, line_direction, plane_point, plane_normal)

@@ -37,8 +37,8 @@ def point_to_plane(point, plane_point, plane_normal, signed=False):
 
 
 @numba.jit(
-    numba.types.Tuple((numba.float64, numba.float64[:]))
-    (numba.float64[:], numba.float64[:], numba.float64[:], numba.boolean),
+    numba.types.Tuple((numba.float64, numba.float64[::1]))
+    (numba.float64[::1], numba.float64[::1], numba.float64[::1], numba.boolean),
     cache=True)
 def _point_to_plane(point, plane_point, plane_normal, signed):
     t = np.dot(plane_normal, point - plane_point)

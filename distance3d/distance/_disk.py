@@ -10,7 +10,7 @@ from ..utils import norm_vector
 
 @numba.jit(
     numba.types.Tuple((numba.float64, numba.float64[:]))
-    (numba.float64[:], numba.float64[:], numba.float64, numba.float64[:]),
+    (numba.float64[::1], numba.float64[::1], numba.float64, numba.float64[::1]),
     cache=True)
 def point_to_disk(point, center, radius, normal):
     """Compute the shortest distance between point and disk.

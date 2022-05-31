@@ -3,7 +3,7 @@ import math
 from itertools import product
 import numba
 import numpy as np
-from .utils import norm_vector
+from .utils import norm_vector, transform_point
 
 
 def convert_rectangle_to_segment(rectangle_center, rectangle_extents, i0, i1):
@@ -133,7 +133,9 @@ def convert_segment_to_line(segment_start, segment_end):
 BOX_COORDS = np.array(list(product([-0.5, 0.5], repeat=3)))
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.float64[:, :](numba.float64[:, ::1], numba.float64[::1]),
+    cache=True)
 def convert_box_to_vertices(box2origin, size):
     """Convert box to vertices.
 
@@ -154,7 +156,7 @@ def convert_box_to_vertices(box2origin, size):
 
 
 @numba.jit(
-    numba.float64[:](numba.float64[:], numba.float64[:, :], numba.float64,
+    numba.float64[:](numba.float64[::1], numba.float64[:, ::1], numba.float64,
                      numba.float64),
     cache=True, boundscheck=False)
 def cylinder_extreme_along_direction(
@@ -199,11 +201,11 @@ def cylinder_extreme_along_direction(
     else:
         d = radius / s
         local_vertex = np.array([local_dir[0] * d, local_dir[1] * d, z])
-    return cylinder2origin[:3, 3] + np.dot(cylinder2origin[:3, :3], local_vertex)
+    return transform_point(cylinder2origin, local_vertex)
 
 
 @numba.jit(
-    numba.float64[:](numba.float64[:], numba.float64[:, :], numba.float64,
+    numba.float64[:](numba.float64[::1], numba.float64[:, ::1], numba.float64,
                      numba.float64),
     cache=True, boundscheck=False)
 def capsule_extreme_along_direction(
@@ -249,11 +251,11 @@ def capsule_extreme_along_direction(
     else:
         local_vertex[2] -= 0.5 * height
 
-    return capsule2origin[:3, 3] + np.dot(capsule2origin[:3, :3], local_vertex)
+    return transform_point(capsule2origin, local_vertex)
 
 
 @numba.jit(
-    numba.float64[:](numba.float64[:], numba.float64[:, :], numba.float64[:]),
+    numba.float64[:](numba.float64[::1], numba.float64[:, ::1], numba.float64[::1]),
     cache=True, boundscheck=False)
 def ellipsoid_extreme_along_direction(
         search_direction, ellipsoid2origin, radii):
@@ -277,11 +279,11 @@ def ellipsoid_extreme_along_direction(
     """
     local_dir = np.dot(ellipsoid2origin[:3, :3].T, search_direction)
     local_vertex = norm_vector(local_dir * radii) * radii
-    return ellipsoid2origin[:3, 3] + np.dot(ellipsoid2origin[:3, :3], local_vertex)
+    return transform_point(ellipsoid2origin, local_vertex)
 
 
 @numba.jit(
-    numba.float64[:](numba.float64[:], numba.float64[:, :], numba.float64[:]),
+    numba.float64[:](numba.float64[::1], numba.float64[:, ::1], numba.float64[::1]),
     cache=True, boundscheck=False)
 def box_extreme_along_direction(search_direction, box2origin, half_lengths):
     """Compute extreme point of box along a direction.
@@ -304,7 +306,7 @@ def box_extreme_along_direction(search_direction, box2origin, half_lengths):
     """
     local_dir = np.dot(box2origin[:3, :3].T, search_direction)
     local_vertex = np.sign(local_dir) * half_lengths
-    return box2origin[:3, 3] + np.dot(box2origin[:3, :3], local_vertex)
+    return transform_point(box2origin, local_vertex)
 
 
 @numba.njit(cache=True)

@@ -29,7 +29,7 @@ def test_sphere_aabb():
 
 def test_box_aabb():
     box2origin = np.eye(4)
-    size = np.array([1, 2, 3])
+    size = np.array([1, 2, 3], dtype=float)
     mins, maxs = box_aabb(box2origin, size)
     assert_array_almost_equal(mins, [-0.5, -1, -1.5])
     assert_array_almost_equal(maxs, [0.5, 1, 1.5])

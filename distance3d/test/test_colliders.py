@@ -22,7 +22,7 @@ def test_bvh():
 
     tm.set_joint("joint1", 3.1415926535)
     bvh.update_collider_poses()
-    box = colliders.Box(np.eye(4), np.array([1, 1, 1]))
+    box = colliders.Box(np.eye(4), np.array([1, 1, 1], dtype=float))
     colls = bvh.aabb_overlapping_colliders(box)
     assert len(colls) == 5
 
