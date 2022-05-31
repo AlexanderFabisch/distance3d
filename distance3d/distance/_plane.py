@@ -94,8 +94,8 @@ def line_to_plane(
 
 @numba.njit(
     numba.types.Tuple((numba.boolean, numba.float64))
-    (numba.float64[:], numba.float64[:], numba.float64[:], numba.float64[:],
-     numba.float64),
+    (numba.float64[::1], numba.float64[::1], numba.float64[::1],
+     numba.float64[::1], numba.float64),
     cache=False)
 def _line_to_plane(line_point, line_direction, plane_point, plane_normal,
                    epsilon):
