@@ -1,7 +1,5 @@
 import numba
 import numpy as np
-from .containment import axis_aligned_bounding_box
-from aabbtree import AABB
 
 
 class MeshHillClimbingSupportFunction:
@@ -45,54 +43,6 @@ class MeshHillClimbingSupportFunction:
         self.first_idx = idx  # vertex caching
         return idx, self.mesh2origin[:3, 3] + np.dot(
             self.mesh2origin[:3, :3], self.vertices[idx])
-
-    def aabb(self):
-        """
-        mins, maxs = axis_aligned_bounding_box(
-            self.mesh2origin[np.newaxis, :3, 3] + np.dot(
-                self.vertices, self.mesh2origin[:3, :3].T))
-        return AABB(np.array([mins, maxs]).T)
-
-        #import time
-        #start = time.time()
-        mins, maxs = axis_aligned_bounding_box(
-            self.mesh2origin[np.newaxis, :3, 3] + np.dot(
-                self.vertices, self.mesh2origin[:3, :3].T))
-        #stop = time.time()
-        #print(stop - start)
-        #print(mins, maxs)
-        """
-
-        #import time
-        #start = time.time()
-        idx_xm = hill_climb_mesh_extreme(
-            -self.mesh2origin[0, :3], self.first_idx, self.vertices,
-            self.connections, self.shortcut_connections)
-        idx_xp = hill_climb_mesh_extreme(
-            self.mesh2origin[0, :3], self.first_idx, self.vertices,
-            self.connections, self.shortcut_connections)
-        idx_ym = hill_climb_mesh_extreme(
-            -self.mesh2origin[1, :3], self.first_idx, self.vertices,
-            self.connections, self.shortcut_connections)
-        idx_yp = hill_climb_mesh_extreme(
-            self.mesh2origin[1, :3], self.first_idx, self.vertices,
-            self.connections, self.shortcut_connections)
-        idx_zm = hill_climb_mesh_extreme(
-            -self.mesh2origin[2, :3], self.first_idx, self.vertices,
-            self.connections, self.shortcut_connections)
-        idx_zp = hill_climb_mesh_extreme(
-            self.mesh2origin[2, :3], self.first_idx, self.vertices,
-            self.connections, self.shortcut_connections)
-        min_vertices = self.vertices[[idx_xm, idx_ym, idx_zm]]
-        max_vertices = self.vertices[[idx_xp, idx_yp, idx_zp]]
-        min_vertices = self.mesh2origin[np.newaxis, :3, 3] + min_vertices.dot(self.mesh2origin[:3, :3].T)
-        max_vertices = self.mesh2origin[np.newaxis, :3, 3] + max_vertices.dot(self.mesh2origin[:3, :3].T)
-        mins = np.diag(min_vertices)
-        maxs = np.diag(max_vertices)
-        #stop = time.time()
-        #print(stop - start)
-        #print(mins, maxs)
-        return AABB(np.array([mins, maxs]).T)
 
 
 @numba.njit(
@@ -143,9 +93,3 @@ class MeshSupportFunction:
         idx = np.argmax(self.vertices.dot(search_direction_in_mesh))
         return idx, self.mesh2origin[:3, 3] + np.dot(
             self.mesh2origin[:3, :3], self.vertices[idx])
-
-    def aabb(self):
-        mins, maxs = axis_aligned_bounding_box(
-            self.mesh2origin[np.newaxis, :3, 3] + np.dot(
-                self.vertices, self.mesh2origin[:3, :3].T))
-        return AABB(np.array([mins, maxs]).T)
