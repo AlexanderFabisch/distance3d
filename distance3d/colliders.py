@@ -432,7 +432,10 @@ class MeshGraph(Convex):
             self.artist_.set_data(mesh2origin)
 
     def aabb(self):
-        return self.support_function.aabb()
+        mins, maxs = axis_aligned_bounding_box(
+            self.mesh2origin[np.newaxis, :3, 3] + np.dot(
+                self.vertices_, self.mesh2origin[:3, :3].T))
+        return AABB(np.array([mins, maxs]).T)
 
 
 class Cylinder(ConvexCollider):
