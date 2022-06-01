@@ -12,7 +12,7 @@ from .containment import (
     capsule_aabb, ellipsoid_aabb)
 from .urdf_utils import self_collision_whitelists
 from .visualization import Mesh as VisualMesh
-from .mesh import MeshHillClimber, MeshSupportFunction
+from .mesh import MeshHillClimbingSupportFunction, MeshSupportFunction
 from aabbtree import AABB, AABBTree
 
 
@@ -405,7 +405,7 @@ class MeshGraph(Convex):
         super(Convex, self).__init__(vertices, artist)
         self.mesh2origin = mesh2origin
         self.triangles = triangles
-        self.support_function = MeshHillClimber(
+        self.support_function = MeshHillClimbingSupportFunction(
             mesh2origin, vertices, triangles)
 
     def support_function(self, search_direction):
@@ -432,11 +432,7 @@ class MeshGraph(Convex):
             self.artist_.set_data(mesh2origin)
 
     def aabb(self):
-        # TODO graph search
-        mins, maxs = axis_aligned_bounding_box(
-            self.mesh2origin[np.newaxis, :3, 3] + np.dot(
-                self.vertices_, self.mesh2origin[:3, :3].T))
-        return AABB(np.array([mins, maxs]).T)
+        return self.support_function.aabb()
 
 
 class Cylinder(ConvexCollider):
