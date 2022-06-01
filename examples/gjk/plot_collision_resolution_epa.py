@@ -16,8 +16,8 @@ mesh2origin, vertices, triangles = random.randn_convex(random_state, center_scal
 mesh2origin2, vertices2, triangles2 = random.randn_convex(random_state, center_scale=0.2)
 points = pt.transform(mesh2origin, pt.vectors_to_points(vertices))[:, :3]
 points2 = pt.transform(mesh2origin2, pt.vectors_to_points(vertices2))[:, :3]
-dist, p1, p2, simplex = gjk.gjk_with_simplex(colliders.Convex(vertices), colliders.Convex(vertices2))
-mtv, minkowski_faces, success = epa.epa(simplex, colliders.Convex(vertices), colliders.Convex(vertices2))
+dist, p1, p2, simplex = gjk.gjk_with_simplex(colliders.Convex(points), colliders.Convex(points2))
+mtv, minkowski_faces, success = epa.epa(simplex, colliders.Convex(points), colliders.Convex(points2))
 assert success
 assert all(p1 == p2)
 print(p1)
