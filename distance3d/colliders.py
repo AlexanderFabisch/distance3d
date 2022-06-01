@@ -245,6 +245,16 @@ class ConvexCollider(abc.ABC):
             Extreme point along search direction.
         """
 
+    @abc.abstractmethod
+    def center(self):
+        """Returns the (approximate) center of the collider.
+
+        Returns
+        -------
+        center : array, shape (3,)
+            Center of the collider.
+        """
+
     def compute_point(self, barycentric_coordinates, indices):
         """Compute point from barycentric coordinates.
 
@@ -309,6 +319,9 @@ class Convex(ConvexCollider):
         idx = np.argmax(self.vertices_.dot(search_direction))
         return idx, self.vertices_[idx]
 
+    def center(self):
+        return np.mean(self.vertices_, axis=0)
+
     def compute_point(self, barycentric_coordinates, indices):
         return np.dot(barycentric_coordinates, self.vertices_[indices])
 
@@ -344,6 +357,9 @@ class Box(Convex):
 
     def make_artist(self, c=None):
         self.artist_ = pv.Box(size=self.size, A2B=self.box2origin, c=c)
+
+    def center(self):
+        return self.box2origin[:3, 3]
 
     def update_pose(self, pose):
         self.box2origin = pose
@@ -438,6 +454,9 @@ class Cylinder(ConvexCollider):
             length=self.length, radius=self.radius, A2B=self.cylinder2origin,
             c=c)
 
+    def center(self):
+        return self.cylinder2origin[:3, 3]
+
     def first_vertex(self):
         vertex = self.cylinder2origin[:3, 3] + 0.5 * self.length * self.cylinder2origin[:3, 2]
         self.vertices_.append(vertex)
@@ -490,6 +509,9 @@ class Capsule(ConvexCollider):
             height=self.height, radius=self.radius, A2B=self.capsule2origin,
             c=c)
 
+    def center(self):
+        return self.capsule2origin[:3, 3]
+
     def first_vertex(self):
         vertex = self.capsule2origin[:3, 3] - (self.radius + 0.5 * self.height) * self.capsule2origin[:3, 2]
         self.vertices_.append(vertex)
@@ -537,6 +559,9 @@ class Sphere(ConvexCollider):
         sphere2origin = np.eye(4)
         sphere2origin[:3, 3] = self.c
         self.artist_ = pv.Sphere(radius=self.radius, A2B=sphere2origin, c=c)
+
+    def center(self):
+        return self.c
 
     def first_vertex(self):
         vertex = self.c + np.array([0, 0, self.radius])
@@ -589,6 +614,9 @@ class Ellipsoid(ConvexCollider):
     def make_artist(self, c=None):
         self.artist_ = pv.Ellipsoid(
             radii=self.radii, A2B=self.ellipsoid2origin, c=c)
+
+    def center(self):
+        return self.ellipsoid2origin[:3, 3]
 
     def first_vertex(self):
         vertex = self.ellipsoid2origin[:3, 3] + self.radii[2] * self.ellipsoid2origin[:3, 2]
