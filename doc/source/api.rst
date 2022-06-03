@@ -136,6 +136,23 @@ API Reference
    ~distance3d.gjk.gjk_with_simplex
 
 
+:mod:`distance3d.mpr`
+---------------------
+
+.. automodule:: distance3d.mpr
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.mpr
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.mpr.mpr_intersection
+   ~distance3d.mpr.mpr_penetration
+
+
 :mod:`distance3d.geometry`
 --------------------------
 
