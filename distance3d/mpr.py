@@ -45,6 +45,11 @@ def mpr_intersection(collider1, collider2, mpr_tolerance=0.0001):
 def mpr_penetration(collider1, collider2, mpr_tolerance=0.0001, max_iterations=100):
     """Minkowski Portal Refinement (MPR) with penetration info.
 
+    The returned penetration direction and contact position form a line along
+    which the penetration happens. The penetration direction is computed such
+    that adding depth + penetration_direction to each vertex of the second
+    collider separates the two colliders.
+
     Parameters
     ----------
     collider1 : ConvexCollider
