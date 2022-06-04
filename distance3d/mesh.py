@@ -112,6 +112,7 @@ def make_convex_mesh(vertices):
         Indices of vertices forming the faces of a convex mesh. Normals of the
         faces point to the outside of the mesh.
     """
+    vertices = vertices - np.mean(vertices, axis=0)
     ch = ConvexHull(vertices)
     triangles = ch.simplices
     faces = np.array([vertices[[i, j, k]] for i, j, k in triangles])
