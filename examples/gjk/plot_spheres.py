@@ -30,11 +30,6 @@ for i in range(1000):
     print(dist)
     if i > 5:
         continue
-    if i == 0:
-        vertices1 = np.array(s1.vertices_)
-        ax.scatter(vertices1[:, 0], vertices1[:, 1], vertices1[:, 2], color="r")
-        vertices2 = np.array(s2.vertices_)
-        ax.scatter(vertices2[:, 0], vertices2[:, 1], vertices2[:, 2], color="g")
     plotting.plot_segment(
         ax, closest_point_sphere, closest_point_sphere2, c="k", lw=1)
     ppu.plot_sphere(ax, p=center2, radius=radius2, wireframe=False, alpha=0.2)

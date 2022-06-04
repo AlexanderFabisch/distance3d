@@ -30,11 +30,6 @@ for i in range(700):
     print(dist)
     if i > 5:
         continue
-    if i == 0:
-        vertices1 = np.array(c1.vertices_)
-        ax.scatter(vertices1[:, 0], vertices1[:, 1], vertices1[:, 2], color="r")
-        vertices2 = np.array(c2.vertices_)
-        ax.scatter(vertices2[:, 0], vertices2[:, 1], vertices2[:, 2], color="g")
     plotting.plot_segment(
         ax, closest_point_capsule, closest_point_capsule2, c="k", lw=1)
     ppu.plot_ellipsoid(
