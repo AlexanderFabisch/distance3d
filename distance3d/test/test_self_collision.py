@@ -55,13 +55,13 @@ def test_self_collision_detection_mesh():
     assert np.count_nonzero(contacts) == 0
     assert not self_collision.detect_any(bvh)
 
-    tm.set_joint("joint1", 2)
-    tm.set_joint("joint2", 2)
-    tm.set_joint("joint3", 2)
+    tm.set_joint("joint1", 1.5)
+    tm.set_joint("joint2", 1.5)
+    tm.set_joint("joint3", 1.5)
     bvh.update_collider_poses()
 
     contacts = list(self_collision.detect(bvh).values())
-    assert np.count_nonzero(contacts) == 3
+    assert np.count_nonzero(contacts) == 2
     assert self_collision.detect_any(bvh)
 
     tm.set_joint("joint1", 2.7)
