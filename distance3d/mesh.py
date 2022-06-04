@@ -6,6 +6,19 @@ from .utils import angles_between_vectors
 
 
 class MeshHillClimbingSupportFunction:
+    """Mesh support function with hill climbing.
+
+    Parameters
+    ----------
+    mesh2origin : array, shape (4, 4)
+        Pose of the mesh.
+
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    triangles : array, shape (n_triangles, 3)
+        Indices of vertices that form triangles of the mesh.
+    """
     def __init__(self, mesh2origin, vertices, triangles):
         self.mesh2origin = mesh2origin
         self.vertices = vertices
@@ -35,9 +48,23 @@ class MeshHillClimbingSupportFunction:
                 connected_indices, dtype=int, count=len(connected_indices))
 
     def update_pose(self, mesh2origin):
+        """Update pose.
+
+        Parameters
+        ----------
+        mesh2origin : array, shape (4, 4)
+            New pose of the mesh.
+        """
         self.mesh2origin = mesh2origin
 
     def __call__(self, search_direction):
+        """Support function.
+
+        Parameters
+        ----------
+        search_direction : array, shape (3,)
+            Search direction.
+        """
         search_direction_in_mesh = np.dot(
             self.mesh2origin[:3, :3].T, search_direction)
         idx = hill_climb_mesh_extreme(
@@ -56,6 +83,25 @@ class MeshHillClimbingSupportFunction:
 def hill_climb_mesh_extreme(
         search_direction, start_idx, vertices, connections,
         shortcut_connections):
+    """Hill climbing to find support point of mesh.
+
+    Parameters
+    ----------
+    search_direction : array, shape (3,)
+        Search direction in mesh frame.
+
+    start_idx : int
+        Index of vertex from which we start hill climbing.
+
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    connections : dict
+        Maps vertex indices to neighboring vertex indices.
+
+    shortcut_connections : array, shape (n_shortcut_connections,)
+        Indices of extreme vertices of the mesh in mesh frame.
+    """
     search_direction = np.ascontiguousarray(search_direction)
     best_idx = start_idx
 
@@ -82,15 +128,42 @@ def hill_climb_mesh_extreme(
 
 
 class MeshSupportFunction:
+    """Standard mesh support function.
+
+    Parameters
+    ----------
+    mesh2origin : array, shape (4, 4)
+        Pose of the mesh.
+
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    triangles : array, shape (n_triangles, 3)
+        Indices of vertices that form triangles of the mesh.
+    """
     def __init__(self, mesh2origin, vertices, triangles):
         self.mesh2origin = mesh2origin
         self.vertices = vertices
         self.first_idx = 0
 
     def update_pose(self, mesh2origin):
+        """Update pose.
+
+        Parameters
+        ----------
+        mesh2origin : array, shape (4, 4)
+            New pose of the mesh.
+        """
         self.mesh2origin = mesh2origin
 
     def __call__(self, search_direction):
+        """Support function.
+
+        Parameters
+        ----------
+        search_direction : array, shape (3,)
+            Search direction.
+        """
         search_direction_in_mesh = np.dot(
             self.mesh2origin[:3, :3].T, search_direction)
         idx = np.argmax(self.vertices.dot(search_direction_in_mesh))
