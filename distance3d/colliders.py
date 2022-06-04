@@ -92,7 +92,11 @@ class BoundingVolumeHierarchy:
                 length=obj.length)
         else:
             assert isinstance(obj, urdf.Mesh)
-            collider = Mesh(obj.filename, A2B, obj.scale)
+            import open3d as o3d
+            mesh = o3d.io.read_triangle_mesh(obj.filename)
+            vertices = np.asarray(mesh.vertices) * obj.scale
+            triangles = np.asarray(mesh.triangles)
+            collider = MeshGraph(A2B, vertices, triangles)
         if make_artists:
             collider.make_artist()
         return collider
@@ -350,38 +354,6 @@ class Box(Convex):
     def aabb(self):
         mins, maxs = box_aabb(self.box2origin, self.size)
         return AABB(np.array([mins, maxs]).T)
-
-
-class Mesh(Convex):
-    """Wraps mesh for GJK algorithm (we assume a convex mesh).
-
-    Parameters
-    ----------
-    filename : str
-        Path to mesh file.
-
-    A2B : array, shape (4, 4)
-        Center of the mesh.
-
-    scale : float, optional (default: 1)
-        Scaling of the mesh.
-
-    artist : pytransform3d.visualizer.Artist, optional (default: None)
-        Corresponding artist for visualizer.
-    """
-    def __init__(self, filename, A2B, scale=1.0, artist=None):
-        import pytransform3d.visualizer as pv
-        if artist is None:
-            artist = pv.Mesh(filename=filename, A2B=A2B, s=scale)
-        vertices = np.asarray(artist.mesh.vertices)
-        super(Mesh, self).__init__(vertices, artist)
-
-    def make_artist(self, c=None):
-        assert self.artist_ is not None
-
-    def update_pose(self, pose):
-        self.artist_.set_data(pose)
-        self.vertices_ = np.asarray(self.artist_.mesh.vertices)
 
 
 class MeshGraph(Convex):
