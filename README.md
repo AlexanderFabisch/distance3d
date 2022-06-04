@@ -18,6 +18,14 @@ Distance computation and collision detection in 3D.
 * Broad phase collision detection with bounding volume hierarchy (AABB tree).
 * Self-collision detection for robots.
 
+## Dependencies
+
+distance3d relies on numba to speed up computations. numba in its latest
+version requires at least Python 3.7 and NumPy 1.18. See [here](
+https://numba.readthedocs.io/en/stable/user/installing.html#compatibility)
+for current requirements. Required Python libraries will automatically be
+installed during installation of distance3d.
+
 ## Installation
 
 Install the package with
