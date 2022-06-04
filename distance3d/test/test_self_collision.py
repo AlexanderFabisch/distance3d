@@ -37,3 +37,34 @@ def test_self_collision_detection():
     contacts = list(self_collision.detect(bvh).values())
     assert np.count_nonzero(contacts) == 3
     assert self_collision.detect_any(bvh)
+
+
+def test_self_collision_detection_mesh():
+    tm = UrdfTransformManager()
+    data_dir = "test/data/"
+    filename = os.path.join(data_dir, "simple_mechanism.urdf")
+    with open(filename, "r") as f:
+        robot_urdf = f.read()
+        tm.load_urdf(robot_urdf, mesh_path=data_dir)
+
+    bvh = colliders.BoundingVolumeHierarchy(tm, "simple_mechanism")
+    bvh.fill_tree_with_colliders(
+        tm, make_artists=True, fill_self_collision_whitelists=True)
+
+    contacts = list(self_collision.detect(bvh).values())
+    assert np.count_nonzero(contacts) == 0
+    assert not self_collision.detect_any(bvh)
+
+    tm.set_joint("joint", 2)
+    bvh.update_collider_poses()
+
+    contacts = list(self_collision.detect(bvh).values())
+    assert np.count_nonzero(contacts) == 0
+    assert not self_collision.detect_any(bvh)
+
+    tm.set_joint("joint", 2)
+    bvh.update_collider_poses()
+
+    contacts = list(self_collision.detect(bvh).values())
+    assert np.count_nonzero(contacts) == 3
+    assert self_collision.detect_any(bvh)
