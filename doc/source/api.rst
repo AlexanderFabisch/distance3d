@@ -248,19 +248,3 @@ API Reference
    ~distance3d.random.rand_cylinder
    ~distance3d.random.rand_sphere
    ~distance3d.random.randn_convex
-
-
-:mod:`distance3d.utils`
------------------------
-
-.. automodule:: distance3d.utils
-    :no-members:
-    :no-inherited-members:
-
-.. currentmodule:: distance3d.utils
-
-.. autosummary::
-   :nosignatures:
-   :toctree: _autosummary/
-
-   ~distance3d.utils.norm_vector
