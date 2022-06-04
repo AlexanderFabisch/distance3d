@@ -118,9 +118,9 @@ def make_convex_mesh(vertices):
     faces = vertices[triangles]
     A = faces[:, 2] - faces[:, 0]
     B = faces[:, 1] - faces[:, 0]
-    C = np.cross(A, B)
-    centers = np.mean(faces, axis=1)
-    angles = angles_between_vectors(C, centers)
+    face_normals = np.cross(A, B)
+    face_centers = np.mean(faces, axis=1)
+    angles = angles_between_vectors(face_normals, face_centers)
     indices = np.where(angles < 0.5 * np.pi)[0]
     triangles[indices] = triangles[indices, ::-1]
     return triangles
