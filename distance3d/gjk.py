@@ -171,7 +171,9 @@ class Solution:
         coords_sum = a + b + c
         self.barycentric_coordinates[0] = a / coords_sum
         self.barycentric_coordinates[1] = b / coords_sum
-        self.barycentric_coordinates[2] = c / coords_sum
+        # more stable floating point operation than c / coords_sum:
+        self.barycentric_coordinates[2] = 1.0 - (
+            self.barycentric_coordinates[0] + self.barycentric_coordinates[1])
         self.search_direction = self.barycentric_coordinates[:3].dot(simplex.points[vi])
         self.distance_squared = np.dot(self.search_direction, self.search_direction)
 
