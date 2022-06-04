@@ -73,7 +73,7 @@ API Reference
    ~distance3d.colliders.BoundingVolumeHierarchy
    ~distance3d.colliders.ConvexCollider
    ~distance3d.colliders.Convex
-   ~distance3d.colliders.Mesh
+   ~distance3d.colliders.MeshGraph
    ~distance3d.colliders.Box
    ~distance3d.colliders.Cylinder
    ~distance3d.colliders.Sphere
