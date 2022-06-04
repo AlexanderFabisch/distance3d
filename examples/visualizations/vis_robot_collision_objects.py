@@ -10,12 +10,14 @@ import numpy as np
 import open3d as o3d
 from pytransform3d.urdf import UrdfTransformManager
 import pytransform3d.visualizer as pv
-from distance3d import random, colliders, gjk
+from distance3d import random, colliders, gjk, mpr
 
 
 class AnimationCallback:
-    def __init__(self, with_aabb_tree=True, n_frames=100, verbose=0):
+    def __init__(self, with_aabb_tree=True, collision_detection_algorithm="mpr",
+                 n_frames=100, verbose=0):
         self.with_aabb_tree = with_aabb_tree
+        self.collision_detection_algorithm = collision_detection_algorithm
         self.n_frames = n_frames
         self.verbose = verbose
         self.total_time = 0.0
@@ -32,6 +34,16 @@ class AnimationCallback:
         in_contact = {frame: False for frame in colls.get_collider_frames()}
         in_aabb = {frame: False for frame in colls.get_collider_frames()}
 
+        if self.collision_detection_algorithm == "gjk":
+            detect_collision = lambda x, y: gjk.gjk_with_simplex(x, y)[0] < 1e-6
+        elif self.collision_detection_algorithm == "mpr":
+            detect_collision = mpr.mpr_intersection
+        else:
+            raise ValueError(
+                f"Unknown collision detection algorithm "
+                f"'{self.collision_detection_algorithm}'. Allowed values are: "
+                f"'gjk', 'mpr'")
+
         total_time = 0.0
         if self.with_aabb_tree:
             for box in boxes:
@@ -39,9 +51,8 @@ class AnimationCallback:
                 overlapping_colls = colls.aabb_overlapping_colliders(
                     box).items()
                 for frame, collider in overlapping_colls:
-                    dist = gjk.gjk_with_simplex(collider, box)[0]
                     in_aabb[frame] |= True
-                    in_contact[frame] |= dist < 1e-6
+                    in_contact[frame] |= detect_collision(collider, box)
                 stop = time.time()
                 total_time += stop - start
             if self.verbose:
@@ -50,8 +61,7 @@ class AnimationCallback:
             for frame, collider in colls.colliders_.items():
                 start = time.time()
                 for box in boxes:
-                    dist = gjk.gjk_with_simplex(collider, box)[0]
-                    in_contact[frame] |= dist < 1e-6
+                    in_contact[frame] |= detect_collision(collider, box)
                 stop = time.time()
                 total_time += stop - start
             if self.verbose:
@@ -120,7 +130,8 @@ fig.view_init()
 fig.set_zoom(1.5)
 n_frames = 100
 animation_callback = AnimationCallback(
-    with_aabb_tree=True, n_frames=n_frames, verbose=0)
+    with_aabb_tree=True, collision_detection_algorithm="mpr",  # mpr or gjk
+    n_frames=n_frames, verbose=0)
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
                 fargs=(n_frames, tm, colls, boxes, joint_names))
