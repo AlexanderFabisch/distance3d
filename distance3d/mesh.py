@@ -64,6 +64,14 @@ class MeshHillClimbingSupportFunction:
         ----------
         search_direction : array, shape (3,)
             Search direction.
+
+        Returns
+        -------
+        idx : int
+            Index of support point.
+
+        support_point : array, shape (3,)
+            Support point.
         """
         search_direction_in_mesh = np.dot(
             self.mesh2origin[:3, :3].T, search_direction)
@@ -163,6 +171,14 @@ class MeshSupportFunction:
         ----------
         search_direction : array, shape (3,)
             Search direction.
+
+        Returns
+        -------
+        idx : int
+            Index of support point.
+
+        support_point : array, shape (3,)
+            Support point.
         """
         search_direction_in_mesh = np.dot(
             self.mesh2origin[:3, :3].T, search_direction)
