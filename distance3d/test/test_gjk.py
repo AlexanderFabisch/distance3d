@@ -10,8 +10,8 @@ def test_select_line_segment():
     random_state = np.random.RandomState(23)
     simplex.points[:, :] = random_state.randn(*simplex.points.shape)
     simplex.dot_product_table = simplex.points.dot(simplex.points.T)
-    simplex.indices_polytope1 = np.arange(4, dtype=int)
-    simplex.indices_polytope2 = np.arange(4, dtype=int)
+    simplex.points_polytope1 = np.arange(4, dtype=int)
+    simplex.points_polytope2 = np.arange(4, dtype=int)
     for i in range(1, 4):
         for j in range(i + 1, 4):
             simplex.dot_product_table[i, j] = float("nan")
@@ -36,8 +36,8 @@ def test_select_face():
     random_state = np.random.RandomState(24)
     simplex.points[:, :] = random_state.randn(*simplex.points.shape)
     simplex.dot_product_table = simplex.points.dot(simplex.points.T)
-    simplex.indices_polytope1 = np.arange(4, dtype=int)
-    simplex.indices_polytope2 = np.arange(4, dtype=int)
+    simplex.points_polytope1 = np.arange(4, dtype=int)
+    simplex.points_polytope2 = np.arange(4, dtype=int)
     for i in range(1, 4):
         for j in range(i + 1, 4):
             simplex.dot_product_table[i, j] = float("nan")
@@ -70,8 +70,8 @@ def test_simplex_reorder():
     random_state = np.random.RandomState(24)
     simplex.points[:, :] = random_state.randn(*simplex.points.shape)
     simplex.dot_product_table = simplex.points.dot(simplex.points.T)
-    simplex.indices_polytope1 = np.arange(4, dtype=int)
-    simplex.indices_polytope2 = np.arange(4, dtype=int)
+    simplex.points_polytope1 = np.arange(4, dtype=int)
+    simplex.points_polytope2 = np.arange(4, dtype=int)
     for i in range(1, 4):
         for j in range(i + 1, 4):
             simplex.dot_product_table[i, j] = float("nan")
@@ -80,14 +80,14 @@ def test_simplex_reorder():
     simplex_backup.copy_from(simplex)
 
     simplex.reorder(np.array([3, 2, 1, 0], dtype=int))
-    assert_array_almost_equal(simplex.indices_polytope1, [3, 2, 1, 0])
-    assert_array_almost_equal(simplex.indices_polytope2, [3, 2, 1, 0])
+    assert_array_almost_equal(simplex.points_polytope1, [3, 2, 1, 0])
+    assert_array_almost_equal(simplex.points_polytope2, [3, 2, 1, 0])
     assert_dot_product_table(simplex)
     assert len(simplex) == 4
 
     simplex.reorder(np.array([3, 2, 1, 0], dtype=int))
-    assert_array_almost_equal(simplex.indices_polytope1, [0, 1, 2, 3])
-    assert_array_almost_equal(simplex.indices_polytope2, [0, 1, 2, 3])
+    assert_array_almost_equal(simplex.points_polytope1, [0, 1, 2, 3])
+    assert_array_almost_equal(simplex.points_polytope2, [0, 1, 2, 3])
     assert_dot_product_table(simplex)
 
 

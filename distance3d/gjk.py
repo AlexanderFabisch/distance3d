@@ -74,8 +74,7 @@ def gjk_with_simplex(collider1, collider2):
     simplex = Simplex()
     old_simplex = Simplex()
 
-    simplex.set_first_point(
-        0, 0, collider1.first_vertex() - collider2.first_vertex())
+    simplex.set_first_point(collider1.first_vertex(), collider2.first_vertex())
 
     iteration = 0
     backup = False
@@ -89,12 +88,12 @@ def gjk_with_simplex(collider1, collider2):
         simplex_is_tetrahedron = len(simplex) == 4
         if no_improvement or simplex_is_tetrahedron:
             if backup:
-                closest_point1 = collider1.compute_point(
+                closest_point1 = np.dot(
                     solution.barycentric_coordinates[:len(simplex)],
-                    simplex.indices_polytope1[:len(simplex)])
-                closest_point2 = collider2.compute_point(
+                    simplex.points_polytope1[:len(simplex)])
+                closest_point2 = np.dot(
                     solution.barycentric_coordinates[:len(simplex)],
-                    simplex.indices_polytope2[:len(simplex)])
+                    simplex.points_polytope2[:len(simplex)])
 
                 if simplex_is_tetrahedron:
                     # Make sure intersection has zero distance
@@ -120,10 +119,9 @@ def gjk_with_simplex(collider1, collider2):
 
 
 def _find_new_supporting_point(collider1, collider2, simplex, solution):
-    new_index1, new_vertex1 = collider1.support_function(-solution.search_direction)
-    new_index2, new_vertex2 = collider2.support_function(solution.search_direction)
-    new_simplex_point = new_vertex1 - new_vertex2
-    simplex.add_new_point(new_index1, new_index2, new_simplex_point)
+    new_vertex1 = collider1.support_function(-solution.search_direction)
+    new_vertex2 = collider2.support_function(solution.search_direction)
+    simplex.add_new_point(new_vertex1, new_vertex2)
 
 
 class Solution:
@@ -202,12 +200,12 @@ class Simplex:
         dot_product_table[i, j] = Inner product of simplex[i] and simplex[j].
         Note that only elements i >= j are used.
 
-    indices_polytope1 : array, shape (n_simplex_points,)
+    points_polytope1 : array, shape (n_simplex_points, 3)
         Index vector for first polytope. For k = 1, ..., n_simplex_points,
         simplex[k] = vertices1[indices_polytope1[k]]
         - vertices2[indices_polytope2[k]].
 
-    indices_polytope2 : array, shape (n_simplex_points,)
+    points_polytope2 : array, shape (n_simplex_points, 3)
         Index vectors for first and second polytope. For k = 1, ...,
         n_simplex_points, simplex[k] = vertices1[indices_polytope1[k]]
         - vertices2[indices_polytope2[k]].
@@ -216,13 +214,13 @@ class Simplex:
         self.n_simplex_points = 0
         self.points = np.empty((4, 3), dtype=float)
         self.dot_product_table = np.empty((4, 4), dtype=float)
-        self.indices_polytope1 = np.empty(4, dtype=int)
-        self.indices_polytope2 = np.empty(4, dtype=int)
+        self.points_polytope1 = np.empty((4, 3), dtype=int)
+        self.points_polytope2 = np.empty((4, 3), dtype=int)
 
-    def set_first_point(self, new_index1, new_index2, new_simplex_point):
-        self.indices_polytope1[0] = new_index1
-        self.indices_polytope2[0] = new_index2
-        self.points[0] = new_simplex_point
+    def set_first_point(self, new_point1, new_point2):
+        self.points_polytope1[0] = new_point1
+        self.points_polytope2[0] = new_point2
+        self.points[0] = new_point1 - new_point2
         self.n_simplex_points += 1
         self.dot_product_table[:self.n_simplex_points, 0] = np.dot(
             self.points[:self.n_simplex_points], self.points[0])
@@ -230,25 +228,25 @@ class Simplex:
     def copy_from(self, simplex):
         self.n_simplex_points = len(simplex)
         self.points[:len(simplex)] = simplex.points[:len(simplex)]
-        self.indices_polytope1[:len(simplex)] = simplex.indices_polytope1[:len(simplex)]
-        self.indices_polytope2[:len(simplex)] = simplex.indices_polytope2[:len(simplex)]
+        self.points_polytope1[:len(simplex)] = simplex.points_polytope1[:len(simplex)]
+        self.points_polytope2[:len(simplex)] = simplex.points_polytope2[:len(simplex)]
         self.dot_product_table[:self.n_simplex_points, :self.n_simplex_points] = simplex.dot_product_table[
             :self.n_simplex_points, :self.n_simplex_points]
 
     def reorder(self, ordered_indices):
         self.n_simplex_points = len(ordered_indices)
-        self.indices_polytope1[:self.n_simplex_points] = self.indices_polytope1[ordered_indices]
-        self.indices_polytope2[:self.n_simplex_points] = self.indices_polytope2[ordered_indices]
+        self.points_polytope1[:self.n_simplex_points] = self.points_polytope1[ordered_indices]
+        self.points_polytope2[:self.n_simplex_points] = self.points_polytope2[ordered_indices]
         self.points[:self.n_simplex_points] = self.points[ordered_indices]
         self.dot_product_table = self.points.dot(self.points.T)
 
-    def add_new_point(self, new_index1, new_index2, new_simplex_point):
+    def add_new_point(self, new_point1, new_point2):
         self._move_first_point_to_last_spot()
-        self.set_first_point(new_index1, new_index2, new_simplex_point)
+        self.set_first_point(new_point1, new_point2)
 
     def _move_first_point_to_last_spot(self):
-        self.indices_polytope1[self.n_simplex_points] = self.indices_polytope1[0]
-        self.indices_polytope2[self.n_simplex_points] = self.indices_polytope2[0]
+        self.points_polytope1[self.n_simplex_points] = self.points_polytope1[0]
+        self.points_polytope2[self.n_simplex_points] = self.points_polytope2[0]
         self.points[self.n_simplex_points] = self.points[0]
         self.dot_product_table[self.n_simplex_points, :self.n_simplex_points] = self.dot_product_table[
                                                                                 :self.n_simplex_points, 0]
@@ -257,8 +255,8 @@ class Simplex:
     def _move_vertex(self, old_index, new_index):
         if old_index == new_index:
             return
-        self.indices_polytope1[new_index] = self.indices_polytope1[old_index]
-        self.indices_polytope2[new_index] = self.indices_polytope2[old_index]
+        self.points_polytope1[new_index] = self.points_polytope1[old_index]
+        self.points_polytope2[new_index] = self.points_polytope2[old_index]
         self.points[new_index] = self.points[old_index]
 
     def select_vertex(self, i):

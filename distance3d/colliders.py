@@ -186,22 +186,15 @@ class ConvexCollider(abc.ABC):
 
     Parameters
     ----------
-    vertices : iterable
-        Vertices of the convex collider.
-
     artist : pytransform3d.visualizer.Artist, optional (default: None)
         Corresponding artist for visualizer.
 
     Attributes
     ----------
-    vertices_ : iterable
-        Vertices of the convex collider.
-
     artist_ : pytransform3d.visualizer.Artist, optional (default: None)
         Corresponding artist for visualizer.
     """
-    def __init__(self, vertices, artist=None):
-        self.vertices_ = vertices
+    def __init__(self, artist=None):
         self.artist_ = artist
 
     @abc.abstractmethod
@@ -256,7 +249,7 @@ class ConvexCollider(abc.ABC):
             Point that we compute from barycentric coordinates.
         """
         return np.dot(barycentric_coordinates,
-                      np.array([self.vertices_[i] for i in indices]))
+                      np.array([self.vertices[i] for i in indices]))
 
     @abc.abstractmethod
     def update_pose(self, pose):
@@ -291,28 +284,29 @@ class Convex(ConvexCollider):
         Artist for visualizer.
     """
     def __init__(self, vertices, artist=None):
-        super(Convex, self).__init__(vertices, artist)
+        self.vertices = vertices
+        super(Convex, self).__init__(artist)
 
     def make_artist(self, c=None):
-        self.artist_ = pv.PointCollection3D(self.vertices_, s=0.005, c=c)
+        self.artist_ = pv.PointCollection3D(self.vertices, s=0.005, c=c)
 
     def first_vertex(self):
-        return self.vertices_[0]
+        return self.vertices[0]
 
     def support_function(self, search_direction):
-        idx = np.argmax(self.vertices_.dot(search_direction))
-        return idx, self.vertices_[idx]
+        idx = np.argmax(self.vertices.dot(search_direction))
+        return self.vertices[idx]
 
     def compute_point(self, barycentric_coordinates, indices):
-        return np.dot(barycentric_coordinates, self.vertices_[indices])
+        return np.dot(barycentric_coordinates, self.vertices[indices])
 
     def update_pose(self, vertices):
-        self.vertices_ = vertices
+        self.vertices = vertices
         if self.artist_ is not None:
-            self.artist_.set_data(self.vertices_)
+            self.artist_.set_data(self.vertices)
 
     def aabb(self):
-        mins, maxs = axis_aligned_bounding_box(self.vertices_)
+        mins, maxs = axis_aligned_bounding_box(self.vertices)
         return AABB(np.array([mins, maxs]).T)
 
 
@@ -341,7 +335,7 @@ class Box(Convex):
 
     def update_pose(self, pose):
         self.box2origin = pose
-        self.vertices_ = convert_box_to_vertices(pose, self.size)
+        self.vertices = convert_box_to_vertices(pose, self.size)
         if self.artist_ is not None:
             self.artist_.set_data(pose)
 
@@ -379,7 +373,7 @@ class Mesh(Convex):
 
     def update_pose(self, pose):
         self.artist_.set_data(pose)
-        self.vertices_ = np.asarray(self.artist_.mesh.vertices)
+        self.vertices = np.asarray(self.artist_.mesh.vertices)
 
 
 class Cylinder(ConvexCollider):
@@ -400,7 +394,7 @@ class Cylinder(ConvexCollider):
         Corresponding artist for visualizer.
     """
     def __init__(self, cylinder2origin, radius, length, artist=None):
-        super(Cylinder, self).__init__([], artist)
+        super(Cylinder, self).__init__(artist)
         self.cylinder2origin = cylinder2origin
         self.radius = radius
         self.length = length
@@ -411,20 +405,14 @@ class Cylinder(ConvexCollider):
             c=c)
 
     def first_vertex(self):
-        vertex = self.cylinder2origin[:3, 3] + 0.5 * self.length * self.cylinder2origin[:3, 2]
-        self.vertices_.append(vertex)
-        return vertex
+        return self.cylinder2origin[:3, 3] + 0.5 * self.length * self.cylinder2origin[:3, 2]
 
     def support_function(self, search_direction):
-        vertex = cylinder_extreme_along_direction(
+        return cylinder_extreme_along_direction(
             search_direction, self.cylinder2origin, self.radius, self.length)
-        vertex_idx = len(self.vertices_)
-        self.vertices_.append(vertex)
-        return vertex_idx, vertex
 
     def update_pose(self, pose):
         self.cylinder2origin = pose
-        self.vertices_ = []
         if self.artist_ is not None:
             self.artist_.set_data(pose)
 
@@ -452,7 +440,7 @@ class Capsule(ConvexCollider):
         Corresponding artist for visualizer.
     """
     def __init__(self, capsule2origin, radius, height, artist=None):
-        super(Capsule, self).__init__([], artist)
+        super(Capsule, self).__init__(artist)
         self.capsule2origin = capsule2origin
         self.radius = radius
         self.height = height
@@ -463,20 +451,14 @@ class Capsule(ConvexCollider):
             c=c)
 
     def first_vertex(self):
-        vertex = self.capsule2origin[:3, 3] - (self.radius + 0.5 * self.height) * self.capsule2origin[:3, 2]
-        self.vertices_.append(vertex)
-        return vertex
+        return self.capsule2origin[:3, 3] - (self.radius + 0.5 * self.height) * self.capsule2origin[:3, 2]
 
     def support_function(self, search_direction):
-        vertex = capsule_extreme_along_direction(
+        return capsule_extreme_along_direction(
             search_direction, self.capsule2origin, self.radius, self.height)
-        vertex_idx = len(self.vertices_)
-        self.vertices_.append(vertex)
-        return vertex_idx, vertex
 
     def update_pose(self, pose):
         self.capsule2origin = pose
-        self.vertices_ = []
         if self.artist_ is not None:
             self.artist_.set_data(pose)
 
@@ -501,7 +483,7 @@ class Sphere(ConvexCollider):
         Corresponding artist for visualizer.
     """
     def __init__(self, center, radius, artist=None):
-        super(Sphere, self).__init__([], artist)
+        super(Sphere, self).__init__(artist)
         self.c = center
         self.radius = radius
 
@@ -511,9 +493,7 @@ class Sphere(ConvexCollider):
         self.artist_ = pv.Sphere(radius=self.radius, A2B=sphere2origin, c=c)
 
     def first_vertex(self):
-        vertex = self.c + np.array([0, 0, self.radius])
-        self.vertices_.append(vertex)
-        return vertex
+        return self.c + np.array([0, 0, self.radius])
 
     def support_function(self, search_direction):
         # Similar implementation:
@@ -524,13 +504,10 @@ class Sphere(ConvexCollider):
             vertex = self.c + np.array([0, 0, self.radius])
         else:
             vertex = self.c + search_direction / s_norm * self.radius
-        vertex_idx = len(self.vertices_)
-        self.vertices_.append(vertex)
-        return vertex_idx, vertex
+        return vertex
 
     def update_pose(self, pose):
         self.c = pose[:3, 3]
-        self.vertices_ = []
         if self.artist_ is not None:
             self.artist_.set_data(pose)
 
@@ -554,7 +531,7 @@ class Ellipsoid(ConvexCollider):
         Corresponding artist for visualizer.
     """
     def __init__(self, ellipsoid2origin, radii, artist=None):
-        super(Ellipsoid, self).__init__([], artist)
+        super(Ellipsoid, self).__init__(artist)
         self.ellipsoid2origin = ellipsoid2origin
         self.radii = radii
 
@@ -563,20 +540,14 @@ class Ellipsoid(ConvexCollider):
             radii=self.radii, A2B=self.ellipsoid2origin, c=c)
 
     def first_vertex(self):
-        vertex = self.ellipsoid2origin[:3, 3] + self.radii[2] * self.ellipsoid2origin[:3, 2]
-        self.vertices_.append(vertex)
-        return vertex
+        return self.ellipsoid2origin[:3, 3] + self.radii[2] * self.ellipsoid2origin[:3, 2]
 
     def support_function(self, search_direction):
-        vertex = ellipsoid_extreme_along_direction(
+        return ellipsoid_extreme_along_direction(
             search_direction, self.ellipsoid2origin, self.radii)
-        vertex_idx = len(self.vertices_)
-        self.vertices_.append(vertex)
-        return vertex_idx, vertex
 
     def update_pose(self, pose):
         self.ellipsoid2origin = pose
-        self.vertices_ = []
         if self.artist_ is not None:
             self.artist_.set_data(pose)
 
