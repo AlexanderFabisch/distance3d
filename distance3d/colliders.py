@@ -296,10 +296,8 @@ class Convex(ConvexCollider):
     def center(self):
         return np.mean(self.vertices, axis=0)
 
-    def update_pose(self, vertices):
-        self.vertices = vertices
-        if self.artist_ is not None:
-            self.artist_.set_data(self.vertices)
+    def update_pose(self, pose):
+        raise NotImplementedError("update_pose is not implemented!")
 
     def aabb(self):
         mins, maxs = axis_aligned_bounding_box(self.vertices)
