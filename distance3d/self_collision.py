@@ -1,7 +1,7 @@
-from . import gjk
+from . import mpr
 
 
-def detect(bvh, collision_margin=1e-3):
+def detect(bvh):
     """Detect self collisions of a robot represented by a BVH.
 
     Parameters
@@ -11,9 +11,6 @@ def detect(bvh, collision_margin=1e-3):
         the attribute bvh.self_collision_whitelists_ has to be filled.
         Otherwise a collection of a collider with itself or direct neighbors
         will be considered a self collision!
-
-    collision_margin : float, optional (default: 0.001)
-        Distance between colliders that is considered to be a collision.
 
     Returns
     -------
@@ -31,8 +28,7 @@ def detect(bvh, collision_margin=1e-3):
 
         contacts[frame] = False
         for frame2, collider2 in candidates.items():
-            dist, _, _, _ = gjk.gjk_with_simplex(collider, collider2)
-            if dist < collision_margin:
+            if mpr.mpr_intersection(collider, collider2):
                 contacts[frame] = True
                 contacts[frame2] = True
                 break
@@ -65,7 +61,6 @@ def detect_any(bvh, collision_margin=1e-3):
             collider, whitelist=bvh.self_collision_whitelists_[frame])
 
         for frame2, collider2 in candidates.items():
-            dist, _, _, _ = gjk.gjk_with_simplex(collider, collider2)
-            if dist < collision_margin:
+            if mpr.mpr_intersection(collider, collider2):
                 return True
     return False
