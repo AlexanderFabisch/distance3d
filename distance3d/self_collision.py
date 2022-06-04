@@ -35,7 +35,7 @@ def detect(bvh):
     return contacts
 
 
-def detect_any(bvh, collision_margin=1e-3):
+def detect_any(bvh):
     """Detect self collisions of a robot represented by a BVH.
 
     This function aborts on first detected self collision.
@@ -47,9 +47,6 @@ def detect_any(bvh, collision_margin=1e-3):
         the attribute bvh.self_collision_whitelists_ has to be filled.
         Otherwise a collection of a collider with itself or direct neighbors
         will be considered a self collision!
-
-    collision_margin : float, optional (default: 0.001)
-        Distance between colliders that is considered to be a collision.
 
     Returns
     -------
