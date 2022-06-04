@@ -1,6 +1,7 @@
 import numpy as np
-from distance3d import colliders, mpr, gjk, epa
+from distance3d import colliders, mpr, gjk, epa, utils
 from numpy.testing import assert_array_almost_equal
+from pytest import approx
 
 
 def test_intersection_mpr_vs_gjk():
@@ -22,6 +23,15 @@ def test_intersection_mpr_vs_gjk():
 
 def test_penetration():
     sphere1 = colliders.Sphere(np.array([0.0, 0.0, 0.0]), 1.0)
+    sphere2 = colliders.Sphere(np.array([0.0, 0.0, 0.0]), 1.0)
+    intersection, depth, penetration_direction, contact_point = mpr.mpr_penetration(
+        sphere1, sphere2)
+    assert intersection
+    assert depth == 2.0
+    assert approx(np.linalg.norm(penetration_direction)) == 1.0
+    assert_array_almost_equal(contact_point, [0, 0, 0])
+
+    sphere1 = colliders.Sphere(np.array([0.0, 0.0, 0.0]), 1.0)
     sphere2 = colliders.Sphere(np.array([0.0, 0.0, 1.0]), 0.5)
     intersection, depth, penetration_direction, contact_point = mpr.mpr_penetration(
         sphere1, sphere2)
@@ -29,3 +39,12 @@ def test_penetration():
     assert depth == 0.5
     assert_array_almost_equal(penetration_direction, [0, 0, 1])
     assert_array_almost_equal(contact_point, [0, 0, 0.75])
+
+    sphere1 = colliders.Sphere(np.array([0.0, 0.0, 0.0]), 1.0)
+    sphere2 = colliders.Sphere(np.array([1.0, 0.0, 0.0]), 0.5)
+    intersection, depth, penetration_direction, contact_point = mpr.mpr_penetration(
+        sphere1, sphere2)
+    assert intersection
+    assert depth == 0.5
+    assert_array_almost_equal(penetration_direction, [1, 0, 0])
+    assert_array_almost_equal(contact_point, [0.75, 0, 0])
