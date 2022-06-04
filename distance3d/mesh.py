@@ -115,7 +115,7 @@ def make_convex_mesh(vertices):
     vertices = vertices - np.mean(vertices, axis=0)
     ch = ConvexHull(vertices)
     triangles = ch.simplices
-    faces = np.array([vertices[[i, j, k]] for i, j, k in triangles])
+    faces = vertices[triangles]
     A = faces[:, 2] - faces[:, 0]
     B = faces[:, 1] - faces[:, 0]
     C = np.cross(A, B)
