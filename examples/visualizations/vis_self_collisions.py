@@ -22,7 +22,7 @@ class AnimationCallback:
         if step == 0:
             self.total_time = 0.0
 
-        angle = 2.0 * np.cos(2.0 * np.pi * (step / self.n_frames))
+        angle = 2.7 * np.cos(2.0 * np.pi * (step / self.n_frames))
         for joint_name in joint_names:
             tm.set_joint(joint_name, angle)
         bvh.update_collider_poses()
