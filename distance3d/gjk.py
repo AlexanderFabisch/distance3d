@@ -77,8 +77,9 @@ def gjk_with_simplex(collider1, collider2):
     simplex = Simplex()
     old_simplex = Simplex()
 
-    simplex.set_first_point(
-        0, 0, collider1.first_vertex() - collider2.first_vertex())
+    new_idx1, new_vertex1 = collider1.first_vertex()
+    new_idx2, new_vertex2 = collider2.first_vertex()
+    simplex.set_first_point(new_idx1, new_idx2, new_vertex1 - new_vertex2)
 
     iteration = 0
     backup = False
@@ -92,11 +93,11 @@ def gjk_with_simplex(collider1, collider2):
         simplex_is_tetrahedron = len(simplex) == 4
         if no_improvement or simplex_is_tetrahedron:
             if backup:
-                closest_point1 = collider1.compute_point(
-                    solution.barycentric_coordinates[:len(simplex)],
+                closest_point1 = compute_point(
+                    collider1, solution.barycentric_coordinates[:len(simplex)],
                     simplex.indices_polytope1[:len(simplex)])
-                closest_point2 = collider2.compute_point(
-                    solution.barycentric_coordinates[:len(simplex)],
+                closest_point2 = compute_point(
+                    collider2, solution.barycentric_coordinates[:len(simplex)],
                     simplex.indices_polytope2[:len(simplex)])
 
                 if simplex_is_tetrahedron:
@@ -127,6 +128,29 @@ def _find_new_supporting_point(collider1, collider2, simplex, solution):
     new_index2, new_vertex2 = collider2.support_function(solution.search_direction)
     new_simplex_point = new_vertex1 - new_vertex2
     simplex.add_new_point(new_index1, new_index2, new_simplex_point)
+
+
+def compute_point(vertex_cache, barycentric_coordinates, indices):
+    """Compute point from barycentric coordinates.
+
+    Parameters
+    ----------
+    vertex_cache : VertexCachedCollider
+        Collider that contains cached vertices.
+
+    barycentric_coordinates : array, shape (n_vertices,)
+        Barycentric coordinates of the point that we compute.
+
+    indices : array, shape (n_vertices,)
+        Vertex indices to which the barycentric coordinates apply.
+
+    Returns
+    -------
+    point : array, shape (3,)
+        Point that we compute from barycentric coordinates.
+    """
+    return np.dot(barycentric_coordinates,
+                  [vertex_cache.vertices_[i] for i in indices])
 
 
 class Solution:
