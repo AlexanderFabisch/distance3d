@@ -171,10 +171,11 @@ API Reference
    ~distance3d.geometry.convert_box_to_face
    ~distance3d.geometry.convert_segment_to_line
    ~distance3d.geometry.convert_box_to_vertices
-   ~distance3d.geometry.box_extreme_along_direction
-   ~distance3d.geometry.cylinder_extreme_along_direction
-   ~distance3d.geometry.capsule_extreme_along_direction
-   ~distance3d.geometry.ellipsoid_extreme_along_direction
+   ~distance3d.geometry.support_function_cylinder
+   ~distance3d.geometry.support_function_capsule
+   ~distance3d.geometry.support_function_ellipsoid
+   ~distance3d.geometry.support_function_box
+   ~distance3d.geometry.support_function_sphere
    ~distance3d.geometry.hesse_normal_form
    ~distance3d.geometry.line_from_pluecker
 

@@ -322,6 +322,9 @@ def support_function_sphere(search_direction, center, radius):
 
     Parameters
     ----------
+    search_direction : array, shape (3,)
+        Search direction.
+
     center : array, shape (3,)
         Center of the sphere.
 
