@@ -96,3 +96,25 @@ def transform_point(A2B, point_in_A):
         Point in frame B.
     """
     return A2B[:3, 3] + np.dot(A2B[:3, :3], point_in_A)
+
+
+def angles_between_vectors(A, B):
+    """Compute angle between two vectors.
+
+    Parameters
+    ----------
+    A : array, shape (n_vectors, 3)
+        3d vectors
+
+    B : array-like, shape (n_vectors, 3)
+        3d vectors
+
+    Returns
+    -------
+    angles : array, shape (n_vectors,)
+        Angles between pairs of vectors from A and B
+    """
+    return np.arccos(
+        np.clip(np.sum(A * B, axis=1) / (np.linalg.norm(A, axis=1)
+                                         * np.linalg.norm(B, axis=1)),
+                -1.0, 1.0))

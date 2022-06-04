@@ -54,12 +54,12 @@ fig.plot_transform(np.eye(4), s=1)
 random_state = np.random.RandomState(6)
 
 mesh2origin, vertices1, triangles1 = random.randn_convex(
-    random_state, n_points=10, center_scale=0.0, radius_scale=5)
+    random_state, n_vertices=10, center_scale=0.0, radius_scale=5)
 artist1 = visualization.Mesh(mesh2origin, vertices1, triangles1)
 artist1.add_artist(fig)
 
 _, vertices2, triangles2 = random.randn_convex(
-    random_state, n_points=10, center_scale=0.0, radius_scale=1)
+    random_state, n_vertices=10, center_scale=0.0, radius_scale=1)
 mesh2origin2 = pt.transform_from(R=np.eye(3), p=[0, 0, 10])
 artist2 = visualization.Mesh(mesh2origin2, vertices2, triangles2)
 artist2.add_artist(fig)

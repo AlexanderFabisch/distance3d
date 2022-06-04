@@ -2,7 +2,8 @@
 import numpy as np
 import pytransform3d.rotations as pr
 import pytransform3d.transformations as pt
-from scipy.spatial import ConvexHull
+
+from .mesh import make_convex_mesh
 from .utils import norm_vector
 
 
@@ -361,7 +362,7 @@ def rand_sphere(random_state, center_scale=1.0, radius_scale=1.0):
     return center, radius
 
 
-def randn_convex(random_state, n_points=10, center_scale=1.0, min_radius=1.0,
+def randn_convex(random_state, n_vertices=10, center_scale=1.0, min_radius=1.0,
                  radius_scale=1.0):
     """Sample convex mesh.
 
@@ -372,7 +373,7 @@ def randn_convex(random_state, n_points=10, center_scale=1.0, min_radius=1.0,
     random_state : np.random.RandomState
         Random number generator.
 
-    n_points : int
+    n_vertices : int
         Number of points to sample from normal distribution.
 
     center_scale : float, optional (default: 1)
@@ -395,32 +396,15 @@ def randn_convex(random_state, n_points=10, center_scale=1.0, min_radius=1.0,
     triangles : array, shape (n_triangles, 3)
         Vertex indices of faces.
     """
-    phis = random_state.rand(n_points) * np.pi
-    thetas = random_state.rand(n_points) * 2 * np.pi
+    phis = random_state.rand(n_vertices) * np.pi
+    thetas = random_state.rand(n_vertices) * 2 * np.pi
     sin_phis = np.sin(phis)
     x = sin_phis * np.cos(thetas)
     y = sin_phis * np.sin(thetas)
     z = np.cos(phis)
     radii = min_radius + (1.0 - random_state.rand(3)) * radius_scale
-    points = np.column_stack((x, y, z)) * radii[np.newaxis]
-    ch = ConvexHull(points)
-
-    simplices = ch.simplices
-    faces = np.array([points[[i, j, k]] for i, j, k in simplices])
-    A = faces[:, 2] - faces[:, 0]
-    B = faces[:, 1] - faces[:, 0]
-    C = np.cross(A, B)
-    centers = np.mean(faces, axis=1)
-    angles = angle_between_vectors(C, centers)
-    indices = np.where(angles < 0.5 * np.pi)[0]
-    simplices[indices] = simplices[indices, ::-1]
-
+    vertices = np.column_stack((x, y, z)) * radii[np.newaxis]
+    triangles = make_convex_mesh(vertices)
     mesh2origin = pt.random_transform(random_state)
     mesh2origin[:3, 3] *= center_scale
-    return mesh2origin, points, simplices
-
-
-def angle_between_vectors(A, B):
-    return np.arccos(
-        np.clip(np.sum(A * B, axis=1) / (np.linalg.norm(A, axis=1) * np.linalg.norm(B, axis=1)),
-                -1.0, 1.0))
+    return mesh2origin, vertices, triangles

@@ -12,7 +12,7 @@ def run_support_function(random_state, support_function):
 
 
 random_state = np.random.RandomState(0)
-mesh2origin, vertices, triangles = random.randn_convex(random_state, n_points=50000)
+mesh2origin, vertices, triangles = random.randn_convex(random_state, n_vertices=50000)
 
 support_function = MeshSupportFunction(mesh2origin, vertices, triangles)
 times = timeit.repeat(partial(
@@ -21,7 +21,7 @@ times = timeit.repeat(partial(
 print(f"Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 
 random_state = np.random.RandomState(0)
-mesh2origin, vertices, triangles = random.randn_convex(random_state, n_points=50000)
+mesh2origin, vertices, triangles = random.randn_convex(random_state, n_vertices=50000)
 
 start = time.time()
 support_function = MeshHillClimbingSupportFunction(mesh2origin, vertices, triangles)
