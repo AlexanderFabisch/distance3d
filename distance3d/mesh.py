@@ -1,5 +1,8 @@
 import numba
 import numpy as np
+from scipy.spatial import ConvexHull
+
+from .utils import angles_between_vectors
 
 
 class MeshHillClimbingSupportFunction:
@@ -93,3 +96,30 @@ class MeshSupportFunction:
         idx = np.argmax(self.vertices.dot(search_direction_in_mesh))
         return idx, self.mesh2origin[:3, 3] + np.dot(
             self.mesh2origin[:3, :3], self.vertices[idx])
+
+
+def make_convex_mesh(vertices):
+    """Make convex mesh from vertices.
+
+    Parameters
+    ----------
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh (not necessarily convex, but might be).
+
+    Returns
+    -------
+    triangles : array, shape (n_triangles, 3)
+        Indices of vertices forming the faces of a convex mesh. Normals of the
+        faces point to the outside of the mesh.
+    """
+    ch = ConvexHull(vertices)
+    triangles = ch.simplices
+    faces = np.array([vertices[[i, j, k]] for i, j, k in triangles])
+    A = faces[:, 2] - faces[:, 0]
+    B = faces[:, 1] - faces[:, 0]
+    C = np.cross(A, B)
+    centers = np.mean(faces, axis=1)
+    angles = angles_between_vectors(C, centers)
+    indices = np.where(angles < 0.5 * np.pi)[0]
+    triangles[indices] = triangles[indices, ::-1]
+    return triangles
