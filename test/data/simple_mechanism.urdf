@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+  <robot name="simple_mechanism">
+    <link name="cone1">
+      <collision name="cone1">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="cone.stl" scale="1 1 1"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="cone2">
+      <collision name="cone1">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="cone.stl" scale="1 1 1"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="cone3">
+      <collision name="cone1">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="cone.stl" scale="1 1 1"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="cone4">
+      <collision name="cone1">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="cone.stl" scale="1 1 1"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="joint1" type="revolute">
+      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <parent link="cone1"/>
+      <child link="cone2"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-2.79253" upper="2.79253" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="joint2" type="revolute">
+      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <parent link="cone2"/>
+      <child link="cone3"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-2.79253" upper="2.79253" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="joint3" type="revolute">
+      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <parent link="cone3"/>
+      <child link="cone4"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-2.79253" upper="2.79253" effort="0" velocity="0"/>
+    </joint>
+
+  </robot>
