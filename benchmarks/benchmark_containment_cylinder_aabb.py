@@ -2,7 +2,7 @@ import timeit
 from functools import partial
 import numpy as np
 from distance3d.containment import cylinder_aabb
-from distance3d.geometry import cylinder_extreme_along_direction
+from distance3d.geometry import support_function_cylinder
 from distance3d import random
 
 
@@ -30,15 +30,15 @@ ZP = np.array([0.0, 0.0, 1.0])
 
 def cylinder_aabb_slow(cylinder2origin, radius, length):
     negative_vertices = np.vstack((
-        cylinder_extreme_along_direction(XM, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(YM, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(ZM, cylinder2origin, radius, length),
+        support_function_cylinder(XM, cylinder2origin, radius, length),
+        support_function_cylinder(YM, cylinder2origin, radius, length),
+        support_function_cylinder(ZM, cylinder2origin, radius, length),
     ))
     mins = np.min(negative_vertices, axis=0)
     positive_vertices = np.vstack((
-        cylinder_extreme_along_direction(XP, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(YP, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(ZP, cylinder2origin, radius, length),
+        support_function_cylinder(XP, cylinder2origin, radius, length),
+        support_function_cylinder(YP, cylinder2origin, radius, length),
+        support_function_cylinder(ZP, cylinder2origin, radius, length),
     ))
     maxs = np.max(positive_vertices, axis=0)
     return mins, maxs

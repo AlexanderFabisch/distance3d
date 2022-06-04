@@ -5,8 +5,8 @@ import numpy as np
 from pytransform3d import urdf
 import pytransform3d.visualizer as pv
 from .geometry import (
-    capsule_extreme_along_direction, cylinder_extreme_along_direction,
-    convert_box_to_vertices, ellipsoid_extreme_along_direction)
+    support_function_capsule, support_function_cylinder,
+    convert_box_to_vertices, support_function_ellipsoid)
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb, ellipsoid_aabb)
@@ -429,7 +429,7 @@ class Cylinder(ConvexCollider):
         return self.cylinder2origin[:3, 3] + 0.5 * self.length * self.cylinder2origin[:3, 2]
 
     def support_function(self, search_direction):
-        return cylinder_extreme_along_direction(
+        return support_function_cylinder(
             search_direction, self.cylinder2origin, self.radius, self.length)
 
     def update_pose(self, pose):
@@ -478,7 +478,7 @@ class Capsule(ConvexCollider):
         return self.capsule2origin[:3, 3] - (self.radius + 0.5 * self.height) * self.capsule2origin[:3, 2]
 
     def support_function(self, search_direction):
-        return capsule_extreme_along_direction(
+        return support_function_capsule(
             search_direction, self.capsule2origin, self.radius, self.height)
 
     def update_pose(self, pose):
@@ -573,7 +573,7 @@ class Ellipsoid(ConvexCollider):
         return self.ellipsoid2origin[:3, 3] + self.radii[2] * self.ellipsoid2origin[:3, 2]
 
     def support_function(self, search_direction):
-        return ellipsoid_extreme_along_direction(
+        return support_function_ellipsoid(
             search_direction, self.ellipsoid2origin, self.radii)
 
     def update_pose(self, pose):

@@ -5,7 +5,7 @@ from distance3d.containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb, ellipsoid_aabb)
 from distance3d.geometry import (
-    cylinder_extreme_along_direction, capsule_extreme_along_direction)
+    support_function_cylinder, support_function_capsule)
 from distance3d import random
 from numpy.testing import assert_array_almost_equal
 
@@ -72,15 +72,15 @@ ZP = np.array([0.0, 0.0, 1.0])
 
 def cylinder_aabb_slow(cylinder2origin, radius, length):
     negative_vertices = np.vstack((
-        cylinder_extreme_along_direction(XM, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(YM, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(ZM, cylinder2origin, radius, length),
+        support_function_cylinder(XM, cylinder2origin, radius, length),
+        support_function_cylinder(YM, cylinder2origin, radius, length),
+        support_function_cylinder(ZM, cylinder2origin, radius, length),
     ))
     mins = np.min(negative_vertices, axis=0)
     positive_vertices = np.vstack((
-        cylinder_extreme_along_direction(XP, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(YP, cylinder2origin, radius, length),
-        cylinder_extreme_along_direction(ZP, cylinder2origin, radius, length),
+        support_function_cylinder(XP, cylinder2origin, radius, length),
+        support_function_cylinder(YP, cylinder2origin, radius, length),
+        support_function_cylinder(ZP, cylinder2origin, radius, length),
     ))
     maxs = np.max(positive_vertices, axis=0)
     return mins, maxs
@@ -105,15 +105,15 @@ def test_capsule_aabb():
 
 def capsule_aabb_slow(capsule2origin, radius, height):
     negative_vertices = np.vstack((
-        capsule_extreme_along_direction(XM, capsule2origin, radius, height),
-        capsule_extreme_along_direction(YM, capsule2origin, radius, height),
-        capsule_extreme_along_direction(ZM, capsule2origin, radius, height),
+        support_function_capsule(XM, capsule2origin, radius, height),
+        support_function_capsule(YM, capsule2origin, radius, height),
+        support_function_capsule(ZM, capsule2origin, radius, height),
     ))
     mins = np.min(negative_vertices, axis=0)
     positive_vertices = np.vstack((
-        capsule_extreme_along_direction(XP, capsule2origin, radius, height),
-        capsule_extreme_along_direction(YP, capsule2origin, radius, height),
-        capsule_extreme_along_direction(ZP, capsule2origin, radius, height),
+        support_function_capsule(XP, capsule2origin, radius, height),
+        support_function_capsule(YP, capsule2origin, radius, height),
+        support_function_capsule(ZP, capsule2origin, radius, height),
     ))
     maxs = np.max(positive_vertices, axis=0)
     return mins, maxs
