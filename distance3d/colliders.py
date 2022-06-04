@@ -92,7 +92,7 @@ class BoundingVolumeHierarchy:
                 length=obj.length)
         else:
             assert isinstance(obj, urdf.Mesh)
-            collider = MeshGraph(obj.filename, A2B, obj.scale)
+            collider = Mesh(obj.filename, A2B, obj.scale)
         if make_artists:
             collider.make_artist()
         return collider
