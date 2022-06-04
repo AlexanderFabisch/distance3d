@@ -1,5 +1,5 @@
 import numpy as np
-from distance3d import colliders, mpr, gjk, epa, utils
+from distance3d import random, colliders, mpr, gjk
 from numpy.testing import assert_array_almost_equal
 from pytest import approx
 
@@ -48,3 +48,25 @@ def test_penetration():
     assert depth == 0.5
     assert_array_almost_equal(penetration_direction, [1, 0, 0])
     assert_array_almost_equal(contact_point, [0.75, 0, 0])
+
+
+def test_mpr_separation():
+    random_state = np.random.RandomState(26)
+
+    for _ in range(50):
+        capsule2origin1, radius1, height1 = random.rand_capsule(
+            random_state, radius_scale=0.5)
+        capsule1 = colliders.Capsule(capsule2origin1, radius1, height1)
+        capsule2origin2, radius2, height2 = random.rand_capsule(
+            random_state, radius_scale=0.5)
+        capsule2 = colliders.Capsule(capsule2origin2, radius2, height2)
+
+        intersection, depth, pdir, pos = mpr.mpr_penetration(capsule1, capsule2)
+        if not intersection:
+            continue
+
+        capsule2origin2[:3, 3] += (1.0 + depth) * pdir
+        capsule2_separated = colliders.Capsule(capsule2origin2, radius2, height2)
+        gjk_dist, closest_point1, closest_point2, simplex = gjk.gjk_with_simplex(
+            capsule1, capsule2_separated)
+        assert 0.9 < gjk_dist < 1.1
