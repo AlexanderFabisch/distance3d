@@ -6,7 +6,8 @@ from pytransform3d import urdf
 import pytransform3d.visualizer as pv
 from .geometry import (
     support_function_capsule, support_function_cylinder,
-    convert_box_to_vertices, support_function_ellipsoid)
+    convert_box_to_vertices, support_function_ellipsoid,
+    support_function_sphere)
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb, ellipsoid_aabb)
@@ -522,16 +523,8 @@ class Sphere(ConvexCollider):
     def first_vertex(self):
         return self.c + np.array([0, 0, self.radius])
 
-    def support_function(self, search_direction):  # TODO refactor
-        # Similar implementation:
-        # https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L33
-        # (Copyright (c) 2017 Kevin Moran, MIT License or Unlicense)
-        s_norm = np.linalg.norm(search_direction)
-        if s_norm == 0.0:
-            vertex = self.c + np.array([0, 0, self.radius])
-        else:
-            vertex = self.c + search_direction / s_norm * self.radius
-        return vertex
+    def support_function(self, search_direction):
+        return support_function_sphere(search_direction, self.c, self.radius)
 
     def update_pose(self, pose):
         self.c = pose[:3, 3]

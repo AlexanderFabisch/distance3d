@@ -284,7 +284,7 @@ def support_function_ellipsoid(
 
 @numba.njit(
     numba.float64[:](numba.float64[::1], numba.float64[:, ::1], numba.float64[::1]),
-    cache=True, boundscheck=False)
+    cache=True)
 def support_function_box(search_direction, box2origin, half_lengths):
     """Compute extreme point of box along a direction.
 
@@ -307,6 +307,38 @@ def support_function_box(search_direction, box2origin, half_lengths):
     local_dir = np.dot(box2origin[:3, :3].T, search_direction)
     local_vertex = np.sign(local_dir) * half_lengths
     return transform_point(box2origin, local_vertex)
+
+
+@numba.njit(
+    numba.float64[:](numba.float64[::1], numba.float64[::1], numba.float64),
+    cache=True)
+def support_function_sphere(search_direction, center, radius):
+    """Compute extreme point of box along a direction.
+
+    You can find similar implementations here:
+
+    * https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L33
+      (Copyright (c) 2017 Kevin Moran, MIT License or Unlicense)
+
+    Parameters
+    ----------
+    center : array, shape (3,)
+        Center of the sphere.
+
+    radius : float
+        Radius of the sphere.
+
+    Returns
+    -------
+    extreme_point : array, shape (3,)
+        Extreme point along search direction.
+    """
+    s_norm = np.linalg.norm(search_direction)
+    if s_norm == 0.0:
+        vertex = center + np.array([0, 0, radius])
+    else:
+        vertex = center + search_direction / s_norm * radius
+    return vertex
 
 
 @numba.njit(cache=True)
