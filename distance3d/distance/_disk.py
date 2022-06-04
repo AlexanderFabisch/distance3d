@@ -8,7 +8,7 @@ from ._plane import plane_intersects_plane
 from ..utils import norm_vector
 
 
-@numba.jit(
+@numba.njit(
     numba.types.Tuple((numba.float64, numba.float64[:]))
     (numba.float64[::1], numba.float64[::1], numba.float64, numba.float64[::1]),
     cache=True)

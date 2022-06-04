@@ -36,7 +36,7 @@ def point_to_plane(point, plane_point, plane_normal, signed=False):
     return _point_to_plane(point, plane_point, plane_normal, signed)
 
 
-@numba.jit(
+@numba.njit(
     numba.types.Tuple((numba.float64, numba.float64[::1]))
     (numba.float64[::1], numba.float64[::1], numba.float64[::1], numba.boolean),
     cache=True)
@@ -145,7 +145,7 @@ def line_segment_to_plane(
         segment_start, segment_end, plane_point, plane_normal, epsilon)
 
 
-@numba.jit(cache=True)
+@numba.njit(cache=True)
 def _line_segment_to_plane(
         segment_start, segment_end, plane_point, plane_normal, epsilon):
     segment_direction, segment_length = convert_segment_to_line(
