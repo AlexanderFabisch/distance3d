@@ -599,30 +599,12 @@ class VertexCachedCollider:
 
     def first_vertex(self):
         vertex = self.collider.first_vertex()
+        vertex_idx = len(self.vertices_)
         self.vertices_.append(vertex)
-        return vertex
+        return vertex_idx, vertex
 
     def support_function(self, search_direction):
         vertex = self.collider.support_function(search_direction)
         vertex_idx = len(self.vertices_)
         self.vertices_.append(vertex)
         return vertex_idx, vertex
-
-    def compute_point(self, barycentric_coordinates, indices):  # TODO refactor
-        """Compute point from barycentric coordinates.
-
-        Parameters
-        ----------
-        barycentric_coordinates : array, shape (n_vertices,)
-            Barycentric coordinates of the point that we compute.
-
-        indices : array, shape (n_vertices,)
-            Vertex indices to which the barycentric coordinates apply.
-
-        Returns
-        -------
-        point : array, shape (3,)
-            Point that we compute from barycentric coordinates.
-        """
-        return np.dot(barycentric_coordinates,
-                      np.array([self.vertices_[i] for i in indices]))
