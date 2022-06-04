@@ -587,24 +587,3 @@ class Ellipsoid(ConvexCollider):
     def aabb(self):
         mins, maxs = ellipsoid_aabb(self.ellipsoid2origin, self.radii)
         return AABB(np.array([mins, maxs]).T)
-
-
-class VertexCachedCollider:
-    def __init__(self, collider):
-        self.collider = collider
-        self.vertices_ = []
-
-    def center(self):
-        return self.collider.center()
-
-    def first_vertex(self):
-        vertex = self.collider.first_vertex()
-        vertex_idx = len(self.vertices_)
-        self.vertices_.append(vertex)
-        return vertex_idx, vertex
-
-    def support_function(self, search_direction):
-        vertex = self.collider.support_function(search_direction)
-        vertex_idx = len(self.vertices_)
-        self.vertices_.append(vertex)
-        return vertex_idx, vertex

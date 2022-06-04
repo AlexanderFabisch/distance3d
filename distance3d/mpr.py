@@ -9,7 +9,6 @@ import numpy as np
 import numba
 from distance3d.utils import norm_vector
 from distance3d.distance import point_to_triangle
-from distance3d.colliders import VertexCachedCollider
 
 
 EPSILON = np.finfo(float).eps
@@ -34,9 +33,6 @@ def mpr_intersection(collider1, collider2, mpr_tolerance=0.0001):
     intersection : bool
         Do the two colliders intersect?
     """
-    collider1 = VertexCachedCollider(collider1)
-    collider2 = VertexCachedCollider(collider2)
-
     res, portal = _discover_portal(collider1, collider2)
     if res == PortalState.ORIGIN_OUTSIDE_PORTAL:
         return False
@@ -83,9 +79,6 @@ def mpr_penetration(collider1, collider2, mpr_tolerance=0.0001, max_iterations=1
     contact_position : array, shape (3,) or None
         Contact position.
     """
-    collider1 = VertexCachedCollider(collider1)
-    collider2 = VertexCachedCollider(collider2)
-
     res, portal = _discover_portal(collider1, collider2)
     depth, penetration_direction, contact_position = None, None, None
     if res == PortalState.ORIGIN_OUTSIDE_PORTAL:
@@ -227,8 +220,8 @@ def _iterate_discover_portal(v, v1, v2, search_direction, portal_size):
 
 
 def _support_function(collider1, collider2, search_direction):
-    v1 = collider1.support_function(search_direction)[1]
-    v2 = collider2.support_function(-search_direction)[1]
+    v1 = collider1.support_function(search_direction)
+    v2 = collider2.support_function(-search_direction)
     return _make_support_point(v1, v2)
 
 
