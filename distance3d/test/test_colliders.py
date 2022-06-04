@@ -4,6 +4,7 @@ from pytransform3d.transform_manager import TransformManager
 from pytransform3d.urdf import UrdfTransformManager
 import pytransform3d.transformations as pt
 from distance3d import colliders, random
+from numpy.testing import assert_array_almost_equal
 
 
 def test_bvh():
@@ -88,3 +89,17 @@ def test_bvh_from_colliders():
             overlapping_aabbs2[frame1].append(frame2)
 
     assert overlapping_aabbs == overlapping_aabbs2
+
+
+def test_convex_collider():
+    convex = colliders.Convex(np.array([[0.0, 0.0, 1.0], [0.0, 1.0, 0.0]]))
+    assert_array_almost_equal(
+        convex.aabb().limits, np.array([[0.0, 0.0], [0.0, 1.0], [0.0, 1.0]]))
+    assert_array_almost_equal(convex.center(), [0, 0.5, 0.5])
+
+
+def test_box_collider():
+    box = colliders.Box(np.eye(4), np.array([1.0, 1.0, 1.0]))
+    assert_array_almost_equal(
+        box.aabb().limits, np.array([[-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5]]))
+    assert_array_almost_equal(box.center(), [0, 0, 0])
