@@ -1,7 +1,7 @@
 """Gilbert-Johnson-Keerthi (GJK) for distance calculation of convex shapes."""
 import math
 import numpy as np
-from .colliders import Convex, VertexCachedCollider
+from .colliders import Convex
 
 
 def gjk(vertices1, vertices2):
@@ -121,6 +121,60 @@ def gjk_with_simplex(collider1, collider2):
             old_simplex.copy_from(simplex)
             if len(simplex) == 4:
                 simplex.reorder(simplex.nondecreasing_ordered_indices())
+
+
+class VertexCachedCollider:
+    """Caches vertices from a collider.
+
+    Many colliders do not store their vertices explicitly. However, GJK only
+    stores indices to the vertices. Hence, we will cache requested vertices
+    of a collider here.
+
+    Parameters
+    ----------
+    collider : ConvexCollider
+        Collider object.
+    """
+    def __init__(self, collider):
+        self.collider = collider
+        self.vertices_ = []
+
+    def first_vertex(self):
+        """Get vertex from collider to initialize GJK algorithm.
+
+        Returns
+        -------
+        vertex_idx : int
+            Index in vertex cache.
+
+        vertex : array, shape (3,)
+            Vertex from collider.
+        """
+        vertex = self.collider.first_vertex()
+        vertex_idx = len(self.vertices_)
+        self.vertices_.append(vertex)
+        return vertex_idx, vertex
+
+    def support_function(self, search_direction):
+        """Support function for collider.
+
+        Parameters
+        ----------
+        search_direction : array, shape (3,)
+            Direction in which we search for support point of the collider.
+
+        Returns
+        -------
+        vertex_idx : int
+            Index in vertex cache.
+
+        support_point : array, shape (3,)
+            Extreme point along search direction.
+        """
+        vertex = self.collider.support_function(search_direction)
+        vertex_idx = len(self.vertices_)
+        self.vertices_.append(vertex)
+        return vertex_idx, vertex
 
 
 def _find_new_supporting_point(collider1, collider2, simplex, solution):

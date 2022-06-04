@@ -1,6 +1,6 @@
 """Expanding polytope algorithm (EPA) for collision resolution after GJK."""
 import numpy as np
-from .colliders import Convex, VertexCachedCollider
+from .colliders import Convex
 from .utils import norm_vector
 
 
@@ -84,9 +84,6 @@ def epa(simplex, collider1, collider2, max_iter=64, max_loose_edges=32, max_face
     success : bool
         EPA converged before maximum number of iterations was reached.
     """
-    collider1 = VertexCachedCollider(collider1)
-    collider2 = VertexCachedCollider(collider2)
-
     polytope = Polytope(simplex, max_faces, epsilon)
     loose_edges = LooseEdges(max_loose_edges, epsilon)
 
@@ -94,8 +91,8 @@ def epa(simplex, collider1, collider2, max_iter=64, max_loose_edges=32, max_face
         min_dist, closest_face = polytope.find_face_closest_to_origin()
 
         search_direction = closest_face[3]
-        _, new_vertex1 = collider1.support_function(search_direction)
-        _, new_vertex2 = collider2.support_function(-search_direction)
+        new_vertex1 = collider1.support_function(search_direction)
+        new_vertex2 = collider2.support_function(-search_direction)
         new_point = new_vertex1 - new_vertex2
 
         if np.dot(new_point, search_direction) - min_dist < epsilon:
