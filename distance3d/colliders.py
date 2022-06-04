@@ -343,7 +343,7 @@ class Box(Convex):
         return AABB(np.array([mins, maxs]).T)
 
 
-class MeshGraph(Convex):
+class MeshGraph(ConvexCollider):
     """Wraps mesh for GJK and use triangles for hill climbing.
 
     Parameters
@@ -361,39 +361,38 @@ class MeshGraph(Convex):
         Corresponding artist for visualizer.
     """
     def __init__(self, mesh2origin, vertices, triangles, artist=None):
-        super(Convex, self).__init__(vertices, artist)
+        super(MeshGraph, self).__init__(artist)
         self.mesh2origin = mesh2origin
+        self.vertices = vertices
         self.triangles = triangles
-        self.support_function = MeshHillClimbingSupportFunction(
+        self._support_function = MeshHillClimbingSupportFunction(
             mesh2origin, vertices, triangles)
-
-    def support_function(self, search_direction):
-        return self.support_function(search_direction)
 
     def make_artist(self, c=None):
         self.artist_ = VisualMesh(
-            self.mesh2origin, self.vertices_, self.triangles, c=c)
+            self.mesh2origin, self.vertices, self.triangles, c=c)
 
     def first_vertex(self):
         return self.mesh2origin[:3, 3] + np.dot(
-            self.mesh2origin[:3, :3], self.vertices_[0])
+            self.mesh2origin[:3, :3], self.vertices[0])
 
-    def compute_point(self, barycentric_coordinates, indices):
-        vertices_in_mesh = self.vertices_[indices]
-        vertices_in_origin = self.mesh2origin[np.newaxis, :3, 3] + np.dot(
-            vertices_in_mesh, self.mesh2origin[:3, :3].T)
-        return np.dot(barycentric_coordinates, vertices_in_origin)
+    def support_function(self, search_direction):
+        return self._support_function(search_direction)[1]
+
+    def center(self):
+        return self.mesh2origin[:3, 3] + np.dot(
+            self.mesh2origin[:3, :3], np.mean(self.vertices, axis=0))
 
     def update_pose(self, mesh2origin):
         self.mesh2origin = mesh2origin
-        self.support_function.update_pose(mesh2origin)
+        self._support_function.update_pose(mesh2origin)
         if self.artist_ is not None:
             self.artist_.set_data(mesh2origin)
 
     def aabb(self):
         mins, maxs = axis_aligned_bounding_box(
             self.mesh2origin[np.newaxis, :3, 3] + np.dot(
-                self.vertices_, self.mesh2origin[:3, :3].T))
+                self.vertices, self.mesh2origin[:3, :3].T))
         return AABB(np.array([mins, maxs]).T)
 
 
