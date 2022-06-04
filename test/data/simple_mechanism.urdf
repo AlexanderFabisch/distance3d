@@ -4,7 +4,7 @@
       <collision name="cone1">
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="cone.stl" scale="1 1 1"/>
+          <sphere center="0 0 0" radius="0.1"/>
         </geometry>
       </collision>
     </link>
