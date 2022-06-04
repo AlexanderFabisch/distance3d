@@ -1,7 +1,7 @@
 """Gilbert-Johnson-Keerthi (GJK) for distance calculation of convex shapes."""
 import math
 import numpy as np
-from .colliders import Convex
+from .colliders import Convex, VertexCachedCollider
 
 
 def gjk(vertices1, vertices2):
@@ -70,6 +70,9 @@ def gjk_with_simplex(collider1, collider2):
         Simplex defined by 4 points of the Minkowski difference between
         vertices of the two colliders.
     """
+    collider1 = VertexCachedCollider(collider1)
+    collider2 = VertexCachedCollider(collider2)
+
     solution = Solution()
     simplex = Simplex()
     old_simplex = Simplex()
