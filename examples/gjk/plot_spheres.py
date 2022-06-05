@@ -24,7 +24,7 @@ for i in range(1000):
     start = time.time()
     s1 = colliders.Sphere(center, radius)
     s2 = colliders.Sphere(center2, radius2)
-    dist, closest_point_sphere, closest_point_sphere2, _ = gjk.gjk_with_simplex(s1, s2)
+    dist, closest_point_sphere, closest_point_sphere2, _ = gjk.gjk(s1, s2)
     end = time.time()
     accumulated_time += end - start
     print(dist)

@@ -1,40 +1,9 @@
 """Expanding polytope algorithm (EPA) for collision resolution after GJK."""
 import numpy as np
-from .colliders import Convex
 from .utils import norm_vector
 
 
 EDGES_PER_FACE = 3
-
-
-def epa_vertices(simplex, vertices1, vertices2, epsilon=1e-8):
-    """Expanding Polytope Algorithm (EPA).
-
-    Find minimum translation vector to resolve collision.
-
-    Parameters
-    ----------
-    simplex : array-like, shape (4, 3)
-        Simplex of Minkowski distances obtained by GJK.
-
-    vertices1 : array, shape (n_vertices1, 3)
-        Vertices of the first convex shape.
-
-    vertices2 : array, shape (n_vertices2, 3)
-        Vertices of the second convex shape.
-
-    epsilon : float, optional (default: 1e-8)
-        Floating point tolerance
-
-    Returns
-    -------
-    mtv : array, shape (3,)
-        Minimum translation vector to be added to the second set of vertices
-        or subtracted from the first set of vertices to resolve the collision.
-        The norm of this vector is the penetration depth and the direction is
-        the contact normal.
-    """
-    return epa(simplex, Convex(vertices1), Convex(vertices2), epsilon=epsilon)[0]
 
 
 def epa(simplex, collider1, collider2, max_iter=64, max_loose_edges=32, max_faces=64, epsilon=1e-8):

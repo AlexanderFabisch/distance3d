@@ -7,7 +7,7 @@ print(__doc__)
 import numpy as np
 import pytransform3d.transformations as pt
 import pytransform3d.visualizer as pv
-from distance3d import random, gjk, epa, visualization
+from distance3d import random, gjk, epa, visualization, colliders
 
 
 dt = 0.001
@@ -38,9 +38,11 @@ class AnimationCallback:
         # Collision detection and resolution
         vertices1 = np.asarray(artist1.mesh.vertices)
         vertices2 = np.asarray(artist2.mesh.vertices)
-        dist, _, _, simplex = gjk.gjk_with_simplex(gjk.Convex(vertices1), gjk.Convex(vertices2))
+        collider1 = colliders.Convex(vertices1)
+        collider2 = colliders.Convex(vertices2)
+        dist, _, _, simplex = gjk.gjk(collider1, collider2)
         if dist == 0.0:
-            mtv = epa.epa_vertices(simplex, vertices1, vertices2)
+            mtv = epa.epa(simplex, collider1, collider2)[0]
             self.pose2[:3, 3] += mtv
 
         artist2.set_data(np.copy(self.pose2))
@@ -60,7 +62,7 @@ artist1.add_artist(fig)
 
 _, vertices2, triangles2 = random.randn_convex(
     random_state, n_vertices=10, center_scale=0.0, radius_scale=1)
-mesh2origin2 = pt.transform_from(R=np.eye(3), p=[0, 0, 10])
+mesh2origin2 = pt.transform_from(R=np.eye(3), p=[0.0, 0.0, 10.0])
 artist2 = visualization.Mesh(mesh2origin2, vertices2, triangles2)
 artist2.add_artist(fig)
 

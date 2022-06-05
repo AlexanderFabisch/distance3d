@@ -14,8 +14,7 @@ def test_intersection_mpr_vs_gjk():
         vertices2 = random_state.rand(6, 3) * np.array([[1, 1, 1]])
         convex2 = colliders.Convex(vertices2)
 
-        dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
-            convex1, convex2)
+        dist, closest_point1, closest_point2, _ = gjk.gjk(convex1, convex2)
         gjk_intersection = dist < 1e-16
         mpr_intersection = mpr.mpr_intersection(convex1, convex2)
         assert gjk_intersection == mpr_intersection
@@ -67,6 +66,6 @@ def test_mpr_separation():
 
         capsule2origin2[:3, 3] += (1.0 + depth) * pdir
         capsule2_separated = colliders.Capsule(capsule2origin2, radius2, height2)
-        gjk_dist, closest_point1, closest_point2, simplex = gjk.gjk_with_simplex(
+        gjk_dist, closest_point1, closest_point2, simplex = gjk.gjk(
             capsule1, capsule2_separated)
         assert 0.9 < gjk_dist < 1.1

@@ -10,7 +10,7 @@ import pytransform3d.visualizer as pv
 from distance3d.random import rand_ellipsoid
 from distance3d.colliders import Ellipsoid
 from distance3d.broad_phase import BoundingVolumeHierarchy
-from distance3d.gjk import gjk_with_simplex
+from distance3d.gjk import gjk
 from distance3d.urdf_utils import fast_transform_manager_initialization
 from distance3d.benchmark import Timer
 
@@ -42,7 +42,7 @@ for frame1, collider1 in bvh.colliders_.items():
     timer.stop_and_add_to_total("broad phase")
     for frame2, collider2 in colliders.items():
         timer.start("gjk")
-        dist, point1, point2, _ = gjk_with_simplex(collider1, collider2)
+        dist, point1, point2, _ = gjk(collider1, collider2)
         timer.stop_and_add_to_total("gjk")
         if dist < collision_margin:
             collisions.append((frame1, frame2))

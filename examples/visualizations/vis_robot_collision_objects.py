@@ -35,7 +35,7 @@ class AnimationCallback:
         in_aabb = {frame: False for frame in colls.get_collider_frames()}
 
         if self.collision_detection_algorithm == "gjk":
-            detect_collision = lambda x, y: gjk.gjk_with_simplex(x, y)[0] < 1e-6
+            detect_collision = lambda x, y: gjk.gjk(x, y)[0] < 1e-6
         elif self.collision_detection_algorithm == "mpr":
             detect_collision = mpr.mpr_intersection
         else:

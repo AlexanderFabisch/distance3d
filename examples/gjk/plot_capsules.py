@@ -25,7 +25,7 @@ for i in range(700):
     start = time.time()
     c1 = colliders.Capsule(capsule2origin, radius, height)
     c2 = colliders.Capsule(capsule2origin2, radius2, height2)
-    dist, closest_point_capsule, closest_point_capsule2, _ = gjk.gjk_with_simplex(c1, c2)
+    dist, closest_point_capsule, closest_point_capsule2, _ = gjk.gjk(c1, c2)
     end = time.time()
     accumulated_time += end - start
     print(dist)

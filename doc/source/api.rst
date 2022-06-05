@@ -81,7 +81,7 @@ API Reference
 
 
 :mod:`distance3d.broad_phase`
----------------------------
+-----------------------------
 
 .. automodule:: distance3d.broad_phase
     :no-members:

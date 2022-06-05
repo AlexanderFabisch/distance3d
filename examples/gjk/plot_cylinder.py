@@ -24,7 +24,7 @@ for i in range(700):
     start = time.time()
     c1 = colliders.Cylinder(cylinder2origin, radius, length)
     c2 = colliders.Cylinder(cylinder2origin2, radius2, length2)
-    dist, closest_point_cylinder, closest_point_cylinder2, _ = gjk.gjk_with_simplex(c1, c2)
+    dist, closest_point_cylinder, closest_point_cylinder2, _ = gjk.gjk(c1, c2)
     end = time.time()
     accumulated_time += end - start
     print(dist)

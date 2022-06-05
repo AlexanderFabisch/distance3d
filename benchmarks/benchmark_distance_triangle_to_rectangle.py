@@ -2,7 +2,7 @@ import timeit
 from functools import partial
 import numpy as np
 from distance3d.distance import triangle_to_rectangle
-from distance3d import random, gjk, geometry
+from distance3d import random, gjk, geometry, colliders
 
 
 random_state = np.random.RandomState(0)
@@ -30,7 +30,8 @@ def distance_random_triangle_to_rectangle_gjk(random_state, triangle_points):
         random_state)
     rectangle_points = geometry.convert_rectangle_to_vertices(
         rectangle_center, rectangle_axes, rectangle_lengths)
-    gjk.gjk(triangle_points, rectangle_points)
+    gjk.gjk(colliders.Convex(triangle_points),
+            colliders.Convex(rectangle_points))
 
 
 times = timeit.repeat(partial(

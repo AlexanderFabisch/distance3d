@@ -1,35 +1,9 @@
 """Gilbert-Johnson-Keerthi (GJK) for distance calculation of convex shapes."""
 import math
 import numpy as np
-from .colliders import Convex
 
 
-def gjk(vertices1, vertices2):
-    """Gilbert-Johnson-Keerthi algorithm for distance calculation.
-
-    Parameters
-    ----------
-    vertices1 : array, shape (n_vertices1, 3)
-        Vertices of the first convex shape.
-
-    vertices2 : array, shape (n_vertices2, 3)
-        Vertices of the second convex shape.
-
-    Returns
-    -------
-    distance : float
-        The shortest distance between two convex shapes.
-
-    closest_point1 : array, shape (3,)
-        Closest point on first convex shape.
-
-    closest_point2 : array, shape (3,)
-        Closest point on second convex shape.
-    """
-    return gjk_with_simplex(Convex(vertices1), Convex(vertices2))[:3]
-
-
-def gjk_with_simplex(collider1, collider2):
+def gjk(collider1, collider2):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
 
     The GJK algorithm only works for convex shapes. Concave objects have to be
@@ -121,6 +95,9 @@ def gjk_with_simplex(collider1, collider2):
             old_simplex.copy_from(simplex)
             if len(simplex) == 4:
                 simplex.reorder(simplex.nondecreasing_ordered_indices())
+
+
+gjk_with_simplex = gjk  # for backward compatibility
 
 
 class VertexCachedCollider:

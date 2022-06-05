@@ -23,7 +23,7 @@ def test_epa():
         [0.04164598, -0.47531991, -1.26098837],
         [-0.37343875, 0.4638171, -0.01383896],
         [-0.04278462, -0.59883687, -0.44309735]])
-    dist, p1, p2, simplex = gjk.gjk_with_simplex(
+    dist, p1, p2, simplex = gjk.gjk(
         colliders.Convex(vertices), colliders.Convex(vertices2))
     assert_array_almost_equal(p1, p2)
     mtv, _, success = epa.epa(
@@ -42,7 +42,7 @@ def test_epa_separation():
         vertices2 = random_state.rand(6, 3) * np.array([[1, 1, 1]])
         convex2 = colliders.Convex(vertices2)
 
-        dist, closest_point1, closest_point2, simplex = gjk.gjk_with_simplex(
+        dist, closest_point1, closest_point2, simplex = gjk.gjk(
             convex1, convex2)
         if dist > 0.0:
             continue
@@ -53,6 +53,6 @@ def test_epa_separation():
         pdir = mtv / depth
         vertices2_separated = vertices2 + (1.0 + depth) * pdir[np.newaxis]
         convex2_separated = colliders.Convex(vertices2_separated)
-        gjk_dist, closest_point1, closest_point2, simplex = gjk.gjk_with_simplex(
+        gjk_dist, closest_point1, closest_point2, simplex = gjk.gjk(
             convex1, convex2_separated)
         assert approx(gjk_dist) == 1.0

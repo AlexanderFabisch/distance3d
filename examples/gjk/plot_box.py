@@ -23,7 +23,7 @@ for i in range(3000):
     box2origin2, size2 = random.rand_box(random_state, 2, 1)
     box_collider2 = colliders.Box(box2origin2, size2)
     start = time.time()
-    dist, closest_point_box, closest_point_box2, _ = gjk.gjk_with_simplex(
+    dist, closest_point_box, closest_point_box2, _ = gjk.gjk(
         box_collider, box_collider2)
     end = time.time()
     accumulated_time += end - start
