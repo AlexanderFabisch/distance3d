@@ -23,7 +23,7 @@ for i in range(4000):
     mesh2origin2, vertices2, triangles2 = random.randn_convex(random_state, center_scale=10.0)
     points2 = pt.transform(mesh2origin2, pt.vectors_to_points(vertices2))[:, :3]
     start = time.time()
-    dist, p1, p2, _ = gjk.gjk(colliders.Convex(points), colliders.Convex(points2))
+    dist, p1, p2, _ = gjk.gjk(colliders.ConvexHullVertices(points), colliders.ConvexHullVertices(points2))
     end = time.time()
     accumulated_time += end - start
     print(dist)

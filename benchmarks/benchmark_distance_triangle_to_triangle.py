@@ -26,8 +26,8 @@ triangle_points = random.randn_triangle(random_state) * 0.5
 
 def distance_random_triangle_to_triangle_gjk(random_state, triangle_points):
     triangle_points2 = random.randn_triangle(random_state)
-    gjk.gjk(colliders.Convex(triangle_points2),
-            colliders.Convex(triangle_points))
+    gjk.gjk(colliders.ConvexHullVertices(triangle_points2),
+            colliders.ConvexHullVertices(triangle_points))
 
 
 times = timeit.repeat(partial(

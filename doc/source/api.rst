@@ -71,13 +71,13 @@ API Reference
    :toctree: _autosummary/
 
    ~distance3d.colliders.ConvexCollider
-   ~distance3d.colliders.Convex
+   ~distance3d.colliders.ConvexHullVertices
    ~distance3d.colliders.MeshGraph
    ~distance3d.colliders.Box
-   ~distance3d.colliders.Cylinder
    ~distance3d.colliders.Sphere
    ~distance3d.colliders.Capsule
    ~distance3d.colliders.Ellipsoid
+   ~distance3d.colliders.Cylinder
 
 
 :mod:`distance3d.broad_phase`

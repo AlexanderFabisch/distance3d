@@ -5,7 +5,7 @@ from numpy.testing import assert_array_almost_equal
 
 
 def test_convex_collider():
-    convex = colliders.Convex(np.array([[0.0, 0.0, 1.0], [0.0, 1.0, 0.0]]))
+    convex = colliders.ConvexHullVertices(np.array([[0.0, 0.0, 1.0], [0.0, 1.0, 0.0]]))
     assert_array_almost_equal(
         convex.aabb().limits, np.array([[0.0, 0.0], [0.0, 1.0], [0.0, 1.0]]))
     assert_array_almost_equal(convex.center(), [0, 0.5, 0.5])

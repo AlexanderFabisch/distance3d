@@ -30,8 +30,8 @@ def distance_random_triangle_to_rectangle_gjk(random_state, triangle_points):
         random_state)
     rectangle_points = geometry.convert_rectangle_to_vertices(
         rectangle_center, rectangle_axes, rectangle_lengths)
-    gjk.gjk(colliders.Convex(triangle_points),
-            colliders.Convex(rectangle_points))
+    gjk.gjk(colliders.ConvexHullVertices(triangle_points),
+            colliders.ConvexHullVertices(rectangle_points))
 
 
 times = timeit.repeat(partial(

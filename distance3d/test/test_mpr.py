@@ -9,10 +9,10 @@ def test_intersection_mpr_vs_gjk():
 
     for _ in range(50):
         vertices1 = random_state.rand(6, 3) * np.array([[2, 2, 2]])
-        convex1 = colliders.Convex(vertices1)
+        convex1 = colliders.ConvexHullVertices(vertices1)
 
         vertices2 = random_state.rand(6, 3) * np.array([[1, 1, 1]])
-        convex2 = colliders.Convex(vertices2)
+        convex2 = colliders.ConvexHullVertices(vertices2)
 
         dist, closest_point1, closest_point2, _ = gjk.gjk(convex1, convex2)
         gjk_intersection = dist < 1e-16

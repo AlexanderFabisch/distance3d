@@ -94,8 +94,8 @@ class ConvexCollider(abc.ABC):
         """
 
 
-class Convex(ConvexCollider):
-    """Wraps convex hull of a set of vertices for GJK algorithm.
+class ConvexHullVertices(ConvexCollider):
+    """Convex hull of a set of vertices.
 
     Parameters
     ----------
@@ -106,7 +106,7 @@ class Convex(ConvexCollider):
         Artist for visualizer.
     """
     def __init__(self, vertices, artist=None):
-        super(Convex, self).__init__(artist)
+        super(ConvexHullVertices, self).__init__(artist)
         self.vertices = vertices
 
     def make_artist(self, c=None):
@@ -130,8 +130,8 @@ class Convex(ConvexCollider):
         return AABB(np.array([mins, maxs]).T)
 
 
-class Box(Convex):
-    """Wraps box for GJK algorithm.
+class Box(ConvexHullVertices):
+    """Box collider.
 
     Parameters
     ----------
@@ -169,7 +169,7 @@ class Box(Convex):
 
 
 class MeshGraph(ConvexCollider):
-    """Wraps mesh for GJK and use triangles for hill climbing.
+    """Mesh collider that uses triangles for hill climbing.
 
     Parameters
     ----------
@@ -222,108 +222,8 @@ class MeshGraph(ConvexCollider):
         return AABB(np.array([mins, maxs]).T)
 
 
-class Cylinder(ConvexCollider):
-    """Wraps cylinder for GJK algorithm.
-
-    Parameters
-    ----------
-    cylinder2origin : array, shape (4, 4)
-        Pose of the cylinder.
-
-    radius : float
-        Radius of the cylinder.
-
-    length : float
-        Length of the cylinder.
-
-    artist : pytransform3d.visualizer.Artist, optional (default: None)
-        Corresponding artist for visualizer.
-    """
-    def __init__(self, cylinder2origin, radius, length, artist=None):
-        super(Cylinder, self).__init__(artist)
-        self.cylinder2origin = cylinder2origin
-        self.radius = radius
-        self.length = length
-
-    def make_artist(self, c=None):
-        import pytransform3d.visualizer as pv
-        self.artist_ = pv.Cylinder(
-            length=self.length, radius=self.radius, A2B=self.cylinder2origin,
-            c=c)
-
-    def center(self):
-        return self.cylinder2origin[:3, 3]
-
-    def first_vertex(self):
-        return self.cylinder2origin[:3, 3] + 0.5 * self.length * self.cylinder2origin[:3, 2]
-
-    def support_function(self, search_direction):
-        return support_function_cylinder(
-            search_direction, self.cylinder2origin, self.radius, self.length)
-
-    def update_pose(self, pose):
-        self.cylinder2origin = pose
-        if self.artist_ is not None:
-            self.artist_.set_data(pose)
-
-    def aabb(self):
-        mins, maxs = cylinder_aabb(
-            self.cylinder2origin, self.radius, self.length)
-        return AABB(np.array([mins, maxs]).T)
-
-
-class Capsule(ConvexCollider):
-    """Wraps capsule for GJK algorithm.
-
-    Parameters
-    ----------
-    capsule2origin : array, shape (4, 4)
-        Pose of the capsule.
-
-    radius : float
-        Radius of the capsule.
-
-    height : float
-        Height of the capsule.
-
-    artist : pytransform3d.visualizer.Artist, optional (default: None)
-        Corresponding artist for visualizer.
-    """
-    def __init__(self, capsule2origin, radius, height, artist=None):
-        super(Capsule, self).__init__(artist)
-        self.capsule2origin = capsule2origin
-        self.radius = radius
-        self.height = height
-
-    def make_artist(self, c=None):
-        import pytransform3d.visualizer as pv
-        self.artist_ = pv.Capsule(
-            height=self.height, radius=self.radius, A2B=self.capsule2origin,
-            c=c)
-
-    def center(self):
-        return self.capsule2origin[:3, 3]
-
-    def first_vertex(self):
-        return self.capsule2origin[:3, 3] - (self.radius + 0.5 * self.height) * self.capsule2origin[:3, 2]
-
-    def support_function(self, search_direction):
-        return support_function_capsule(
-            search_direction, self.capsule2origin, self.radius, self.height)
-
-    def update_pose(self, pose):
-        self.capsule2origin = pose
-        if self.artist_ is not None:
-            self.artist_.set_data(pose)
-
-    def aabb(self):
-        mins, maxs = capsule_aabb(
-            self.capsule2origin, self.radius, self.height)
-        return AABB(np.array([mins, maxs]).T)
-
-
 class Sphere(ConvexCollider):
-    """Wraps sphere for GJK algorithm.
+    """Sphere collider.
 
     Parameters
     ----------
@@ -367,8 +267,59 @@ class Sphere(ConvexCollider):
         return AABB(np.array([mins, maxs]).T)
 
 
+class Capsule(ConvexCollider):
+    """Capsule collider.
+
+    Parameters
+    ----------
+    capsule2origin : array, shape (4, 4)
+        Pose of the capsule.
+
+    radius : float
+        Radius of the capsule.
+
+    height : float
+        Height of the capsule.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
+    def __init__(self, capsule2origin, radius, height, artist=None):
+        super(Capsule, self).__init__(artist)
+        self.capsule2origin = capsule2origin
+        self.radius = radius
+        self.height = height
+
+    def make_artist(self, c=None):
+        import pytransform3d.visualizer as pv
+        self.artist_ = pv.Capsule(
+            height=self.height, radius=self.radius, A2B=self.capsule2origin,
+            c=c)
+
+    def center(self):
+        return self.capsule2origin[:3, 3]
+
+    def first_vertex(self):
+        return self.capsule2origin[:3, 3] - (
+            self.radius + 0.5 * self.height) * self.capsule2origin[:3, 2]
+
+    def support_function(self, search_direction):
+        return support_function_capsule(
+            search_direction, self.capsule2origin, self.radius, self.height)
+
+    def update_pose(self, pose):
+        self.capsule2origin = pose
+        if self.artist_ is not None:
+            self.artist_.set_data(pose)
+
+    def aabb(self):
+        mins, maxs = capsule_aabb(
+            self.capsule2origin, self.radius, self.height)
+        return AABB(np.array([mins, maxs]).T)
+
+
 class Ellipsoid(ConvexCollider):
-    """Wraps ellipsoid for GJK algorithm.
+    """Ellipsoid collider.
 
     Parameters
     ----------
@@ -395,7 +346,8 @@ class Ellipsoid(ConvexCollider):
         return self.ellipsoid2origin[:3, 3]
 
     def first_vertex(self):
-        return self.ellipsoid2origin[:3, 3] + self.radii[2] * self.ellipsoid2origin[:3, 2]
+        return (self.ellipsoid2origin[:3, 3]
+                + self.radii[2] * self.ellipsoid2origin[:3, 2])
 
     def support_function(self, search_direction):
         return support_function_ellipsoid(
@@ -408,4 +360,55 @@ class Ellipsoid(ConvexCollider):
 
     def aabb(self):
         mins, maxs = ellipsoid_aabb(self.ellipsoid2origin, self.radii)
+        return AABB(np.array([mins, maxs]).T)
+
+
+class Cylinder(ConvexCollider):
+    """Cylinder collider.
+
+    Parameters
+    ----------
+    cylinder2origin : array, shape (4, 4)
+        Pose of the cylinder.
+
+    radius : float
+        Radius of the cylinder.
+
+    length : float
+        Length of the cylinder.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
+    def __init__(self, cylinder2origin, radius, length, artist=None):
+        super(Cylinder, self).__init__(artist)
+        self.cylinder2origin = cylinder2origin
+        self.radius = radius
+        self.length = length
+
+    def make_artist(self, c=None):
+        import pytransform3d.visualizer as pv
+        self.artist_ = pv.Cylinder(
+            length=self.length, radius=self.radius, A2B=self.cylinder2origin,
+            c=c)
+
+    def center(self):
+        return self.cylinder2origin[:3, 3]
+
+    def first_vertex(self):
+        return (self.cylinder2origin[:3, 3]
+                + 0.5 * self.length * self.cylinder2origin[:3, 2])
+
+    def support_function(self, search_direction):
+        return support_function_cylinder(
+            search_direction, self.cylinder2origin, self.radius, self.length)
+
+    def update_pose(self, pose):
+        self.cylinder2origin = pose
+        if self.artist_ is not None:
+            self.artist_.set_data(pose)
+
+    def aabb(self):
+        mins, maxs = cylinder_aabb(
+            self.cylinder2origin, self.radius, self.length)
         return AABB(np.array([mins, maxs]).T)

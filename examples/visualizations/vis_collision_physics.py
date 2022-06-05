@@ -38,8 +38,8 @@ class AnimationCallback:
         # Collision detection and resolution
         vertices1 = np.asarray(artist1.mesh.vertices)
         vertices2 = np.asarray(artist2.mesh.vertices)
-        collider1 = colliders.Convex(vertices1)
-        collider2 = colliders.Convex(vertices2)
+        collider1 = colliders.ConvexHullVertices(vertices1)
+        collider2 = colliders.ConvexHullVertices(vertices2)
         dist, _, _, simplex = gjk.gjk(collider1, collider2)
         if dist == 0.0:
             mtv = epa.epa(simplex, collider1, collider2)[0]

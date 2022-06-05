@@ -1368,10 +1368,10 @@ def test_gjk_points():
 
     for _ in range(50):
         vertices1 = random_state.rand(6, 3) * np.array([[2, 5, 1]])
-        convex1 = colliders.Convex(vertices1)
+        convex1 = colliders.ConvexHullVertices(vertices1)
 
         vertices2 = random_state.rand(6, 3) * np.array([[1, 3, 1]])
-        convex2 = colliders.Convex(vertices2)
+        convex2 = colliders.ConvexHullVertices(vertices2)
 
         dist, closest_point1, closest_point2, _ = gjk.gjk(
             convex1, convex2)
@@ -1385,10 +1385,10 @@ def test_gjk_points():
 
     for _ in range(50):
         vertices1 = random_state.rand(6, 3) * np.array([[2, 5, 1]])
-        convex1 = colliders.Convex(vertices1)
+        convex1 = colliders.ConvexHullVertices(vertices1)
 
         vertices2 = random_state.rand(6, 3) * np.array([[-2, -3, 1]])
-        convex2 = colliders.Convex(vertices2)
+        convex2 = colliders.ConvexHullVertices(vertices2)
 
         dist, closest_point1, closest_point2, _ = gjk.gjk(
             convex1, convex2)
@@ -1406,9 +1406,9 @@ def test_gjk_point_subset():
 
     for _ in range(50):
         vertices1 = random_state.rand(15, 3)
-        convex1 = colliders.Convex(vertices1)
+        convex1 = colliders.ConvexHullVertices(vertices1)
         vertices2 = vertices1[::2]
-        convex2 = colliders.Convex(vertices2)
+        convex2 = colliders.ConvexHullVertices(vertices2)
         dist, closest_point1, closest_point2, _ = gjk.gjk(
             convex1, convex2)
         assert approx(dist) == 0.0
@@ -1423,7 +1423,7 @@ def test_gjk_triangle_to_triangle():
         triangle_points = random.randn_triangle(random_state)
         triangle_points2 = random.randn_triangle(random_state)
         dist, closest_point_triangle, closest_point_triangle2, _ = gjk.gjk(
-            colliders.Convex(triangle_points), colliders.Convex(triangle_points2))
+            colliders.ConvexHullVertices(triangle_points), colliders.ConvexHullVertices(triangle_points2))
         dist2, closest_point_triangle_2, closest_point_triangle2_2 = distance.triangle_to_triangle(
             triangle_points, triangle_points2)
         assert approx(dist) == dist2
@@ -1442,7 +1442,7 @@ def test_gjk_triangle_to_rectangle():
         rectangle_points = geometry.convert_rectangle_to_vertices(
             rectangle_center, rectangle_axes, rectangle_lengths)
         dist, closest_point_triangle, closest_point_rectangle, _ = gjk.gjk(
-            colliders.Convex(triangle_points), colliders.Convex(rectangle_points))
+            colliders.ConvexHullVertices(triangle_points), colliders.ConvexHullVertices(rectangle_points))
         dist2, closest_point_triangle2, closest_point_rectangle2 = distance.triangle_to_rectangle(
             triangle_points, rectangle_center, rectangle_axes, rectangle_lengths)
         assert approx(dist) == dist2
@@ -1488,5 +1488,5 @@ def test_gjk_floating_point_accuracy_of_barycentric_coordinates_of_face():
         [0.46786979185146715, 0.1591897910580864, 0.47912132312107114],
         [0.9895873763930331, 0.5549956997906568, 0.6427151977095377],
         [0.07800999236334982, 0.8380559395155408, 0.24411711979617723]])
-    dist = gjk.gjk(colliders.Convex(vertices1), colliders.Convex(vertices2))[0]
+    dist = gjk.gjk(colliders.ConvexHullVertices(vertices1), colliders.ConvexHullVertices(vertices2))[0]
     assert dist > 0.0
