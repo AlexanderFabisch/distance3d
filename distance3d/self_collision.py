@@ -1,3 +1,4 @@
+"""Self-collision detection."""
 from . import mpr
 
 

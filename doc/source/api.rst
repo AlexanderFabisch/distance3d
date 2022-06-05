@@ -70,7 +70,6 @@ API Reference
    :nosignatures:
    :toctree: _autosummary/
 
-   ~distance3d.colliders.BoundingVolumeHierarchy
    ~distance3d.colliders.ConvexCollider
    ~distance3d.colliders.Convex
    ~distance3d.colliders.MeshGraph
@@ -79,6 +78,22 @@ API Reference
    ~distance3d.colliders.Sphere
    ~distance3d.colliders.Capsule
    ~distance3d.colliders.Ellipsoid
+
+
+:mod:`distance3d.broad_phase`
+---------------------------
+
+.. automodule:: distance3d.broad_phase
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.broad_phase
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.broad_phase.BoundingVolumeHierarchy
 
 
 :mod:`distance3d.containment`
@@ -115,7 +130,6 @@ API Reference
    :nosignatures:
    :toctree: _autosummary/
 
-   ~distance3d.epa.epa_vertices
    ~distance3d.epa.epa
 
 
@@ -133,7 +147,6 @@ API Reference
    :toctree: _autosummary/
 
    ~distance3d.gjk.gjk
-   ~distance3d.gjk.gjk_with_simplex
 
 
 :mod:`distance3d.mpr`

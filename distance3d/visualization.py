@@ -1,3 +1,4 @@
+"""Visualization tools."""
 import numpy as np
 import pytransform3d.visualizer as pv
 import open3d as o3d

@@ -5,12 +5,14 @@ Robot
 
 Plot AABB tree of a robot.
 """
+import distance3d.broad_phase
+
 print(__doc__)
 import os
 import pytransform3d.plot_utils as ppu
 from pytransform3d.urdf import UrdfTransformManager
 import matplotlib.pyplot as plt
-from distance3d import colliders, plotting
+from distance3d import plotting
 
 
 BASE_DIR = "test/data/"
@@ -30,7 +32,7 @@ joint_names = ["joint%d" % i for i in range(1, 7)]
 for joint_name in joint_names:
     tm.set_joint(joint_name, 0.7)
 
-bvh = colliders.BoundingVolumeHierarchy(tm, "robot_arm")
+bvh = distance3d.broad_phase.BoundingVolumeHierarchy(tm, "robot_arm")
 bvh.fill_tree_with_colliders(tm, make_artists=False)
 
 ax = ppu.make_3d_axis(0.6)

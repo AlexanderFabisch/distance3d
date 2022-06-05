@@ -1,3 +1,4 @@
+"""Benchmark utilities."""
 import time
 
 

@@ -8,7 +8,8 @@ import numpy as np
 from pytransform3d.transform_manager import TransformManager
 import pytransform3d.visualizer as pv
 from distance3d.random import rand_capsule
-from distance3d.colliders import BoundingVolumeHierarchy, Capsule
+from distance3d.colliders import Capsule
+from distance3d.broad_phase import BoundingVolumeHierarchy
 from distance3d.gjk import gjk_with_simplex
 from distance3d.urdf_utils import fast_transform_manager_initialization
 from distance3d.benchmark import Timer

@@ -1,6 +1,8 @@
 import os
 import numpy as np
 from pytransform3d.urdf import UrdfTransformManager
+
+import distance3d.broad_phase
 from distance3d import colliders, self_collision
 
 
@@ -12,7 +14,7 @@ def test_self_collision_detection():
         robot_urdf = f.read()
         tm.load_urdf(robot_urdf, mesh_path=data_dir)
 
-    bvh = colliders.BoundingVolumeHierarchy(tm, "robot_arm")
+    bvh = distance3d.broad_phase.BoundingVolumeHierarchy(tm, "robot_arm")
     bvh.fill_tree_with_colliders(
         tm, make_artists=True, fill_self_collision_whitelists=True)
 
@@ -47,7 +49,7 @@ def test_self_collision_detection_mesh():
         robot_urdf = f.read()
         tm.load_urdf(robot_urdf, mesh_path=data_dir)
 
-    bvh = colliders.BoundingVolumeHierarchy(tm, "simple_mechanism")
+    bvh = distance3d.broad_phase.BoundingVolumeHierarchy(tm, "simple_mechanism")
     bvh.fill_tree_with_colliders(
         tm, make_artists=True, fill_self_collision_whitelists=True)
 

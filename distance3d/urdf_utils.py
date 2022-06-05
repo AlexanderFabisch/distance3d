@@ -1,3 +1,4 @@
+"""Utilities to work with URDF files."""
 import re
 import warnings
 import numpy as np

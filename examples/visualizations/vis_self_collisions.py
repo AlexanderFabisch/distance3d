@@ -4,12 +4,13 @@ Self-collisions of a robot
 ==========================
 """
 print(__doc__)
+
 import os
 import time
 import numpy as np
 from pytransform3d.urdf import UrdfTransformManager
 import pytransform3d.visualizer as pv
-from distance3d import colliders, self_collision
+from distance3d import self_collision, broad_phase
 
 
 class AnimationCallback:
@@ -72,7 +73,7 @@ with open(filename, "r") as f:
     robot_urdf = f.read()
     tm.load_urdf(robot_urdf, mesh_path=data_dir)
 
-bvh = colliders.BoundingVolumeHierarchy(tm, "simple_mechanism")
+bvh = broad_phase.BoundingVolumeHierarchy(tm, "simple_mechanism")
 bvh.fill_tree_with_colliders(
     tm, make_artists=True, fill_self_collision_whitelists=True)
 
