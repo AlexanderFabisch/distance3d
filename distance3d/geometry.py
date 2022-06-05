@@ -344,6 +344,10 @@ def support_function_sphere(search_direction, center, radius):
     return vertex
 
 
+def support_function_cone(search_direction, cone2origin, radius, height):
+    raise NotImplementedError()
+
+
 @numba.njit(cache=True)
 def hesse_normal_form(plane_point, plane_normal):
     """Computes Hesse normal form of a plane.

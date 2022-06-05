@@ -4,10 +4,10 @@ import numpy as np
 from .geometry import (
     support_function_capsule, support_function_cylinder,
     convert_box_to_vertices, support_function_ellipsoid,
-    support_function_sphere)
+    support_function_sphere, support_function_cone)
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
-    capsule_aabb, ellipsoid_aabb)
+    capsule_aabb, ellipsoid_aabb, cone_aabb)
 from .mesh import MeshHillClimbingSupportFunction
 from aabbtree import AABB
 
@@ -411,4 +411,55 @@ class Cylinder(ConvexCollider):
     def aabb(self):
         mins, maxs = cylinder_aabb(
             self.cylinder2origin, self.radius, self.length)
+        return AABB(np.array([mins, maxs]).T)
+
+
+class Cone(ConvexCollider):
+    """Cone collider.
+
+    Parameters
+    ----------
+    cone2origin : array, shape (4, 4)
+        Pose of the cone.
+
+    radius : float
+        Radius of the cone.
+
+    height : float
+        Length of the cone.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
+    def __init__(self, cone2origin, radius, height, artist=None):
+        super(Cone, self).__init__(artist)
+        self.cone2origin = cone2origin
+        self.radius = radius
+        self.height = height
+
+    def make_artist(self, c=None):
+        import pytransform3d.visualizer as pv
+        self.artist_ = pv.Cone(
+            A2B=self.cone2origin, radius=self.radius, height=self.height)
+
+    def center(self):
+        return (self.cone2origin[:3, 3]
+                + 0.5 * self.height * self.cone2origin[:3, 2])
+
+    def first_vertex(self):
+        return (self.cone2origin[:3, 3]
+                + self.height * self.cone2origin[:3, 2])
+
+    def support_function(self, search_direction):
+        return support_function_cone(
+            search_direction, self.cone2origin, self.radius, self.height)
+
+    def update_pose(self, pose):
+        self.cone2origin = pose
+        if self.artist_ is not None:
+            self.artist_.set_data(pose)
+
+    def aabb(self):
+        mins, maxs = cone_aabb(
+            self.cone2origin, self.radius, self.height)
         return AABB(np.array([mins, maxs]).T)

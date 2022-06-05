@@ -146,3 +146,7 @@ def ellipsoid_aabb(ellipsoid2origin, radii):
     extents *= radii[np.newaxis]
     extent = np.max(np.dot(ellipsoid2origin[:3, :3], extents.T), axis=0)
     return ellipsoid2origin[:3, 3] - extent, ellipsoid2origin[:3, 3] + extent
+
+
+def cone_aabb(cone2origin, radius, height):
+    raise NotImplementedError()
