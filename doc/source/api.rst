@@ -78,6 +78,7 @@ API Reference
    ~distance3d.colliders.Capsule
    ~distance3d.colliders.Ellipsoid
    ~distance3d.colliders.Cylinder
+   ~distance3d.colliders.Cone
 
 
 :mod:`distance3d.broad_phase`
@@ -115,6 +116,7 @@ API Reference
    ~distance3d.containment.cylinder_aabb
    ~distance3d.containment.capsule_aabb
    ~distance3d.containment.ellipsoid_aabb
+   ~distance3d.containment.cone_aabb
 
 
 :mod:`distance3d.gjk`
@@ -189,6 +191,7 @@ API Reference
    ~distance3d.geometry.support_function_ellipsoid
    ~distance3d.geometry.support_function_box
    ~distance3d.geometry.support_function_sphere
+   ~distance3d.geometry.support_function_cone
    ~distance3d.geometry.hesse_normal_form
    ~distance3d.geometry.line_from_pluecker
 
