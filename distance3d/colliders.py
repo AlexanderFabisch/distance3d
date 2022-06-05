@@ -3,7 +3,6 @@ import abc
 import warnings
 import numpy as np
 from pytransform3d import urdf
-import pytransform3d.visualizer as pv
 from .geometry import (
     support_function_capsule, support_function_cylinder,
     convert_box_to_vertices, support_function_ellipsoid,
@@ -12,7 +11,6 @@ from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb, ellipsoid_aabb)
 from .urdf_utils import self_collision_whitelists
-from .visualization import Mesh as VisualMesh
 from .mesh import MeshHillClimbingSupportFunction, MeshSupportFunction
 from aabbtree import AABB, AABBTree
 
@@ -286,6 +284,7 @@ class Convex(ConvexCollider):
         self.vertices = vertices
 
     def make_artist(self, c=None):
+        import pytransform3d.visualizer as pv
         self.artist_ = pv.PointCollection3D(self.vertices, s=0.005, c=c)
 
     def first_vertex(self):
@@ -326,6 +325,7 @@ class Box(Convex):
         self.size = size
 
     def make_artist(self, c=None):
+        import pytransform3d.visualizer as pv
         self.artist_ = pv.Box(size=self.size, A2B=self.box2origin, c=c)
 
     def center(self):
@@ -368,7 +368,8 @@ class MeshGraph(ConvexCollider):
             mesh2origin, vertices, triangles)
 
     def make_artist(self, c=None):
-        self.artist_ = VisualMesh(
+        from .visualization import Mesh
+        self.artist_ = Mesh(
             self.mesh2origin, self.vertices, self.triangles, c=c)
 
     def first_vertex(self):
@@ -419,6 +420,7 @@ class Cylinder(ConvexCollider):
         self.length = length
 
     def make_artist(self, c=None):
+        import pytransform3d.visualizer as pv
         self.artist_ = pv.Cylinder(
             length=self.length, radius=self.radius, A2B=self.cylinder2origin,
             c=c)
@@ -468,6 +470,7 @@ class Capsule(ConvexCollider):
         self.height = height
 
     def make_artist(self, c=None):
+        import pytransform3d.visualizer as pv
         self.artist_ = pv.Capsule(
             height=self.height, radius=self.radius, A2B=self.capsule2origin,
             c=c)
@@ -513,6 +516,7 @@ class Sphere(ConvexCollider):
         self.radius = radius
 
     def make_artist(self, c=None):
+        import pytransform3d.visualizer as pv
         sphere2origin = np.eye(4)
         sphere2origin[:3, 3] = self.c
         self.artist_ = pv.Sphere(radius=self.radius, A2B=sphere2origin, c=c)
@@ -521,10 +525,11 @@ class Sphere(ConvexCollider):
         return self.c
 
     def first_vertex(self):
-        return self.c + np.array([0, 0, self.radius])
+        return self.c + np.array([0, 0, self.radius], dtype=float)
 
     def support_function(self, search_direction):
-        return support_function_sphere(search_direction, self.c, self.radius)
+        return support_function_sphere(
+            search_direction, np.ascontiguousarray(self.c), self.radius)
 
     def update_pose(self, pose):
         self.c = pose[:3, 3]
@@ -556,6 +561,7 @@ class Ellipsoid(ConvexCollider):
         self.radii = radii
 
     def make_artist(self, c=None):
+        import pytransform3d.visualizer as pv
         self.artist_ = pv.Ellipsoid(
             radii=self.radii, A2B=self.ellipsoid2origin, c=c)
 

@@ -7,8 +7,8 @@ Gems 7" (Gem 2.5: XenoCollide: Complex Collision Made Simple).
 from enum import Enum
 import numpy as np
 import numba
-from distance3d.utils import norm_vector
-from distance3d.distance import point_to_triangle
+from .utils import norm_vector
+from .distance import point_to_triangle
 
 
 EPSILON = np.finfo(float).eps

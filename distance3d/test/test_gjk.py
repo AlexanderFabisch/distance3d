@@ -1287,22 +1287,22 @@ def test_gjk_boxes():
 
 
 def test_gjk_spheres():
-    sphere1 = colliders.Sphere(center=np.array([0, 0, 0]), radius=1.0)
+    sphere1 = colliders.Sphere(center=np.array([0, 0, 0], dtype=float), radius=1.0)
     dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
         sphere1, sphere1)
     assert approx(dist) == 0.0
     assert_array_almost_equal(closest_point1, np.array([0, 0, 1]))
     assert_array_almost_equal(closest_point1, closest_point2)
 
-    sphere2 = colliders.Sphere(center=np.array([1, 1, 1]), radius=1.0)
+    sphere2 = colliders.Sphere(center=np.array([1, 1, 1], dtype=float), radius=1.0)
     dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
         sphere1, sphere2)
     assert approx(dist) == 0.0
     assert_array_almost_equal(closest_point1, np.array([0.5, 0.5, 0.633975]))
     assert_array_almost_equal(closest_point1, closest_point2)
 
-    sphere1 = colliders.Sphere(center=np.array([0, 0, 0]), radius=1.0)
-    sphere2 = colliders.Sphere(center=np.array([0, 0, 3]), radius=1.0)
+    sphere1 = colliders.Sphere(center=np.array([0, 0, 0], dtype=float), radius=1.0)
+    sphere2 = colliders.Sphere(center=np.array([0, 0, 3], dtype=float), radius=1.0)
     dist, closest_point1, closest_point2, _ = gjk.gjk_with_simplex(
         sphere1, sphere2)
     assert approx(dist) == 1
