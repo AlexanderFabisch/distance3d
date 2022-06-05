@@ -117,22 +117,6 @@ API Reference
    ~distance3d.containment.ellipsoid_aabb
 
 
-:mod:`distance3d.epa`
----------------------
-
-.. automodule:: distance3d.epa
-    :no-members:
-    :no-inherited-members:
-
-.. currentmodule:: distance3d.epa
-
-.. autosummary::
-   :nosignatures:
-   :toctree: _autosummary/
-
-   ~distance3d.epa.epa
-
-
 :mod:`distance3d.gjk`
 ---------------------
 
@@ -147,6 +131,22 @@ API Reference
    :toctree: _autosummary/
 
    ~distance3d.gjk.gjk
+
+
+:mod:`distance3d.epa`
+---------------------
+
+.. automodule:: distance3d.epa
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.epa
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.epa.epa
 
 
 :mod:`distance3d.mpr`
