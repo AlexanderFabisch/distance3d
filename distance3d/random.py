@@ -362,6 +362,15 @@ def rand_sphere(random_state, center_scale=1.0, radius_scale=1.0):
     return center, radius
 
 
+def rand_cone(random_state, center_scale=1.0, min_radius=0.0,
+              min_height=0.0, radius_scale=1.0, height_scale=1.0):
+    cone2origin = pt.random_transform(random_state)
+    cone2origin[:3, 3] *= center_scale
+    radius = min_radius + (1.0 - random_state.rand()) * radius_scale
+    height = min_height + (1.0 - random_state.rand()) * height_scale
+    return cone2origin, radius, height
+
+
 def randn_convex(random_state, n_vertices=10, center_scale=1.0, min_radius=1.0,
                  radius_scale=1.0):
     """Sample convex mesh.
