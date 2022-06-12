@@ -344,6 +344,10 @@ def support_function_sphere(search_direction, center, radius):
     return vertex
 
 
+@numba.njit(
+    numba.float64[:](numba.float64[::1], numba.float64[::1], numba.float64,
+                     numba.float64[::1]),
+    cache=True)
 def support_function_disc(search_direction, center, radius, normal):
     x, y = plane_basis_from_normal(normal)
     R = np.column_stack((x, y, normal))

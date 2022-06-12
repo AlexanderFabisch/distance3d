@@ -4,11 +4,12 @@ import numpy as np
 from .geometry import (
     support_function_capsule, support_function_cylinder,
     convert_box_to_vertices, support_function_ellipsoid,
-    support_function_sphere, support_function_cone)
+    support_function_sphere, support_function_cone, support_function_disc)
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
-    capsule_aabb, ellipsoid_aabb, cone_aabb)
+    capsule_aabb, ellipsoid_aabb, cone_aabb, disk_aabb)
 from .mesh import MeshHillClimbingSupportFunction
+from .utils import plane_basis_from_normal
 from aabbtree import AABB
 
 
@@ -411,6 +412,60 @@ class Cylinder(ConvexCollider):
     def aabb(self):
         mins, maxs = cylinder_aabb(
             self.cylinder2origin, self.radius, self.length)
+        return AABB(np.array([mins, maxs]).T)
+
+
+class Disk(ConvexCollider):
+    """Disk collider.
+
+    Parameters
+    ----------
+    center : array, shape (3,)
+        Center of the disk.
+
+    radius : float
+        Radius of the disk.
+
+    normal : array, shape (3,)
+        Normal to the plane in which the disk lies.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
+    def __init__(self, center, radius, normal, artist=None):
+        super(Disk, self).__init__(artist)
+        self.c = center
+        self.radius = radius
+        self.normal = normal
+
+    def make_artist(self, c=None):
+        import pytransform3d.visualizer as pv
+        x, y = plane_basis_from_normal(self.normal)
+        disk2origin = np.eye(4)
+        disk2origin[:3, :3] = np.column_stack((x, y, self.normal))
+        disk2origin[:3, 3] = self.c
+        self.artist_ = pv.Cylinder(  # TODO disk artist?
+            A2B=disk2origin, radius=self.radius, length=0.01 * self.radius,
+            c=c)
+
+    def center(self):
+        return self.c
+
+    def first_vertex(self):
+        return self.c  # TODO border?
+
+    def support_function(self, search_direction):
+        return support_function_disc(
+            search_direction, self.c, self.radius, self.normal)
+
+    def update_pose(self, pose):
+        self.c = pose[:3, 3]
+        self.normal = pose[:3, 2]
+        if self.artist_ is not None:
+            self.artist_.set_data(pose)
+
+    def aabb(self):
+        mins, maxs = disk_aabb(self.c, self.radius, self.normal)
         return AABB(np.array([mins, maxs]).T)
 
 

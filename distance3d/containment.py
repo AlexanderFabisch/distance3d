@@ -148,6 +148,11 @@ def ellipsoid_aabb(ellipsoid2origin, radii):
     return ellipsoid2origin[:3, 3] - extent, ellipsoid2origin[:3, 3] + extent
 
 
+def disk_aabb(center, radius, normal):
+    e = radius * np.sqrt(1.0 - normal * normal)
+    return center - e, center + e
+
+
 def cone_aabb(cone2origin, radius, height):
     pa = cone2origin[:3, 3]
     pb = cone2origin[:3, 3] + height * cone2origin[:3, 2]
