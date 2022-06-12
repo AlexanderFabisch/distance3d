@@ -1051,7 +1051,7 @@ def _gjk(collider1, collider2, simplex, max_iterations):
     simplex.add_point(*support_point)
     search_direction = -support_point[0]
 
-    for iterations in range(max_iterations):
+    for _ in range(max_iterations):
         support_point = support_function(collider1, collider2, search_direction)
 
         is_before_origin = np.dot(support_point[0], search_direction) < 0.0
@@ -1082,12 +1082,11 @@ class GjkState(Enum):
 @numba.njit(cache=True)
 def _refine_simplex(v, v1, v2, n_points):
     if n_points == 2:
-        gjk_state, search_direction, n_points = _line_segment(v, v1, v2)
+        return _line_segment(v, v1, v2)
     elif n_points == 3:
-        gjk_state, search_direction, n_points = _triangle(v, v1, v2)
+        return _triangle(v, v1, v2)
     else:
-        gjk_state, search_direction, n_points = _tetrahedron(v, v1, v2)
-    return gjk_state, search_direction, n_points
+        return _tetrahedron(v, v1, v2)
 
 
 @numba.njit(cache=True)
@@ -1125,9 +1124,9 @@ def _line_segment(v, v1, v2):
 
 @numba.njit(cache=True)
 def _triangle(v, v1, v2):
-    A = v[2], v1[2], v1[2]
-    B = v[1], v1[1], v2[1]
-    C = v[0], v1[0], v1[0]
+    A = np.copy(v[2]), np.copy(v1[2]), np.copy(v1[2])
+    B = np.copy(v[1]), np.copy(v1[1]), np.copy(v2[1])
+    C = np.copy(v[0]), np.copy(v1[0]), np.copy(v1[0])
 
     touching_contact = abs(point_to_triangle(
         np.zeros(3), np.row_stack((A[0], B[0], C[0])))[0]) < EPSILON_SQRT
@@ -1188,10 +1187,10 @@ def _triangle(v, v1, v2):
 
 @numba.njit(cache=True)
 def _tetrahedron(v, v1, v2):
-    A = v[3], v1[3], v1[3]
-    B = v[2], v1[2], v1[2]
-    C = v[1], v1[1], v2[1]
-    D = v[0], v1[0], v1[0]
+    A = np.copy(v[3]), np.copy(v1[3]), np.copy(v1[3])
+    B = np.copy(v[2]), np.copy(v1[2]), np.copy(v1[2])
+    C = np.copy(v[1]), np.copy(v1[1]), np.copy(v2[1])
+    D = np.copy(v[0]), np.copy(v1[0]), np.copy(v1[0])
 
     degenerated_tetrahedron = abs(point_to_triangle(
         A[0], np.row_stack((B[0], C[0], D[0])))[0]) < EPSILON_SQRT

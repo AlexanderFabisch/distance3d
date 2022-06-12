@@ -1490,3 +1490,19 @@ def test_gjk_floating_point_accuracy_of_barycentric_coordinates_of_face():
         [0.07800999236334982, 0.8380559395155408, 0.24411711979617723]])
     dist = gjk.gjk(colliders.ConvexHullVertices(vertices1), colliders.ConvexHullVertices(vertices2))[0]
     assert dist > 0.0
+
+
+def test_gjk_intersection_vs_gjk():
+    random_state = np.random.RandomState(24)
+
+    for _ in range(50):
+        vertices1 = random_state.rand(6, 3) * np.array([[2, 2, 2]])
+        convex1 = colliders.ConvexHullVertices(vertices1)
+
+        vertices2 = random_state.rand(6, 3) * np.array([[1, 1, 1]])
+        convex2 = colliders.ConvexHullVertices(vertices2)
+
+        dist, closest_point1, closest_point2, _ = gjk.gjk(convex1, convex2)
+        gjk_intersection = dist < 1e-16
+        gjk_intersection2 = gjk.gjk_intersection(convex1, convex2)
+        assert gjk_intersection == gjk_intersection2, f"{vertices1=}\n{vertices2=}"
