@@ -7,11 +7,10 @@ Gems 7" (Gem 2.5: XenoCollide: Complex Collision Made Simple).
 from enum import Enum
 import numpy as np
 import numba
-from .utils import norm_vector
+
+from .minkowski import Simplex, support_function, make_support_point
+from .utils import norm_vector, EPSILON
 from .distance import point_to_triangle
-
-
-EPSILON = np.finfo(float).eps
 
 
 def mpr_intersection(collider1, collider2, mpr_tolerance=0.0001):
@@ -108,21 +107,13 @@ class PortalState(Enum):
     ORIGIN_ON_V0V1_SEGMENT = 2
 
 
-class Portal:
-    def __init__(self):
-        self.v = np.empty((4, 3))  # Vertices of the Minkowski difference
-        self.v1 = np.empty((4, 3))  # Vertices of collider 1
-        self.v2 = np.empty((4, 3))  # Vertices of collider 2
-        self.n_points = 0
-
-
 def _discover_portal(collider1, collider2):
     """Discover initial portal.
 
     The initial portal is a tetrahedron that intersects with the ray from
     the center of the Minkowski difference to the origin.
     """
-    portal = Portal()
+    portal = Simplex()
     _find_origin_ray(portal, collider1, collider2)
 
     origin_outside_v1 = _find_support_in_direction_of_origin_ray(
@@ -139,7 +130,7 @@ def _discover_portal(collider1, collider2):
     search_direction = _search_direction_perpendicular_to_plane_containing_v012(
         portal.v, portal.v1, portal.v2)
     while portal.n_points < 4:
-        portal.v[3], portal.v1[3], portal.v2[3] = _support_function(
+        portal.v[3], portal.v1[3], portal.v2[3] = support_function(
             collider1, collider2, search_direction)
         if portal.v[3].dot(search_direction) < EPSILON:
             return PortalState.ORIGIN_OUTSIDE_PORTAL, portal
@@ -157,7 +148,7 @@ def _find_origin_ray(portal, collider1, collider2):
     Such a point can be obtained from points inside the colliders. Center
     points are good candidates.
     """
-    portal.v[0], portal.v1[0], portal.v2[0] = _make_support_point(
+    portal.v[0], portal.v1[0], portal.v2[0] = make_support_point(
         collider1.center(), collider2.center())
     portal.n_points = 1
     portals_center_is_origin = all(portal.v[0] == 0.0)
@@ -168,7 +159,7 @@ def _find_origin_ray(portal, collider1, collider2):
 
 def _find_support_in_direction_of_origin_ray(portal, collider1, collider2):
     search_direction = norm_vector(-portal.v[0])
-    portal.v[1], portal.v1[1], portal.v2[1] = _support_function(
+    portal.v[1], portal.v1[1], portal.v2[1] = support_function(
         collider1, collider2, search_direction)
     portal.n_points = 2
     origin_outside_v1 = portal.v[1].dot(search_direction) < EPSILON
@@ -184,7 +175,7 @@ def _find_support_perpendicular_to_plane_containing_origin_v01(
         else:
             return PortalState.ORIGIN_ON_V0V1_SEGMENT
     search_direction = norm_vector(search_direction)
-    portal.v[2], portal.v1[2], portal.v2[2] = _support_function(
+    portal.v[2], portal.v1[2], portal.v2[2] = support_function(
         collider1, collider2, search_direction)
     if portal.v[2].dot(search_direction) < EPSILON:
         return PortalState.ORIGIN_OUTSIDE_PORTAL
@@ -219,17 +210,6 @@ def _iterate_discover_portal(v, v1, v2, search_direction, portal_size):
     return search_direction, portal_size
 
 
-def _support_function(collider1, collider2, search_direction):
-    v1 = collider1.support_function(search_direction)
-    v2 = collider2.support_function(-search_direction)
-    return _make_support_point(v1, v2)
-
-
-@numba.njit(cache=True)
-def _make_support_point(v1, v2):
-    return v1 - v2, v1, v2
-
-
 @numba.njit(cache=True)
 def _swap_vertices(v, v1, v2, idx1, idx2):
     tmp = v[idx1]
@@ -248,7 +228,7 @@ def _refine_portal(collider1, collider2, portal, mpr_tolerance):
 
     Parameters
     ----------
-    portal : Portal
+    portal : Simplex
         Already established portal.
 
     Returns
@@ -260,7 +240,7 @@ def _refine_portal(collider1, collider2, portal, mpr_tolerance):
         search_direction = _portal_direction(portal.v)
         if _encapsulates_origin(portal.v[1], search_direction):
             return True
-        next_support_point, next_support_point1, next_support_point2 = _support_function(
+        next_support_point, next_support_point1, next_support_point2 = support_function(
             collider1, collider2, search_direction)
         if (not _encapsulates_origin(next_support_point, search_direction)
                 or _portal_reach_tolerance(portal.v, next_support_point,
@@ -320,7 +300,7 @@ def _find_penetration_info(collider1, collider2, portal, mpr_tolerance, max_iter
     iterations = 0
     while True:
         search_direction = _portal_direction(portal.v)
-        next_support_point, next_support_point1, next_support_point2 = _support_function(
+        next_support_point, next_support_point1, next_support_point2 = support_function(
             collider1, collider2, search_direction)
         tolerance_reached = (
                 _portal_reach_tolerance(

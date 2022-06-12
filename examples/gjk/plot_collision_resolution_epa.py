@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.plot_utils as ppu
 import pytransform3d.transformations as pt
-from distance3d import random, plotting, gjk, epa, colliders
+from distance3d import random, plotting, gjk, epa, colliders, minkowski
 
 
 random_state = np.random.RandomState(1)
@@ -38,7 +38,7 @@ plotting.plot_convex(ax, mesh2origin2, vertices2, triangles2, alpha=0.1, color="
 plotting.plot_segment(ax, p1, p2 + mtv)
 
 ax = ppu.make_3d_axis(ax_s=4, pos=133)
-minkowski_points = gjk.minkowski_sum(vertices, -vertices2)
+minkowski_points = minkowski.minkowski_sum(vertices, -vertices2)
 ax.scatter(minkowski_points[:, 0], minkowski_points[:, 1], minkowski_points[:, 2])
 plotting.plot_tetrahedron(ax, simplex)
 for f in minkowski_faces:
