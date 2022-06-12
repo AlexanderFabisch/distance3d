@@ -3,7 +3,7 @@ import math
 from itertools import product
 import numba
 import numpy as np
-from .utils import norm_vector, transform_point
+from .utils import norm_vector, transform_point, plane_basis_from_normal
 
 
 def convert_rectangle_to_segment(rectangle_center, rectangle_extents, i0, i1):
@@ -344,8 +344,29 @@ def support_function_sphere(search_direction, center, radius):
     return vertex
 
 
+def support_function_disc(search_direction, center, radius, normal):
+    x, y = plane_basis_from_normal(normal)
+    R = np.column_stack((x, y, normal))
+    point = np.dot(R.T, search_direction)
+    point[2] = 0.0
+    norm = np.linalg.norm(point)
+    if norm == 0.0:
+        return np.zeros(3, dtype=float)
+    point *= radius / norm
+    return center + np.dot(R, point)
+
+
 def support_function_cone(search_direction, cone2origin, radius, height):
-    raise NotImplementedError()
+    search_direction = np.dot(cone2origin[:3, :3].T, search_direction)
+    disk_point = np.copy(search_direction)
+    disk_point[2] = 0.0
+    disk_point *= radius / np.linalg.norm(disk_point)
+    point = np.array([0.0, 0.0, height])
+    if np.dot(search_direction, disk_point) > np.dot(search_direction, point):
+        point_in_cone = disk_point
+    else:
+        point_in_cone = point
+    return transform_point(cone2origin, point_in_cone)
 
 
 @numba.njit(cache=True)

@@ -149,4 +149,8 @@ def ellipsoid_aabb(ellipsoid2origin, radii):
 
 
 def cone_aabb(cone2origin, radius, height):
-    raise NotImplementedError()
+    pa = cone2origin[:3, 3]
+    pb = cone2origin[:3, 3] + height * cone2origin[:3, 2]
+    a = pb - pa
+    e = np.sqrt(1.0 - a * a / (height * height))
+    return np.minimum(pa - e * radius, pb), np.maximum(pa + e * radius, pb)
