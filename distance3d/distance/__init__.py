@@ -64,7 +64,7 @@ by GJK.
         <td>X</td>
         <td>X</td>
         <td>X</td>
-        <td>-</td>
+        <td>G</td>
         <td>X</td>
         <td>G</td>
         <td>G</td>
@@ -92,7 +92,7 @@ by GJK.
         <td>X</td>
         <td>X</td>
         <td>-</td>
-        <td>-</td>
+        <td>G</td>
         <td>G</td>
         <td>G</td>
         <td>G</td>
@@ -106,7 +106,7 @@ by GJK.
         <td>X</td>
         <td>G</td>
         <td>-</td>
-        <td>-</td>
+        <td>G</td>
         <td>G</td>
         <td>G</td>
         <td>G</td>
@@ -129,15 +129,15 @@ by GJK.
         <td>disk</td>
         <td>X</td>
         <td>-</td>
+        <td>G</td>
         <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
+        <td>G</td>
+        <td>G</td>
         <td>-</td>
         <td>X</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
+        <td>G</td>
+        <td>G</td>
+        <td>G</td>
       </tr>
       <tr>
         <td>box</td>
@@ -145,10 +145,10 @@ by GJK.
         <td>X</td>
         <td>X</td>
         <td>X</td>
-        <td>-</td>
+        <td>G</td>
         <td>G</td>
         <td>-</td>
-        <td>-</td>
+        <td>G</td>
         <td>G</td>
         <td>G</td>
         <td>G</td>
@@ -157,12 +157,12 @@ by GJK.
         <td>ellipsoid</td>
         <td>X</td>
         <td>-</td>
-        <td>-</td>
+        <td>G</td>
         <td>X</td>
-        <td>-</td>
+        <td>G</td>
         <td>G</td>
         <td>-</td>
-        <td>-</td>
+        <td>G</td>
         <td>G</td>
         <td>G</td>
         <td>G</td>
@@ -171,12 +171,12 @@ by GJK.
         <td>cylinder</td>
         <td>X</td>
         <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
         <td>G</td>
         <td>-</td>
+        <td>G</td>
+        <td>G</td>
         <td>-</td>
+        <td>G</td>
         <td>G</td>
         <td>G</td>
         <td>G</td>
