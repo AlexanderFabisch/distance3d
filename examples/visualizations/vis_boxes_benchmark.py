@@ -10,12 +10,11 @@ import pytransform3d.visualizer as pv
 from distance3d.random import rand_box
 from distance3d.colliders import Box
 from distance3d.broad_phase import BoundingVolumeHierarchy
-from distance3d.gjk import gjk
+from distance3d.gjk import gjk_intersection
 from distance3d.urdf_utils import fast_transform_manager_initialization
 from distance3d.benchmark import Timer
 
 
-collision_margin = 1e-3
 tm = TransformManager(check=False)
 bvh = BoundingVolumeHierarchy(tm, "base")
 random_state = np.random.RandomState(32)
@@ -42,9 +41,9 @@ for frame1, collider1 in bvh.colliders_.items():
     timer.stop_and_add_to_total("broad phase")
     for frame2, collider2 in colliders.items():
         timer.start("gjk")
-        dist, point1, point2, _ = gjk(collider1, collider2)
+        intersection = gjk_intersection(collider1, collider2)
         timer.stop_and_add_to_total("gjk")
-        if dist < collision_margin:
+        if intersection:
             collisions.append((frame1, frame2))
 total_collision_detection = timer.stop("collision")
 print(f"Insertion in AABB tree: {timer.total_time_['aabbtree']} s")
