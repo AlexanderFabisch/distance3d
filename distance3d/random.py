@@ -364,6 +364,39 @@ def rand_sphere(random_state, center_scale=1.0, radius_scale=1.0):
 
 def rand_cone(random_state, center_scale=1.0, min_radius=0.0,
               min_height=0.0, radius_scale=1.0, height_scale=1.0):
+    """Sample cone.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    center_scale : float, optional (default: 1)
+        Scaling factor for center.
+
+    min_radius : float, optional (default: 0)
+        Minimum radius of cone.
+
+    min_height : float, optional (default: 0)
+        Minimum height of cone.
+
+    radius_scale : float, optional (default: 1)
+        Scaling factor for radius.
+
+    height_scale : float, optional (default: 1)
+        Scaling factor for height.
+
+    Returns
+    -------
+    cone2origin : array, shape (4, 4)
+        Pose of the cone.
+
+    radius : float
+        Radius of the cone within (min_radius, min_radius + radius_scale].
+
+    height : float
+        Height of the cone within (min_height, min_height + height_scale].
+    """
     cone2origin = pt.random_transform(random_state)
     cone2origin[:3, 3] *= center_scale
     radius = min_radius + (1.0 - random_state.rand()) * radius_scale
