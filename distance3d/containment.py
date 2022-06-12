@@ -149,11 +149,53 @@ def ellipsoid_aabb(ellipsoid2origin, radii):
 
 
 def disk_aabb(center, radius, normal):
+    """Compute axis-aligned bounding box of a disk.
+
+    Parameters
+    ----------
+    center : array, shape (3,)
+        Center of the disk.
+
+    radius : float
+        Radius of the disk.
+
+    normal : array, shape (3,)
+        Normal to the plane in which the disk lies.
+
+    Returns
+    -------
+    mins : array, shape (3,)
+        Minimum coordinates.
+
+    maxs : array, shape (3,)
+        Maximum coordinates.
+    """
     e = radius * np.sqrt(1.0 - normal * normal)
     return center - e, center + e
 
 
 def cone_aabb(cone2origin, radius, height):
+    """Compute axis-aligned bounding box of a cone.
+
+    Parameters
+    ----------
+    cone2origin : array, shape (4, 4)
+        Pose of the cone.
+
+    radius : float
+        Radius of the cone.
+
+    height : float
+        Length of the cone.
+
+    Returns
+    -------
+    mins : array, shape (3,)
+        Minimum coordinates.
+
+    maxs : array, shape (3,)
+        Maximum coordinates.
+    """
     pa = cone2origin[:3, 3]
     pb = cone2origin[:3, 3] + height * cone2origin[:3, 2]
     a = pb - pa
