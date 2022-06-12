@@ -1513,4 +1513,4 @@ def test_gjk_intersection_vs_gjk():
         dist, closest_point1, closest_point2, _ = gjk.gjk(convex1, convex2)
         gjk_intersection = dist < 1e-16
         gjk_intersection2 = gjk.gjk_intersection(convex1, convex2)
-        assert gjk_intersection == gjk_intersection2, f"{vertices1=}\n{vertices2=}"
+        assert gjk_intersection == gjk_intersection2
