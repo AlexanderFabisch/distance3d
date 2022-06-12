@@ -351,21 +351,27 @@ def support_function_disc(search_direction, center, radius, normal):
     point[2] = 0.0
     norm = np.linalg.norm(point)
     if norm == 0.0:
-        return np.zeros(3, dtype=float)
+        return np.copy(center)
     point *= radius / norm
     return center + np.dot(R, point)
 
 
+@numba.njit(
+    numba.float64[:](numba.float64[::1], numba.float64[:, ::1], numba.float64,
+                     numba.float64),
+    cache=True)
 def support_function_cone(search_direction, cone2origin, radius, height):
-    search_direction = np.dot(cone2origin[:3, :3].T, search_direction)
-    disk_point = np.copy(search_direction)
-    disk_point[2] = 0.0
-    disk_point *= radius / np.linalg.norm(disk_point)
-    point = np.array([0.0, 0.0, height])
-    if np.dot(search_direction, disk_point) > np.dot(search_direction, point):
+    local_dir = np.dot(cone2origin[:3, :3].T, search_direction)
+    disk_point = np.array([local_dir[0], local_dir[1], 0.0])
+    norm = np.linalg.norm(disk_point)
+    if norm == 0.0:
+        disk_point = np.copy(cone2origin[:3, 3])
+    else:
+        disk_point *= radius / norm
+    if np.dot(local_dir, disk_point) > local_dir[2] * height:
         point_in_cone = disk_point
     else:
-        point_in_cone = point
+        point_in_cone = np.array([0.0, 0.0, height])
     return transform_point(cone2origin, point_in_cone)
 
 

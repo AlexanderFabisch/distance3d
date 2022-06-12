@@ -440,7 +440,7 @@ class Cone(ConvexCollider):
     def make_artist(self, c=None):
         import pytransform3d.visualizer as pv
         self.artist_ = pv.Cone(
-            A2B=self.cone2origin, radius=self.radius, height=self.height)
+            A2B=self.cone2origin, radius=self.radius, height=self.height, c=c)
 
     def center(self):
         return (self.cone2origin[:3, 3]
