@@ -1499,8 +1499,12 @@ def test_gjk_intersection_vs_gjk():
         vertices1 = random_state.rand(6, 3) * np.array([[2, 2, 2]])
         vertices2 = random_state.rand(6, 3) * np.array([[1, 1, 1]])
 
-        if random_state.randn() > 0.0:
+        if random_state.rand() > 0.5:
             vertices2[3] = vertices1[0]
+        if random_state.rand() > 0.75:
+            vertices2[2] = vertices1[1]
+        if random_state.rand() > 0.875:
+            vertices2[1] = vertices1[2]
 
         convex1 = colliders.ConvexHullVertices(vertices1)
 
