@@ -78,6 +78,7 @@ API Reference
    ~distance3d.colliders.Capsule
    ~distance3d.colliders.Ellipsoid
    ~distance3d.colliders.Cylinder
+   ~distance3d.colliders.Disk
    ~distance3d.colliders.Cone
 
 
@@ -116,6 +117,7 @@ API Reference
    ~distance3d.containment.cylinder_aabb
    ~distance3d.containment.capsule_aabb
    ~distance3d.containment.ellipsoid_aabb
+   ~distance3d.containment.disk_aabb
    ~distance3d.containment.cone_aabb
 
 
@@ -191,6 +193,7 @@ API Reference
    ~distance3d.geometry.support_function_ellipsoid
    ~distance3d.geometry.support_function_box
    ~distance3d.geometry.support_function_sphere
+   ~distance3d.geometry.support_function_disk
    ~distance3d.geometry.support_function_cone
    ~distance3d.geometry.hesse_normal_form
    ~distance3d.geometry.line_from_pluecker
@@ -263,4 +266,5 @@ API Reference
    ~distance3d.random.rand_ellipsoid
    ~distance3d.random.rand_cylinder
    ~distance3d.random.rand_sphere
+   ~distance3d.random.rand_cone
    ~distance3d.random.randn_convex

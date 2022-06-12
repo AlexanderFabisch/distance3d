@@ -4,7 +4,7 @@ import numpy as np
 from .geometry import (
     support_function_capsule, support_function_cylinder,
     convert_box_to_vertices, support_function_ellipsoid,
-    support_function_sphere, support_function_cone, support_function_disc)
+    support_function_sphere, support_function_cone, support_function_disk)
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb, ellipsoid_aabb, cone_aabb, disk_aabb)
@@ -455,7 +455,7 @@ class Disk(ConvexCollider):
         return self.c  # TODO border?
 
     def support_function(self, search_direction):
-        return support_function_disc(
+        return support_function_disk(
             search_direction, self.c, self.radius, self.normal)
 
     def update_pose(self, pose):
