@@ -349,6 +349,27 @@ def support_function_sphere(search_direction, center, radius):
                      numba.float64[::1]),
     cache=True)
 def support_function_disk(search_direction, center, radius, normal):
+    """Compute extreme point of disk along a direction.
+
+    Parameters
+    ----------
+    search_direction : array, shape (3,)
+        Search direction.
+
+    center : array, shape (3,)
+        Center of the disk.
+
+    radius : float
+        Radius of the disk.
+
+    normal : array, shape (3,)
+        Normal to the plane in which the disk lies.
+
+    Returns
+    -------
+    extreme_point : array, shape (3,)
+        Extreme point along search direction.
+    """
     x, y = plane_basis_from_normal(normal)
     R = np.column_stack((x, y, normal))
     point = np.dot(R.T, search_direction)
@@ -365,6 +386,27 @@ def support_function_disk(search_direction, center, radius, normal):
                      numba.float64),
     cache=True)
 def support_function_cone(search_direction, cone2origin, radius, height):
+    """Compute extreme point of cone along a direction.
+
+    Parameters
+    ----------
+    search_direction : array, shape (3,)
+        Search direction.
+
+    cone2origin : array, shape (4, 4)
+        Pose of the cone.
+
+    radius : float
+        Radius of the cone.
+
+    height : float
+        Length of the cone.
+
+    Returns
+    -------
+    extreme_point : array, shape (3,)
+        Extreme point along search direction.
+    """
     local_dir = np.dot(cone2origin[:3, :3].T, search_direction)
     disk_point = np.array([local_dir[0], local_dir[1], 0.0])
     norm = np.linalg.norm(disk_point)
