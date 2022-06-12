@@ -348,7 +348,7 @@ def support_function_sphere(search_direction, center, radius):
     numba.float64[:](numba.float64[::1], numba.float64[::1], numba.float64,
                      numba.float64[::1]),
     cache=True)
-def support_function_disc(search_direction, center, radius, normal):
+def support_function_disk(search_direction, center, radius, normal):
     x, y = plane_basis_from_normal(normal)
     R = np.column_stack((x, y, normal))
     point = np.dot(R.T, search_direction)
