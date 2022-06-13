@@ -3,7 +3,7 @@ import pytransform3d.rotations as pr
 import pytransform3d.transformations as pt
 from distance3d.containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
-    capsule_aabb, ellipsoid_aabb)
+    capsule_aabb, ellipsoid_aabb, disk_aabb, cone_aabb)
 from distance3d.geometry import (
     support_function_cylinder, support_function_capsule)
 from distance3d import random
@@ -156,3 +156,21 @@ def test_ellipsoid_aabb():
     mins, maxs = ellipsoid_aabb(ellipsoid2origin, radii)
     assert_array_almost_equal(mins, [-0.676639, -0.03155, -0.091812])
     assert_array_almost_equal(maxs, [0.076639, 1.63155, 0.891812])
+
+
+def test_disk_aabb():
+    center = np.array([0.0, 0.0, 0.0])
+    radius = 0.5
+    normal = np.array([0.0, 0.0, 1.0])
+    mins, maxs = disk_aabb(center, radius, normal)
+    assert_array_almost_equal(mins, [-0.5, -0.5, 0.0])
+    assert_array_almost_equal(maxs, [0.5, 0.5, 0.0])
+
+
+def test_cone_aabb():
+    cone2origin = np.eye(4)
+    radius = 0.5
+    height = 1.0
+    mins, maxs = cone_aabb(cone2origin, radius, height)
+    assert_array_almost_equal(mins, [-0.5, -0.5, 0.0])
+    assert_array_almost_equal(maxs, [0.5, 0.5, 1.0])
