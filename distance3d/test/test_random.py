@@ -3,7 +3,8 @@ import pytransform3d.transformations as pt
 from distance3d.random import (
     randn_point, randn_direction, randn_line, randn_line_segment,
     randn_plane, randn_triangle, randn_rectangle, rand_circle, rand_box,
-    rand_capsule, rand_ellipsoid, rand_cylinder, rand_sphere, randn_convex)
+    rand_capsule, rand_ellipsoid, rand_cylinder, rand_sphere, rand_cone,
+    randn_convex)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -105,6 +106,16 @@ def test_rand_sphere():
     center, radius = rand_sphere(random_state)
     assert len(center) == 3
     assert 0 < radius <= 1
+
+
+def test_rand_cone():
+    random_state = np.random.RandomState(1101)
+    capsule2origin, radius, height = rand_cone(
+        random_state, center_scale=2.0, min_radius=0.5, min_height=0.3,
+        radius_scale=2.0, height_scale=3.0)
+    pt.assert_transform(capsule2origin)
+    assert 0.5 < radius <= 2.5
+    assert 0.3 < height <= 3.3
 
 
 def test_randn_convex():
