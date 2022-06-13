@@ -1059,7 +1059,7 @@ def _gjk(collider1, collider2, simplex, max_iterations):
             simplex.n_points = 1
             return True, simplex
 
-        is_before_origin = np.dot(support_point[0], search_direction) < 0.0
+        is_before_origin = np.dot(support_point[0], search_direction) < -EPSILON_SQRT
         if is_before_origin:
             return False, simplex
 
