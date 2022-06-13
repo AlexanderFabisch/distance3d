@@ -411,10 +411,10 @@ def support_function_cone(search_direction, cone2origin, radius, height):
     disk_point = np.array([local_dir[0], local_dir[1], 0.0])
     norm = np.linalg.norm(disk_point)
     if norm == 0.0:
-        disk_point = np.copy(cone2origin[:3, 3])
+        disk_point = np.zeros(3, dtype=float)
     else:
         disk_point *= radius / norm
-    if np.dot(local_dir, disk_point) > local_dir[2] * height:
+    if np.dot(local_dir, disk_point) >= local_dir[2] * height:
         point_in_cone = disk_point
     else:
         point_in_cone = np.array([0.0, 0.0, height])
