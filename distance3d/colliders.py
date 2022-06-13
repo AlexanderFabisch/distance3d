@@ -444,7 +444,7 @@ class Disk(ConvexCollider):
         disk2origin = np.eye(4)
         disk2origin[:3, :3] = np.column_stack((x, y, self.normal))
         disk2origin[:3, 3] = self.c
-        self.artist_ = pv.Cylinder(  # TODO disk artist?
+        self.artist_ = pv.Cylinder(
             A2B=disk2origin, radius=self.radius, length=0.01 * self.radius,
             c=c)
 
@@ -452,7 +452,8 @@ class Disk(ConvexCollider):
         return self.c
 
     def first_vertex(self):
-        return self.c  # TODO border?
+        x, _ = plane_basis_from_normal(self.normal)
+        return self.c + self.radius * x
 
     def support_function(self, search_direction):
         return support_function_disk(
