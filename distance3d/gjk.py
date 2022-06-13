@@ -789,7 +789,7 @@ def _distance_subalgorithm_tetrahedron(simplex, d):
     d.tetrahedron_coordinates_6(simplex, e123, e124, e134)
     if d.face_023_of_tetrahedron_optimal():
         simplex.select_face(0, 3, 2)
-        solution.from_face(simplex, [0, 2, 1], d.d[0, 12], d.d[3, 12], d.d[2, 12])
+        solution.from_face(simplex, [0, 1, 2], d.d[0, 12], d.d[3, 12], d.d[2, 12])
         return solution
     d.tetrahedron_coordinates_7(simplex, e213, e214)
     if d.convex_hull_of_tetrahedron_optimal():
