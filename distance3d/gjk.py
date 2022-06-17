@@ -634,19 +634,20 @@ class BarycentricCoordinates:
         return self.line_segment_02_of_face_optimal() and not self.d[3, 12] > 0.0
 
     def face_012_of_tetrahedron_optimal(self):
-        return self.face_012_of_face_optimal() and not self.d[3, 14] > 0.0
+        return self.face_012_of_face_optimal() and not self.d[3, 14] > EPSILON
 
     def line_segment_03_of_tetrahedron_optimal(self):
         return not (self.d[1, 11] > 0.0 or self.d[2, 12] > 0.0) and self.check_line_segment_03_of_tetrahedron()
 
     def face_013_of_tetrahedron_optimal(self):
-        return not self.d[2, 14] > 0.0 and self.check_face_013_of_tetrahedron()
+        return not self.d[2, 14] > EPSILON and self.check_face_013_of_tetrahedron()
 
     def face_023_of_tetrahedron_optimal(self):
-        return not self.d[1, 14] > 0.0 and self.check_face_023_of_tetrahedron()
+        return not self.d[1, 14] > EPSILON and self.check_face_023_of_tetrahedron()
 
     def convex_hull_of_tetrahedron_optimal(self):
-        return not (self.d[0, 14] <= 0.0 or self.d[1, 14] <= 0.0 or self.d[2, 14] <= 0.0 or self.d[3, 14] <= 0.0)
+        return not (self.d[0, 14] <= EPSILON or self.d[1, 14] <= EPSILON
+                    or self.d[2, 14] <= EPSILON or self.d[3, 14] <= EPSILON)
 
     def vertex_1_of_tetrahedron_optimal(self):
         return self.vertex_1_of_face_optimal() and not self.d[3, 9] > 0.0
@@ -667,7 +668,7 @@ class BarycentricCoordinates:
         return not (self.d[0, 12] > 0.0 or self.d[1, 13] > 0.0) and self.check_line_segment_23_of_tetrahedron()
 
     def face_123_of_tetrahedron_optimal(self):
-        return not self.d[0, 14] > 0.0 and self.check_face_123_of_tetrahedron()
+        return not self.d[0, 14] > EPSILON and self.check_face_123_of_tetrahedron()
 
     def check_line_segment_02_of_face(self):
         return not (self.d[0, 4] <= 0.0 or self.d[2, 4] <= 0.0)
