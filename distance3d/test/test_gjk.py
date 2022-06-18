@@ -1517,3 +1517,42 @@ def test_gjk_intersection_vs_gjk():
         gjk_intersection = dist < 10.0 * np.finfo(float).eps
         gjk_intersection2 = gjk.gjk_intersection(convex1, convex2)
         assert gjk_intersection == gjk_intersection2
+
+
+def test_gjk_no_intersection():
+    random_state = np.random.RandomState(25)
+
+    for _ in range(10):
+        vertices1 = random_state.rand(6, 3)
+        vertices2 = random_state.rand(6, 3) + np.ones(3)
+
+        convex1 = colliders.ConvexHullVertices(vertices1)
+        convex2 = colliders.ConvexHullVertices(vertices2)
+
+        assert not gjk.gjk_intersection(convex1, convex2)
+
+
+def test_gjk_touching_contact():
+    random_state = np.random.RandomState(26)
+    for _ in range(10):
+        vertices1_xy = random_state.rand(6, 2)
+        vertices2_xy = random_state.rand(6, 2)
+
+        n_common_vertices = random_state.randint(1, 5)
+        common_vertices_xy = random_state.rand(n_common_vertices, 2)
+        common_vertices = np.hstack((
+            common_vertices_xy, np.ones((n_common_vertices, 1))))
+
+        vertices1 = np.vstack((
+            np.hstack((vertices1_xy, np.zeros((len(vertices1_xy), 1)))),
+            common_vertices
+        ))
+        vertices2 = np.vstack((
+            common_vertices,
+            np.hstack((vertices2_xy, 2 * np.ones((len(vertices2_xy), 1))))
+        ))
+
+        convex1 = colliders.ConvexHullVertices(vertices1)
+        convex2 = colliders.ConvexHullVertices(vertices2)
+
+        assert gjk.gjk_intersection(convex1, convex2), f"{vertices1=}\n{vertices2=}"
