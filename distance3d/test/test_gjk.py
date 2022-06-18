@@ -1,11 +1,14 @@
 import numpy as np
 from distance3d import colliders, gjk, geometry, random, distance
+from distance3d.gjk.gjk_distance import (
+    SimplexInfo, Solution, BarycentricCoordinates,
+    distance_subalgorithm_with_backup_procedure)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
 
 def test_select_line_segment():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.n_simplex_points = 4
     random_state = np.random.RandomState(23)
     simplex.points[:, :] = random_state.randn(*simplex.points.shape)
@@ -18,7 +21,7 @@ def test_select_line_segment():
 
     assert_dot_product_table(simplex)
 
-    simplex_backup = gjk.SimplexInfo()
+    simplex_backup = SimplexInfo()
     simplex_backup.copy_from(simplex)
 
     for i in range(4):
@@ -31,7 +34,7 @@ def test_select_line_segment():
 
 
 def test_select_face():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.n_simplex_points = 4
     random_state = np.random.RandomState(24)
     simplex.points[:, :] = random_state.randn(*simplex.points.shape)
@@ -44,7 +47,7 @@ def test_select_face():
 
     assert_dot_product_table(simplex)
 
-    simplex_backup = gjk.SimplexInfo()
+    simplex_backup = SimplexInfo()
     simplex_backup.copy_from(simplex)
 
     for i in range(4):
@@ -65,7 +68,7 @@ def assert_dot_product_table(simplex):
 
 
 def test_simplex_reorder():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.n_simplex_points = 4
     random_state = np.random.RandomState(24)
     simplex.points[:, :] = random_state.randn(*simplex.points.shape)
@@ -76,7 +79,7 @@ def test_simplex_reorder():
         for j in range(i + 1, 4):
             simplex.dot_product_table[i, j] = float("nan")
 
-    simplex_backup = gjk.SimplexInfo()
+    simplex_backup = SimplexInfo()
     simplex_backup.copy_from(simplex)
 
     simplex.reorder(np.array([3, 2, 1, 0], dtype=int))
@@ -92,11 +95,11 @@ def test_simplex_reorder():
 
 
 def test_vertex_optimal_point():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
@@ -104,11 +107,11 @@ def test_vertex_optimal_point():
 
 
 def test_vertex_optimal_point_backup():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
@@ -116,49 +119,49 @@ def test_vertex_optimal_point_backup():
 
 
 def test_line_segment_optimal_point():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.line_segment_coordinates_0(simplex)
     barycentric_coordinates.line_segment_coordinates_1(simplex)
     assert barycentric_coordinates.vertex_0_of_line_segment_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.line_segment_coordinates_0(simplex)
     barycentric_coordinates.line_segment_coordinates_1(simplex)
     assert barycentric_coordinates.vertex_1_of_line_segment_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.line_segment_coordinates_0(simplex)
     barycentric_coordinates.line_segment_coordinates_1(simplex)
     assert barycentric_coordinates.line_segment_01_of_line_segment_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
@@ -166,49 +169,49 @@ def test_line_segment_optimal_point():
 
 
 def test_line_segment_optimal_point_backup():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.line_segment_coordinates_0(simplex)
     barycentric_coordinates.line_segment_coordinates_1(simplex)
     assert barycentric_coordinates.vertex_0_of_line_segment_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.line_segment_coordinates_0(simplex)
     barycentric_coordinates.line_segment_coordinates_1(simplex)
     assert barycentric_coordinates.vertex_1_of_line_segment_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.line_segment_coordinates_0(simplex)
     barycentric_coordinates.line_segment_coordinates_1(simplex)
     assert barycentric_coordinates.line_segment_01_of_line_segment_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
@@ -216,12 +219,12 @@ def test_line_segment_optimal_point_backup():
 
 
 def test_face_optimal_point():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
@@ -229,19 +232,19 @@ def test_face_optimal_point():
     assert_array_almost_equal(simplex.points[0], [0, 0, 1])
     assert barycentric_coordinates.vertex_0_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
@@ -249,19 +252,19 @@ def test_face_optimal_point():
     assert_array_almost_equal(simplex.points[1], [0, 0, 1])
     assert barycentric_coordinates.vertex_1_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
@@ -269,84 +272,84 @@ def test_face_optimal_point():
     assert_array_almost_equal(simplex.points[2], [0, 0, 1])
     assert barycentric_coordinates.vertex_2_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
     assert barycentric_coordinates.line_segment_01_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
     assert barycentric_coordinates.line_segment_12_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
     assert barycentric_coordinates.line_segment_02_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
     assert barycentric_coordinates.face_012_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
@@ -355,12 +358,12 @@ def test_face_optimal_point():
 
 
 def test_face_optimal_point_backup():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
@@ -368,19 +371,19 @@ def test_face_optimal_point_backup():
     assert_array_almost_equal(simplex.points[0], [0, 0, 1])
     assert barycentric_coordinates.vertex_0_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
@@ -388,19 +391,19 @@ def test_face_optimal_point_backup():
     assert_array_almost_equal(simplex.points[1], [0, 0, 1])
     assert barycentric_coordinates.vertex_1_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
@@ -408,84 +411,84 @@ def test_face_optimal_point_backup():
     assert_array_almost_equal(simplex.points[2], [0, 0, 1])
     assert barycentric_coordinates.vertex_2_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
     assert barycentric_coordinates.line_segment_01_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
     assert barycentric_coordinates.line_segment_12_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
     assert barycentric_coordinates.line_segment_02_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.face_coordinates_0(simplex)
     barycentric_coordinates.face_coordinates_1(simplex)
     e123 = barycentric_coordinates.face_coordinates_2(simplex)
     barycentric_coordinates.face_coordinates_3(simplex, e123)
     assert barycentric_coordinates.face_012_of_face_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
@@ -494,13 +497,13 @@ def test_face_optimal_point_backup():
 
 
 def test_tetrahedron_optimal_point():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 3], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -511,20 +514,20 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.vertex_0_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -535,20 +538,20 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.vertex_1_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -559,20 +562,20 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.vertex_2_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -583,20 +586,20 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.vertex_3_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -607,20 +610,20 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_01_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -631,20 +634,20 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_02_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -655,20 +658,20 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_03_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -679,20 +682,20 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_12_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -703,20 +706,20 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_13_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -727,20 +730,20 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_23_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -751,21 +754,21 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.face_012_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -776,21 +779,21 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.face_013_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -801,21 +804,21 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.face_023_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 2, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -826,21 +829,21 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.face_123_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 2, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, -3], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -851,8 +854,8 @@ def test_tetrahedron_optimal_point():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.convex_hull_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), False)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), False)
     assert not backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 0])
     assert approx(solution.distance_squared) == 0
@@ -861,13 +864,13 @@ def test_tetrahedron_optimal_point():
 
 
 def test_tetrahedron_optimal_point_backup():
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 3], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -878,20 +881,20 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.vertex_0_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -902,20 +905,20 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.vertex_1_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -926,20 +929,20 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.vertex_2_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 4], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 3], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -950,20 +953,20 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.vertex_3_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:1], [1])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -974,20 +977,20 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_01_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -998,20 +1001,20 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_02_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([0, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -1022,20 +1025,20 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_03_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -1046,20 +1049,20 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_12_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -1070,20 +1073,20 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_13_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, 0, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -1094,20 +1097,20 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.line_segment_23_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(solution.barycentric_coordinates[:2], [0.5, 0.5])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -1118,21 +1121,21 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.face_012_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -1143,21 +1146,21 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.face_013_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, 0, 2], dtype=float))
     simplex.add_new_point(1, 1, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 2, 1], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -1168,21 +1171,21 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.face_023_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 2, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([1, 0, 2], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -1193,21 +1196,21 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.face_123_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 1])
     assert approx(solution.distance_squared) == 1
     assert_array_almost_equal(
         solution.barycentric_coordinates[:3], [1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0])
 
-    simplex = gjk.SimplexInfo()
+    simplex = SimplexInfo()
     simplex.set_first_point(0, 0, np.array([1, -1, 1], dtype=float))
     simplex.add_new_point(1, 1, np.array([-1, -1, 1], dtype=float))
     simplex.add_new_point(2, 2, np.array([0, 2, 1], dtype=float))
     simplex.add_new_point(3, 3, np.array([0, 0, -3], dtype=float))
 
-    barycentric_coordinates = gjk.BarycentricCoordinates()
+    barycentric_coordinates = BarycentricCoordinates()
     barycentric_coordinates.tetrahedron_coordinates_0(simplex)
     e132, e142 = barycentric_coordinates.tetrahedron_coordinates_1(simplex)
     e123, e143 = barycentric_coordinates.tetrahedron_coordinates_2(simplex)
@@ -1218,8 +1221,8 @@ def test_tetrahedron_optimal_point_backup():
     barycentric_coordinates.tetrahedron_coordinates_7(simplex, e213, e214)
     assert barycentric_coordinates.convex_hull_of_tetrahedron_optimal()
 
-    solution, backup = gjk.distance_subalgorithm_with_backup_procedure(
-        simplex, gjk.Solution(), True)
+    solution, backup = distance_subalgorithm_with_backup_procedure(
+        simplex, Solution(), True)
     assert backup
     assert_array_almost_equal(solution.search_direction, [0, 0, 0])
     assert approx(solution.distance_squared) == 0
