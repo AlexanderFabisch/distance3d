@@ -162,7 +162,9 @@ def _find_support_in_direction_of_origin_ray(portal, collider1, collider2):
     portal.v[1], portal.v1[1], portal.v2[1] = support_function(
         collider1, collider2, search_direction)
     portal.n_points = 2
-    origin_outside_v1 = portal.v[1].dot(search_direction) < EPSILON
+    origin_outside_v1 = (
+        any(portal.v[1] != 0.0) and
+        portal.v[1].dot(search_direction) < EPSILON)
     return origin_outside_v1
 
 
@@ -262,7 +264,7 @@ def _portal_direction(v):
 @numba.njit(cache=True)
 def _encapsulates_origin(v, search_direction):
     """Does the portal encapsulate the origin?"""
-    return v.dot(search_direction) > -EPSILON
+    return v.dot(search_direction) > -10.0 * EPSILON
 
 
 @numba.njit(cache=True)
