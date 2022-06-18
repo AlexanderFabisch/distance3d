@@ -1,6 +1,8 @@
 import math
 import numpy as np
-from distance3d.utils import EPSILON
+
+
+EPSILON = 10.0 * np.finfo(float).eps
 
 
 def gjk(collider1, collider2):
