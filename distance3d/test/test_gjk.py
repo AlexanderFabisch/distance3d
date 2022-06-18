@@ -1556,3 +1556,14 @@ def test_gjk_touching_contact():
         convex2 = colliders.ConvexHullVertices(vertices2)
 
         assert gjk.gjk_intersection(convex1, convex2)
+
+
+def test_gjk_max_iterations():
+    random_state = np.random.RandomState(27)
+    c1 = colliders.MeshGraph(*random.randn_convex(
+        random_state, n_vertices=10000, center_scale=1.0))
+    c2 = colliders.MeshGraph(*random.randn_convex(
+        random_state, n_vertices=10000, center_scale=1.0))
+    # not enough iterations to find correct solution
+    intersection = gjk.gjk_intersection(c1, c2, max_iterations=2)
+    assert not intersection
