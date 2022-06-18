@@ -143,28 +143,10 @@ def _triangle(v, v1, v2):
             n_points = 2
             search_direction = _triple_cross(AC, AO, AC)
         else:
-            # TODO duplicate code
-            if np.dot(AB, AO) > -EPSILON:
-                _set_point(v, v1, v2, 0, *B)
-                _set_point(v, v1, v2, 1, *A)
-                n_points = 2
-                search_direction = _triple_cross(AB, AO, AB)
-            else:
-                _set_point(v, v1, v2, 0, *A)
-                n_points = 1
-                search_direction = AO
+            n_points, search_direction = _triangle_ab(A, B, AB, AO, v, v1, v2)
     else:
         if np.dot(np.cross(AB, ABC), AO) > -EPSILON:
-            # TODO duplicate code
-            if np.dot(AB, AO) > -EPSILON:
-                _set_point(v, v1, v2, 0, *B)
-                _set_point(v, v1, v2, 1, *A)
-                n_points = 2
-                search_direction = _triple_cross(AB, AO, AB)
-            else:
-                _set_point(v, v1, v2, 0, *A)
-                n_points = 1
-                search_direction = AO
+            n_points, search_direction = _triangle_ab(A, B, AB, AO, v, v1, v2)
         else:
             if np.dot(ABC, AO) > -EPSILON:
                 n_points = 3
@@ -176,6 +158,20 @@ def _triangle(v, v1, v2):
                 search_direction = -ABC
 
     return GjkState.CONTINUE, search_direction, n_points
+
+
+@numba.njit(cache=True)
+def _triangle_ab(A, B, AB, AO, v, v1, v2):
+    if np.dot(AB, AO) > -EPSILON:
+        _set_point(v, v1, v2, 0, *B)
+        _set_point(v, v1, v2, 1, *A)
+        n_points = 2
+        search_direction = _triple_cross(AB, AO, AB)
+    else:
+        _set_point(v, v1, v2, 0, *A)
+        n_points = 1
+        search_direction = AO
+    return n_points, search_direction
 
 
 @numba.njit(cache=True)
