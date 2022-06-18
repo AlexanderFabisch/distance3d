@@ -1555,4 +1555,4 @@ def test_gjk_touching_contact():
         convex1 = colliders.ConvexHullVertices(vertices1)
         convex2 = colliders.ConvexHullVertices(vertices2)
 
-        assert gjk.gjk_intersection(convex1, convex2), f"{vertices1=}\n{vertices2=}"
+        assert gjk.gjk_intersection(convex1, convex2)
