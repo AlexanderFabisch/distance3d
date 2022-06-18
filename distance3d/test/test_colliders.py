@@ -1,7 +1,44 @@
 import numpy as np
 
-from distance3d import colliders
+from distance3d import colliders, random
 from numpy.testing import assert_array_almost_equal
+
+
+collider_classes = {
+    "sphere": (colliders.Sphere, random.rand_sphere),
+    "ellipsoid": (colliders.Ellipsoid, random.rand_ellipsoid),
+    "capsule": (colliders.Capsule, random.rand_capsule),
+    "cylinder": (colliders.Cylinder, random.rand_cylinder),
+    "box": (colliders.Box, random.rand_box),
+    "mesh": (colliders.MeshGraph, random.randn_convex),
+}
+
+
+def test_all_colliders():
+    random_state = np.random.RandomState(4)
+    for Collider, rand in collider_classes.values():
+        print(Collider)
+        c = Collider(*rand(random_state))
+        limits = np.array(c.aabb().limits)
+        center = c.center()
+        assert all(limits[:, 0] <= center)
+        assert all(center <= limits[:, 1])
+        first_vertex = c.first_vertex()
+        assert all(limits[:, 0] <= first_vertex)
+        assert all(first_vertex <= limits[:, 1])
+
+        c.make_artist(c=(0, 0, 1))
+        assert c.artist_ is not None
+        a = c.artist_
+        aabb = a.geometries[0].get_axis_aligned_bounding_box()
+
+        c.update_pose(np.eye(4))
+        aabb2 = a.geometries[0].get_axis_aligned_bounding_box()
+        assert all(np.asarray(aabb.min_bound) != np.asarray(aabb2.min_bound))
+        assert all(np.asarray(aabb.max_bound) != np.asarray(aabb2.max_bound))
+
+        c.artist_ = None
+        c.update_pose(np.eye(4))
 
 
 def test_convex_collider():
