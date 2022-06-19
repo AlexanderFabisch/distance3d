@@ -14,6 +14,11 @@ EPSILON_SQRT = math.sqrt(EPSILON)
 def gjk_intersection(collider1, collider2, max_iterations=100):
     """Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.
 
+    This implementation of GJK is based on libccd (for details, see
+    https://github.com/danfis/libccd). For the original code the copyright is
+    of Daniel Fiser <danfis@danfis.cz>. It has been released under 3-clause BSD
+    license.
+
     Parameters
     ----------
     collider1 : ConvexCollider

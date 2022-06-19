@@ -20,6 +20,11 @@ marked as such in the source code.
 The EPA algorithm is adapted from Kevin Moran's GJK implementation
 (https://github.com/kevinmoran/GJK, MIT License or Unlicense).
 
+The GJK intersection test and MPR algorithm are based on libccd (for details,
+see https://github.com/danfis/libccd). For the original code the copyright is
+of Daniel Fiser <danfis@danfis.cz>. It has been released under 3-clause BSD
+license.
+
 The translation to Python has been done by Alexander Fabisch and the glue
 code around it is licensed under the 3-clause BSD license:
 

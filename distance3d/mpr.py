@@ -3,6 +3,11 @@
 Another name for the algorithm is XenoCollide (for details, see
 http://xenocollide.snethen.com/). It has been presented in "Game Programming
 Gems 7" (Gem 2.5: XenoCollide: Complex Collision Made Simple).
+
+This implementation of MPR is based on libccd (for details, see
+https://github.com/danfis/libccd). For the original code the copyright is of
+Daniel Fiser <danfis@danfis.cz>. It has been released under 3-clause BSD
+license.
 """
 from enum import Enum
 import numpy as np
