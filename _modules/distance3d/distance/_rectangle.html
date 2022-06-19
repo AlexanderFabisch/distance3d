@@ -1,11 +1,11 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.distance._rectangle &#8212; distance3d 0.3.0 documentation</title>
+    <title>distance3d.distance._rectangle &#8212; distance3d 0.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
@@ -16,6 +16,7 @@
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -40,7 +41,7 @@
 <span class="kn">from</span> <span class="nn">..geometry</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">convert_rectangle_to_segment</span><span class="p">,</span> <span class="n">convert_segment_to_line</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">._line</span> <span class="kn">import</span> <span class="n">_line_to_line_segment</span>
-<span class="kn">import</span> <span class="nn">pytransform3d.rotations</span> <span class="k">as</span> <span class="nn">pr</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">plane_basis_from_normal</span>
 
 
 <div class="viewcode-block" id="point_to_rectangle"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.point_to_rectangle.html#distance3d.distance.point_to_rectangle">[docs]</a><span class="k">def</span> <span class="nf">point_to_rectangle</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span>
@@ -126,10 +127,10 @@
 <span class="sd">    dist : float</span>
 <span class="sd">        The shortest distance between line and rectangle.</span>
 
-<span class="sd">    contact_point_line : array, shape (3,)</span>
+<span class="sd">    closest_point_line : array, shape (3,)</span>
 <span class="sd">        Closest point on the line.</span>
 
-<span class="sd">    contact_point_rectangle : array, shape (3,)</span>
+<span class="sd">    closest_point_rectangle : array, shape (3,)</span>
 <span class="sd">        Closest point on the rectangle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_line_to_rectangle</span><span class="p">(</span>
@@ -160,18 +161,18 @@
         <span class="k">for</span> <span class="n">i0</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
             <span class="n">segment_end</span><span class="p">,</span> <span class="n">segment_start</span> <span class="o">=</span> <span class="n">convert_rectangle_to_segment</span><span class="p">(</span>
                 <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_extents</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">)</span>
-            <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point_line</span><span class="p">,</span> <span class="n">contact_point_segment</span><span class="p">,</span> <span class="n">l_closest</span><span class="p">,</span> <span class="n">s_closest</span> <span class="o">=</span> <span class="n">_line_to_line_segment</span><span class="p">(</span>
-                <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="n">epsilon</span><span class="p">)</span>
+            <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_line</span><span class="p">,</span> <span class="n">closest_point_segment</span><span class="p">,</span> <span class="n">l_closest</span><span class="p">,</span> <span class="n">s_closest</span> <span class="o">=</span> <span class="n">_line_to_line_segment</span><span class="p">(</span>
+                <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">best_dist</span><span class="p">:</span>
-                <span class="n">best_contact_point_line</span> <span class="o">=</span> <span class="n">contact_point_line</span>
-                <span class="n">best_contact_point_rectangle</span> <span class="o">=</span> <span class="n">contact_point_segment</span>
+                <span class="n">best_closest_point_line</span> <span class="o">=</span> <span class="n">closest_point_line</span>
+                <span class="n">best_closest_point_rectangle</span> <span class="o">=</span> <span class="n">closest_point_segment</span>
                 <span class="n">best_dist</span> <span class="o">=</span> <span class="n">dist</span>
                 <span class="n">best_line_parameter</span> <span class="o">=</span> <span class="n">l_closest</span>
             <span class="k">if</span> <span class="n">best_dist</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
                 <span class="k">break</span>
 
-    <span class="k">return</span> <span class="n">best_dist</span><span class="p">,</span> <span class="n">best_contact_point_line</span><span class="p">,</span> <span class="n">best_contact_point_rectangle</span><span class="p">,</span> <span class="n">best_line_parameter</span>
+    <span class="k">return</span> <span class="n">best_dist</span><span class="p">,</span> <span class="n">best_closest_point_line</span><span class="p">,</span> <span class="n">best_closest_point_rectangle</span><span class="p">,</span> <span class="n">best_line_parameter</span>
 
 
 <span class="k">def</span> <span class="nf">_line_intersects_rectangle</span><span class="p">(</span>
@@ -182,7 +183,7 @@
         <span class="c1"># The line and rectangle are not parallel, so the line intersects</span>
         <span class="c1"># the plane of the rectangle.</span>
         <span class="n">diff</span> <span class="o">=</span> <span class="n">line_point</span> <span class="o">-</span> <span class="n">rectangle_center</span>
-        <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">plane_basis_from_normal</span><span class="p">(</span><span class="n">line_direction</span><span class="p">)</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">plane_basis_from_normal</span><span class="p">(</span><span class="n">line_direction</span><span class="p">)</span>
         <span class="n">udd</span> <span class="o">=</span> <span class="n">rectangle_axes</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
         <span class="n">vdd</span> <span class="o">=</span> <span class="n">rectangle_axes</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="n">uddiff</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
@@ -200,9 +201,9 @@
             <span class="n">line_parameter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">line_direction_d_d</span><span class="p">)</span> <span class="o">-</span> <span class="n">line_direction_dot_diff</span>
 
             <span class="c1"># The intersection point is inside or on the rectangle.</span>
-            <span class="n">contact_point_line</span> <span class="o">=</span> <span class="n">line_point</span> <span class="o">+</span> <span class="n">line_parameter</span> <span class="o">*</span> <span class="n">line_direction</span>
-            <span class="n">contact_point_rectangle</span> <span class="o">=</span> <span class="n">rectangle_center</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rectangle_axes</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">contact_point_line</span><span class="p">,</span> <span class="n">contact_point_rectangle</span><span class="p">,</span> <span class="n">line_parameter</span><span class="p">)</span>
+            <span class="n">closest_point_line</span> <span class="o">=</span> <span class="n">line_point</span> <span class="o">+</span> <span class="n">line_parameter</span> <span class="o">*</span> <span class="n">line_direction</span>
+            <span class="n">closest_point_rectangle</span> <span class="o">=</span> <span class="n">rectangle_center</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rectangle_axes</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">closest_point_line</span><span class="p">,</span> <span class="n">closest_point_rectangle</span><span class="p">,</span> <span class="n">line_parameter</span><span class="p">)</span>
     <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
 
 
@@ -326,12 +327,12 @@
             <span class="n">segment_end</span><span class="p">,</span> <span class="n">segment_start</span> <span class="o">=</span> <span class="n">convert_rectangle_to_segment</span><span class="p">(</span>
                 <span class="n">rectangle_center1</span><span class="p">,</span> <span class="n">rectangle_extents1</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">)</span>
 
-            <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point_rectangle1</span><span class="p">,</span> <span class="n">contact_point_rectangle2</span> <span class="o">=</span> <span class="n">line_segment_to_rectangle</span><span class="p">(</span>
+            <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_rectangle1</span><span class="p">,</span> <span class="n">closest_point_rectangle2</span> <span class="o">=</span> <span class="n">line_segment_to_rectangle</span><span class="p">(</span>
                 <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">rectangle_center2</span><span class="p">,</span> <span class="n">rectangle_axes2</span><span class="p">,</span> <span class="n">rectangle_lengths2</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">best_dist</span><span class="p">:</span>
-                <span class="n">best_contact_point_rectangle1</span> <span class="o">=</span> <span class="n">contact_point_rectangle1</span>
-                <span class="n">best_contact_point_rectangle2</span> <span class="o">=</span> <span class="n">contact_point_rectangle2</span>
+                <span class="n">best_closest_point_rectangle1</span> <span class="o">=</span> <span class="n">closest_point_rectangle1</span>
+                <span class="n">best_closest_point_rectangle2</span> <span class="o">=</span> <span class="n">closest_point_rectangle2</span>
                 <span class="n">best_dist</span> <span class="o">=</span> <span class="n">dist</span>
             <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">epsilon</span><span class="p">:</span>
                 <span class="k">break</span>
@@ -344,17 +345,17 @@
             <span class="n">segment_end</span><span class="p">,</span> <span class="n">segment_start</span> <span class="o">=</span> <span class="n">convert_rectangle_to_segment</span><span class="p">(</span>
                 <span class="n">rectangle_center2</span><span class="p">,</span> <span class="n">rectangle_extents2</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">)</span>
 
-            <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point_rectangle2</span><span class="p">,</span> <span class="n">contact_point_rectangle1</span> <span class="o">=</span> <span class="n">line_segment_to_rectangle</span><span class="p">(</span>
+            <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_rectangle2</span><span class="p">,</span> <span class="n">closest_point_rectangle1</span> <span class="o">=</span> <span class="n">line_segment_to_rectangle</span><span class="p">(</span>
                 <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">rectangle_center1</span><span class="p">,</span> <span class="n">rectangle_axes1</span><span class="p">,</span> <span class="n">rectangle_lengths1</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">best_dist</span><span class="p">:</span>
-                <span class="n">best_contact_point_rectangle1</span> <span class="o">=</span> <span class="n">contact_point_rectangle1</span>
-                <span class="n">best_contact_point_rectangle2</span> <span class="o">=</span> <span class="n">contact_point_rectangle2</span>
+                <span class="n">best_closest_point_rectangle1</span> <span class="o">=</span> <span class="n">closest_point_rectangle1</span>
+                <span class="n">best_closest_point_rectangle2</span> <span class="o">=</span> <span class="n">closest_point_rectangle2</span>
                 <span class="n">best_dist</span> <span class="o">=</span> <span class="n">dist</span>
             <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">epsilon</span><span class="p">:</span>
                 <span class="k">break</span>
 
-    <span class="k">return</span> <span class="n">best_dist</span><span class="p">,</span> <span class="n">best_contact_point_rectangle1</span><span class="p">,</span> <span class="n">best_contact_point_rectangle2</span></div>
+    <span class="k">return</span> <span class="n">best_dist</span><span class="p">,</span> <span class="n">best_closest_point_rectangle1</span><span class="p">,</span> <span class="n">best_closest_point_rectangle2</span></div>
 </pre></div>
 
           </div>
@@ -373,7 +374,7 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../_auto_examples/index.html">Examples</a></li>
@@ -392,12 +393,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -414,7 +415,7 @@
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

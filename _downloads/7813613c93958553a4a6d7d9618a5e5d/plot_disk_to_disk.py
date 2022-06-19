@@ -12,7 +12,7 @@ from distance3d.distance import disk_to_disk
 from distance3d import plotting, random
 
 
-random_state = np.random.RandomState(0)
+random_state = np.random.RandomState(2)
 center = np.zeros(3)
 radius = 1.0
 normal = np.array([0.0, 0.0, 1.0])
@@ -22,6 +22,8 @@ ax = ppu.make_3d_axis(ax_s=1.5)
 accumulated_time = 0.0
 for i in range(3000):
     center2, radius2, normal2 = random.rand_circle(random_state)
+    if random_state.rand() >= 0.75:
+        normal2 = normal
     start = time.time()
     dist, closest_point1, closest_point2 = disk_to_disk(
         center2, radius2, normal2, center, radius, normal)

@@ -1,0 +1,28 @@
+﻿distance3d.colliders.ConvexHullVertices
+=======================================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: ConvexHullVertices
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ConvexHullVertices.__init__
+      ~ConvexHullVertices.aabb
+      ~ConvexHullVertices.center
+      ~ConvexHullVertices.first_vertex
+      ~ConvexHullVertices.make_artist
+      ~ConvexHullVertices.support_function
+      ~ConvexHullVertices.update_pose
+   
+   
+
+   
+   
+   

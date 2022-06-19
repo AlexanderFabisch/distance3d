@@ -24,7 +24,7 @@ Robot
 
 Plot AABB tree of a robot.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-40
+.. GENERATED FROM PYTHON SOURCE LINES 8-42
 
 
 
@@ -39,12 +39,14 @@ Plot AABB tree of a robot.
 
 .. code-block:: default
 
+    import distance3d.broad_phase
+
     print(__doc__)
     import os
     import pytransform3d.plot_utils as ppu
     from pytransform3d.urdf import UrdfTransformManager
     import matplotlib.pyplot as plt
-    from distance3d import colliders, plotting
+    from distance3d import plotting
 
 
     BASE_DIR = "test/data/"
@@ -64,7 +66,7 @@ Plot AABB tree of a robot.
     for joint_name in joint_names:
         tm.set_joint(joint_name, 0.7)
 
-    bvh = colliders.BoundingVolumeHierarchy(tm, "robot_arm")
+    bvh = distance3d.broad_phase.BoundingVolumeHierarchy(tm, "robot_arm")
     bvh.fill_tree_with_colliders(tm, make_artists=False)
 
     ax = ppu.make_3d_axis(0.6)
@@ -75,7 +77,7 @@ Plot AABB tree of a robot.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.346 seconds)
+   **Total running time of the script:** ( 0 minutes  0.454 seconds)
 
 
 .. _sphx_glr_download__auto_examples_aabbtree_plot_robot.py:

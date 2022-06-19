@@ -1,0 +1,6 @@
+﻿distance3d.geometry.support\_function\_disk
+===========================================
+
+.. currentmodule:: distance3d.geometry
+
+.. autofunction:: support_function_disk

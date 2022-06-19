@@ -1,0 +1,6 @@
+﻿distance3d.mpr.mpr\_penetration
+===============================
+
+.. currentmodule:: distance3d.mpr
+
+.. autofunction:: mpr_penetration

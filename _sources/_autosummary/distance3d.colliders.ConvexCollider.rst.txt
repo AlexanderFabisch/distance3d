@@ -15,7 +15,7 @@
    
       ~ConvexCollider.__init__
       ~ConvexCollider.aabb
-      ~ConvexCollider.compute_point
+      ~ConvexCollider.center
       ~ConvexCollider.first_vertex
       ~ConvexCollider.make_artist
       ~ConvexCollider.support_function

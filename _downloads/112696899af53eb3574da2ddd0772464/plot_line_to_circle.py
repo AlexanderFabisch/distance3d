@@ -23,16 +23,17 @@ accumulated_time = 0.0
 for i in range(5000):
     line_point, line_direction = random.randn_line(random_state)
     start = time.time()
-    dist, contact_point_line, contact_point_circle = line_to_circle(
+    dist, closest_point_line, closest_point_circle = line_to_circle(
         line_point, line_direction, center, radius, normal)
     end = time.time()
     accumulated_time += end - start
     print(dist)
     if i > 10:
         continue
-    plotting.plot_segment(ax, contact_point_line, contact_point_circle, c="k", lw=1)
+    plotting.plot_segment(ax, closest_point_line, closest_point_circle,
+                          c="k", lw=1)
     plotting.plot_line(ax, line_point, line_direction)
 print(f"{accumulated_time=}")
 
-plotting.plot_circle(ax, center, radius, normal)
+plotting.plot_circle(ax, center, radius, normal, surface_alpha=0)
 plt.show()

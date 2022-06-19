@@ -23,7 +23,7 @@ for i in range(3000):
     box2origin2, size2 = random.rand_box(random_state, 2, 1)
     box_collider2 = colliders.Box(box2origin2, size2)
     start = time.time()
-    dist, contact_point_box, contact_point_box2, _ = gjk.gjk_with_simplex(
+    dist, closest_point_box, closest_point_box2, _ = gjk.gjk(
         box_collider, box_collider2)
     end = time.time()
     accumulated_time += end - start
@@ -31,7 +31,7 @@ for i in range(3000):
     if i > 10:
         continue
     plotting.plot_segment(
-        ax, contact_point_box, contact_point_box2, c="k", lw=1)
+        ax, closest_point_box, closest_point_box2, c="k", lw=1)
     ppu.plot_box(ax=ax, A2B=box2origin2, size=size2, wireframe=False, alpha=0.2)
 print(f"{accumulated_time=}")
 

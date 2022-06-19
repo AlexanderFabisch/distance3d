@@ -15,7 +15,7 @@
    
       ~Sphere.__init__
       ~Sphere.aabb
-      ~Sphere.compute_point
+      ~Sphere.center
       ~Sphere.first_vertex
       ~Sphere.make_artist
       ~Sphere.support_function

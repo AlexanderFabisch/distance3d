@@ -46,7 +46,7 @@ Distance from rectangle to box
     3.816740509633549
     1.916622946277794
     2.7350752506669935
-    0.5105723966158994
+    0.5105723966158995
     2.6940146400922127
     3.1574352234336507
     5.4591495290760905
@@ -55,7 +55,7 @@ Distance from rectangle to box
     2.8100868791164557
     5.616442514472597
     4.129114504821131
-    0.43443572591771906
+    0.434435725917719
     3.7160268814235264
     3.536471982506936
     1.2910213385032527
@@ -73,8 +73,8 @@ Distance from rectangle to box
     2.109378366875959
     1.9147530484983157
     4.932417715669764
-    1.7571796416961374
-    1.369587990126992
+    1.757179641696137
+    1.3695879901269923
     2.0247626214548715
     0.7233951671241937
     2.1854919472670282
@@ -85,7 +85,7 @@ Distance from rectangle to box
     5.591436257055188
     0.9194187556174591
     4.39032850973214
-    5.031446456140429
+    5.031446456140428
     2.128089277093525
     4.05093397797027
     5.295351189506589
@@ -98,10 +98,10 @@ Distance from rectangle to box
     1.9295253545957332
     0.5410264462167694
     0.8525074877148474
-    4.549583340136514
+    4.549583340136513
     2.1447501487604526
     4.627653216843869
-    2.5809117692366432
+    2.5809117692366437
     3.362774018619297
     3.20594098019593
     0.0
@@ -110,10 +110,10 @@ Distance from rectangle to box
     1.1288708997592238
     0.541653802372401
     1.0558122082601538
-    0.008180073359175352
+    0.008180073359175359
     4.850504033105888
     3.628355062122066
-    4.3388797162289165
+    4.338879716228917
     3.2071195369011622
     1.6947463815899368
     3.7902149341269373
@@ -129,7 +129,7 @@ Distance from rectangle to box
     2.1036004879635324
     3.663961621521724
     1.1634030208569854
-    accumulated_time=0.9445111751556396
+    accumulated_time=0.5930533409118652
 
 
 
@@ -162,7 +162,7 @@ Distance from rectangle to box
             random_state, center_scale=2.5, length_scale=5)
 
         start = time.time()
-        dist, contact_point_rectangle, contact_point_box = rectangle_to_box(
+        dist, closest_point_rectangle, closest_point_box = rectangle_to_box(
             rectangle_center, rectangle_axes, rectangle_lengths, box2origin, size)
         end = time.time()
         accumulated_time += end - start
@@ -170,7 +170,7 @@ Distance from rectangle to box
         if i > 10:
             continue
         plotting.plot_segment(
-            ax, contact_point_rectangle, contact_point_box, c="k", lw=1)
+            ax, closest_point_rectangle, closest_point_box, c="k", lw=1)
         plotting.plot_rectangle(
             ax, rectangle_center, rectangle_axes, rectangle_lengths,
             show_axes=False)
@@ -184,7 +184,7 @@ Distance from rectangle to box
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.144 seconds)
+   **Total running time of the script:** ( 0 minutes  0.791 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_rectangle_to_box.py:

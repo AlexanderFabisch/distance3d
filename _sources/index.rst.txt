@@ -6,8 +6,9 @@ Distance computation and collision detection in 3D in pure Python.
 Features
 --------
 
-* Fast collision detection and distance computation with GJK.
+* Collision detection and distance computation with GJK.
 * Calculation of penetration depth with EPA.
+* Collision detection and calculation of penetration depth with MPR.
 * Various specific distance calculations for points, lines, line segments,
   planes, triangles, rectangles, circles, disks, boxes, cylinders, ellipsoids,
   ...

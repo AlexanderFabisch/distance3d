@@ -15,7 +15,7 @@
    
       ~Cylinder.__init__
       ~Cylinder.aabb
-      ~Cylinder.compute_point
+      ~Cylinder.center
       ~Cylinder.first_vertex
       ~Cylinder.make_artist
       ~Cylinder.support_function

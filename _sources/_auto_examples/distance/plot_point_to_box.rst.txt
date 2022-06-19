@@ -21039,7 +21039,7 @@ Distance from point to box
     1.1453650347428084
     0.11580146294023043
     0.41038773699315606
-    accumulated_time=0.9645829200744629
+    accumulated_time=0.9455127716064453
 
 
 
@@ -21069,13 +21069,13 @@ Distance from point to box
     for i in range(21000):
         point = random.randn_point(random_state) * 2
         start = time.time()
-        dist, contact_point = point_to_box(point, box2origin, size)
+        dist, closest_point = point_to_box(point, box2origin, size)
         end = time.time()
         accumulated_time += end - start
         print(dist)
         if i > 10:
             continue
-        plotting.plot_segment(ax, point, contact_point, lw=1)
+        plotting.plot_segment(ax, point, closest_point, lw=1)
     print(f"{accumulated_time=}")
 
     ppu.plot_box(ax=ax, A2B=box2origin, size=size, wireframe=False, alpha=0.5)
@@ -21085,7 +21085,7 @@ Distance from point to box
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.898 seconds)
+   **Total running time of the script:** ( 0 minutes  1.843 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_box.py:

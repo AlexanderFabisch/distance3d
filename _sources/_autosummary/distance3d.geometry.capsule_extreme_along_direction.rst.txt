@@ -1,6 +1,0 @@
-﻿distance3d.geometry.capsule\_extreme\_along\_direction
-======================================================
-
-.. currentmodule:: distance3d.geometry
-
-.. autofunction:: capsule_extreme_along_direction

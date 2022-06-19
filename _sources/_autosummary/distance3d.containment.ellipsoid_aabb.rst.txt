@@ -1,0 +1,6 @@
+﻿distance3d.containment.ellipsoid\_aabb
+======================================
+
+.. currentmodule:: distance3d.containment
+
+.. autofunction:: ellipsoid_aabb

@@ -1,0 +1,6 @@
+﻿distance3d.containment.disk\_aabb
+=================================
+
+.. currentmodule:: distance3d.containment
+
+.. autofunction:: disk_aabb

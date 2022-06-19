@@ -1,6 +1,0 @@
-﻿distance3d.epa.epa\_vertices
-============================
-
-.. currentmodule:: distance3d.epa
-
-.. autofunction:: epa_vertices

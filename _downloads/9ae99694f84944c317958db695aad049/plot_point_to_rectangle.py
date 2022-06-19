@@ -22,13 +22,14 @@ accumulated_time = 0.0
 for i in range(45000):
     point = random.randn_point(random_state)
     start = time.time()
-    dist, contact_point = point_to_rectangle(point, rectangle_center, rectangle_axes, rectangle_lengths)
+    dist, closest_point = point_to_rectangle(
+        point, rectangle_center, rectangle_axes, rectangle_lengths)
     end = time.time()
     accumulated_time += end - start
     print(dist)
     if i > 15:
         continue
-    plotting.plot_segment(ax, point, contact_point, lw=1)
+    plotting.plot_segment(ax, point, closest_point, lw=1)
 print(f"{accumulated_time=}")
 
 plotting.plot_rectangle(ax, rectangle_center, rectangle_axes, rectangle_lengths)

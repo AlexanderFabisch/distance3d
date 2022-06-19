@@ -1,0 +1,6 @@
+﻿distance3d.mpr.mpr\_intersection
+================================
+
+.. currentmodule:: distance3d.mpr
+
+.. autofunction:: mpr_intersection

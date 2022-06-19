@@ -15,7 +15,7 @@
    
       ~Box.__init__
       ~Box.aabb
-      ~Box.compute_point
+      ~Box.center
       ~Box.first_vertex
       ~Box.make_artist
       ~Box.support_function

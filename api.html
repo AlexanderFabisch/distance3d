@@ -1,11 +1,11 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API Reference &#8212; distance3d 0.3.0 documentation</title>
+    <title>API Reference &#8212; distance3d 0.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,6 +16,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -38,12 +39,12 @@
           <div class="body" role="main">
             
   <div class="section" id="api-reference">
-<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this heading">¶</a></h1>
 <div class="section" id="module-distance3d">
-<span id="distance3d"></span><h2><a class="reference internal" href="#module-distance3d" title="distance3d"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d</span></code></a><a class="headerlink" href="#module-distance3d" title="Permalink to this headline">¶</a></h2>
+<span id="distance3d"></span><h2><a class="reference internal" href="#module-distance3d" title="distance3d"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d</span></code></a><a class="headerlink" href="#module-distance3d" title="Permalink to this heading">¶</a></h2>
 <p>Distance computation and collision detection in 3D.</p>
 <div class="section" id="module-distance3d.distance">
-<span id="distance3d-distance"></span><h3><a class="reference internal" href="#module-distance3d.distance" title="distance3d.distance"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.distance</span></code></a><a class="headerlink" href="#module-distance3d.distance" title="Permalink to this headline">¶</a></h3>
+<span id="distance3d-distance"></span><h3><a class="reference internal" href="#module-distance3d.distance" title="distance3d.distance"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.distance</span></code></a><a class="headerlink" href="#module-distance3d.distance" title="Permalink to this heading">¶</a></h3>
 <p>Distance calculation of specific geometric shapes.</p>
 <p>Note that for distance calculations to triangles, rectangles, boxes, cylinders,
 spheres, capsules, and convex meshes GJK is usually the fastest option if
@@ -51,7 +52,8 @@ applicable. GJK is not applicable if one of the geometric objects is a line
 or a plane and GJK is slower when one of the objects is a point or a line
 segment.</p>
 <p>In the following table an X indicates that the distance computation between
-two geometric objects is implemented.</p>
+two geometric objects is implemented. G means the pair of shapes is covered
+by GJK.</p>
 <table>
   <tr>
     <th></th>
@@ -104,10 +106,10 @@ two geometric objects is implemented.</p>
     <td>X</td>
     <td>X</td>
     <td>X</td>
-    <td>-</td>
+    <td>G</td>
     <td>X</td>
-    <td>-</td>
-    <td>-</td>
+    <td>G</td>
+    <td>G</td>
   </tr>
   <tr>
     <td>plane</td>
@@ -132,10 +134,10 @@ two geometric objects is implemented.</p>
     <td>X</td>
     <td>X</td>
     <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
   </tr>
   <tr>
     <td>rectangle</td>
@@ -144,12 +146,12 @@ two geometric objects is implemented.</p>
     <td>X</td>
     <td>X</td>
     <td>X</td>
+    <td>G</td>
     <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
   </tr>
   <tr>
     <td>circle</td>
@@ -169,15 +171,15 @@ two geometric objects is implemented.</p>
     <td>disk</td>
     <td>X</td>
     <td>-</td>
+    <td>G</td>
     <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td>G</td>
+    <td>G</td>
     <td>-</td>
     <td>X</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
   </tr>
   <tr>
     <td>box</td>
@@ -185,43 +187,43 @@ two geometric objects is implemented.</p>
     <td>X</td>
     <td>X</td>
     <td>X</td>
+    <td>G</td>
+    <td>G</td>
     <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
   </tr>
   <tr>
     <td>ellipsoid</td>
     <td>X</td>
     <td>-</td>
-    <td>-</td>
+    <td>G</td>
     <td>X</td>
+    <td>G</td>
+    <td>G</td>
     <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
   </tr>
   <tr>
     <td>cylinder</td>
     <td>X</td>
     <td>-</td>
+    <td>G</td>
     <td>-</td>
+    <td>G</td>
+    <td>G</td>
     <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
+    <td>G</td>
   </tr>
-</table><table class="longtable docutils align-default">
+</table><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -330,45 +332,66 @@ two geometric objects is implemented.</p>
 </table>
 </div>
 <div class="section" id="module-distance3d.colliders">
-<span id="distance3d-colliders"></span><h3><a class="reference internal" href="#module-distance3d.colliders" title="distance3d.colliders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.colliders</span></code></a><a class="headerlink" href="#module-distance3d.colliders" title="Permalink to this headline">¶</a></h3>
-<p>Colliders used for collision detection with GJK algorithm.</p>
-<table class="longtable docutils align-default">
+<span id="distance3d-colliders"></span><h3><a class="reference internal" href="#module-distance3d.colliders" title="distance3d.colliders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.colliders</span></code></a><a class="headerlink" href="#module-distance3d.colliders" title="Permalink to this heading">¶</a></h3>
+<p>Colliders used for collision detection with GJK and MPR algorithms.</p>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.BoundingVolumeHierarchy.html#distance3d.colliders.BoundingVolumeHierarchy" title="distance3d.colliders.BoundingVolumeHierarchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoundingVolumeHierarchy</span></code></a></p></td>
-<td><p>Bounding volume hierarchy (BVH) for broad phase collision detection.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.ConvexCollider.html#distance3d.colliders.ConvexCollider" title="distance3d.colliders.ConvexCollider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConvexCollider</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.ConvexCollider.html#distance3d.colliders.ConvexCollider" title="distance3d.colliders.ConvexCollider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConvexCollider</span></code></a></p></td>
 <td><p>Convex collider base class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Convex.html#distance3d.colliders.Convex" title="distance3d.colliders.Convex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Convex</span></code></a></p></td>
-<td><p>Wraps convex hull of a set of vertices for GJK algorithm.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.ConvexHullVertices.html#distance3d.colliders.ConvexHullVertices" title="distance3d.colliders.ConvexHullVertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConvexHullVertices</span></code></a></p></td>
+<td><p>Convex hull of a set of vertices.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.MeshGraph.html#distance3d.colliders.MeshGraph" title="distance3d.colliders.MeshGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeshGraph</span></code></a></p></td>
+<td><p>Mesh collider that uses triangles for hill climbing.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box" title="distance3d.colliders.Box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Box</span></code></a></p></td>
-<td><p>Wraps box for GJK algorithm.</p></td>
+<td><p>Box collider.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Mesh.html#distance3d.colliders.Mesh" title="distance3d.colliders.Mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mesh</span></code></a></p></td>
-<td><p>Wraps mesh for GJK algorithm (we assume a convex mesh).</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere" title="distance3d.colliders.Sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sphere</span></code></a></p></td>
+<td><p>Sphere collider.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule" title="distance3d.colliders.Capsule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Capsule</span></code></a></p></td>
+<td><p>Capsule collider.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Ellipsoid.html#distance3d.colliders.Ellipsoid" title="distance3d.colliders.Ellipsoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ellipsoid</span></code></a></p></td>
+<td><p>Ellipsoid collider.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Cylinder.html#distance3d.colliders.Cylinder" title="distance3d.colliders.Cylinder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cylinder</span></code></a></p></td>
-<td><p>Wraps cylinder for GJK algorithm.</p></td>
+<td><p>Cylinder collider.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule" title="distance3d.colliders.Capsule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Capsule</span></code></a></p></td>
-<td><p>Wraps capsule for GJK algorithm.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Disk.html#distance3d.colliders.Disk" title="distance3d.colliders.Disk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Disk</span></code></a></p></td>
+<td><p>Disk collider.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere" title="distance3d.colliders.Sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sphere</span></code></a></p></td>
-<td><p>Wraps sphere for GJK algorithm.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Cone.html#distance3d.colliders.Cone" title="distance3d.colliders.Cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cone</span></code></a></p></td>
+<td><p>Cone collider.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-distance3d.broad_phase">
+<span id="distance3d-broad-phase"></span><h3><a class="reference internal" href="#module-distance3d.broad_phase" title="distance3d.broad_phase"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.broad_phase</span></code></a><a class="headerlink" href="#module-distance3d.broad_phase" title="Permalink to this heading">¶</a></h3>
+<p>Broad-phase collision detection.</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.broad_phase.BoundingVolumeHierarchy.html#distance3d.broad_phase.BoundingVolumeHierarchy" title="distance3d.broad_phase.BoundingVolumeHierarchy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoundingVolumeHierarchy</span></code></a></p></td>
+<td><p>Bounding volume hierarchy (BVH) for broad phase collision detection.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="module-distance3d.containment">
-<span id="distance3d-containment"></span><h3><a class="reference internal" href="#module-distance3d.containment" title="distance3d.containment"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.containment</span></code></a><a class="headerlink" href="#module-distance3d.containment" title="Permalink to this headline">¶</a></h3>
+<span id="distance3d-containment"></span><h3><a class="reference internal" href="#module-distance3d.containment" title="distance3d.containment"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.containment</span></code></a><a class="headerlink" href="#module-distance3d.containment" title="Permalink to this heading">¶</a></h3>
 <p>Containment methods compute bounding volumes.</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -389,49 +412,80 @@ two geometric objects is implemented.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.containment.capsule_aabb.html#distance3d.containment.capsule_aabb" title="distance3d.containment.capsule_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capsule_aabb</span></code></a></p></td>
 <td><p>Compute axis-aligned bounding box of a capsule.</p></td>
 </tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="module-distance3d.epa">
-<span id="distance3d-epa"></span><h3><a class="reference internal" href="#module-distance3d.epa" title="distance3d.epa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.epa</span></code></a><a class="headerlink" href="#module-distance3d.epa" title="Permalink to this headline">¶</a></h3>
-<p>Expanding polytope algorithm (EPA) for collision resolution after GJK.</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.epa.epa_vertices.html#distance3d.epa.epa_vertices" title="distance3d.epa.epa_vertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">epa_vertices</span></code></a></p></td>
-<td><p>Expanding Polytope Algorithm (EPA).</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.containment.ellipsoid_aabb.html#distance3d.containment.ellipsoid_aabb" title="distance3d.containment.ellipsoid_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ellipsoid_aabb</span></code></a></p></td>
+<td><p>Compute axis-aligned bounding box of a capsule.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.epa.epa.html#distance3d.epa.epa" title="distance3d.epa.epa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">epa</span></code></a></p></td>
-<td><p>Expanding Polytope Algorithm (EPA).</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.containment.disk_aabb.html#distance3d.containment.disk_aabb" title="distance3d.containment.disk_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disk_aabb</span></code></a></p></td>
+<td><p>Compute axis-aligned bounding box of a disk.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.containment.cone_aabb.html#distance3d.containment.cone_aabb" title="distance3d.containment.cone_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cone_aabb</span></code></a></p></td>
+<td><p>Compute axis-aligned bounding box of a cone.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="module-distance3d.gjk">
-<span id="distance3d-gjk"></span><h3><a class="reference internal" href="#module-distance3d.gjk" title="distance3d.gjk"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.gjk</span></code></a><a class="headerlink" href="#module-distance3d.gjk" title="Permalink to this headline">¶</a></h3>
+<span id="distance3d-gjk"></span><h3><a class="reference internal" href="#module-distance3d.gjk" title="distance3d.gjk"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.gjk</span></code></a><a class="headerlink" href="#module-distance3d.gjk" title="Permalink to this heading">¶</a></h3>
 <p>Gilbert-Johnson-Keerthi (GJK) for distance calculation of convex shapes.</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk.html#distance3d.gjk.gjk" title="distance3d.gjk.gjk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk</span></code></a></p></td>
-<td><p>Gilbert-Johnson-Keerthi algorithm for distance calculation.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk_with_simplex.html#distance3d.gjk.gjk_with_simplex" title="distance3d.gjk.gjk_with_simplex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk_with_simplex</span></code></a></p></td>
 <td><p>Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk_intersection.html#distance3d.gjk.gjk_intersection" title="distance3d.gjk.gjk_intersection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk_intersection</span></code></a></p></td>
+<td><p>Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-distance3d.epa">
+<span id="distance3d-epa"></span><h3><a class="reference internal" href="#module-distance3d.epa" title="distance3d.epa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.epa</span></code></a><a class="headerlink" href="#module-distance3d.epa" title="Permalink to this heading">¶</a></h3>
+<p>Expanding polytope algorithm (EPA) for collision resolution after GJK.</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.epa.epa.html#distance3d.epa.epa" title="distance3d.epa.epa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">epa</span></code></a></p></td>
+<td><p>Expanding Polytope Algorithm (EPA).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-distance3d.mpr">
+<span id="distance3d-mpr"></span><h3><a class="reference internal" href="#module-distance3d.mpr" title="distance3d.mpr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.mpr</span></code></a><a class="headerlink" href="#module-distance3d.mpr" title="Permalink to this heading">¶</a></h3>
+<p>Minkowski portal refinement (MPR) for collision detection.</p>
+<p>Another name for the algorithm is XenoCollide (for details, see
+<a class="reference external" href="http://xenocollide.snethen.com/">http://xenocollide.snethen.com/</a>). It has been presented in “Game Programming
+Gems 7” (Gem 2.5: XenoCollide: Complex Collision Made Simple).</p>
+<p>This implementation of MPR is based on libccd (for details, see
+<a class="reference external" href="https://github.com/danfis/libccd">https://github.com/danfis/libccd</a>). For the original code the copyright is of
+Daniel Fiser &lt;<a class="reference external" href="mailto:danfis&#37;&#52;&#48;danfis&#46;cz">danfis<span>&#64;</span>danfis<span>&#46;</span>cz</a>&gt;. It has been released under 3-clause BSD
+license.</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.mpr.mpr_intersection.html#distance3d.mpr.mpr_intersection" title="distance3d.mpr.mpr_intersection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mpr_intersection</span></code></a></p></td>
+<td><p>Intersection test with Minkowski Portal Refinement (MPR).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.mpr.mpr_penetration.html#distance3d.mpr.mpr_penetration" title="distance3d.mpr.mpr_penetration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mpr_penetration</span></code></a></p></td>
+<td><p>Minkowski Portal Refinement (MPR) with penetration info.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="module-distance3d.geometry">
-<span id="distance3d-geometry"></span><h3><a class="reference internal" href="#module-distance3d.geometry" title="distance3d.geometry"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.geometry</span></code></a><a class="headerlink" href="#module-distance3d.geometry" title="Permalink to this headline">¶</a></h3>
+<span id="distance3d-geometry"></span><h3><a class="reference internal" href="#module-distance3d.geometry" title="distance3d.geometry"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.geometry</span></code></a><a class="headerlink" href="#module-distance3d.geometry" title="Permalink to this heading">¶</a></h3>
 <p>Tools for geometric computations.</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -452,24 +506,40 @@ two geometric objects is implemented.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.convert_box_to_vertices.html#distance3d.geometry.convert_box_to_vertices" title="distance3d.geometry.convert_box_to_vertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_box_to_vertices</span></code></a></p></td>
 <td><p>Convert box to vertices.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.cylinder_extreme_along_direction.html#distance3d.geometry.cylinder_extreme_along_direction" title="distance3d.geometry.cylinder_extreme_along_direction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cylinder_extreme_along_direction</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_cylinder.html#distance3d.geometry.support_function_cylinder" title="distance3d.geometry.support_function_cylinder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_cylinder</span></code></a></p></td>
 <td><p>Compute extreme point of cylinder along a direction.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.capsule_extreme_along_direction.html#distance3d.geometry.capsule_extreme_along_direction" title="distance3d.geometry.capsule_extreme_along_direction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capsule_extreme_along_direction</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_capsule.html#distance3d.geometry.support_function_capsule" title="distance3d.geometry.support_function_capsule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_capsule</span></code></a></p></td>
 <td><p>Compute extreme point of cylinder along a direction.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.hesse_normal_form.html#distance3d.geometry.hesse_normal_form" title="distance3d.geometry.hesse_normal_form"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hesse_normal_form</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_ellipsoid.html#distance3d.geometry.support_function_ellipsoid" title="distance3d.geometry.support_function_ellipsoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_ellipsoid</span></code></a></p></td>
+<td><p>Compute extreme point of ellipsoid along a direction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_box.html#distance3d.geometry.support_function_box" title="distance3d.geometry.support_function_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_box</span></code></a></p></td>
+<td><p>Compute extreme point of box along a direction.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_sphere.html#distance3d.geometry.support_function_sphere" title="distance3d.geometry.support_function_sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_sphere</span></code></a></p></td>
+<td><p>Compute extreme point of box along a direction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_disk.html#distance3d.geometry.support_function_disk" title="distance3d.geometry.support_function_disk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_disk</span></code></a></p></td>
+<td><p>Compute extreme point of disk along a direction.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_cone.html#distance3d.geometry.support_function_cone" title="distance3d.geometry.support_function_cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_cone</span></code></a></p></td>
+<td><p>Compute extreme point of cone along a direction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.hesse_normal_form.html#distance3d.geometry.hesse_normal_form" title="distance3d.geometry.hesse_normal_form"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hesse_normal_form</span></code></a></p></td>
 <td><p>Computes Hesse normal form of a plane.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.line_from_pluecker.html#distance3d.geometry.line_from_pluecker" title="distance3d.geometry.line_from_pluecker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_from_pluecker</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.line_from_pluecker.html#distance3d.geometry.line_from_pluecker" title="distance3d.geometry.line_from_pluecker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_from_pluecker</span></code></a></p></td>
 <td><p>Computes line from Plücker coordinates.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="module-distance3d.self_collision">
-<span id="distance3d-self-collision"></span><h3><a class="reference internal" href="#module-distance3d.self_collision" title="distance3d.self_collision"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.self_collision</span></code></a><a class="headerlink" href="#module-distance3d.self_collision" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
+<span id="distance3d-self-collision"></span><h3><a class="reference internal" href="#module-distance3d.self_collision" title="distance3d.self_collision"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.self_collision</span></code></a><a class="headerlink" href="#module-distance3d.self_collision" title="Permalink to this heading">¶</a></h3>
+<p>Self-collision detection.</p>
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -485,9 +555,9 @@ two geometric objects is implemented.</p>
 </table>
 </div>
 <div class="section" id="module-distance3d.plotting">
-<span id="distance3d-plotting"></span><h3><a class="reference internal" href="#module-distance3d.plotting" title="distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a><a class="headerlink" href="#module-distance3d.plotting" title="Permalink to this headline">¶</a></h3>
+<span id="distance3d-plotting"></span><h3><a class="reference internal" href="#module-distance3d.plotting" title="distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a><a class="headerlink" href="#module-distance3d.plotting" title="Permalink to this heading">¶</a></h3>
 <p>Plotting functions for geometric shapes.</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -527,9 +597,9 @@ two geometric objects is implemented.</p>
 </table>
 </div>
 <div class="section" id="module-distance3d.random">
-<span id="distance3d-random"></span><h3><a class="reference internal" href="#module-distance3d.random" title="distance3d.random"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.random</span></code></a><a class="headerlink" href="#module-distance3d.random" title="Permalink to this headline">¶</a></h3>
+<span id="distance3d-random"></span><h3><a class="reference internal" href="#module-distance3d.random" title="distance3d.random"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.random</span></code></a><a class="headerlink" href="#module-distance3d.random" title="Permalink to this heading">¶</a></h3>
 <p>Sample geometric shapes.</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -571,23 +641,11 @@ two geometric objects is implemented.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_sphere.html#distance3d.random.rand_sphere" title="distance3d.random.rand_sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_sphere</span></code></a></p></td>
 <td><p>Sample sphere.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.random.randn_convex.html#distance3d.random.randn_convex" title="distance3d.random.randn_convex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randn_convex</span></code></a></p></td>
-<td><p>Sample convex mesh.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_cone.html#distance3d.random.rand_cone" title="distance3d.random.rand_cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_cone</span></code></a></p></td>
+<td><p>Sample cone.</p></td>
 </tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="module-distance3d.utils">
-<span id="distance3d-utils"></span><h3><a class="reference internal" href="#module-distance3d.utils" title="distance3d.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.utils</span></code></a><a class="headerlink" href="#module-distance3d.utils" title="Permalink to this headline">¶</a></h3>
-<p>Utility functions.</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.utils.norm_vector.html#distance3d.utils.norm_vector" title="distance3d.utils.norm_vector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">norm_vector</span></code></a></p></td>
-<td><p>Normalize vector.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.random.randn_convex.html#distance3d.random.randn_convex" title="distance3d.random.randn_convex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randn_convex</span></code></a></p></td>
+<td><p>Sample convex mesh.</p></td>
 </tr>
 </tbody>
 </table>
@@ -612,20 +670,21 @@ two geometric objects is implemented.</p>
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-distance3d"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.distance"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.distance</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.colliders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.colliders</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-distance3d.broad_phase"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.broad_phase</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.containment"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.containment</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-distance3d.epa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.epa</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.gjk"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.gjk</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-distance3d.epa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.epa</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-distance3d.mpr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.mpr</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.geometry"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.geometry</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.self_collision"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.self_collision</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.random"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.random</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-distance3d.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.utils</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -646,12 +705,12 @@ two geometric objects is implemented.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -668,7 +727,7 @@ two geometric objects is implemented.</p>
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

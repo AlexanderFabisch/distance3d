@@ -5,18 +5,20 @@
 
 Computation times
 =================
-**00:11.132** total execution time for **_auto_examples_gjk** files:
+**00:07.848** total execution time for **_auto_examples_gjk** files:
 
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_gjk_plot_convex_mesh.py` (``plot_convex_mesh.py``)                           | 00:06.840 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_gjk_plot_convex_mesh.py` (``plot_convex_mesh.py``)                           | 00:02.894 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_gjk_plot_spheres.py` (``plot_spheres.py``)                                   | 00:01.206 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_gjk_plot_box.py` (``plot_box.py``)                                           | 00:01.096 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_gjk_plot_cylinder.py` (``plot_cylinder.py``)                                 | 00:01.061 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_gjk_plot_spheres.py` (``plot_spheres.py``)                                   | 00:01.014 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_gjk_plot_box.py` (``plot_box.py``)                                           | 00:01.049 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_gjk_plot_ellipsoids.py` (``plot_ellipsoids.py``)                             | 00:00.969 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_gjk_plot_capsules.py` (``plot_capsules.py``)                                 | 00:00.754 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_gjk_plot_cylinder.py` (``plot_cylinder.py``)                                 | 00:00.956 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_gjk_plot_collision_resolution_epa.py` (``plot_collision_resolution_epa.py``) | 00:00.223 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_gjk_plot_capsules.py` (``plot_capsules.py``)                                 | 00:00.656 | 0.0 MB |
++------------------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr__auto_examples_gjk_plot_collision_resolution_epa.py` (``plot_collision_resolution_epa.py``) | 00:00.263 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+

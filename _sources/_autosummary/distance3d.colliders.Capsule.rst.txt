@@ -15,7 +15,7 @@
    
       ~Capsule.__init__
       ~Capsule.aabb
-      ~Capsule.compute_point
+      ~Capsule.center
       ~Capsule.first_vertex
       ~Capsule.make_artist
       ~Capsule.support_function

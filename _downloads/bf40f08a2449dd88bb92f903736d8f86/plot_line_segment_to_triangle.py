@@ -21,7 +21,7 @@ accumulated_time = 0.0
 for i in range(6500):
     segment_start, segment_end = random.randn_line_segment(random_state, scale=2)
     start = time.time()
-    dist, contact_point_segment, contact_point_triangle = line_segment_to_triangle(
+    dist, closest_point_segment, closest_point_triangle = line_segment_to_triangle(
         segment_start, segment_end, triangle_points)
     end = time.time()
     accumulated_time += end - start
@@ -29,7 +29,7 @@ for i in range(6500):
     if i > 10:
         continue
     plotting.plot_segment(
-        ax, contact_point_segment, contact_point_triangle, c="k", lw=1)
+        ax, closest_point_segment, closest_point_triangle, c="k", lw=1)
     plotting.plot_segment(ax, segment_start, segment_end)
 print(f"{accumulated_time=}")
 

@@ -1,11 +1,11 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Distance from point to ellipsoid &#8212; distance3d 0.3.0 documentation</title>
+    <title>Distance from point to ellipsoid &#8212; distance3d 0.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -16,10 +16,11 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Distance between line and circle" href="plot_line_to_circle.html" />
+    <link rel="next" title="Distance from line to triangle" href="plot_line_to_triangle.html" />
     <link rel="prev" title="Distance from point to box" href="plot_point_to_box.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -43,7 +44,7 @@
 to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="distance-from-point-to-ellipsoid">
-<span id="sphx-glr-auto-examples-distance-plot-point-to-ellipsoid-py"></span><h1>Distance from point to ellipsoid<a class="headerlink" href="#distance-from-point-to-ellipsoid" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-distance-plot-point-to-ellipsoid-py"></span><h1>Distance from point to ellipsoid<a class="headerlink" href="#distance-from-point-to-ellipsoid" title="Permalink to this heading">¶</a></h1>
 <img src="../../_images/sphx_glr_plot_point_to_ellipsoid_001.png" srcset="../../_images/sphx_glr_plot_point_to_ellipsoid_001.png" alt="plot point to ellipsoid" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0.7266902285163007
 0.7427001402780525
@@ -1545,7 +1546,7 @@ to download the full example code</p>
 0.11058048815910368
 0.620967506394471
 1.0069799397312358
-accumulated_time=0.5082643032073975
+accumulated_time=0.5136294364929199
 </pre></div>
 </div>
 <div class="line-block">
@@ -1570,13 +1571,13 @@ accumulated_time=0.5082643032073975
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1500</span><span class="p">):</span>
     <span class="n">point</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.random.randn_point.html#distance3d.random.randn_point" title="distance3d.random.randn_point" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><span class="n">random</span><span class="o">.</span><span class="n">randn_point</span></a><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.distance.point_to_ellipsoid.html#distance3d.distance.point_to_ellipsoid" title="distance3d.distance.point_to_ellipsoid" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><span class="n">point_to_ellipsoid</span></a><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">)</span>
+    <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.distance.point_to_ellipsoid.html#distance3d.distance.point_to_ellipsoid" title="distance3d.distance.point_to_ellipsoid" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><span class="n">point_to_ellipsoid</span></a><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">)</span>
     <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">accumulated_time</span> <span class="o">+=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
         <span class="k">continue</span>
-    <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">contact_point</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">closest_point</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">accumulated_time</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="n">ppu</span><span class="o">.</span><span class="n">plot_ellipsoid</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span> <span class="n">wireframe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
@@ -1585,7 +1586,7 @@ accumulated_time=0.5082643032073975
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.818 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.821 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-distance-plot-point-to-ellipsoid-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/254123f4cabb69a882ed16ca5974e2c4/plot_point_to_ellipsoid.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_point_to_ellipsoid.py</span></code></a></p>
@@ -1614,7 +1615,7 @@ accumulated_time=0.5082643032073975
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples</a><ul class="current">
@@ -1627,18 +1628,18 @@ accumulated_time=0.5082643032073975
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_rectangle.html">Distance from point to rectangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_box.html">Distance from point to box</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Distance from point to ellipsoid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_to_circle.html">Distance between line and circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_triangle.html">Distance from line to triangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_disk.html">Distance from point to disk</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_circle.html">Distance from point to circle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_disk_to_disk.html">Distance between two disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_box.html">Distance from line segment to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_circle.html">Distance from line segment to circle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_point_to_circle.html">Distance from point to circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_line_segment.html">Distance from line to line segment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_triangle.html">Distance from line segment to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_cylinder.html">Distance from point to cylinder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_line_to_circle.html">Distance between line and circle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_circle.html">Distance from line segment to circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_plane_to_triangle.html">Distance from plane to triangle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_point_to_cylinder.html">Distance from point to cylinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_line.html">Distance from line to line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_disk_to_disk.html">Distance between two disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_triangle_to_triangle.html">Distance between two triangles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_rectangle.html">Distance from line to rectangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_plane_to_plane.html">Distance from plane to plane</a></li>
@@ -1667,7 +1668,7 @@ accumulated_time=0.5082643032073975
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Examples</a><ul>
       <li>Previous: <a href="plot_point_to_box.html" title="previous chapter">Distance from point to box</a></li>
-      <li>Next: <a href="plot_line_to_circle.html" title="next chapter">Distance between line and circle</a></li>
+      <li>Next: <a href="plot_line_to_triangle.html" title="next chapter">Distance from line to triangle</a></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -1676,12 +1677,12 @@ accumulated_time=0.5082643032073975
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -1698,7 +1699,7 @@ accumulated_time=0.5082643032073975
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

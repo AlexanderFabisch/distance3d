@@ -1,0 +1,28 @@
+﻿distance3d.colliders.Cone
+=========================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: Cone
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Cone.__init__
+      ~Cone.aabb
+      ~Cone.center
+      ~Cone.first_vertex
+      ~Cone.make_artist
+      ~Cone.support_function
+      ~Cone.update_pose
+   
+   
+
+   
+   
+   

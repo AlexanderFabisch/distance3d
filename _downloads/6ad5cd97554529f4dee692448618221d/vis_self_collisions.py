@@ -4,12 +4,13 @@ Self-collisions of a robot
 ==========================
 """
 print(__doc__)
+
 import os
 import time
 import numpy as np
 from pytransform3d.urdf import UrdfTransformManager
 import pytransform3d.visualizer as pv
-from distance3d import colliders, self_collision
+from distance3d import self_collision, broad_phase
 
 
 class AnimationCallback:
@@ -22,7 +23,7 @@ class AnimationCallback:
         if step == 0:
             self.total_time = 0.0
 
-        angle = 2.0 * np.cos(2.0 * np.pi * (step / self.n_frames))
+        angle = 2.7 * np.cos(2.0 * np.pi * (step / self.n_frames))
         for joint_name in joint_names:
             tm.set_joint(joint_name, angle)
         bvh.update_collider_poses()
@@ -67,12 +68,12 @@ while (not os.path.exists(data_dir) and
     data_dir = os.path.join(search_path, BASE_DIR)
 
 tm = UrdfTransformManager()
-filename = os.path.join(data_dir, "robot.urdf")
+filename = os.path.join(data_dir, "simple_mechanism.urdf")
 with open(filename, "r") as f:
     robot_urdf = f.read()
     tm.load_urdf(robot_urdf, mesh_path=data_dir)
 
-bvh = colliders.BoundingVolumeHierarchy(tm, "robot_arm")
+bvh = broad_phase.BoundingVolumeHierarchy(tm, "simple_mechanism")
 bvh.fill_tree_with_colliders(
     tm, make_artists=True, fill_self_collision_whitelists=True)
 
@@ -86,7 +87,7 @@ n_frames = 500
 animation_callback = AnimationCallback(n_frames=n_frames, detect_any=False)
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
-                fargs=(tm, bvh, ["joint2", "joint3", "joint5"]))
+                fargs=(tm, bvh, ["joint1", "joint2", "joint3"]))
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")

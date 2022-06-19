@@ -22,7 +22,7 @@ accumulated_time = 0.0
 for i in range(7000):
     line_point, line_direction = random.randn_line(random_state)
     start = time.time()
-    dist, contact_point_line, contact_point_rectangle = line_to_rectangle(
+    dist, closest_point_line, closest_point_rectangle = line_to_rectangle(
         line_point, line_direction, rectangle_center, rectangle_axes, rectangle_lengths)
     end = time.time()
     accumulated_time += end - start
@@ -30,7 +30,7 @@ for i in range(7000):
     if i > 10:
         continue
     plotting.plot_segment(
-        ax, contact_point_line, contact_point_rectangle, c="k", lw=1)
+        ax, closest_point_line, closest_point_rectangle, c="k", lw=1)
     plotting.plot_line(ax, line_point, line_direction)
 print(f"{accumulated_time=}")
 

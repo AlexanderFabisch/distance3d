@@ -21,7 +21,7 @@ accumulated_time = 0.0
 for i in range(45000):
     line_point, line_direction = random.randn_line(random_state)
     start = time.time()
-    dist, contact_point_line, contact_point_segment = line_to_line_segment(
+    dist, closest_point_line, closest_point_segment = line_to_line_segment(
         line_point, line_direction, segment_start, segment_end)
     end = time.time()
     accumulated_time += end - start
@@ -29,7 +29,7 @@ for i in range(45000):
     if i > 5:
         continue
     plotting.plot_segment(
-        ax, contact_point_line, contact_point_segment, c="k", lw=1)
+        ax, closest_point_line, closest_point_segment, c="k", lw=1)
     plotting.plot_line(ax, line_point, line_direction)
 print(f"{accumulated_time=}")
 

@@ -1,11 +1,11 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Distance from rectangle to box &#8212; distance3d 0.3.0 documentation</title>
+    <title>Distance from rectangle to box &#8212; distance3d 0.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -16,10 +16,11 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Distance between convex meshes with GJK" href="../gjk/plot_convex_mesh.html" />
+    <link rel="next" title="Distance between spheres with GJK" href="../gjk/plot_spheres.html" />
     <link rel="prev" title="Distance from line segment to line segment" href="plot_line_segment_to_line_segment.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -43,7 +44,7 @@
 to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="distance-from-rectangle-to-box">
-<span id="sphx-glr-auto-examples-distance-plot-rectangle-to-box-py"></span><h1>Distance from rectangle to box<a class="headerlink" href="#distance-from-rectangle-to-box" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-distance-plot-rectangle-to-box-py"></span><h1>Distance from rectangle to box<a class="headerlink" href="#distance-from-rectangle-to-box" title="Permalink to this heading">¶</a></h1>
 <img src="../../_images/sphx_glr_plot_rectangle_to_box_001.png" srcset="../../_images/sphx_glr_plot_rectangle_to_box_001.png" alt="plot rectangle to box" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>6.158410582694057
 2.641085488169706
@@ -52,7 +53,7 @@ to download the full example code</p>
 3.816740509633549
 1.916622946277794
 2.7350752506669935
-0.5105723966158994
+0.5105723966158995
 2.6940146400922127
 3.1574352234336507
 5.4591495290760905
@@ -61,7 +62,7 @@ to download the full example code</p>
 2.8100868791164557
 5.616442514472597
 4.129114504821131
-0.43443572591771906
+0.434435725917719
 3.7160268814235264
 3.536471982506936
 1.2910213385032527
@@ -79,8 +80,8 @@ to download the full example code</p>
 2.109378366875959
 1.9147530484983157
 4.932417715669764
-1.7571796416961374
-1.369587990126992
+1.757179641696137
+1.3695879901269923
 2.0247626214548715
 0.7233951671241937
 2.1854919472670282
@@ -91,7 +92,7 @@ to download the full example code</p>
 5.591436257055188
 0.9194187556174591
 4.39032850973214
-5.031446456140429
+5.031446456140428
 2.128089277093525
 4.05093397797027
 5.295351189506589
@@ -104,10 +105,10 @@ to download the full example code</p>
 1.9295253545957332
 0.5410264462167694
 0.8525074877148474
-4.549583340136514
+4.549583340136513
 2.1447501487604526
 4.627653216843869
-2.5809117692366432
+2.5809117692366437
 3.362774018619297
 3.20594098019593
 0.0
@@ -116,10 +117,10 @@ to download the full example code</p>
 1.1288708997592238
 0.541653802372401
 1.0558122082601538
-0.008180073359175352
+0.008180073359175359
 4.850504033105888
 3.628355062122066
-4.3388797162289165
+4.338879716228917
 3.2071195369011622
 1.6947463815899368
 3.7902149341269373
@@ -135,7 +136,7 @@ to download the full example code</p>
 2.1036004879635324
 3.663961621521724
 1.1634030208569854
-accumulated_time=0.9445111751556396
+accumulated_time=0.5930533409118652
 </pre></div>
 </div>
 <div class="line-block">
@@ -163,7 +164,7 @@ accumulated_time=0.9445111751556396
         <span class="n">random_state</span><span class="p">,</span> <span class="n">center_scale</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">length_scale</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">dist</span><span class="p">,</span> <span class="n">contact_point_rectangle</span><span class="p">,</span> <span class="n">contact_point_box</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><span class="n">rectangle_to_box</span></a><span class="p">(</span>
+    <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_rectangle</span><span class="p">,</span> <span class="n">closest_point_box</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><span class="n">rectangle_to_box</span></a><span class="p">(</span>
         <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span> <span class="n">rectangle_lengths</span><span class="p">,</span> <span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
     <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">accumulated_time</span> <span class="o">+=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
@@ -171,7 +172,7 @@ accumulated_time=0.9445111751556396
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
         <span class="k">continue</span>
     <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a><span class="p">(</span>
-        <span class="n">ax</span><span class="p">,</span> <span class="n">contact_point_rectangle</span><span class="p">,</span> <span class="n">contact_point_box</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">,</span> <span class="n">closest_point_rectangle</span><span class="p">,</span> <span class="n">closest_point_box</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <a href="../../_autosummary/distance3d.plotting.plot_rectangle.html#distance3d.plotting.plot_rectangle" title="distance3d.plotting.plot_rectangle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_rectangle</span></a><span class="p">(</span>
         <span class="n">ax</span><span class="p">,</span> <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span> <span class="n">rectangle_lengths</span><span class="p">,</span>
         <span class="n">show_axes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -183,7 +184,7 @@ accumulated_time=0.9445111751556396
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.144 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.791 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-distance-plot-rectangle-to-box-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/48544fabde9048fbcb4571b0191fd823/plot_rectangle_to_box.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_rectangle_to_box.py</span></code></a></p>
@@ -212,7 +213,7 @@ accumulated_time=0.9445111751556396
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples</a><ul class="current">
@@ -225,18 +226,18 @@ accumulated_time=0.9445111751556396
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_rectangle.html">Distance from point to rectangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_box.html">Distance from point to box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_ellipsoid.html">Distance from point to ellipsoid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_to_circle.html">Distance between line and circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_triangle.html">Distance from line to triangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_disk.html">Distance from point to disk</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_circle.html">Distance from point to circle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_disk_to_disk.html">Distance between two disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_box.html">Distance from line segment to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_circle.html">Distance from line segment to circle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_point_to_circle.html">Distance from point to circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_line_segment.html">Distance from line to line segment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_triangle.html">Distance from line segment to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_cylinder.html">Distance from point to cylinder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_line_to_circle.html">Distance between line and circle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_circle.html">Distance from line segment to circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_plane_to_triangle.html">Distance from plane to triangle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_point_to_cylinder.html">Distance from point to cylinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_line.html">Distance from line to line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_disk_to_disk.html">Distance between two disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_triangle_to_triangle.html">Distance between two triangles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_rectangle.html">Distance from line to rectangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_plane_to_plane.html">Distance from plane to plane</a></li>
@@ -265,7 +266,7 @@ accumulated_time=0.9445111751556396
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Examples</a><ul>
       <li>Previous: <a href="plot_line_segment_to_line_segment.html" title="previous chapter">Distance from line segment to line segment</a></li>
-      <li>Next: <a href="../gjk/plot_convex_mesh.html" title="next chapter">Distance between convex meshes with GJK</a></li>
+      <li>Next: <a href="../gjk/plot_spheres.html" title="next chapter">Distance between spheres with GJK</a></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -274,12 +275,12 @@ accumulated_time=0.9445111751556396
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -296,7 +297,7 @@ accumulated_time=0.9445111751556396
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

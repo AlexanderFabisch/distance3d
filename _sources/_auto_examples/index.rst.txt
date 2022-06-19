@@ -229,27 +229,6 @@ Distance
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance between line and circle">
-
-.. only:: html
-
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_circle_thumb.png
-     :alt: Distance between line and circle
-
-     :ref:`sphx_glr__auto_examples_distance_plot_line_to_circle.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_to_circle
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Distance from line to triangle">
 
 .. only:: html
@@ -292,48 +271,6 @@ Distance
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance from point to circle">
-
-.. only:: html
-
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_circle_thumb.png
-     :alt: Distance from point to circle
-
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_circle.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_circle
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance between two disks">
-
-.. only:: html
-
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_disk_to_disk_thumb.png
-     :alt: Distance between two disks
-
-     :ref:`sphx_glr__auto_examples_distance_plot_disk_to_disk.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_disk_to_disk
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to box">
 
 .. only:: html
@@ -355,14 +292,14 @@ Distance
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to circle">
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from point to circle">
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_circle_thumb.png
-     :alt: Distance from line segment to circle
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_circle_thumb.png
+     :alt: Distance from point to circle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_circle.py`
+     :ref:`sphx_glr__auto_examples_distance_plot_point_to_circle.py`
 
 .. raw:: html
 
@@ -372,7 +309,7 @@ Distance
 .. toctree::
    :hidden:
 
-   /_auto_examples/distance/plot_line_segment_to_circle
+   /_auto_examples/distance/plot_point_to_circle
 
 .. raw:: html
 
@@ -418,14 +355,14 @@ Distance
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance from point to cylinder">
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between line and circle">
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_cylinder_thumb.png
-     :alt: Distance from point to cylinder
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_circle_thumb.png
+     :alt: Distance between line and circle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_cylinder.py`
+     :ref:`sphx_glr__auto_examples_distance_plot_line_to_circle.py`
 
 .. raw:: html
 
@@ -435,7 +372,28 @@ Distance
 .. toctree::
    :hidden:
 
-   /_auto_examples/distance/plot_point_to_cylinder
+   /_auto_examples/distance/plot_line_to_circle
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to circle">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_circle_thumb.png
+     :alt: Distance from line segment to circle
+
+     :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_circle.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/distance/plot_line_segment_to_circle
 
 .. raw:: html
 
@@ -460,6 +418,27 @@ Distance
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from point to cylinder">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_cylinder_thumb.png
+     :alt: Distance from point to cylinder
+
+     :ref:`sphx_glr__auto_examples_distance_plot_point_to_cylinder.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/distance/plot_point_to_cylinder
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Distance from line to line">
 
 .. only:: html
@@ -478,6 +457,27 @@ Distance
    :hidden:
 
    /_auto_examples/distance/plot_line_to_line
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between two disks">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_disk_to_disk_thumb.png
+     :alt: Distance between two disks
+
+     :ref:`sphx_glr__auto_examples_distance_plot_disk_to_disk.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/distance/plot_disk_to_disk
 
 .. raw:: html
 
@@ -786,14 +786,14 @@ GJK
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance between convex meshes with GJK">
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between spheres with GJK">
 
 .. only:: html
 
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_convex_mesh_thumb.png
-     :alt: Distance between convex meshes with GJK
+ .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_spheres_thumb.png
+     :alt: Distance between spheres with GJK
 
-     :ref:`sphx_glr__auto_examples_gjk_plot_convex_mesh.py`
+     :ref:`sphx_glr__auto_examples_gjk_plot_spheres.py`
 
 .. raw:: html
 
@@ -803,7 +803,7 @@ GJK
 .. toctree::
    :hidden:
 
-   /_auto_examples/gjk/plot_convex_mesh
+   /_auto_examples/gjk/plot_spheres
 
 .. raw:: html
 
@@ -828,6 +828,48 @@ GJK
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between convex meshes with GJK">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_convex_mesh_thumb.png
+     :alt: Distance between convex meshes with GJK
+
+     :ref:`sphx_glr__auto_examples_gjk_plot_convex_mesh.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/gjk/plot_convex_mesh
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between ellipsoids with GJK">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_ellipsoids_thumb.png
+     :alt: Distance between ellipsoids with GJK
+
+     :ref:`sphx_glr__auto_examples_gjk_plot_ellipsoids.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/gjk/plot_ellipsoids
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Distance between cylinders with GJK">
 
 .. only:: html
@@ -849,14 +891,14 @@ GJK
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance between spheres with GJK">
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between capsules with GJK">
 
 .. only:: html
 
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_spheres_thumb.png
-     :alt: Distance between spheres with GJK
+ .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_capsules_thumb.png
+     :alt: Distance between capsules with GJK
 
-     :ref:`sphx_glr__auto_examples_gjk_plot_spheres.py`
+     :ref:`sphx_glr__auto_examples_gjk_plot_capsules.py`
 
 .. raw:: html
 
@@ -866,7 +908,7 @@ GJK
 .. toctree::
    :hidden:
 
-   /_auto_examples/gjk/plot_spheres
+   /_auto_examples/gjk/plot_capsules
 
 .. raw:: html
 
@@ -888,27 +930,6 @@ GJK
    :hidden:
 
    /_auto_examples/gjk/plot_collision_resolution_epa
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance between capsules with GJK">
-
-.. only:: html
-
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_capsules_thumb.png
-     :alt: Distance between capsules with GJK
-
-     :ref:`sphx_glr__auto_examples_gjk_plot_capsules.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/gjk/plot_capsules
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>
@@ -924,14 +945,14 @@ Visualizations
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Self-collisions of a robot">
+    <div class="sphx-glr-thumbcontainer" tooltip="Title">
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_self_collisions_thumb.png
-     :alt: Self-collisions of a robot
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_hand_contacts_thumb.png
+     :alt: Title
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_self_collisions.py`
+     :ref:`sphx_glr__auto_examples_visualizations_vis_hand_contacts.py`
 
 .. raw:: html
 
@@ -941,7 +962,7 @@ Visualizations
 .. toctree::
    :hidden:
 
-   /_auto_examples/visualizations/vis_self_collisions
+   /_auto_examples/visualizations/vis_hand_contacts
 
 .. raw:: html
 
@@ -963,6 +984,174 @@ Visualizations
    :hidden:
 
    /_auto_examples/visualizations/vis_collision_physics
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for boxes">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_boxes_benchmark_thumb.png
+     :alt: Benchmark collision detection for boxes
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_boxes_benchmark.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_boxes_benchmark
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for disks">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_disk_benchmark_thumb.png
+     :alt: Benchmark collision detection for disks
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_disk_benchmark.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_disk_benchmark
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for cones">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_cone_benchmark_thumb.png
+     :alt: Benchmark collision detection for cones
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_cone_benchmark.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_cone_benchmark
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for ellipsoids">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_ellipsoids_benchmark_thumb.png
+     :alt: Benchmark collision detection for ellipsoids
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_ellipsoids_benchmark.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_ellipsoids_benchmark
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for capsules">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_capsules_benchmark_thumb.png
+     :alt: Benchmark collision detection for capsules
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_capsules_benchmark.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_capsules_benchmark
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for cylinders">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_cylinders_benchmark_thumb.png
+     :alt: Benchmark collision detection for cylinders
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_cylinders_benchmark.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_cylinders_benchmark
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for meshes">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_mesh_benchmark_thumb.png
+     :alt: Benchmark collision detection for meshes
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_mesh_benchmark.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_mesh_benchmark
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Self-collisions of a robot">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_self_collisions_thumb.png
+     :alt: Self-collisions of a robot
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_self_collisions.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_self_collisions
 
 .. raw:: html
 

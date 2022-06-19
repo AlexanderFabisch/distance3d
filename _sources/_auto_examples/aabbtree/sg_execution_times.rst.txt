@@ -5,10 +5,10 @@
 
 Computation times
 =================
-**00:00.549** total execution time for **_auto_examples_aabbtree** files:
+**00:00.817** total execution time for **_auto_examples_aabbtree** files:
 
 +---------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_aabbtree_plot_robot.py` (``plot_robot.py``)       | 00:00.346 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_aabbtree_plot_robot.py` (``plot_robot.py``)       | 00:00.454 | 0.0 MB |
 +---------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_aabbtree_plot_aabbtree.py` (``plot_aabbtree.py``) | 00:00.203 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_aabbtree_plot_aabbtree.py` (``plot_aabbtree.py``) | 00:00.364 | 0.0 MB |
 +---------------------------------------------------------------------------------+-----------+--------+

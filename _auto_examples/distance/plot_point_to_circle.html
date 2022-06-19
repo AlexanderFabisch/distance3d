@@ -1,11 +1,11 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Distance from point to circle &#8212; distance3d 0.3.0 documentation</title>
+    <title>Distance from point to circle &#8212; distance3d 0.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -16,11 +16,12 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Distance between two disks" href="plot_disk_to_disk.html" />
-    <link rel="prev" title="Distance from point to disk" href="plot_point_to_disk.html" />
+    <link rel="next" title="Distance from line to line segment" href="plot_line_to_line_segment.html" />
+    <link rel="prev" title="Distance from line segment to box" href="plot_line_segment_to_box.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
@@ -43,7 +44,7 @@
 to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="distance-from-point-to-circle">
-<span id="sphx-glr-auto-examples-distance-plot-point-to-circle-py"></span><h1>Distance from point to circle<a class="headerlink" href="#distance-from-point-to-circle" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-distance-plot-point-to-circle-py"></span><h1>Distance from point to circle<a class="headerlink" href="#distance-from-point-to-circle" title="Permalink to this heading">¶</a></h1>
 <img src="../../_images/sphx_glr_plot_point_to_circle_001.png" srcset="../../_images/sphx_glr_plot_point_to_circle_001.png" alt="plot point to circle" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.6489825948729122
 2.684606456315384
@@ -65045,7 +65046,7 @@ to download the full example code</p>
 1.6817370131741423
 0.48633224648188855
 0.9364402945062739
-accumulated_time=1.045186996459961
+accumulated_time=1.0511925220489502
 </pre></div>
 </div>
 <div class="line-block">
@@ -65073,21 +65074,21 @@ accumulated_time=1.045186996459961
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">65000</span><span class="p">):</span>
     <span class="n">point</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.random.randn_point.html#distance3d.random.randn_point" title="distance3d.random.randn_point" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><span class="n">random</span><span class="o">.</span><span class="n">randn_point</span></a><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">distance</span><span class="p">,</span> <span class="n">contact_point</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.distance.point_to_circle.html#distance3d.distance.point_to_circle" title="distance3d.distance.point_to_circle" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><span class="n">point_to_circle</span></a><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">distance</span><span class="p">,</span> <span class="n">closest_point</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.distance.point_to_circle.html#distance3d.distance.point_to_circle" title="distance3d.distance.point_to_circle" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><span class="n">point_to_circle</span></a><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
     <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">accumulated_time</span> <span class="o">+=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">distance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">:</span>
         <span class="k">continue</span>
-    <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">contact_point</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">closest_point</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">accumulated_time</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">center</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-<a href="../../_autosummary/distance3d.plotting.plot_circle.html#distance3d.plotting.plot_circle" title="distance3d.plotting.plot_circle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_circle</span></a><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+<a href="../../_autosummary/distance3d.plotting.plot_circle.html#distance3d.plotting.plot_circle" title="distance3d.plotting.plot_circle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_circle</span></a><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">normal</span><span class="p">,</span> <span class="n">surface_alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.176 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.151 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-distance-plot-point-to-circle-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/15fd392f4043a05d8d52f7e819c6acba/plot_point_to_circle.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_point_to_circle.py</span></code></a></p>
@@ -65116,7 +65117,7 @@ accumulated_time=1.045186996459961
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples</a><ul class="current">
@@ -65129,18 +65130,18 @@ accumulated_time=1.045186996459961
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_rectangle.html">Distance from point to rectangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_box.html">Distance from point to box</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_ellipsoid.html">Distance from point to ellipsoid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_to_circle.html">Distance between line and circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_triangle.html">Distance from line to triangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_point_to_disk.html">Distance from point to disk</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Distance from point to circle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_disk_to_disk.html">Distance between two disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_box.html">Distance from line segment to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_circle.html">Distance from line segment to circle</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Distance from point to circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_line_segment.html">Distance from line to line segment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_triangle.html">Distance from line segment to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_cylinder.html">Distance from point to cylinder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_line_to_circle.html">Distance between line and circle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_circle.html">Distance from line segment to circle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_plane_to_triangle.html">Distance from plane to triangle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_point_to_cylinder.html">Distance from point to cylinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_line.html">Distance from line to line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_disk_to_disk.html">Distance between two disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_triangle_to_triangle.html">Distance between two triangles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_line_to_rectangle.html">Distance from line to rectangle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_plane_to_plane.html">Distance from plane to plane</a></li>
@@ -65168,8 +65169,8 @@ accumulated_time=1.045186996459961
 <ul>
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Examples</a><ul>
-      <li>Previous: <a href="plot_point_to_disk.html" title="previous chapter">Distance from point to disk</a></li>
-      <li>Next: <a href="plot_disk_to_disk.html" title="next chapter">Distance between two disks</a></li>
+      <li>Previous: <a href="plot_line_segment_to_box.html" title="previous chapter">Distance from line segment to box</a></li>
+      <li>Next: <a href="plot_line_to_line_segment.html" title="next chapter">Distance from line to line segment</a></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -65178,12 +65179,12 @@ accumulated_time=1.045186996459961
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -65200,7 +65201,7 @@ accumulated_time=1.045186996459961
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

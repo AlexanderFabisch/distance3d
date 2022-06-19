@@ -65039,7 +65039,7 @@ Distance from point to circle
     1.6817370131741423
     0.48633224648188855
     0.9364402945062739
-    accumulated_time=1.045186996459961
+    accumulated_time=1.0511925220489502
 
 
 
@@ -65072,23 +65072,23 @@ Distance from point to circle
     for i in range(65000):
         point = random.randn_point(random_state)
         start = time.time()
-        distance, contact_point = point_to_circle(point, center, radius, normal)
+        distance, closest_point = point_to_circle(point, center, radius, normal)
         end = time.time()
         accumulated_time += end - start
         print(f"{distance}")
         if i > 25:
             continue
-        plotting.plot_segment(ax, point, contact_point, lw=1)
+        plotting.plot_segment(ax, point, closest_point, lw=1)
     print(f"{accumulated_time=}")
 
     ax.scatter(center[0], center[1], center[2])
-    plotting.plot_circle(ax, center, radius, normal)
+    plotting.plot_circle(ax, center, radius, normal, surface_alpha=0)
     plt.show()
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.176 seconds)
+   **Total running time of the script:** ( 0 minutes  3.151 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_circle.py:

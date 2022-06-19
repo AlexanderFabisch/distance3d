@@ -1539,7 +1539,7 @@ Distance from point to ellipsoid
     0.11058048815910368
     0.620967506394471
     1.0069799397312358
-    accumulated_time=0.5082643032073975
+    accumulated_time=0.5136294364929199
 
 
 
@@ -1569,13 +1569,13 @@ Distance from point to ellipsoid
     for i in range(1500):
         point = random.randn_point(random_state)
         start = time.time()
-        dist, contact_point = point_to_ellipsoid(point, ellipsoid2origin, radii)
+        dist, closest_point = point_to_ellipsoid(point, ellipsoid2origin, radii)
         end = time.time()
         accumulated_time += end - start
         print(dist)
         if i > 50:
             continue
-        plotting.plot_segment(ax, point, contact_point, lw=1)
+        plotting.plot_segment(ax, point, closest_point, lw=1)
     print(f"{accumulated_time=}")
 
     ppu.plot_ellipsoid(ax=ax, A2B=ellipsoid2origin, radii=radii, wireframe=False, alpha=0.5)
@@ -1586,7 +1586,7 @@ Distance from point to ellipsoid
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.818 seconds)
+   **Total running time of the script:** ( 0 minutes  0.821 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_ellipsoid.py:

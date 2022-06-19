@@ -1,11 +1,11 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.random &#8212; distance3d 0.3.0 documentation</title>
+    <title>distance3d.random &#8212; distance3d 0.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -16,6 +16,7 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -40,7 +41,8 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pytransform3d.rotations</span> <span class="k">as</span> <span class="nn">pr</span>
 <span class="kn">import</span> <span class="nn">pytransform3d.transformations</span> <span class="k">as</span> <span class="nn">pt</span>
-<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">ConvexHull</span>
+
+<span class="kn">from</span> <span class="nn">.mesh</span> <span class="kn">import</span> <span class="n">make_convex_mesh</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">norm_vector</span>
 
 
@@ -298,7 +300,8 @@
     <span class="k">return</span> <span class="n">capsule2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span></div>
 
 
-<div class="viewcode-block" id="rand_ellipsoid"><a class="viewcode-back" href="../../_autosummary/distance3d.random.rand_ellipsoid.html#distance3d.random.rand_ellipsoid">[docs]</a><span class="k">def</span> <span class="nf">rand_ellipsoid</span><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="n">min_radius</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<div class="viewcode-block" id="rand_ellipsoid"><a class="viewcode-back" href="../../_autosummary/distance3d.random.rand_ellipsoid.html#distance3d.random.rand_ellipsoid">[docs]</a><span class="k">def</span> <span class="nf">rand_ellipsoid</span><span class="p">(</span>
+        <span class="n">random_state</span><span class="p">,</span> <span class="n">center_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">min_radius</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">radius_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sample ellipsoid.</span>
 
 <span class="sd">    Parameters</span>
@@ -306,8 +309,14 @@
 <span class="sd">    random_state : np.random.RandomState</span>
 <span class="sd">        Random number generator.</span>
 
+<span class="sd">    center_scale : float, optional (default: 1)</span>
+<span class="sd">        Scaling factor for center.</span>
+
 <span class="sd">    min_radius : float, optional (default: 0)</span>
 <span class="sd">        Minimum radius of ellipsoid.</span>
+
+<span class="sd">    radius_scale : float, optional (default: 1)</span>
+<span class="sd">        Scaling factor for radii.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -315,15 +324,16 @@
 <span class="sd">        Pose of the ellipsoid.</span>
 
 <span class="sd">    radii : array, shape (3,)</span>
-<span class="sd">        Radii of the ellipsoid within (min_radius, min_radius + 1].</span>
+<span class="sd">        Radii of the ellipsoid within (min_radius, min_radius + radius_scale].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ellipsoid2origin</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">random_transform</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
-    <span class="n">radii</span> <span class="o">=</span> <span class="n">min_radius</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">ellipsoid2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*=</span> <span class="n">center_scale</span>
+    <span class="n">radii</span> <span class="o">=</span> <span class="n">min_radius</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="n">radius_scale</span>
     <span class="k">return</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span></div>
 
 
 <div class="viewcode-block" id="rand_cylinder"><a class="viewcode-back" href="../../_autosummary/distance3d.random.rand_cylinder.html#distance3d.random.rand_cylinder">[docs]</a><span class="k">def</span> <span class="nf">rand_cylinder</span><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="n">center_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">min_radius</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-                  <span class="n">min_length</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+                  <span class="n">min_length</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">radius_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">length_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sample cylinder.</span>
 
 <span class="sd">    Parameters</span>
@@ -331,14 +341,20 @@
 <span class="sd">    random_state : np.random.RandomState</span>
 <span class="sd">        Random number generator.</span>
 
+<span class="sd">    center_scale : float, optional (default: 1)</span>
+<span class="sd">        Scaling factor for center.</span>
+
 <span class="sd">    min_radius : float, optional (default: 0)</span>
 <span class="sd">        Minimum radius of cylinder.</span>
 
 <span class="sd">    min_length : float, optional (default: 0)</span>
 <span class="sd">        Minimum length of cylinder.</span>
 
-<span class="sd">    center_scale : float, optional (default: 1)</span>
-<span class="sd">        Scaling factor for center.</span>
+<span class="sd">    radius_scale : float, optional (default: 1)</span>
+<span class="sd">        Scaling factor for radius.</span>
+
+<span class="sd">    length_scale : float, optional (default: 1)</span>
+<span class="sd">        Scaling factor for length.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -346,15 +362,15 @@
 <span class="sd">        Pose of the cylinder.</span>
 
 <span class="sd">    radius : float</span>
-<span class="sd">        Radius of the cylinder within (min_radius, min_radius + 1].</span>
+<span class="sd">        Radius of the cylinder within (min_radius, min_radius + radius_scale].</span>
 
 <span class="sd">    length : float</span>
-<span class="sd">        Length of the cylinder within (min_length, min_length + 1].</span>
+<span class="sd">        Length of the cylinder within (min_length, min_length + length_scale].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cylinder2origin</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">random_transform</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
     <span class="n">cylinder2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*=</span> <span class="n">center_scale</span>
-    <span class="n">radius</span> <span class="o">=</span> <span class="n">min_radius</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">())</span>
-    <span class="n">length</span> <span class="o">=</span> <span class="n">min_length</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">())</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">min_radius</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">())</span> <span class="o">*</span> <span class="n">radius_scale</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">min_length</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">())</span> <span class="o">*</span> <span class="n">length_scale</span>
     <span class="k">return</span> <span class="n">cylinder2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">length</span></div>
 
 
@@ -385,62 +401,94 @@
     <span class="k">return</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span></div>
 
 
-<div class="viewcode-block" id="randn_convex"><a class="viewcode-back" href="../../_autosummary/distance3d.random.randn_convex.html#distance3d.random.randn_convex">[docs]</a><span class="k">def</span> <span class="nf">randn_convex</span><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">center_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">return_indices</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Sample convex mesh.</span>
+<div class="viewcode-block" id="rand_cone"><a class="viewcode-back" href="../../_autosummary/distance3d.random.rand_cone.html#distance3d.random.rand_cone">[docs]</a><span class="k">def</span> <span class="nf">rand_cone</span><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="n">center_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">min_radius</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+              <span class="n">min_height</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">radius_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">height_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sample cone.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    random_state : np.random.RandomState</span>
 <span class="sd">        Random number generator.</span>
 
-<span class="sd">    n_points : int</span>
+<span class="sd">    center_scale : float, optional (default: 1)</span>
+<span class="sd">        Scaling factor for center.</span>
+
+<span class="sd">    min_radius : float, optional (default: 0)</span>
+<span class="sd">        Minimum radius of cone.</span>
+
+<span class="sd">    min_height : float, optional (default: 0)</span>
+<span class="sd">        Minimum height of cone.</span>
+
+<span class="sd">    radius_scale : float, optional (default: 1)</span>
+<span class="sd">        Scaling factor for radius.</span>
+
+<span class="sd">    height_scale : float, optional (default: 1)</span>
+<span class="sd">        Scaling factor for height.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cone2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the cone.</span>
+
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the cone within (min_radius, min_radius + radius_scale].</span>
+
+<span class="sd">    height : float</span>
+<span class="sd">        Height of the cone within (min_height, min_height + height_scale].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cone2origin</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">random_transform</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">cone2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*=</span> <span class="n">center_scale</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">min_radius</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">())</span> <span class="o">*</span> <span class="n">radius_scale</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">min_height</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">())</span> <span class="o">*</span> <span class="n">height_scale</span>
+    <span class="k">return</span> <span class="n">cone2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span></div>
+
+
+<div class="viewcode-block" id="randn_convex"><a class="viewcode-back" href="../../_autosummary/distance3d.random.randn_convex.html#distance3d.random.randn_convex">[docs]</a><span class="k">def</span> <span class="nf">randn_convex</span><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="n">n_vertices</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">center_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">min_radius</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                 <span class="n">radius_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sample convex mesh.</span>
+
+<span class="sd">    We randomly sample points from the surface of an ellipsoid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    random_state : np.random.RandomState</span>
+<span class="sd">        Random number generator.</span>
+
+<span class="sd">    n_vertices : int</span>
 <span class="sd">        Number of points to sample from normal distribution.</span>
 
 <span class="sd">    center_scale : float, optional (default: 1)</span>
 <span class="sd">        Scaling factor for center.</span>
 
-<span class="sd">    std : float, optional (default: 1)</span>
-<span class="sd">        Standard deviation of normal distribution.</span>
+<span class="sd">    min_radius : float, optional (default: 1)</span>
+<span class="sd">        Minimum distance of vertices to the origin of the mesh.</span>
 
-<span class="sd">    return_indices : bool, optional (default: False)</span>
-<span class="sd">        Return indices of vertices in faces and all points.</span>
+<span class="sd">    radius_scale : float, optional (default: 1)</span>
+<span class="sd">        Scaling factor for the distance to the origin of the mesh.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    vertices : array, shape (n_convex_points, 3)</span>
+<span class="sd">    mesh2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the mesh.</span>
+
+<span class="sd">    vertices : array, shape (n_vertices, 3), optional</span>
 <span class="sd">        Vertices of the convex mesh.</span>
 
-<span class="sd">    faces : array, shape (n_triangles, 3, 3)</span>
-<span class="sd">        Vertices organized as triangles.</span>
-
-<span class="sd">    points : array, shape (n_points,), optional</span>
-<span class="sd">        All points that have been sampled from normal distribution.</span>
-
-<span class="sd">    indices : array, shape (n_triangles, 3), optional</span>
-<span class="sd">        Indices of points forming the simplical facets of the convex hull.</span>
+<span class="sd">    triangles : array, shape (n_triangles, 3)</span>
+<span class="sd">        Vertex indices of faces.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">points</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_points</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">std</span>
-    <span class="n">ch</span> <span class="o">=</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">qhull_options</span><span class="o">=</span><span class="s2">&quot;Qf&quot;</span><span class="p">)</span>
-    <span class="n">simplices</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">simplices</span>
-    <span class="n">faces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">points</span><span class="p">[[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">simplices</span><span class="p">])</span>
-
-    <span class="n">reordered_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">face_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)):</span>
-        <span class="k">if</span> <span class="n">pr</span><span class="o">.</span><span class="n">angle_between_vectors</span><span class="p">(</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                         <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
-            <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="n">reordered_indices</span><span class="p">]</span>
-            <span class="n">simplices</span><span class="p">[</span><span class="n">face_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">simplices</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="n">reordered_indices</span><span class="p">]</span>
-
-    <span class="n">center</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">center_scale</span>
-    <span class="n">points</span> <span class="o">+=</span> <span class="n">center</span>
-    <span class="n">faces</span> <span class="o">+=</span> <span class="n">center</span>
-    <span class="n">vertices</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">vertices</span><span class="p">]</span>
-    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">return_indices</span><span class="p">:</span>
-        <span class="n">ret</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">ch</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">simplices</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">ret</span></div>
+    <span class="n">phis</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_vertices</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">thetas</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_vertices</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">sin_phis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phis</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">sin_phis</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">thetas</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">sin_phis</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">thetas</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phis</span><span class="p">)</span>
+    <span class="n">radii</span> <span class="o">=</span> <span class="n">min_radius</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="n">radius_scale</span>
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span> <span class="o">*</span> <span class="n">radii</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+    <span class="n">triangles</span> <span class="o">=</span> <span class="n">make_convex_mesh</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+    <span class="n">mesh2origin</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">random_transform</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">mesh2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">*=</span> <span class="n">center_scale</span>
+    <span class="k">return</span> <span class="n">mesh2origin</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">triangles</span></div>
 </pre></div>
 
           </div>
@@ -459,7 +507,7 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../_auto_examples/index.html">Examples</a></li>
@@ -478,12 +526,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -500,7 +548,7 @@
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

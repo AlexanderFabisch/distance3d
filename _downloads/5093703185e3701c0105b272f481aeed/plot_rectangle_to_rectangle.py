@@ -23,7 +23,7 @@ for i in range(500):
     rectangle_center2, rectangle_axes2, rectangle_lengths2 = random.randn_rectangle(
         random_state, center_scale=1.0, length_scale=5.0)
     start = time.time()
-    dist, contact_point_rectangle, contact_point_rectangle2 = rectangle_to_rectangle(
+    dist, closest_point_rectangle, closest_point_rectangle2 = rectangle_to_rectangle(
         rectangle_center, rectangle_axes, rectangle_lengths,
         rectangle_center2, rectangle_axes2, rectangle_lengths2)
     end = time.time()
@@ -32,7 +32,7 @@ for i in range(500):
     if i > 7:
         continue
     plotting.plot_segment(
-        ax, contact_point_rectangle, contact_point_rectangle2, c="k", lw=1)
+        ax, closest_point_rectangle, closest_point_rectangle2, c="k", lw=1)
     plotting.plot_rectangle(ax, rectangle_center2, rectangle_axes2, rectangle_lengths2, show_axes=False)
 print(f"{accumulated_time=}")
 

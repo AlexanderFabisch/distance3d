@@ -25,7 +25,7 @@ for i in range(90):
         random_state, center_scale=2.5, length_scale=5)
 
     start = time.time()
-    dist, contact_point_rectangle, contact_point_box = rectangle_to_box(
+    dist, closest_point_rectangle, closest_point_box = rectangle_to_box(
         rectangle_center, rectangle_axes, rectangle_lengths, box2origin, size)
     end = time.time()
     accumulated_time += end - start
@@ -33,7 +33,7 @@ for i in range(90):
     if i > 10:
         continue
     plotting.plot_segment(
-        ax, contact_point_rectangle, contact_point_box, c="k", lw=1)
+        ax, closest_point_rectangle, closest_point_box, c="k", lw=1)
     plotting.plot_rectangle(
         ax, rectangle_center, rectangle_axes, rectangle_lengths,
         show_axes=False)

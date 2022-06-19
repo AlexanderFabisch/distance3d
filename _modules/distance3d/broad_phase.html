@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.broad_phase &#8212; distance3d 0.4.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distance3d.broad_phase</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Broad-phase collision detection.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">aabbtree</span> <span class="kn">import</span> <span class="n">AABBTree</span>
+<span class="kn">from</span> <span class="nn">pytransform3d</span> <span class="kn">import</span> <span class="n">urdf</span>
+
+<span class="kn">from</span> <span class="nn">.colliders</span> <span class="kn">import</span> <span class="n">Sphere</span><span class="p">,</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Cylinder</span><span class="p">,</span> <span class="n">MeshGraph</span>
+<span class="kn">from</span> <span class="nn">.urdf_utils</span> <span class="kn">import</span> <span class="n">self_collision_whitelists</span>
+
+
+<div class="viewcode-block" id="BoundingVolumeHierarchy"><a class="viewcode-back" href="../../_autosummary/distance3d.broad_phase.BoundingVolumeHierarchy.html#distance3d.broad_phase.BoundingVolumeHierarchy">[docs]</a><span class="k">class</span> <span class="nc">BoundingVolumeHierarchy</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Bounding volume hierarchy (BVH) for broad phase collision detection.</span>
+
+<span class="sd">    Wraps multiple colliders that are connected through transformations.</span>
+<span class="sd">    In addition, these colliders are stored in an AABB tree for broad phase</span>
+<span class="sd">    collision detection.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tm : pytransform3d.transform_manager.TransformManager</span>
+<span class="sd">        Transform manager that stores the transformations.</span>
+
+<span class="sd">    base_frame : str</span>
+<span class="sd">        Name of the base frame in which colliders are represented.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    aabbtree_ : AABBTree</span>
+<span class="sd">        Tree of axis-aligned bounding boxes.</span>
+
+<span class="sd">    colliders_ : dict</span>
+<span class="sd">        Maps frames of collision objects to colliders.</span>
+
+<span class="sd">    self_collision_whitelists_ : dict</span>
+<span class="sd">        Whitelists for self-collision detection in case this BVH represents</span>
+<span class="sd">        a robot.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="BoundingVolumeHierarchy.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.broad_phase.BoundingVolumeHierarchy.html#distance3d.broad_phase.BoundingVolumeHierarchy.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">base_frame</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tm</span> <span class="o">=</span> <span class="n">tm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_frame</span> <span class="o">=</span> <span class="n">base_frame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collider_frames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aabbtree_</span> <span class="o">=</span> <span class="n">AABBTree</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colliders_</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">self_collision_whitelists_</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+    <span class="k">def</span> <span class="nf">fill_tree_with_colliders</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">make_artists</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">fill_self_collision_whitelists</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fill tree with colliders from URDF transform manager.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tm : pytransform3d.urdf.UrdfTransformManager</span>
+<span class="sd">            Transform manager that has colliders.</span>
+
+<span class="sd">        make_artists : bool, optional (default: False)</span>
+<span class="sd">            Create artist for visualization for each collision object.</span>
+
+<span class="sd">        fill_self_collision_whitelists : bool, optional (default: False)</span>
+<span class="sd">            Fill whitelists for self collision detection. All collision</span>
+<span class="sd">            objects connected to the current link, child, and parent links</span>
+<span class="sd">            will be ignored.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tm</span><span class="o">.</span><span class="n">collision_objects</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">collider</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_collider</span><span class="p">(</span><span class="n">tm</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">make_artists</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_collider</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">collider</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">fill_self_collision_whitelists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">self_collision_whitelists_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">self_collision_whitelists</span><span class="p">(</span><span class="n">tm</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_make_collider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">make_artists</span><span class="p">):</span>
+        <span class="n">A2B</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">get_transform</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_frame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">urdf</span><span class="o">.</span><span class="n">Sphere</span><span class="p">):</span>
+            <span class="n">collider</span> <span class="o">=</span> <span class="n">Sphere</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">A2B</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">radius</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">urdf</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
+            <span class="n">collider</span> <span class="o">=</span> <span class="n">Box</span><span class="p">(</span><span class="n">A2B</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">urdf</span><span class="o">.</span><span class="n">Cylinder</span><span class="p">):</span>
+            <span class="n">collider</span> <span class="o">=</span> <span class="n">Cylinder</span><span class="p">(</span>
+                <span class="n">cylinder2origin</span><span class="o">=</span><span class="n">A2B</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span>
+                <span class="n">length</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">urdf</span><span class="o">.</span><span class="n">Mesh</span><span class="p">)</span>
+            <span class="kn">import</span> <span class="nn">open3d</span> <span class="k">as</span> <span class="nn">o3d</span>
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">o3d</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read_triangle_mesh</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">*</span> <span class="n">obj</span><span class="o">.</span><span class="n">scale</span>
+            <span class="n">triangles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">triangles</span><span class="p">)</span>
+            <span class="n">collider</span> <span class="o">=</span> <span class="n">MeshGraph</span><span class="p">(</span><span class="n">A2B</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">triangles</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">make_artists</span><span class="p">:</span>
+            <span class="n">collider</span><span class="o">.</span><span class="n">make_artist</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">collider</span>
+
+    <span class="k">def</span> <span class="nf">add_collider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">collider</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add collider.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frame : Hashable</span>
+<span class="sd">            Frame in which the collider is located.</span>
+
+<span class="sd">        collider : ConvexCollider</span>
+<span class="sd">            Collider.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collider_frames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colliders_</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span> <span class="o">=</span> <span class="n">collider</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aabbtree_</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">collider</span><span class="o">.</span><span class="n">aabb</span><span class="p">(),</span> <span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">collider</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">update_collider_poses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update poses of all colliders from transform manager.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aabbtree_</span> <span class="o">=</span> <span class="n">AABBTree</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colliders_</span><span class="p">:</span>
+            <span class="n">A2B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tm</span><span class="o">.</span><span class="n">get_transform</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_frame</span><span class="p">)</span>
+            <span class="n">collider</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colliders_</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
+            <span class="n">collider</span><span class="o">.</span><span class="n">update_pose</span><span class="p">(</span><span class="n">A2B</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aabbtree_</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">collider</span><span class="o">.</span><span class="n">aabb</span><span class="p">(),</span> <span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">collider</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">get_colliders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all colliders.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        colliders : list</span>
+<span class="sd">            List of colliders.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">colliders_</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_artists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all artists.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        artists : list</span>
+<span class="sd">            List of artists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">collider</span><span class="o">.</span><span class="n">artist_</span> <span class="k">for</span> <span class="n">collider</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colliders_</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">collider</span><span class="o">.</span><span class="n">artist_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">aabb_overlapping_colliders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collider</span><span class="p">,</span> <span class="n">whitelist</span><span class="o">=</span><span class="p">()):</span>
+        <span class="sd">&quot;&quot;&quot;Get colliders with an overlapping AABB.</span>
+
+<span class="sd">        This function performs broad phase collision detection with a bounding</span>
+<span class="sd">        volume hierarchy, where the bounding volumes are axis-aligned bounding</span>
+<span class="sd">        boxes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        collider : ConvexCollider</span>
+<span class="sd">            Collider.</span>
+
+<span class="sd">        whitelist : sequence</span>
+<span class="sd">            Names of frames to which collisions are allowed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        colliders : dict</span>
+<span class="sd">            Maps frame names to colliders with overlapping AABB.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">aabb</span> <span class="o">=</span> <span class="n">collider</span><span class="o">.</span><span class="n">aabb</span><span class="p">()</span>
+        <span class="n">colliders</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aabbtree_</span><span class="o">.</span><span class="n">overlap_values</span><span class="p">(</span><span class="n">aabb</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">whitelist</span><span class="p">:</span>
+            <span class="n">colliders</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">colliders</span>
+
+    <span class="k">def</span> <span class="nf">get_collider_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get collider frames.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        collider_frames : set</span>
+<span class="sd">            Collider frames.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">collider_frames</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

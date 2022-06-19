@@ -1,11 +1,11 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.geometry &#8212; distance3d 0.3.0 documentation</title>
+    <title>distance3d.geometry &#8212; distance3d 0.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -16,6 +16,7 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -39,7 +40,9 @@
 <span></span><span class="sd">&quot;&quot;&quot;Tools for geometric computations.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="kn">import</span> <span class="nn">numba</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">norm_vector</span><span class="p">,</span> <span class="n">transform_point</span><span class="p">,</span> <span class="n">plane_basis_from_normal</span>
 
 
 <div class="viewcode-block" id="convert_rectangle_to_segment"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.convert_rectangle_to_segment.html#distance3d.geometry.convert_rectangle_to_segment">[docs]</a><span class="k">def</span> <span class="nf">convert_rectangle_to_segment</span><span class="p">(</span><span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_extents</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">):</span>
@@ -139,7 +142,8 @@
     <span class="k">return</span> <span class="n">face_center</span><span class="p">,</span> <span class="n">face_axes</span><span class="p">,</span> <span class="n">face_lengths</span></div>
 
 
-<div class="viewcode-block" id="convert_segment_to_line"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.convert_segment_to_line.html#distance3d.geometry.convert_segment_to_line">[docs]</a><span class="k">def</span> <span class="nf">convert_segment_to_line</span><span class="p">(</span><span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">):</span>
+<div class="viewcode-block" id="convert_segment_to_line"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.convert_segment_to_line.html#distance3d.geometry.convert_segment_to_line">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">convert_segment_to_line</span><span class="p">(</span><span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert line segment to line.</span>
 
 <span class="sd">    Parameters</span>
@@ -168,7 +172,10 @@
 <span class="n">BOX_COORDS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">3</span><span class="p">)))</span>
 
 
-<div class="viewcode-block" id="convert_box_to_vertices"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.convert_box_to_vertices.html#distance3d.geometry.convert_box_to_vertices">[docs]</a><span class="k">def</span> <span class="nf">convert_box_to_vertices</span><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<div class="viewcode-block" id="convert_box_to_vertices"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.convert_box_to_vertices.html#distance3d.geometry.convert_box_to_vertices">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">convert_box_to_vertices</span><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert box to vertices.</span>
 
 <span class="sd">    Parameters</span>
@@ -187,7 +194,11 @@
     <span class="k">return</span> <span class="n">box2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">BOX_COORDS</span> <span class="o">*</span> <span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">box2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="cylinder_extreme_along_direction"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.cylinder_extreme_along_direction.html#distance3d.geometry.cylinder_extreme_along_direction">[docs]</a><span class="k">def</span> <span class="nf">cylinder_extreme_along_direction</span><span class="p">(</span>
+<div class="viewcode-block" id="support_function_cylinder"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.support_function_cylinder.html#distance3d.geometry.support_function_cylinder">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                     <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">support_function_cylinder</span><span class="p">(</span>
         <span class="n">search_direction</span><span class="p">,</span> <span class="n">cylinder2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute extreme point of cylinder along a direction.</span>
 
@@ -224,21 +235,25 @@
         <span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">length</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">z</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">length</span>
-    <span class="k">if</span> <span class="n">s</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">local_vertex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">radius</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">radius</span> <span class="o">/</span> <span class="n">s</span>
         <span class="n">local_vertex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">local_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">local_vertex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">radius</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">cylinder2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cylinder2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">local_vertex</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">transform_point</span><span class="p">(</span><span class="n">cylinder2origin</span><span class="p">,</span> <span class="n">local_vertex</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="capsule_extreme_along_direction"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.capsule_extreme_along_direction.html#distance3d.geometry.capsule_extreme_along_direction">[docs]</a><span class="k">def</span> <span class="nf">capsule_extreme_along_direction</span><span class="p">(</span>
+<div class="viewcode-block" id="support_function_capsule"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.support_function_capsule.html#distance3d.geometry.support_function_capsule">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                     <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">support_function_capsule</span><span class="p">(</span>
         <span class="n">search_direction</span><span class="p">,</span> <span class="n">capsule2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute extreme point of cylinder along a direction.</span>
 
 <span class="sd">    You can find similar implementations here:</span>
 
-<span class="sd">    * https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L42/kevinmoran/GJK/blob/master/Collider.h#L42</span>
+<span class="sd">    * https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L57</span>
 <span class="sd">      (Copyright (c) 2017 Kevin Moran, MIT License or Unlicense)</span>
 <span class="sd">    * https://github.com/bulletphysics/bullet3/blob/e306b274f1885f32b7e9d65062aa942b398805c2/src/BulletCollision/CollisionShapes/btConvexShape.cpp#L228</span>
 <span class="sd">      (Copyright (c) 2003-2009 Erwin Coumans, zlib license)</span>
@@ -266,9 +281,8 @@
 
     <span class="n">s</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">local_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">local_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">local_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">local_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                   <span class="o">+</span> <span class="n">local_dir</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">local_dir</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-    <span class="c1"># TODO error with axis-aligned capsules?</span>
     <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="n">local_vertex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">local_vertex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">radius</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">local_vertex</span> <span class="o">=</span> <span class="n">local_dir</span> <span class="o">*</span> <span class="p">(</span><span class="n">radius</span> <span class="o">/</span> <span class="n">s</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">local_dir</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
@@ -276,10 +290,178 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">local_vertex</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">height</span>
 
-    <span class="k">return</span> <span class="n">capsule2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">capsule2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">local_vertex</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">transform_point</span><span class="p">(</span><span class="n">capsule2origin</span><span class="p">,</span> <span class="n">local_vertex</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hesse_normal_form"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.hesse_normal_form.html#distance3d.geometry.hesse_normal_form">[docs]</a><span class="k">def</span> <span class="nf">hesse_normal_form</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">):</span>
+<div class="viewcode-block" id="support_function_ellipsoid"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.support_function_ellipsoid.html#distance3d.geometry.support_function_ellipsoid">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">support_function_ellipsoid</span><span class="p">(</span>
+        <span class="n">search_direction</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute extreme point of ellipsoid along a direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    search_direction : array, shape (3,)</span>
+<span class="sd">        Search direction.</span>
+
+<span class="sd">    ellipsoid2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the ellipsoid.</span>
+
+<span class="sd">    radii : array, shape (3,)</span>
+<span class="sd">        Radii of the ellipsoid.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    extreme_point : array, shape (3,)</span>
+<span class="sd">        Extreme point along search direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local_dir</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ellipsoid2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">)</span>
+    <span class="n">local_vertex</span> <span class="o">=</span> <span class="n">norm_vector</span><span class="p">(</span><span class="n">local_dir</span> <span class="o">*</span> <span class="n">radii</span><span class="p">)</span> <span class="o">*</span> <span class="n">radii</span>
+    <span class="k">return</span> <span class="n">transform_point</span><span class="p">(</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">local_vertex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="support_function_box"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.support_function_box.html#distance3d.geometry.support_function_box">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">support_function_box</span><span class="p">(</span><span class="n">search_direction</span><span class="p">,</span> <span class="n">box2origin</span><span class="p">,</span> <span class="n">half_lengths</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute extreme point of box along a direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    search_direction : array, shape (3,)</span>
+<span class="sd">        Search direction.</span>
+
+<span class="sd">    box2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the box.</span>
+
+<span class="sd">    half_lengths : array, shape (3,)</span>
+<span class="sd">        Half lengths of the box along its axes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    extreme_point : array, shape (3,)</span>
+<span class="sd">        Extreme point along search direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local_dir</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">box2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">)</span>
+    <span class="n">local_vertex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">local_dir</span><span class="p">)</span> <span class="o">*</span> <span class="n">half_lengths</span>
+    <span class="k">return</span> <span class="n">transform_point</span><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">local_vertex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="support_function_sphere"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.support_function_sphere.html#distance3d.geometry.support_function_sphere">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">support_function_sphere</span><span class="p">(</span><span class="n">search_direction</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute extreme point of box along a direction.</span>
+
+<span class="sd">    You can find similar implementations here:</span>
+
+<span class="sd">    * https://github.com/kevinmoran/GJK/blob/b38d923d268629f30b44c3cf6d4f9974bbcdb0d3/Collider.h#L33</span>
+<span class="sd">      (Copyright (c) 2017 Kevin Moran, MIT License or Unlicense)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    search_direction : array, shape (3,)</span>
+<span class="sd">        Search direction.</span>
+
+<span class="sd">    center : array, shape (3,)</span>
+<span class="sd">        Center of the sphere.</span>
+
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the sphere.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    extreme_point : array, shape (3,)</span>
+<span class="sd">        Extreme point along search direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">search_direction</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s_norm</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">center</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">radius</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">center</span> <span class="o">+</span> <span class="n">search_direction</span> <span class="o">/</span> <span class="n">s_norm</span> <span class="o">*</span> <span class="n">radius</span>
+    <span class="k">return</span> <span class="n">vertex</span></div>
+
+
+<div class="viewcode-block" id="support_function_disk"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.support_function_disk.html#distance3d.geometry.support_function_disk">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                     <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">support_function_disk</span><span class="p">(</span><span class="n">search_direction</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">normal</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute extreme point of disk along a direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    search_direction : array, shape (3,)</span>
+<span class="sd">        Search direction.</span>
+
+<span class="sd">    center : array, shape (3,)</span>
+<span class="sd">        Center of the disk.</span>
+
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the disk.</span>
+
+<span class="sd">    normal : array, shape (3,)</span>
+<span class="sd">        Normal to the plane in which the disk lies.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    extreme_point : array, shape (3,)</span>
+<span class="sd">        Extreme point along search direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">plane_basis_from_normal</span><span class="p">(</span><span class="n">normal</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">normal</span><span class="p">))</span>
+    <span class="n">point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">)</span>
+    <span class="n">point</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">norm</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">center</span><span class="p">)</span>
+    <span class="n">point</span> <span class="o">*=</span> <span class="n">radius</span> <span class="o">/</span> <span class="n">norm</span>
+    <span class="k">return</span> <span class="n">center</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="support_function_cone"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.support_function_cone.html#distance3d.geometry.support_function_cone">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                     <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">support_function_cone</span><span class="p">(</span><span class="n">search_direction</span><span class="p">,</span> <span class="n">cone2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute extreme point of cone along a direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    search_direction : array, shape (3,)</span>
+<span class="sd">        Search direction.</span>
+
+<span class="sd">    cone2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the cone.</span>
+
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the cone.</span>
+
+<span class="sd">    height : float</span>
+<span class="sd">        Length of the cone.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    extreme_point : array, shape (3,)</span>
+<span class="sd">        Extreme point along search direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local_dir</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cone2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">)</span>
+    <span class="n">disk_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">local_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">local_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">disk_point</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">norm</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">disk_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">disk_point</span> <span class="o">*=</span> <span class="n">radius</span> <span class="o">/</span> <span class="n">norm</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">local_dir</span><span class="p">,</span> <span class="n">disk_point</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">local_dir</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">height</span><span class="p">:</span>
+        <span class="n">point_in_cone</span> <span class="o">=</span> <span class="n">disk_point</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">point_in_cone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">height</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">transform_point</span><span class="p">(</span><span class="n">cone2origin</span><span class="p">,</span> <span class="n">point_in_cone</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="hesse_normal_form"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.hesse_normal_form.html#distance3d.geometry.hesse_normal_form">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hesse_normal_form</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Computes Hesse normal form of a plane.</span>
 
 <span class="sd">    In the Hesse normal form (x * n - d = 0), x is any point on the plane,</span>
@@ -324,9 +506,12 @@
 <span class="sd">    line_direction : array, shape (3,)</span>
 <span class="sd">        Direction of the line. This is assumed to be of unit length.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">line_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">line_moment</span><span class="p">)</span>
+    <span class="n">line_direction</span> <span class="o">=</span> <span class="n">line_direction</span>
     <span class="n">line_dir_norm_squared</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">)</span>
-    <span class="n">line_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">line_moment</span><span class="p">)</span> <span class="o">/</span> <span class="n">line_dir_norm_squared</span>
-    <span class="n">line_direction</span> <span class="o">=</span> <span class="n">line_direction</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">line_dir_norm_squared</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">line_dir_norm_squared</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">line_point</span> <span class="o">/=</span> <span class="n">line_dir_norm_squared</span>
+        <span class="n">line_direction</span> <span class="o">/=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">line_dir_norm_squared</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span></div>
 </pre></div>
 
@@ -346,7 +531,7 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../_auto_examples/index.html">Examples</a></li>
@@ -365,12 +550,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -387,7 +572,7 @@
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

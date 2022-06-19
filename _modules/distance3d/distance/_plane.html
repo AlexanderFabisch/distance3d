@@ -1,11 +1,11 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.distance._plane &#8212; distance3d 0.3.0 documentation</title>
+    <title>distance3d.distance._plane &#8212; distance3d 0.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
@@ -16,6 +16,7 @@
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -39,6 +40,7 @@
 <span></span><span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numba</span>
 <span class="kn">from</span> <span class="nn">..geometry</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">hesse_normal_form</span><span class="p">,</span> <span class="n">convert_segment_to_line</span><span class="p">,</span> <span class="n">line_from_pluecker</span><span class="p">,</span>
     <span class="n">convert_rectangle_to_vertices</span><span class="p">,</span> <span class="n">convert_box_to_vertices</span><span class="p">)</span>
@@ -70,11 +72,19 @@
 <span class="sd">    closest_point_plane : array, shape (3,)</span>
 <span class="sd">        Closest point on plane.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_point_to_plane</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">signed</span><span class="p">)</span></div>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Tuple</span><span class="p">((</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">boolean</span><span class="p">),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_point_to_plane</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">signed</span><span class="p">):</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">plane_normal</span><span class="p">,</span> <span class="n">point</span> <span class="o">-</span> <span class="n">plane_point</span><span class="p">)</span>
     <span class="n">closest_point_plane</span> <span class="o">=</span> <span class="n">point</span> <span class="o">-</span> <span class="n">t</span> <span class="o">*</span> <span class="n">plane_normal</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">signed</span><span class="p">:</span>
         <span class="n">t</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">closest_point_plane</span></div>
+    <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">closest_point_plane</span>
 
 
 <div class="viewcode-block" id="line_to_plane"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.line_to_plane.html#distance3d.distance.line_to_plane">[docs]</a><span class="k">def</span> <span class="nf">line_to_plane</span><span class="p">(</span>
@@ -121,8 +131,13 @@
     <span class="k">return</span> <span class="n">dist</span><span class="p">,</span> <span class="n">line_point</span><span class="p">,</span> <span class="n">closest_point_plane</span></div>
 
 
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Tuple</span><span class="p">((</span><span class="n">numba</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+    <span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span>
+     <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_line_to_plane</span><span class="p">(</span><span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span>
-                   <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+                   <span class="n">epsilon</span><span class="p">):</span>
     <span class="n">length_of_dir_projected_on_normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">length_of_dir_projected_on_normal</span> <span class="o">*</span> <span class="n">length_of_dir_projected_on_normal</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
         <span class="c1"># line parallel to plane</span>
@@ -165,6 +180,13 @@
 <span class="sd">    closest_point_plane : array, shape (3,)</span>
 <span class="sd">        Closest point on plane.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_line_segment_to_plane</span><span class="p">(</span>
+        <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span></div>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_line_segment_to_plane</span><span class="p">(</span>
+        <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
     <span class="n">segment_direction</span><span class="p">,</span> <span class="n">segment_length</span> <span class="o">=</span> <span class="n">convert_segment_to_line</span><span class="p">(</span>
         <span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">)</span>
     <span class="n">line_intersects</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">_line_to_plane</span><span class="p">(</span>
@@ -182,9 +204,9 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">closest_point_segment</span> <span class="o">=</span> <span class="n">segment_start</span>
 
-    <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_plane</span> <span class="o">=</span> <span class="n">point_to_plane</span><span class="p">(</span>
-        <span class="n">closest_point_segment</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_segment</span><span class="p">,</span> <span class="n">closest_point_plane</span></div>
+    <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_plane</span> <span class="o">=</span> <span class="n">_point_to_plane</span><span class="p">(</span>
+        <span class="n">closest_point_segment</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_segment</span><span class="p">,</span> <span class="n">closest_point_plane</span>
 
 
 <div class="viewcode-block" id="plane_to_plane"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.plane_to_plane.html#distance3d.distance.plane_to_plane">[docs]</a><span class="k">def</span> <span class="nf">plane_to_plane</span><span class="p">(</span><span class="n">plane_point1</span><span class="p">,</span> <span class="n">plane_normal1</span><span class="p">,</span> <span class="n">plane_point2</span><span class="p">,</span> <span class="n">plane_normal2</span><span class="p">,</span>
@@ -271,14 +293,15 @@
     <span class="k">return</span> <span class="n">_plane_to_convex_hull_points</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">triangle_points</span><span class="p">)</span></div>
 
 
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_plane_to_convex_hull_points</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
-    <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">points</span> <span class="o">-</span> <span class="n">plane_point</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">plane_normal</span><span class="p">)</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">points</span> <span class="o">-</span> <span class="n">plane_point</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">plane_normal</span><span class="p">)</span>
     <span class="n">min_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
     <span class="n">max_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">ts</span><span class="p">[</span><span class="n">min_idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">ts</span><span class="p">[</span><span class="n">max_idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># on opposite sides, intersection</span>
-        <span class="k">return</span> <span class="n">line_segment_to_plane</span><span class="p">(</span>
-            <span class="n">points</span><span class="p">[</span><span class="n">min_idx</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="n">max_idx</span><span class="p">],</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_line_segment_to_plane</span><span class="p">(</span>
+            <span class="n">points</span><span class="p">[</span><span class="n">min_idx</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="n">max_idx</span><span class="p">],</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">)</span>
 
     <span class="n">closest_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span>
     <span class="n">closest_point</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">closest_idx</span><span class="p">]</span>
@@ -359,7 +382,8 @@
     <span class="k">return</span> <span class="n">_plane_to_convex_hull_points</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="plane_to_ellipsoid"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.plane_to_ellipsoid.html#distance3d.distance.plane_to_ellipsoid">[docs]</a><span class="k">def</span> <span class="nf">plane_to_ellipsoid</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
+<div class="viewcode-block" id="plane_to_ellipsoid"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.plane_to_ellipsoid.html#distance3d.distance.plane_to_ellipsoid">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">plane_to_ellipsoid</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the shortest distance between a plane and an ellipsoid.</span>
 
 <span class="sd">    Parameters</span>
@@ -410,6 +434,7 @@
     <span class="k">return</span> <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_plane</span><span class="p">,</span> <span class="n">closest_point_ellipsoid</span></div>
 
 
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_ellipsoid_quadric_matrix</span><span class="p">(</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
     <span class="n">R_scaled</span> <span class="o">=</span> <span class="n">ellipsoid2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">radii</span>
     <span class="k">return</span> <span class="n">R_scaled</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R_scaled</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
@@ -431,7 +456,7 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../_auto_examples/index.html">Examples</a></li>
@@ -450,12 +475,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -472,7 +497,7 @@
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

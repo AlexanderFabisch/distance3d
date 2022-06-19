@@ -1,0 +1,6 @@
+﻿distance3d.random.rand\_cone
+============================
+
+.. currentmodule:: distance3d.random
+
+.. autofunction:: rand_cone

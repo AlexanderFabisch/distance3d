@@ -1,0 +1,28 @@
+﻿distance3d.colliders.MeshGraph
+==============================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: MeshGraph
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MeshGraph.__init__
+      ~MeshGraph.aabb
+      ~MeshGraph.center
+      ~MeshGraph.first_vertex
+      ~MeshGraph.make_artist
+      ~MeshGraph.support_function
+      ~MeshGraph.update_pose
+   
+   
+
+   
+   
+   

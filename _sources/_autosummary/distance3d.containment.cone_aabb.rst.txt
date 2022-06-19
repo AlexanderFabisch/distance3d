@@ -1,0 +1,6 @@
+﻿distance3d.containment.cone\_aabb
+=================================
+
+.. currentmodule:: distance3d.containment
+
+.. autofunction:: cone_aabb

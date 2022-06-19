@@ -1,0 +1,28 @@
+﻿distance3d.colliders.Disk
+=========================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: Disk
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Disk.__init__
+      ~Disk.aabb
+      ~Disk.center
+      ~Disk.first_vertex
+      ~Disk.make_artist
+      ~Disk.support_function
+      ~Disk.update_pose
+   
+   
+
+   
+   
+   
