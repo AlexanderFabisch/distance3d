@@ -12,8 +12,8 @@ Distance computation and collision detection in 3D.
     <td>Capsule collision detection</td>
 </tr>
 <tr>
-    <td><img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/robot_collision_detection.png" width=30% /></td>
-    <td><img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/capsule_collisions.png" width=30% /></td>
+    <td><img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/robot_collision_detection.png" width=100% /></td>
+    <td><img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/capsule_collisions.png" width=100% /></td>
 </tr>
 <tr>
     <td>[vis_robot_collision_objects.py](https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_robot_collision_objects.py)</td>
