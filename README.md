@@ -6,7 +6,7 @@
 
 Distance computation and collision detection in 3D.
 
-<table>
+<table cellspacing="0" cellpadding="0">
 <tr>
     <td>Robot collision detection</td>
     <td>Capsule collision detection</td>
