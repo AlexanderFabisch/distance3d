@@ -1,5 +1,6 @@
 """Colliders used for collision detection with GJK and MPR algorithms."""
 import abc
+
 import numpy as np
 from .geometry import (
     support_function_capsule, support_function_cylinder,
@@ -518,4 +519,44 @@ class Cone(ConvexCollider):
     def aabb(self):
         mins, maxs = cone_aabb(
             self.cone2origin, self.radius, self.height)
+        return AABB(np.array([mins, maxs]).T)
+
+
+class Margin(ConvexCollider):
+    """Margin around collider.
+
+    Parameters
+    ----------
+    collider : ConvexCollider
+        Other collider.
+
+    margin : float
+        Margin size.
+    """
+    def __init__(self, collider, margin):
+        super(Margin, self).__init__(collider.artist_)
+        self.collider = collider
+        self.margin = margin
+
+    def make_artist(self, c=None):
+        self.collider.make_artist(c)
+        self.artist_ = self.collider.artist_
+
+    def first_vertex(self):
+        return self.collider.first_vertex()
+
+    def support_function(self, search_direction):
+        return self.collider.support_function(
+            search_direction) + self.margin * search_direction
+
+    def center(self):
+        return self.collider.center()
+
+    def update_pose(self, pose):
+        self.collider.update_pose(pose)
+
+    def aabb(self):
+        aabb = self.collider.aabb()
+        mins = aabb.limits[:, 0] - self.margin
+        maxs = aabb.limits[:, 1] + self.margin
         return AABB(np.array([mins, maxs]).T)
