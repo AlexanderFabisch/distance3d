@@ -80,6 +80,7 @@ API Reference
    ~distance3d.colliders.Cylinder
    ~distance3d.colliders.Disk
    ~distance3d.colliders.Cone
+   ~distance3d.colliders.Margin
 
 
 :mod:`distance3d.broad_phase`
