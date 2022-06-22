@@ -5,6 +5,7 @@ import numpy as np
 
 
 MAX_FLOAT = np.finfo(float).max
+EPSILON = np.finfo(float).eps
 
 
 @numba.njit(numba.float64[::1](numba.float64[::1]), cache=True)
@@ -163,6 +164,3 @@ def angles_between_vectors(A, B):
         np.clip(np.sum(A * B, axis=1) / (np.linalg.norm(A, axis=1)
                                          * np.linalg.norm(B, axis=1)),
                 -1.0, 1.0))
-
-
-EPSILON = np.finfo(float).eps
