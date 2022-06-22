@@ -24,10 +24,11 @@ def points_in_capsule(points, capsule2origin, radius, height):
     return squared_dist <= radius * radius
 
 
-def point_in_ellipsoid(point, ellipsoid2origin, radii):
-    origin2ellipsoid = np.linalg.inv(ellipsoid2origin)
-    point = origin2ellipsoid[:3, 3] + origin2ellipsoid[:3, :3].dot(point)
-    return all(np.abs(point) / radii < 1.0)
+def points_in_ellipsoid(points, ellipsoid2origin, radii):
+    origin2ellipsoid = invert_transform(ellipsoid2origin)
+    points = origin2ellipsoid[:3, 3] + np.dot(points, origin2ellipsoid[:3, :3].T)
+    normalized_points = points / radii
+    return np.sum(normalized_points * normalized_points, axis=1) <= 1.0
 
 
 def point_in_disk(point, center, radius, normal):
