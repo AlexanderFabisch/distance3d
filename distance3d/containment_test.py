@@ -15,6 +15,12 @@ def point_in_capsule(point, capsule2origin, radius, height):
     return dist <= radius
 
 
+def point_in_ellipsoid(point, ellipsoid2origin, radii):
+    origin2ellipsoid = np.linalg.inv(ellipsoid2origin)
+    point = origin2ellipsoid[:3, 3] + origin2ellipsoid[:3, :3].dot(point)
+    return all(np.abs(point) / radii < 1.0)
+
+
 def point_in_cylinder(point, cylinder2origin, radius, length):
     # signed distance from point to plane of disk
     diff = point - cylinder2origin[:3, 3]
