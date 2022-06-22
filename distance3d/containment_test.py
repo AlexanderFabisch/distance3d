@@ -1,18 +1,27 @@
 import numpy as np
 from .distance import point_to_line_segment
-from .utils import EPSILON
+from .utils import EPSILON, invert_transform
 
 
-def point_in_sphere(point, center, radius):
-    diff = point - center
-    return diff.dot(diff) <= radius * radius
+def points_in_sphere(points, center, radius):
+    diff = points - center
+    squared_dist = np.sum(diff * diff, axis=1)
+    return squared_dist <= radius * radius
 
 
-def point_in_capsule(point, capsule2origin, radius, height):
-    segment_start = capsule2origin[:, 3] - 0.5 * height * capsule2origin[:3, 2]
-    segment_end = capsule2origin[:, 3] + 0.5 * height * capsule2origin[:3, 2]
-    dist = point_to_line_segment(point, segment_start, segment_end)[0]
-    return dist <= radius
+def points_in_capsule(points, capsule2origin, radius, height):
+    segment_start = capsule2origin[:3, 3] - 0.5 * height * capsule2origin[:3, 2]
+    segment_end = capsule2origin[:3, 3] + 0.5 * height * capsule2origin[:3, 2]
+    segment_direction = segment_end - segment_start
+    t = (np.dot(points - segment_start, segment_direction) /
+         np.dot(segment_direction, segment_direction))
+    t = np.minimum(np.maximum(t, 0.0), 1.0)
+    closest_points_line_segment = (
+        segment_start[np.newaxis] +
+        t[:, np.newaxis] * segment_direction[np.newaxis])
+    diff = points - closest_points_line_segment
+    squared_dist = np.sum(diff * diff, axis=1)
+    return squared_dist <= radius * radius
 
 
 def point_in_ellipsoid(point, ellipsoid2origin, radii):
@@ -47,7 +56,7 @@ def point_in_cylinder(point, cylinder2origin, radius, length):
     return sqr_dist_in_plane <= radius * radius
 
 
-def point_in_box(point, box2origin, size):
-    origin2box = np.linalg.inv(box2origin)
-    point = origin2box[:3, 3] + origin2box[:3, :3].dot(point)
-    return all(np.abs(point) < 0.5 * size)
+def points_in_box(points, box2origin, size):
+    origin2box = invert_transform(box2origin)
+    points = origin2box[:3, 3] + np.dot(points, origin2box[:3, :3].T)
+    return np.all(np.abs(points) < 0.5 * size, axis=1)
