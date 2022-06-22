@@ -80,6 +80,7 @@ sphinx_gallery_conf = {
     "gallery_dirs": "_auto_examples",
     "subsection_order": ExplicitOrder([
         "../../examples/aabbtree",
+        "../../examples/containment_test",
         "../../examples/distance",
         "../../examples/gjk",
         "../../examples/visualizations"]),
