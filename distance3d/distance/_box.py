@@ -1,13 +1,13 @@
 import numpy as np
-import pytransform3d.transformations as pt
 from ..geometry import (
     convert_segment_to_line, convert_rectangle_to_vertices,
     convert_box_to_face)
 from ._line_to_box import _line_to_box
 from ._rectangle import rectangle_to_rectangle
+from ..utils import inverse_transform_point
 
 
-def point_to_box(point, box2origin, size, check=False):
+def point_to_box(point, box2origin, size):
     """Compute the shortest distance between point and box.
 
     Parameters
@@ -21,9 +21,6 @@ def point_to_box(point, box2origin, size, check=False):
     size : array, shape (3,)
         Size of the box along its axes.
 
-    check : bool, optional (default: True)
-        Check if transformation matrix is valid before inversion.
-
     Returns
     -------
     dist : float
@@ -32,8 +29,7 @@ def point_to_box(point, box2origin, size, check=False):
     closest_point_box : array, shape (3,)
         Closest point on box.
     """
-    origin2box = pt.invert_transform(box2origin, check=check)
-    point_in_box = origin2box[:3, 3] + origin2box[:3, :3].dot(point)
+    point_in_box = inverse_transform_point(box2origin, point)
     half_size = 0.5 * size
     closest_point_in_box = np.clip(point_in_box, -half_size, half_size)
     closest_point = box2origin[:3, 3] + box2origin[:3, :3].dot(closest_point_in_box)

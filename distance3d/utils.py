@@ -98,6 +98,51 @@ def transform_point(A2B, point_in_A):
     return A2B[:3, 3] + np.dot(A2B[:3, :3], point_in_A)
 
 
+@numba.njit(numba.float64[::1](numba.float64[:, ::1], numba.float64[::1]),
+            cache=True)
+def inverse_transform_point(A2B, point_in_B):
+    """Transform a point from frame B to frame A.
+
+    Parameters
+    ----------
+    A2B : array, shape (4, 4)
+        Transform from frame A to frame B as homogeneous matrix.
+
+    point_in_B : array, shape (3,)
+        Point in frame B.
+
+    Returns
+    -------
+    point_in_A : array, shape (3,)
+        Point in frame A.
+    """
+    RT = A2B[:3, :3].T
+    return np.dot(RT, point_in_B) - np.dot(RT, A2B[:3, 3])
+
+
+@numba.njit(numba.float64[:, :](numba.float64[:, :]), cache=True)
+def invert_transform(A2B):
+    """Invert transform.
+
+    Parameters
+    ----------
+    A2B : array-like, shape (4, 4)
+        Transform from frame A to frame B
+
+    Returns
+    -------
+    B2A : array-like, shape (4, 4)
+        Transform from frame B to frame A
+    """
+    B2A = np.empty((4, 4))
+    RT = A2B[:3, :3].T
+    B2A[:3, :3] = RT
+    B2A[:3, 3] = -np.dot(RT, A2B[:3, 3])
+    B2A[3, :3] = 0.0
+    B2A[3, 3] = 1.0
+    return B2A
+
+
 def angles_between_vectors(A, B):
     """Compute angle between two vectors.
 

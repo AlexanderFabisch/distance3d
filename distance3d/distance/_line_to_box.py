@@ -13,15 +13,15 @@ and may not be copied or disclosed except in accordance with the terms
 of that agreement.
 """
 import math
-
 import numpy as np
+from ..utils import invert_transform
 
 
 def _line_to_box(line_point, line_direction, box2origin, size):
     box_half_size = 0.5 * size
 
     # compute coordinates of line in box coordinate system
-    origin2box = np.linalg.inv(box2origin)
+    origin2box = invert_transform(box2origin)
     point_in_box = origin2box[:3, 3] + origin2box[:3, :3].dot(line_point)
     direction_in_box = origin2box[:3, :3].dot(line_direction)
 
