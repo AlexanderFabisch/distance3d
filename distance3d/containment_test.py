@@ -31,30 +31,34 @@ def points_in_ellipsoid(points, ellipsoid2origin, radii):
     return np.sum(normalized_points * normalized_points, axis=1) <= 1.0
 
 
-def point_in_disk(point, center, radius, normal):
+def points_in_disk(points, center, radius, normal):
+    contained = np.empty(len(points), dtype=bool)
+    contained[:] = True
     # signed distance from point to plane of disk
-    diff = point - center
+    diff = points - center
     dist_to_plane = diff.dot(normal)
-    if abs(dist_to_plane) > 10.0 * EPSILON:
-        return False
+    contained[np.abs(dist_to_plane) > 10.0 * EPSILON] = False
 
     # projection of P - C onto plane is Q - C = P - C - dist_to_plane * N
-    diff_in_plane = diff - dist_to_plane * normal
-    sqr_dist_in_plane = diff_in_plane.dot(diff_in_plane)
-    return sqr_dist_in_plane <= radius * radius
+    diff_in_plane = diff - dist_to_plane[:, np.newaxis] * normal[np.newaxis]
+    sqr_dist_in_plane = np.sum(diff_in_plane * diff_in_plane, axis=1)
+    contained[sqr_dist_in_plane > radius * radius] = False
+    return contained
 
 
-def point_in_cylinder(point, cylinder2origin, radius, length):
+def points_in_cylinder(points, cylinder2origin, radius, length):
+    contained = np.empty(len(points), dtype=bool)
+    contained[:] = True
     # signed distance from point to plane of disk
-    diff = point - cylinder2origin[:3, 3]
+    diff = points - cylinder2origin[:3, 3]
     dist_to_plane = diff.dot(cylinder2origin[:3, 2])
-    if abs(dist_to_plane) > 0.5 * length:
-        return False
+    contained[np.abs(dist_to_plane) > 0.5 * length] = False
 
     # projection of P - C onto plane is Q - C = P - C - dist_to_plane * N
-    diff_in_plane = diff - dist_to_plane * cylinder2origin[:3, 2]
-    sqr_dist_in_plane = diff_in_plane.dot(diff_in_plane)
-    return sqr_dist_in_plane <= radius * radius
+    diff_in_plane = diff - dist_to_plane[:, np.newaxis] * cylinder2origin[np.newaxis, :3, 2]
+    sqr_dist_in_plane = np.sum(diff_in_plane * diff_in_plane, axis=1)
+    contained[sqr_dist_in_plane > radius * radius] = False
+    return contained
 
 
 def points_in_box(points, box2origin, size):
