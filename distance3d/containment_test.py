@@ -26,3 +26,9 @@ def point_in_cylinder(point, cylinder2origin, radius, length):
     diff_in_plane = diff - dist_to_plane * cylinder2origin[:3, 2]
     dist_in_plane = math.sqrt(diff_in_plane.dot(diff_in_plane))
     return dist_in_plane <= radius
+
+
+def point_in_box(point, box2origin, size):
+    origin2box = np.linalg.inv(box2origin)
+    point = origin2box[:3, 3] + origin2box[:3, :3].dot(point)
+    return all(np.abs(point) < 0.5 * size)
