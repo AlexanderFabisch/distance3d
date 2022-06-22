@@ -85,10 +85,7 @@ class BoundingVolumeHierarchy:
                 length=obj.length)
         else:
             assert isinstance(obj, urdf.Mesh)
-            import open3d as o3d
-            mesh = o3d.io.read_triangle_mesh(obj.filename)
-            vertices = np.asarray(mesh.vertices) * obj.scale
-            triangles = np.asarray(mesh.triangles)
+            vertices, triangles = _load_mesh(obj)
             collider = MeshGraph(A2B, vertices, triangles)
         if make_artists:
             collider.make_artist()
@@ -174,3 +171,25 @@ class BoundingVolumeHierarchy:
             Collider frames.
         """
         return self.collider_frames
+
+
+def _load_mesh(obj):
+    try:
+        import open3d as o3d
+        mesh = o3d.io.read_triangle_mesh(obj.filename)
+        vertices = np.asarray(mesh.vertices)
+        triangles = np.asarray(mesh.triangles)
+        try_trimesh = False
+    except OSError:
+        try_trimesh = True
+    except ImportError:
+        try_trimesh = True
+
+    if try_trimesh:
+        import trimesh
+        mesh = trimesh.load(obj.filename)
+        vertices = np.asarray(mesh.vertices)
+        triangles = np.asarray(mesh.faces)
+
+    vertices *= obj.scale
+    return vertices, triangles
