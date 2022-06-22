@@ -1,12 +1,11 @@
-import math
 import numpy as np
 from .distance import point_to_line_segment
 from .utils import EPSILON
 
 
 def point_in_sphere(point, center, radius):
-    dist = np.linalg.norm(point - center)
-    return dist <= radius
+    diff = point - center
+    return diff.dot(diff) <= radius * radius
 
 
 def point_in_capsule(point, capsule2origin, radius, height):
@@ -31,8 +30,8 @@ def point_in_disk(point, center, radius, normal):
 
     # projection of P - C onto plane is Q - C = P - C - dist_to_plane * N
     diff_in_plane = diff - dist_to_plane * normal
-    dist_in_plane = diff_in_plane.dot(diff_in_plane)
-    return dist_in_plane <= radius * radius
+    sqr_dist_in_plane = diff_in_plane.dot(diff_in_plane)
+    return sqr_dist_in_plane <= radius * radius
 
 
 def point_in_cylinder(point, cylinder2origin, radius, length):
@@ -44,8 +43,8 @@ def point_in_cylinder(point, cylinder2origin, radius, length):
 
     # projection of P - C onto plane is Q - C = P - C - dist_to_plane * N
     diff_in_plane = diff - dist_to_plane * cylinder2origin[:3, 2]
-    dist_in_plane = diff_in_plane.dot(diff_in_plane)
-    return dist_in_plane <= radius * radius
+    sqr_dist_in_plane = diff_in_plane.dot(diff_in_plane)
+    return sqr_dist_in_plane <= radius * radius
 
 
 def point_in_box(point, box2origin, size):
