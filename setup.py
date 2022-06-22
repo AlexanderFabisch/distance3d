@@ -23,8 +23,8 @@ if __name__ == "__main__":
           ],
           license="BSD-3-Clause",
           packages=find_packages(),
-          install_requires=["numpy", "scipy", "matplotlib", "pytransform3d",
-                            "open3d", "aabbtree", "numba"],
+          install_requires=["numpy>=1.18", "scipy", "matplotlib",
+                            "pytransform3d", "open3d", "aabbtree", "numba"],
           extras_require={
               "test": ["pytest", "pytest-cov"],
               "doc": ["sphinx", "sphinx-gallery", "numpydoc"],
