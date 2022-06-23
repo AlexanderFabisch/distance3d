@@ -1,7 +1,7 @@
 """
-===============
-Box Containment
-===============
+================
+Mesh Containment
+================
 """
 print(__doc__)
 import time
