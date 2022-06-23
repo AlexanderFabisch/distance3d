@@ -1,6 +1,5 @@
 import numpy as np
-from .utils import EPSILON, HALF_PI, invert_transform, angles_between_vectors
-from scipy.spatial import ConvexHull
+from .utils import EPSILON, invert_transform
 
 
 def points_in_sphere(points, center, radius):
