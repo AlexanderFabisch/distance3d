@@ -3,7 +3,7 @@ import numba
 import numpy as np
 from scipy.spatial import ConvexHull
 
-from .utils import angles_between_vectors
+from .utils import HALF_PI, angles_between_vectors
 
 
 class MeshHillClimbingSupportFunction:
@@ -211,6 +211,6 @@ def make_convex_mesh(vertices):
     face_normals = np.cross(A, B)
     face_centers = np.mean(faces, axis=1)
     angles = angles_between_vectors(face_normals, face_centers)
-    indices = np.where(angles < 0.5 * np.pi)[0]
+    indices = np.where(angles < HALF_PI)[0]
     triangles[indices] = triangles[indices, ::-1]
     return triangles

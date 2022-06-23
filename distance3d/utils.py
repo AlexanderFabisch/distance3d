@@ -6,6 +6,7 @@ import numpy as np
 
 MAX_FLOAT = np.finfo(float).max
 EPSILON = np.finfo(float).eps
+HALF_PI = 0.5 * np.pi
 
 
 @numba.njit(numba.float64[::1](numba.float64[::1]), cache=True)
