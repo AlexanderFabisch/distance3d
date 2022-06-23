@@ -1,5 +1,6 @@
 import numpy as np
-from .utils import EPSILON, invert_transform
+from .utils import EPSILON, HALF_PI, invert_transform, angles_between_vectors
+from scipy.spatial import ConvexHull
 
 
 def points_in_sphere(points, center, radius):
@@ -87,3 +88,22 @@ def points_in_box(points, box2origin, size):
     origin2box = invert_transform(box2origin)
     points = origin2box[:3, 3] + np.dot(points, origin2box[:3, :3].T)
     return np.all(np.abs(points) < 0.5 * size, axis=1)
+
+
+def points_in_mesh(points, mesh2origin, vertices, triangles):
+    origin2mesh = invert_transform(mesh2origin)
+    points = origin2mesh[:3, 3] + np.dot(points, origin2mesh[:3, :3].T)
+
+    faces = vertices[triangles]
+    A = faces[:, 1] - faces[:, 0]
+    B = faces[:, 2] - faces[:, 0]
+    face_normals = np.cross(A, B)
+    face_centers = np.mean(faces, axis=1)
+    contained = np.empty(len(points), dtype=bool)
+    contained[:] = True
+    for i, point in enumerate(points):
+        normal_projected_points = np.sum(
+            face_normals * (point[np.newaxis] - face_centers), axis=1)
+        if np.any(normal_projected_points > 0.0):
+            contained[i] = False
+    return contained
