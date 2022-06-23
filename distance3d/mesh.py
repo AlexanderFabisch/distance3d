@@ -211,6 +211,8 @@ def make_convex_mesh(vertices):
     face_normals = np.cross(A, B)
     face_centers = np.mean(faces, axis=1)
     angles = angles_between_vectors(face_normals, face_centers)
+    # test if normal derived from wrong order points from origin to center of
+    # triangle, should actually point from origin away from center
     indices = np.where(angles < HALF_PI)[0]
     triangles[indices] = triangles[indices, ::-1]
     return triangles
