@@ -1,5 +1,4 @@
 import numpy as np
-from .distance import point_to_line_segment
 from .utils import EPSILON, invert_transform
 
 
@@ -43,6 +42,29 @@ def points_in_disk(points, center, radius, normal):
     diff_in_plane = diff - dist_to_plane[:, np.newaxis] * normal[np.newaxis]
     sqr_dist_in_plane = np.sum(diff_in_plane * diff_in_plane, axis=1)
     contained[sqr_dist_in_plane > radius * radius] = False
+    return contained
+
+
+def points_in_cone(points, cone2origin, radius, height):
+    contained = np.empty(len(points), dtype=bool)
+    contained[:] = True
+    half_height = 0.5 * height
+    # signed distance from point to plane of cone center
+    diff = points - (cone2origin[:3, 3] + half_height * cone2origin[:3, 2])
+    dist_to_center_plane = diff.dot(cone2origin[:3, 2])
+    outside_z = np.abs(dist_to_center_plane) > half_height
+    inside_z = np.logical_not(outside_z)
+    contained[outside_z] = False
+
+    # projection of P - C onto plane is Q - C = P - C - dist_to_plane * N
+    diff_in_plane = diff[inside_z] - dist_to_center_plane[inside_z, np.newaxis] * cone2origin[np.newaxis, :3, 2]
+    sqr_dist_in_plane = np.sum(diff_in_plane * diff_in_plane, axis=1)
+    dist_to_base_plane = dist_to_center_plane[inside_z] + half_height
+    radii = (1.0 - dist_to_base_plane / height) * radius
+    not_contained = sqr_dist_in_plane > radii * radii
+    inside_z_indices = np.where(inside_z)[0]
+    not_contained_indices = inside_z_indices[not_contained]
+    contained[not_contained_indices] = False
     return contained
 
 

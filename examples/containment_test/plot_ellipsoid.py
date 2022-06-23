@@ -8,7 +8,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.plot_utils as ppu
-from distance3d import random, containment_test
+from distance3d import containment_test
 
 
 random_state = np.random.RandomState(0)
