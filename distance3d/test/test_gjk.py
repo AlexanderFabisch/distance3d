@@ -1567,3 +1567,12 @@ def test_gjk_max_iterations():
     # not enough iterations to find correct solution
     intersection = gjk.gjk_intersection(c1, c2, max_iterations=2)
     assert not intersection
+
+
+def test_gjk_distance_with_margin():
+    box = colliders.Box(np.eye(4), np.array([2.0, 2.0, 2.0]))
+    box_with_margin = colliders.Margin(box, 0.1)
+    sphere = colliders.Sphere(np.array([2.0, 0.0, 0.0]), 0.5)
+    dist_without_margin = gjk.gjk(box, sphere)[0]
+    dist_with_margin = gjk.gjk(box_with_margin, sphere)[0]
+    assert approx(dist_without_margin) == dist_with_margin + 0.1
