@@ -56,3 +56,18 @@ def test_points_in_disk():
     contained = containment_test.points_in_disk(
         points, np.zeros(3), 1.0, np.array([0.0, 0.0, 1.0]))
     assert all(contained == [True, True, True, False, False])
+
+
+def test_points_in_cone():
+    points = np.array([
+        [0.0, 0.0, 0.0],
+        [0.5, 0.0, 0.0],
+        [0.0, -0.5, 0.0],
+        [0.0, 0.0, 1.0],
+        [0.0, 0.0, -0.01],
+        [0.3, 0.0, 0.5],
+        [0.01, 0.0, 1.0]
+    ])
+    contained = containment_test.points_in_cone(
+        points, np.eye(4), 0.5, 1.0)
+    assert all(contained == [True, True, True, True, False, False, False])
