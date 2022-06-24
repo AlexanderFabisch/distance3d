@@ -1,5 +1,5 @@
 import numpy as np
-from distance3d import containment_test
+from distance3d import containment_test, mesh
 
 
 def test_points_in_sphere():
@@ -98,4 +98,31 @@ def test_points_in_box():
     ])
     contained = containment_test.points_in_box(
         points, np.eye(4), np.array([0.2, 0.6, 2.0]))
+    assert all(contained == [True, True, True, False, False])
+
+
+def test_points_in_mesh():
+    mesh2origin = np.eye(4)
+    vertices = np.array([
+        [0, 0, 0],
+        [0, 0, 1],
+        [0, 1, 0],
+        [0, 1, 1],
+        [1, 0, 0],
+        [1, 0, 1],
+        [1, 1, 0],
+        [1, 1, 1]
+    ], dtype=float)
+    vertices -= 0.5
+    vertices *= np.array([0.2, 0.6, 2.0])
+    triangles = mesh.make_convex_mesh(vertices)
+    points = np.array([
+        [0.0, 0.0, 0.0],
+        [0.1, 0.3, 1.0],
+        [-0.1, -0.3, -1.0],
+        [0.11, 0.3, 1.0],
+        [0.0, -0.31, 0.0],
+    ])
+    contained = containment_test.points_in_mesh(
+        points, mesh2origin, vertices, triangles)
     assert all(contained == [True, True, True, False, False])
