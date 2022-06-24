@@ -27,3 +27,19 @@ def test_points_in_capsule():
     ])
     contained = containment_test.points_in_capsule(points, np.eye(4), 0.5, 1.0)
     assert all(contained == [True, True, True, True, True, False, False, False])
+
+
+def test_points_in_ellipsoid():
+    points = np.array([
+        [0.0, 0.0, 0.0],
+        [0.1, 0.0, 0.0],
+        [0.0, -0.3, 0.0],
+        [0.0, 0.0, 1.0],
+        [-0.11, 0.0, 0.0],
+        [0.0, 0.31, 0.0],
+        [0.0, 0.0, -1.01],
+        [0.1, 0.3, 0.0]
+    ])
+    contained = containment_test.points_in_ellipsoid(
+        points, np.eye(4), np.array([0.1, 0.3, 1.0]))
+    assert all(contained == [True, True, True, True, False, False, False, False])
