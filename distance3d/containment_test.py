@@ -86,7 +86,7 @@ def points_in_cylinder(points, cylinder2origin, radius, length):
 def points_in_box(points, box2origin, size):
     origin2box = invert_transform(box2origin)
     points = origin2box[:3, 3] + np.dot(points, origin2box[:3, :3].T)
-    return np.all(np.abs(points) < 0.5 * size, axis=1)
+    return np.all(np.abs(points) <= 0.5 * size, axis=1)
 
 
 def points_in_mesh(points, mesh2origin, vertices, triangles):
