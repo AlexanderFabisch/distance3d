@@ -1,0 +1,28 @@
+﻿distance3d.colliders.Margin
+===========================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: Margin
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Margin.__init__
+      ~Margin.aabb
+      ~Margin.center
+      ~Margin.first_vertex
+      ~Margin.make_artist
+      ~Margin.support_function
+      ~Margin.update_pose
+   
+   
+
+   
+   
+   

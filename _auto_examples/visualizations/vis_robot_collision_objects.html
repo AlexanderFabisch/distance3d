@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Collisions between robot and environment &#8212; distance3d 0.4.0 documentation</title>
+    <title>Collisions between robot and environment &#8212; distance3d 0.5.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -159,7 +159,8 @@ to download the full example code</p>
     <span class="n">color</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">box_artist</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
     <span class="n">box_artist</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
-    <span class="n">box</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box" title="distance3d.colliders.Box" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">colliders</span><span class="o">.</span><span class="n">Box</span></a><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="n">box_artist</span><span class="p">)</span>
+    <span class="n">box</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.colliders.Margin.html#distance3d.colliders.Margin" title="distance3d.colliders.Margin" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">colliders</span><span class="o">.</span><span class="n">Margin</span></a><span class="p">(</span>
+        <a href="../../_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box" title="distance3d.colliders.Box" class="sphx-glr-backref-module-distance3d-colliders sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">colliders</span><span class="o">.</span><span class="n">Box</span></a><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="n">box_artist</span><span class="p">),</span> <span class="mf">0.03</span><span class="p">)</span>
     <span class="n">boxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
 
     <span class="n">aabb</span> <span class="o">=</span> <span class="n">box</span><span class="o">.</span><span class="n">aabb</span><span class="p">()</span>
@@ -218,6 +219,7 @@ to download the full example code</p>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../index.html#aabb-tree">AABB Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#containment-tests">Containment Tests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#distance">Distance</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#gjk">GJK</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#visualizations">Visualizations</a><ul class="current">

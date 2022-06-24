@@ -38,12 +38,12 @@
             
   <h1>Source code for distance3d.distance._ellipsoid</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pytransform3d.transformations</span> <span class="k">as</span> <span class="nn">pt</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">inverse_transform_point</span>
 
 
 <div class="viewcode-block" id="point_to_ellipsoid"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.point_to_ellipsoid.html#distance3d.distance.point_to_ellipsoid">[docs]</a><span class="k">def</span> <span class="nf">point_to_ellipsoid</span><span class="p">(</span>
         <span class="n">point</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">,</span> <span class="n">distance_to_surface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-16</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-16</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">64</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the shortest distance between point and ellipsoid.</span>
 
 <span class="sd">    Implementation adapted from 3D Game Engine Design by David H. Eberly.</span>
@@ -78,9 +78,6 @@
 <span class="sd">    max_iter : int, optional (default: 64)</span>
 <span class="sd">        Maximum number of iterations of the optimization.</span>
 
-<span class="sd">    check : bool, optional (default: True)</span>
-<span class="sd">        Check if transformation matrix is valid before inversion.</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dist : float</span>
@@ -89,9 +86,7 @@
 <span class="sd">    closest_point_ellipsoid : array, shape (3,)</span>
 <span class="sd">        Closest point on ellipsoid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># compute coordinates of point in ellipsoid coordinate system</span>
-    <span class="n">origin2ellipsoid</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">invert_transform</span><span class="p">(</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="n">check</span><span class="p">)</span>
-    <span class="n">point_in_ellipsoid</span> <span class="o">=</span> <span class="n">origin2ellipsoid</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">origin2ellipsoid</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+    <span class="n">point_in_ellipsoid</span> <span class="o">=</span> <span class="n">inverse_transform_point</span><span class="p">(</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
 
     <span class="n">radii2</span> <span class="o">=</span> <span class="n">radii</span> <span class="o">**</span> <span class="mi">2</span>
     <span class="n">point2</span> <span class="o">=</span> <span class="n">point_in_ellipsoid</span> <span class="o">**</span> <span class="mi">2</span>

@@ -38,15 +38,15 @@
             
   <h1>Source code for distance3d.distance._box</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pytransform3d.transformations</span> <span class="k">as</span> <span class="nn">pt</span>
 <span class="kn">from</span> <span class="nn">..geometry</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">convert_segment_to_line</span><span class="p">,</span> <span class="n">convert_rectangle_to_vertices</span><span class="p">,</span>
     <span class="n">convert_box_to_face</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">._line_to_box</span> <span class="kn">import</span> <span class="n">_line_to_box</span>
 <span class="kn">from</span> <span class="nn">._rectangle</span> <span class="kn">import</span> <span class="n">rectangle_to_rectangle</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">inverse_transform_point</span>
 
 
-<div class="viewcode-block" id="point_to_box"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.point_to_box.html#distance3d.distance.point_to_box">[docs]</a><span class="k">def</span> <span class="nf">point_to_box</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="point_to_box"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.point_to_box.html#distance3d.distance.point_to_box">[docs]</a><span class="k">def</span> <span class="nf">point_to_box</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the shortest distance between point and box.</span>
 
 <span class="sd">    Parameters</span>
@@ -60,9 +60,6 @@
 <span class="sd">    size : array, shape (3,)</span>
 <span class="sd">        Size of the box along its axes.</span>
 
-<span class="sd">    check : bool, optional (default: True)</span>
-<span class="sd">        Check if transformation matrix is valid before inversion.</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dist : float</span>
@@ -71,8 +68,7 @@
 <span class="sd">    closest_point_box : array, shape (3,)</span>
 <span class="sd">        Closest point on box.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">origin2box</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">invert_transform</span><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="n">check</span><span class="p">)</span>
-    <span class="n">point_in_box</span> <span class="o">=</span> <span class="n">origin2box</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">origin2box</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+    <span class="n">point_in_box</span> <span class="o">=</span> <span class="n">inverse_transform_point</span><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
     <span class="n">half_size</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">size</span>
     <span class="n">closest_point_in_box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">point_in_box</span><span class="p">,</span> <span class="o">-</span><span class="n">half_size</span><span class="p">,</span> <span class="n">half_size</span><span class="p">)</span>
     <span class="n">closest_point</span> <span class="o">=</span> <span class="n">box2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">box2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">closest_point_in_box</span><span class="p">)</span>

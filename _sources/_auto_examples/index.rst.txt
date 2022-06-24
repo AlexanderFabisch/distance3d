@@ -74,6 +74,165 @@ AABB Tree
 
 
 
+.. _sphx_glr__auto_examples_containment_test:
+
+Containment Tests
+-----------------
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Sphere Containment">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_sphere_thumb.png
+     :alt: Sphere Containment
+
+     :ref:`sphx_glr__auto_examples_containment_test_plot_sphere.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/containment_test/plot_sphere
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Box Containment">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_box_thumb.png
+     :alt: Box Containment
+
+     :ref:`sphx_glr__auto_examples_containment_test_plot_box.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/containment_test/plot_box
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Mesh Containment">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_mesh_thumb.png
+     :alt: Mesh Containment
+
+     :ref:`sphx_glr__auto_examples_containment_test_plot_mesh.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/containment_test/plot_mesh
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Ellipsoid Containment">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_ellipsoid_thumb.png
+     :alt: Ellipsoid Containment
+
+     :ref:`sphx_glr__auto_examples_containment_test_plot_ellipsoid.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/containment_test/plot_ellipsoid
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Cone Containment">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_cone_thumb.png
+     :alt: Cone Containment
+
+     :ref:`sphx_glr__auto_examples_containment_test_plot_cone.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/containment_test/plot_cone
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Capsule Containment">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_capsule_thumb.png
+     :alt: Capsule Containment
+
+     :ref:`sphx_glr__auto_examples_containment_test_plot_capsule.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/containment_test/plot_capsule
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Cylinder Containment">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_cylinder_thumb.png
+     :alt: Cylinder Containment
+
+     :ref:`sphx_glr__auto_examples_containment_test_plot_cylinder.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/containment_test/plot_cylinder
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
 .. _sphx_glr__auto_examples_distance:
 
 Distance

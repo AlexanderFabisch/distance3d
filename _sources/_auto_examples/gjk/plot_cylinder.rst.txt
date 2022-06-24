@@ -739,7 +739,7 @@ Distance between cylinders with GJK
     0.2302297841607294
     0.2566507061203933
     0.0
-    accumulated_time=0.7691440582275391
+    accumulated_time=0.7780303955078125
 
 
 
@@ -790,7 +790,7 @@ Distance between cylinders with GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.956 seconds)
+   **Total running time of the script:** ( 0 minutes  0.966 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_cylinder.py:

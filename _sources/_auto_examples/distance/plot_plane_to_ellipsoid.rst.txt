@@ -15039,7 +15039,7 @@ Distance from plane to ellipsoid
     0.8028792873990939
     0.32326555330554135
     0.9559035851339281
-    accumulated_time=2.2185380458831787
+    accumulated_time=2.4170069694519043
 
 
 
@@ -15091,7 +15091,7 @@ Distance from plane to ellipsoid
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.837 seconds)
+   **Total running time of the script:** ( 0 minutes  3.069 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_plane_to_ellipsoid.py:

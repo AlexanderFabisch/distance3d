@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sphere Containment &#8212; distance3d 0.5.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Box Containment" href="plot_box.html" />
+    <link rel="prev" title="AABB Tree" href="../aabbtree/plot_aabbtree.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-containment-test-plot-sphere-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="sphere-containment">
+<span id="sphx-glr-auto-examples-containment-test-plot-sphere-py"></span><h1>Sphere Containment<a class="headerlink" href="#sphere-containment" title="Permalink to this heading">¶</a></h1>
+<img src="../../_images/sphx_glr_plot_sphere_001.png" srcset="../../_images/sphx_glr_plot_sphere_001.png" alt="plot sphere" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0.00470423698425293 s
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pytransform3d.plot_utils</span> <span class="k">as</span> <span class="nn">ppu</span>
+<span class="kn">from</span> <span class="nn">distance3d</span> <span class="kn">import</span> <span class="n">containment_test</span>
+
+
+<span class="n">random_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">radius</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">ppu</span><span class="o">.</span><span class="n">make_3d_axis</span><span class="p">(</span><span class="n">ax_s</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">points</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="mf">0.5</span>
+<span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">2.0</span>
+<span class="n">points</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-=</span> <span class="mf">0.5</span>
+<span class="n">points</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">2.0</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">contained</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.containment_test.points_in_sphere.html#distance3d.containment_test.points_in_sphere" title="distance3d.containment_test.points_in_sphere" class="sphx-glr-backref-module-distance3d-containment_test sphx-glr-backref-type-py-function"><span class="n">containment_test</span><span class="o">.</span><span class="n">points_in_sphere</span></a><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
+<span class="n">stop</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="si">}</span><span class="s2"> s&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">points</span><span class="p">[::</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[::</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">points</span><span class="p">[::</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">contained</span><span class="p">[::</span><span class="mi">10</span><span class="p">])</span>
+<span class="n">ppu</span><span class="o">.</span><span class="n">plot_sphere</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">wireframe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+<span class="n">ppu</span><span class="o">.</span><span class="n">plot_sphere</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">wireframe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.250 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-containment-test-plot-sphere-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/25aa103eb15d2a5fa78d562b56c2dda6/plot_sphere.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_sphere.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/f2ab0a14909133e136b70635012cc9be/plot_sphere.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_sphere.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#aabb-tree">AABB Tree</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#containment-tests">Containment Tests</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Sphere Containment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_box.html">Box Containment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_mesh.html">Mesh Containment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_ellipsoid.html">Ellipsoid Containment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_cone.html">Cone Containment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_capsule.html">Capsule Containment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_cylinder.html">Cylinder Containment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#distance">Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gjk">GJK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#visualizations">Visualizations</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Examples</a><ul>
+      <li>Previous: <a href="../aabbtree/plot_aabbtree.html" title="previous chapter">AABB Tree</a></li>
+      <li>Next: <a href="plot_box.html" title="next chapter">Box Containment</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/_auto_examples/containment_test/plot_sphere.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

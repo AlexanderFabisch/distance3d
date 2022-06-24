@@ -739,7 +739,7 @@ Distance between capsules with GJK
     1.2688826398909474
     1.2616521397308176
     0.5251256384740598
-    accumulated_time=0.40703821182250977
+    accumulated_time=0.41602373123168945
 
 
 
@@ -795,7 +795,7 @@ Distance between capsules with GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.656 seconds)
+   **Total running time of the script:** ( 0 minutes  0.669 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_capsules.py:

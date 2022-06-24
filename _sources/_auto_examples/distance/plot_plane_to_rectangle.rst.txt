@@ -30039,7 +30039,7 @@ Distance from plane to rectangle
     1.5893904109359818
     2.7694640243759827
     2.6479850741697355
-    accumulated_time=0.3648550510406494
+    accumulated_time=0.37787652015686035
 
 
 
@@ -30091,7 +30091,7 @@ Distance from plane to rectangle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.217 seconds)
+   **Total running time of the script:** ( 0 minutes  2.318 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_plane_to_rectangle.py:

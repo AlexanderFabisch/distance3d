@@ -1039,7 +1039,7 @@ Distance between spheres with GJK
     2.8005154935328265
     0.31850550860210425
     0.7518259694952503
-    accumulated_time=0.7986702919006348
+    accumulated_time=0.8046700954437256
 
 
 
@@ -1089,7 +1089,7 @@ Distance between spheres with GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.014 seconds)
+   **Total running time of the script:** ( 0 minutes  1.022 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_spheres.py:

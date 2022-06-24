@@ -40039,7 +40039,7 @@ Distance from plane to triangle
     1.2042601468406362
     1.6359819539597797
     2.927256608791921
-    accumulated_time=1.7090182304382324
+    accumulated_time=1.858841896057129
 
 
 
@@ -40088,7 +40088,7 @@ Distance from plane to triangle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.726 seconds)
+   **Total running time of the script:** ( 0 minutes  2.947 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_plane_to_triangle.py:

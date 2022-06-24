@@ -7039,7 +7039,7 @@ Distance from line to rectangle
     0.9347573437979744
     0.8833261013859082
     0.9744253956964007
-    accumulated_time=0.6879715919494629
+    accumulated_time=0.7225728034973145
 
 
 
@@ -7087,7 +7087,7 @@ Distance from line to rectangle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.135 seconds)
+   **Total running time of the script:** ( 0 minutes  1.186 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_to_rectangle.py:

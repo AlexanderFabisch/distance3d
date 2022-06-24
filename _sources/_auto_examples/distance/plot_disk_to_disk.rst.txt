@@ -3039,7 +3039,7 @@ Distance between two disks
     0.013459380925729573
     0.018902221910357436
     0.5329308823353188
-    accumulated_time=0.5153965950012207
+    accumulated_time=0.5386538505554199
 
 
 
@@ -3089,7 +3089,7 @@ Distance between two disks
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.834 seconds)
+   **Total running time of the script:** ( 0 minutes  0.863 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_disk_to_disk.py:

@@ -1,0 +1,6 @@
+﻿distance3d.containment\_test.points\_in\_disk
+=============================================
+
+.. currentmodule:: distance3d.containment_test
+
+.. autofunction:: points_in_disk
