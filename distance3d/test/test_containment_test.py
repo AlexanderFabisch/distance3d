@@ -123,6 +123,6 @@ def test_points_in_mesh():
         [0.11, 0.3, 1.0],
         [0.0, -0.31, 0.0],
     ])
-    contained = containment_test.points_in_mesh(
+    contained = containment_test.points_in_convex_mesh(
         points, mesh2origin, vertices, triangles)
     assert all(contained == [True, True, True, False, False])
