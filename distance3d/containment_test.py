@@ -227,7 +227,7 @@ def points_in_box(points, box2origin, size):
     return np.all(np.abs(points) <= 0.5 * size, axis=1)
 
 
-def points_in_mesh(points, mesh2origin, vertices, triangles):
+def points_in_convex_mesh(points, mesh2origin, vertices, triangles):
     """Test if points are in box.
 
     Parameters
