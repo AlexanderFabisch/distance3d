@@ -10,7 +10,7 @@ from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb, ellipsoid_aabb, cone_aabb, disk_aabb)
 from .mesh import MeshHillClimbingSupportFunction
-from .utils import plane_basis_from_normal
+from .utils import plane_basis_from_normal, norm_vector
 from aabbtree import AABB
 
 
@@ -547,7 +547,7 @@ class Margin(ConvexCollider):
 
     def support_function(self, search_direction):
         return self.collider.support_function(
-            search_direction) + self.margin * search_direction
+            search_direction) + self.margin * norm_vector(search_direction)
 
     def center(self):
         return self.collider.center()

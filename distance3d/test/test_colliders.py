@@ -83,3 +83,22 @@ def test_disk_collider():
     disk.update_pose(disk2origin)
     assert_array_almost_equal(
         disk.aabb().limits, np.array([[-0.6, 0.4], [-0.7, 0.3], [-0.3, -0.3]]))
+
+
+def test_margin():
+    box = colliders.Box(np.eye(4), np.array([1.0, 1.0, 1.0]))
+    box_with_margin = colliders.Margin(box, 0.1)
+
+    assert_array_almost_equal(
+        box_with_margin.aabb().limits,
+        np.array([[-0.6, 0.6], [-0.6, 0.6], [-0.6, 0.6]]))
+    assert_array_almost_equal(box_with_margin.center(), [0, 0, 0])
+
+    new_pose = np.eye(4)
+    new_pose[:3, 3] = 0.1, 0.2, 0.3
+    box_with_margin.update_pose(new_pose)
+    assert_array_almost_equal(box_with_margin.center(), [0.1, 0.2, 0.3])
+
+    box_with_margin.make_artist()
+    box_with_margin.update_pose(np.eye(4))
+    assert_array_almost_equal(box_with_margin.center(), [0, 0, 0])
