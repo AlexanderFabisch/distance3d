@@ -228,7 +228,7 @@ def points_in_box(points, box2origin, size):
 
 
 def points_in_convex_mesh(points, mesh2origin, vertices, triangles):
-    """Test if points are in box.
+    """Test if points are in convex mesh.
 
     Parameters
     ----------
