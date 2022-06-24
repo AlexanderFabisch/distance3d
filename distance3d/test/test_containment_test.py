@@ -43,3 +43,16 @@ def test_points_in_ellipsoid():
     contained = containment_test.points_in_ellipsoid(
         points, np.eye(4), np.array([0.1, 0.3, 1.0]))
     assert all(contained == [True, True, True, True, False, False, False, False])
+
+
+def test_points_in_disk():
+    points = np.array([
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        [0.0, -1.0, 0.0],
+        [0.0, 0.0, 0.001],
+        [1.0, 1.0, 0.0]
+    ])
+    contained = containment_test.points_in_disk(
+        points, np.zeros(3), 1.0, np.array([0.0, 0.0, 1.0]))
+    assert all(contained == [True, True, True, False, False])
