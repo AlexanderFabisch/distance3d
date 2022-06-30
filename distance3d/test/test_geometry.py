@@ -1,8 +1,10 @@
 import numpy as np
 from distance3d.geometry import (
-    support_function_box, support_function_cone, support_function_disk)
-from distance3d.random import rand_cone, rand_circle
+    support_function_box, support_function_cone, support_function_disk,
+    support_function_ellipse)
+from distance3d.random import rand_cone, rand_circle, rand_ellipse
 from distance3d.utils import plane_basis_from_normal
+from distance3d.containment import ellipse_aabb
 from numpy.testing import assert_array_almost_equal
 from pytest import approx
 
@@ -61,3 +63,24 @@ def test_disk_support_function():
 
     p = support_function_disk(np.zeros(3), center, radius, normal)
     assert_array_almost_equal(p, center)
+
+
+def test_ellipse_support_function():
+    random_state = np.random.RandomState(873)
+    center, axes, radii = rand_ellipse(random_state)
+    mins, maxs = ellipse_aabb(center, axes, radii)
+
+    xm = support_function_ellipse(np.array([-1.0, 0.0, 0.0]), center, axes, radii)
+    assert approx(mins[0]) == xm[0]
+    xp = support_function_ellipse(np.array([1.0, 0.0, 0.0]), center, axes, radii)
+    assert approx(maxs[0]) == xp[0]
+
+    ym = support_function_ellipse(np.array([0.0, -1.0, 0.0]), center, axes, radii)
+    assert approx(mins[1]) == ym[0]
+    yp = support_function_ellipse(np.array([0.0, 1.0, 0.0]), center, axes, radii)
+    assert approx(maxs[1]) == yp[0]
+
+    zm = support_function_ellipse(np.array([0.0, 0.0, -1.0]), center, axes, radii)
+    assert approx(mins[2]) == zm[0]
+    zp = support_function_ellipse(np.array([0.0, 0.0, 1.0]), center, axes, radii)
+    assert approx(maxs[2]) == zp[0]

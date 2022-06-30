@@ -382,6 +382,39 @@ def support_function_disk(search_direction, center, radius, normal):
 
 
 @numba.njit(
+    numba.float64[:](numba.float64[::1], numba.float64[::1],
+                     numba.float64[::1], numba.float64[::1]),
+    cache=True)
+def support_function_ellipse(search_direction, center, axes, radii):
+    """Compute extreme point of ellipse along a direction.
+
+    Parameters
+    ----------
+    search_direction : array, shape (3,)
+        Search direction.
+
+    center : array, shape (3,)
+        Center of ellipse.
+
+    axes : array, shape (2, 3)
+        Axes of ellipse.
+
+    radii : array, shape (2,)
+        Radii of ellipse.
+
+    Returns
+    -------
+    extreme_point : array, shape (3,)
+        Extreme point along search direction.
+    """
+    normal = np.cross(axes[0], axes[1])
+    RT = np.row_stack((axes[0], axes[1], normal))
+    local_dir = np.dot(RT, search_direction)[:2]
+    local_vertex = norm_vector(radii * local_dir)
+    return center + np.dot(local_vertex, axes)
+
+
+@numba.njit(
     numba.float64[:](numba.float64[::1], numba.float64[:, ::1], numba.float64,
                      numba.float64),
     cache=True)
