@@ -201,3 +201,29 @@ def cone_aabb(cone2origin, radius, height):
     a = pb - pa
     e = np.sqrt(1.0 - a * a / (height * height))
     return np.minimum(pa - e * radius, pb), np.maximum(pa + e * radius, pb)
+
+
+def ellipse_aabb(center, axis1, axis2):
+    """Compute axis-aligned bounding box of an ellipse.
+
+    Parameters
+    ----------
+    center : array, shape (3,)
+        Center of ellipse.
+
+    axis1 : array, shape (3,)
+        First axis of ellipse.
+
+    axis2 : array, shape (3,)
+        First axis of ellipse.
+
+    Returns
+    -------
+    mins : array, shape (3,)
+        Minimum coordinates.
+
+    maxs : array, shape (3,)
+        Maximum coordinates.
+    """
+    extent = np.sqrt(axis1 ** 2 + axis2 ** 2)
+    return center - extent, center + extent
