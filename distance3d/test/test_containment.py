@@ -178,8 +178,8 @@ def test_cone_aabb():
 
 def test_ellipse_aabb():
     center = np.array([1.0, 0.0, 0.0])
-    axis1 = np.array([0.0, 0.0, 1.0])
-    axis2 = np.array([0.0, 2.0, 0.0])
-    mins, maxs = ellipse_aabb(center, axis1, axis2)
+    axes = np.array([[0.0, 0.0, 1.0], [0.0, 1.0, 0.0]])
+    radii = np.array([1.0, 2.0])
+    mins, maxs = ellipse_aabb(center, axes, radii)
     assert_array_almost_equal(mins, [1.0, -2.0, -1.0])
     assert_array_almost_equal(maxs, [1.0, 2.0, 1.0])
