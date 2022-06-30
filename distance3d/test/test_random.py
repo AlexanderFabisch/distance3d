@@ -4,7 +4,7 @@ from distance3d.random import (
     randn_point, randn_direction, randn_line, randn_line_segment,
     randn_plane, randn_triangle, randn_rectangle, rand_circle, rand_box,
     rand_capsule, rand_ellipsoid, rand_cylinder, rand_sphere, rand_cone,
-    randn_convex)
+    randn_convex, rand_ellipse)
 from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
@@ -126,3 +126,11 @@ def test_randn_convex():
     assert len(vertices) == n_points
     assert np.min(triangles) == 0
     assert np.max(triangles) == len(vertices) - 1
+
+
+def test_rand_ellipse():
+    random_state = np.random.RandomState(112)
+    center, axes, radii = rand_ellipse(random_state)
+    assert len(center) == 3
+    assert_array_almost_equal(np.linalg.norm(axes, axis=1), [1, 1])
+    assert all(radii > 0)

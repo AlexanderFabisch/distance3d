@@ -4,7 +4,7 @@ import pytransform3d.rotations as pr
 import pytransform3d.transformations as pt
 
 from .mesh import make_convex_mesh
-from .utils import norm_vector
+from .utils import norm_vector, plane_basis_from_normal
 
 
 def randn_point(random_state, scale=1.0):
@@ -450,3 +450,25 @@ def randn_convex(random_state, n_vertices=10, center_scale=1.0, min_radius=1.0,
     mesh2origin = pt.random_transform(random_state)
     mesh2origin[:3, 3] *= center_scale
     return mesh2origin, vertices, triangles
+
+
+def rand_ellipse(random_state):
+    """Sample ellipse.
+
+    Parameters
+    ----------
+    random_state : np.random.RandomState
+        Random number generator.
+
+    Returns
+    -------
+    center : array, shape (3,)
+        Center of ellipse.
+
+    axes : array, shape (2, 3)
+        Axes of ellipse.
+
+    radii : array, shape (2,)
+        Radii of ellipse.
+    """
+    return randn_rectangle(random_state)
