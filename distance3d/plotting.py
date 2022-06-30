@@ -197,6 +197,57 @@ def plot_circle(ax, center, radius, normal, show_normal=False,
         ppu.plot_vector(ax=ax, start=center, direction=normal, s=1.0)
 
 
+def plot_ellipse(ax, center, axes, radii, show_normal=False,
+                 surface_alpha=0.1, color="b"):
+    """Plot ellipse.
+
+    Parameters
+    ----------
+    ax : Matplotlib 3d axis
+        A matplotlib 3d axis.
+
+    center : array, shape (3,)
+        Center of ellipse.
+
+    axes : array, shape (2, 3)
+        Axes of ellipse.
+
+    radii : array, shape (2,)
+        Radii of ellipse.
+
+    show_normal : bool, optional (default: False)
+        Display normal of the ellipse plane.
+
+    surface_alpha : float, optional (default: 0.1)
+        Alpha value of the ellipse surface.
+
+    color : str
+        Color of surface.
+    """
+    ax.scatter(center[0], center[1], center[2])
+    normal = np.cross(axes[0], axes[1])
+    R = np.column_stack((axes[0], axes[1], normal))
+    ellipse = np.array([
+        center + R.dot(pr.matrix_from_angle(2, angle)).dot(
+            [radii[0], radii[1], 0])
+        for angle in np.linspace(0, 2 * np.pi, 20)])
+    ax.plot(ellipse[:, 0], ellipse[:, 1], ellipse[:, 2])
+
+    vertices = np.array([
+        [ellipse[i], ellipse[j], center]
+        for i, j in zip(range(len(ellipse) - 1), range(1, len(ellipse)))])
+    try:  # Matplotlib < 3.5
+        surface = mplot3d.art3d.Poly3DCollection(vertices)
+    except ValueError:  # Matplotlib >= 3.5
+        surface = mplot3d.art3d.Poly3DCollection(vertices.reshape(-1, 3, 3))
+    surface.set_facecolor(color)
+    surface.set_alpha(surface_alpha)
+    ax.add_collection3d(surface)
+
+    if show_normal:
+        ppu.plot_vector(ax=ax, start=center, direction=normal, s=1.0)
+
+
 def plot_aabb(ax, mins, maxs, alpha=1.0, color="r"):
     """Plot axis-aligned bounding box.
 
