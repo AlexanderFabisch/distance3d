@@ -496,7 +496,8 @@ class Ellipse(ConvexCollider):
         self.radii = radii
 
     def make_artist(self, c=None):
-        raise NotImplementedError()  # TODO artist
+        from .visualization import Ellipse
+        self.artist_ = Ellipse(self.c, self.axes, self.radii, c=c)
 
     def center(self):
         return self.c
@@ -511,7 +512,8 @@ class Ellipse(ConvexCollider):
     def update_pose(self, pose):
         self.c = pose[:3, 3]
         self.axes = pose[:3, :2].T
-        # TODO artist
+        if self.artist_ is not None:
+            self.artist_.set_data(pose)
 
     def aabb(self):
         mins, maxs = ellipse_aabb(self.c, self.axes, self.radii)
