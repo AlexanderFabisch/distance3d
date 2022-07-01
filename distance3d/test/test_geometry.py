@@ -70,17 +70,14 @@ def test_ellipse_support_function():
     center, axes, radii = rand_ellipse(random_state)
     mins, maxs = ellipse_aabb(center, axes, radii)
 
-    xm = support_function_ellipse(np.array([-1.0, 0.0, 0.0]), center, axes, radii)
-    assert approx(mins[0]) == xm[0]
-    xp = support_function_ellipse(np.array([1.0, 0.0, 0.0]), center, axes, radii)
-    assert approx(maxs[0]) == xp[0]
+    negative_vertices = np.vstack((
+        support_function_ellipse(np.array([-1.0, 0.0, 0.0]), center, axes, radii),
+        support_function_ellipse(np.array([0.0, -1.0, 0.0]), center, axes, radii),
+        support_function_ellipse(np.array([0.0, 0.0, -1.0]), center, axes, radii)))
+    assert_array_almost_equal(np.min(negative_vertices, axis=0), mins)
 
-    ym = support_function_ellipse(np.array([0.0, -1.0, 0.0]), center, axes, radii)
-    assert approx(mins[1]) == ym[0]
-    yp = support_function_ellipse(np.array([0.0, 1.0, 0.0]), center, axes, radii)
-    assert approx(maxs[1]) == yp[0]
-
-    zm = support_function_ellipse(np.array([0.0, 0.0, -1.0]), center, axes, radii)
-    assert approx(mins[2]) == zm[0]
-    zp = support_function_ellipse(np.array([0.0, 0.0, 1.0]), center, axes, radii)
-    assert approx(maxs[2]) == zp[0]
+    positive_vertices = np.vstack((
+        support_function_ellipse(np.array([1.0, 0.0, 0.0]), center, axes, radii),
+        support_function_ellipse(np.array([0.0, 1.0, 0.0]), center, axes, radii),
+        support_function_ellipse(np.array([0.0, 0.0, 1.0]), center, axes, radii)))
+    assert_array_almost_equal(np.max(positive_vertices, axis=0), maxs)
