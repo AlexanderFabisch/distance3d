@@ -9,6 +9,7 @@ collider_classes = {
     "ellipsoid": (colliders.Ellipsoid, random.rand_ellipsoid),
     "capsule": (colliders.Capsule, random.rand_capsule),
     "disk": (colliders.Disk, random.rand_circle),
+    "ellipse": (colliders.Ellipse, random.rand_ellipse),
     "cone": (colliders.Cone, random.rand_cone),
     "cylinder": (colliders.Cylinder, random.rand_cylinder),
     "box": (colliders.Box, random.rand_box),
