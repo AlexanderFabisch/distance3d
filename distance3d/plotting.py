@@ -226,10 +226,8 @@ def plot_ellipse(ax, center, axes, radii, show_normal=False,
     """
     ax.scatter(center[0], center[1], center[2])
     normal = np.cross(axes[0], axes[1])
-    R = np.column_stack((axes[0], axes[1], normal))
     ellipse = np.array([
-        center + R.dot(pr.matrix_from_angle(2, angle)).dot(
-            [radii[0], radii[1], 0])
+        center + (radii * np.array([np.sin(angle), np.cos(angle)])).dot(axes)
         for angle in np.linspace(0, 2 * np.pi, 20)])
     ax.plot(ellipse[:, 0], ellipse[:, 1], ellipse[:, 2])
 
