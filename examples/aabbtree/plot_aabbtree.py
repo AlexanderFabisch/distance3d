@@ -58,7 +58,7 @@ plotting.plot_circle(ax, center, radius, normal, surface_alpha=0.5, color="k")
 plotting.plot_aabb(ax, mins, maxs)
 aabb7 = aabbtree.AABB(np.array([mins, maxs]).T)
 
-center, axes, radii = random.rand_ellipse(random_state)
+center, axes, radii = random.rand_ellipse(random_state, center_scale=10.0, radii_scale=0.3)
 mins, maxs = containment.ellipse_aabb(center, axes, radii)
 plotting.plot_ellipse(ax, center, axes, radii, surface_alpha=0.5, color="k")
 plotting.plot_aabb(ax, mins, maxs)

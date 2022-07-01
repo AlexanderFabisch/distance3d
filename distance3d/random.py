@@ -452,13 +452,19 @@ def randn_convex(random_state, n_vertices=10, center_scale=1.0, min_radius=1.0,
     return mesh2origin, vertices, triangles
 
 
-def rand_ellipse(random_state):
+def rand_ellipse(random_state, center_scale=1.0, radii_scale=1.0):
     """Sample ellipse.
 
     Parameters
     ----------
     random_state : np.random.RandomState
         Random number generator.
+
+    center_scale : float, optional (default: 1)
+        Scale the center point by this factor.
+
+    radii_scale : float, optional (default: 1)
+        Scale the radii by this factor.
 
     Returns
     -------
@@ -471,4 +477,5 @@ def rand_ellipse(random_state):
     radii : array, shape (2,)
         Radii of ellipse.
     """
-    return randn_rectangle(random_state)
+    return randn_rectangle(
+        random_state, center_scale=center_scale, length_scale=radii_scale)
