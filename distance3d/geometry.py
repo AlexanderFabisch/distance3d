@@ -410,7 +410,7 @@ def support_function_ellipse(search_direction, center, axes, radii):
     normal = np.cross(axes[0], axes[1])
     RT = np.vstack((axes, normal.reshape(1, -1)))
     local_dir = np.dot(RT, search_direction)[:2]
-    local_vertex = norm_vector(radii * local_dir)
+    local_vertex = norm_vector(radii * local_dir) * radii
     return center + np.dot(local_vertex, axes)
 
 
