@@ -5,10 +5,11 @@ import numpy as np
 from .geometry import (
     support_function_capsule, support_function_cylinder,
     convert_box_to_vertices, support_function_ellipsoid,
-    support_function_sphere, support_function_cone, support_function_disk)
+    support_function_sphere, support_function_cone, support_function_disk,
+    support_function_ellipse)
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
-    capsule_aabb, ellipsoid_aabb, cone_aabb, disk_aabb)
+    capsule_aabb, ellipsoid_aabb, cone_aabb, disk_aabb, ellipse_aabb)
 from .mesh import MeshHillClimbingSupportFunction
 from .utils import plane_basis_from_normal, norm_vector
 from aabbtree import AABB
@@ -468,6 +469,52 @@ class Disk(ConvexCollider):
 
     def aabb(self):
         mins, maxs = disk_aabb(self.c, self.radius, self.normal)
+        return AABB(np.array([mins, maxs]).T)
+
+
+class Ellipse(ConvexCollider):
+    """Ellipse collider.
+
+    Parameters
+    ----------
+    center : array, shape (3,)
+        Center of ellipse.
+
+    axes : array, shape (2, 3)
+        Axes of ellipse.
+
+    radii : array, shape (2,)
+        Radii of ellipse.
+
+    artist : pytransform3d.visualizer.Artist, optional (default: None)
+        Corresponding artist for visualizer.
+    """
+    def __init__(self, center, axes, radii, artist=None):
+        super(Ellipse, self).__init__(artist)
+        self.c = center
+        self.axes = axes
+        self.radii = radii
+
+    def make_artist(self, c=None):
+        raise NotImplementedError()  # TODO artist
+
+    def center(self):
+        return self.c
+
+    def first_vertex(self):
+        return self.c + self.axes[0] * self.radii[0]
+
+    def support_function(self, search_direction):
+        return support_function_ellipse(
+            search_direction, self.c, self.axes, self.radii)
+
+    def update_pose(self, pose):
+        self.c = pose[:3, 3]
+        self.axes = pose[:3, :2].T
+        # TODO artist
+
+    def aabb(self):
+        mins, maxs = ellipse_aabb(self.c, self.axes, self.radii)
         return AABB(np.array([mins, maxs]).T)
 
 
