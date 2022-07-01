@@ -407,9 +407,7 @@ def support_function_ellipse(search_direction, center, axes, radii):
     extreme_point : array, shape (3,)
         Extreme point along search direction.
     """
-    normal = np.cross(axes[0], axes[1])
-    RT = np.vstack((axes, normal.reshape(1, -1)))
-    local_dir = np.dot(RT, search_direction)[:2]
+    local_dir = axes.dot(search_direction)
     local_vertex = norm_vector(radii * local_dir) * radii
     return center + np.dot(local_vertex, axes)
 
