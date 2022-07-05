@@ -1,6 +1,6 @@
 import numpy as np
 from distance3d import colliders, gjk, geometry, random, distance
-from distance3d.gjk.gjk_distance import (
+from distance3d.gjk._gjk_distance import (
     SimplexInfo, Solution, BarycentricCoordinates,
     distance_subalgorithm_with_backup_procedure)
 from pytest import approx
