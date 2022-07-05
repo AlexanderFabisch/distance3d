@@ -1,4 +1,6 @@
 import math
+
+import numba
 import numpy as np
 
 
@@ -471,25 +473,30 @@ class BarycentricCoordinates:
         self.d[3, 7] = 1.0
 
 
+@numba.njit(cache=True)
 def line_segment_coordinates_0(d, dot_product_table):
     d[1, 2] = dot_product_table[0, 0] - dot_product_table[1, 0]
 
 
+@numba.njit(cache=True)
 def line_segment_coordinates_1(d, dot_product_table):
     d[0, 2] = dot_product_table[1, 1] - dot_product_table[1, 0]
 
 
+@numba.njit(cache=True)
 def face_coordinates_0(d, dot_product_table):
     line_segment_coordinates_0(d, dot_product_table)
     d[2, 4] = dot_product_table[0, 0] - dot_product_table[2, 0]
 
 
+@numba.njit(cache=True)
 def face_coordinates_1(d, dot_product_table):
     e132 = dot_product_table[1, 0] - dot_product_table[2, 1]
     line_segment_coordinates_1(d, dot_product_table)
     d[2, 6] = d[0, 2] * d[2, 4] + d[1, 2] * e132
 
 
+@numba.njit(cache=True)
 def face_coordinates_2(d, dot_product_table):
     e123 = dot_product_table[2, 0] - dot_product_table[2, 1]
     d[0, 4] = dot_product_table[2, 2] - dot_product_table[2, 0]
@@ -497,6 +504,7 @@ def face_coordinates_2(d, dot_product_table):
     return e123
 
 
+@numba.njit(cache=True)
 def face_coordinates_3(d, dot_product_table, e123):
     e213 = -e123
     d[1, 5] = dot_product_table[2, 2] - dot_product_table[2, 1]
@@ -505,11 +513,13 @@ def face_coordinates_3(d, dot_product_table, e123):
     return e213
 
 
+@numba.njit(cache=True)
 def tetrahedron_coordinates_0(d, dot_product_table):
     face_coordinates_0(d, dot_product_table)
     d[3, 8] = dot_product_table[0, 0] - dot_product_table[3, 0]
 
 
+@numba.njit(cache=True)
 def tetrahedron_coordinates_1(d, dot_product_table):
     e132 = dot_product_table[1, 0] - dot_product_table[2, 1]
     e142 = dot_product_table[1, 0] - dot_product_table[3, 1]
@@ -519,6 +529,7 @@ def tetrahedron_coordinates_1(d, dot_product_table):
     return e132, e142
 
 
+@numba.njit(cache=True)
 def tetrahedron_coordinates_2(d, dot_product_table):
     e123 = dot_product_table[2, 0] - dot_product_table[2, 1]
     e143 = dot_product_table[2, 0] - dot_product_table[3, 2]
@@ -528,6 +539,7 @@ def tetrahedron_coordinates_2(d, dot_product_table):
     return e123, e143
 
 
+@numba.njit(cache=True)
 def tetrahedron_coordinates_3(d, dot_product_table, e123, e142, e143):
     d[1, 5] = dot_product_table[2, 2] - dot_product_table[2, 1]
     d[2, 5] = dot_product_table[1, 1] - dot_product_table[2, 1]
@@ -537,6 +549,7 @@ def tetrahedron_coordinates_3(d, dot_product_table, e123, e142, e143):
     return e213
 
 
+@numba.njit(cache=True)
 def tetrahedron_coordinates_4(d, dot_product_table):
     e124 = dot_product_table[3, 0] - dot_product_table[3, 1]
     e134 = dot_product_table[3, 0] - dot_product_table[3, 2]
@@ -546,6 +559,7 @@ def tetrahedron_coordinates_4(d, dot_product_table):
     return e124, e134
 
 
+@numba.njit(cache=True)
 def tetrahedron_coordinates_5(d, dot_product_table, e124, e132, e134):
     d[1, 9] = dot_product_table[3, 3] - dot_product_table[3, 1]
     d[3, 9] = dot_product_table[1, 1] - dot_product_table[3, 1]
@@ -555,6 +569,7 @@ def tetrahedron_coordinates_5(d, dot_product_table, e124, e132, e134):
     return e214
 
 
+@numba.njit(cache=True)
 def tetrahedron_coordinates_6(d, dot_product_table, e123, e124, e134):
     d[2, 10] = dot_product_table[3, 3] - dot_product_table[3, 2]
     d[3, 10] = dot_product_table[2, 2] - dot_product_table[3, 2]
@@ -563,6 +578,7 @@ def tetrahedron_coordinates_6(d, dot_product_table, e123, e124, e134):
     d[1, 14] = d[0, 12] * d[1, 2] + d[2, 12] * e123 + d[3, 12] * e124
 
 
+@numba.njit(cache=True)
 def tetrahedron_coordinates_7(d, dot_product_table, e213, e214):
     e243 = dot_product_table[2, 1] - dot_product_table[3, 2]
     d[3, 13] = d[1, 5] * d[3, 9] + d[2, 5] * e243
@@ -573,11 +589,13 @@ def tetrahedron_coordinates_7(d, dot_product_table, e213, e214):
     d[0, 14] = d[1, 13] * d[0, 2] + d[2, 13] * e213 + d[3, 13] * e214
 
 
+@numba.njit(cache=True)
 def backup_line_segments(d, dot_product_table):
     d[1, 2] = dot_product_table[0, 0] - dot_product_table[1, 0]
     d[0, 2] = dot_product_table[1, 1] - dot_product_table[1, 0]
 
 
+@numba.njit(cache=True)
 def backup_faces(d, dot_product_table):
     backup_line_segments(d, dot_product_table)
     d[2, 4] = dot_product_table[0, 0] - dot_product_table[2, 0]
@@ -588,6 +606,7 @@ def backup_faces(d, dot_product_table):
     return e132, e123, e213
 
 
+@numba.njit(cache=True)
 def backup_tetrahedron(d, dot_product_table):
     e132, e123, e213 = backup_faces(d, dot_product_table)
     d[3, 8] = dot_product_table[0, 0] - dot_product_table[3, 0]
@@ -602,139 +621,173 @@ def backup_tetrahedron(d, dot_product_table):
     tetrahedron_coordinates_7(d, dot_product_table, e213, e214)
 
 
+@numba.njit(cache=True)
 def vertex_0_of_line_segment_optimal(d):
     return d[1, 2] <= 0.0
 
 
+@numba.njit(cache=True)
 def line_segment_01_of_line_segment_optimal(d):
     return not (vertex_1_of_line_segment_optimal(d) or vertex_0_of_line_segment_optimal(d))
 
 
+@numba.njit(cache=True)
 def vertex_1_of_line_segment_optimal(d):
     return d[0, 2] <= 0.0
 
 
+@numba.njit(cache=True)
 def vertex_0_of_face_optimal(d):
     return not (d[1, 2] > 0.0 or d[2, 4] > 0.0)
 
 
+@numba.njit(cache=True)
 def line_segment_01_of_face_optimal(d):
     return line_segment_01_of_line_segment_optimal(d) and not d[2, 6] > 0.0
 
 
+@numba.njit(cache=True)
 def line_segment_02_of_face_optimal(d):
     return not (d[0, 4] <= 0.0 or d[1, 6] > 0.0 or d[2, 4] <= 0.0)
 
 
+@numba.njit(cache=True)
 def face_012_of_face_optimal(d):
     return not (d[0, 6] <= 0.0 or d[1, 6] <= 0.0 or d[2, 6] <= 0.0)
 
 
+@numba.njit(cache=True)
 def vertex_1_of_face_optimal(d):
     return not (d[0, 2] > 0.0 or d[2, 5] > 0.0)
 
 
+@numba.njit(cache=True)
 def vertex_2_of_face_optimal(d):
     return not (d[0, 4] > 0.0 or d[1, 5] > 0.0)
 
 
+@numba.njit(cache=True)
 def line_segment_12_of_face_optimal(d):
     return not d[0, 6] > 0.0 and check_line_segment_12_of_face(d)
 
 
+@numba.njit(cache=True)
 def vertex_0_of_tetrahedron_optimal(d):
     return vertex_0_of_face_optimal(d) and not d[3, 8] > 0.0
 
 
+@numba.njit(cache=True)
 def line_segment_01_of_tetrahedron_optimal(d):
     return line_segment_01_of_face_optimal(d) and not d[3, 11] > 0.0
 
 
+@numba.njit(cache=True)
 def line_segment_02_of_tetrahedron_optimal(d):
     return line_segment_02_of_face_optimal(d) and not d[3, 12] > 0.0
 
 
+@numba.njit(cache=True)
 def face_012_of_tetrahedron_optimal(d):
     return face_012_of_face_optimal(d) and not d[3, 14] > EPSILON
 
 
+@numba.njit(cache=True)
 def line_segment_03_of_tetrahedron_optimal(d):
     return not (d[1, 11] > 0.0 or d[2, 12] > 0.0) and check_line_segment_03_of_tetrahedron(d)
 
 
+@numba.njit(cache=True)
 def face_013_of_tetrahedron_optimal(d):
     return not d[2, 14] > EPSILON and check_face_013_of_tetrahedron(d)
 
 
+@numba.njit(cache=True)
 def face_023_of_tetrahedron_optimal(d):
     return not d[1, 14] > EPSILON and check_face_023_of_tetrahedron(d)
 
 
+@numba.njit(cache=True)
 def convex_hull_of_tetrahedron_optimal(d):
     return not (d[0, 14] <= EPSILON or d[1, 14] <= EPSILON
                 or d[2, 14] <= EPSILON or d[3, 14] <= EPSILON)
 
 
+@numba.njit(cache=True)
 def vertex_1_of_tetrahedron_optimal(d):
     return vertex_1_of_face_optimal(d) and not d[3, 9] > 0.0
 
 
+@numba.njit(cache=True)
 def vertex_2_of_tetrahedron_optimal(d):
     return vertex_2_of_face_optimal(d) and not d[3, 10] > 0.0
 
 
+@numba.njit(cache=True)
 def vertex_3_of_tetrahedron_optimal(d):
     return not (d[0, 8] > 0.0 or d[1, 9] > 0.0 or d[2, 10] > 0.0)
 
 
+@numba.njit(cache=True)
 def line_segment_12_of_tetrahedron_optimal(d):
     return line_segment_12_of_face_optimal(d) and not d[3, 13] > 0.0
 
 
+@numba.njit(cache=True)
 def line_segment_13_of_tetrahedron_optimal(d):
     return not (d[0, 11] > 0.0 or d[2, 13] > 0.0) and check_line_segment_13_of_tetrahedron(d)
 
 
+@numba.njit(cache=True)
 def line_segment_23_of_tetrahedron_optimal(d):
     return not (d[0, 12] > 0.0 or d[1, 13] > 0.0) and check_line_segment_23_of_tetrahedron(d)
 
 
+@numba.njit(cache=True)
 def face_123_of_tetrahedron_optimal(d):
     return not d[0, 14] > EPSILON and check_face_123_of_tetrahedron(d)
 
 
+@numba.njit(cache=True)
 def check_line_segment_02_of_face(d):
     return not (d[0, 4] <= 0.0 or d[2, 4] <= 0.0)
 
 
+@numba.njit(cache=True)
 def check_face_012_of_face(d):
     return not (d[0, 6] <= 0.0 or d[1, 6] <= 0.0 or d[2, 6] <= 0.0)
 
 
+@numba.njit(cache=True)
 def check_line_segment_12_of_face(d):
     return not (d[1, 5] <= 0.0 or d[2, 5] <= 0.0)
 
 
+@numba.njit(cache=True)
 def check_line_segment_03_of_tetrahedron(d):
     return not (d[0, 8] <= 0.0 or d[3, 8] <= 0.0)
 
 
+@numba.njit(cache=True)
 def check_face_013_of_tetrahedron(d):
     return not (d[0, 11] <= 0.0 or d[1, 11] <= 0.0 or d[3, 11] <= 0.0)
 
 
+@numba.njit(cache=True)
 def check_face_023_of_tetrahedron(d):
     return not (d[0, 12] <= 0.0 or d[2, 12] <= 0.0 or d[3, 12] <= 0.0)
 
 
+@numba.njit(cache=True)
 def check_line_segment_13_of_tetrahedron(d):
     return not (d[1, 9] <= 0.0 or d[3, 9] <= 0.0)
 
 
+@numba.njit(cache=True)
 def check_line_segment_23_of_tetrahedron(d):
     return not (d[2, 10] <= 0.0 or d[3, 10] <= 0.0)
 
 
+@numba.njit(cache=True)
 def check_face_123_of_tetrahedron(d):
     return not (d[1, 13] <= 0.0 or d[2, 13] <= 0.0 or d[3, 13] <= 0.0)
 
