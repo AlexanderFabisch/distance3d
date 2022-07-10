@@ -26,6 +26,18 @@ def test_gjk_line_segments():
     assert gjk.gjk_distance_original(s1, s1)[0] == 0.0
     assert gjk.gjk_distance_jolt(s1, s1)[0] == 0.0
 
+    p1 = colliders.ConvexHullVertices(np.array([[0.0, 0.0, 0.0]]))
+    assert gjk.gjk_intersection_jolt(s1, p1)
+    assert gjk.gjk_intersection_libccd(s1, p1)
+    assert gjk.gjk_distance_original(s1, p1)[0] == 0.0
+    assert gjk.gjk_distance_jolt(s1, p1)[0] == 0.0
+
+    p2 = colliders.ConvexHullVertices(np.array([[1.0, 0.0, 0.0]]))
+    assert gjk.gjk_intersection_jolt(s1, p2)
+    assert gjk.gjk_intersection_libccd(s1, p2)
+    assert gjk.gjk_distance_original(s1, p2)[0] == 0.0
+    assert gjk.gjk_distance_jolt(s1, p2)[0] == 0.0
+
     s2 = colliders.ConvexHullVertices(np.array([
         [0.0, 1.0, 0.0], [1.0, 1.0, 0.0]]))
     assert not gjk.gjk_intersection_jolt(s1, s2)
