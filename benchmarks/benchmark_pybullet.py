@@ -59,8 +59,8 @@ def test_benchmark_distance3d(random_state, n_collision_objects, gui=False):
     for c1 in collision_objects:
         for c2 in collision_objects:
             #dist = gjk.gjk(c1, c2)[0]
-            #dist = gjk.gjk_intersection(c1, c2)
-            dist = mpr.mpr_intersection(c1, c2)
+            dist = gjk.gjk_intersection(c1, c2)
+            #dist = mpr.mpr_intersection(c1, c2)
             distances.append(dist)
     duration = timer.stop("distance3d")
 
