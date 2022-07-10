@@ -189,7 +189,7 @@ def gjk_distance_jolt(
             # Get the closest points
             outPointA, outPointB = calculate_closest_points(Y, P, Q, n_points)
 
-            assert np.dot(search_direction, search_direction) == v_len_sq
+            assert abs(np.dot(search_direction, search_direction) - v_len_sq) < EPSILON
             dist = math.sqrt(v_len_sq)
             if dist < EPSILON:
                 outPointA = outPointB = 0.5 * (outPointA + outPointB)
