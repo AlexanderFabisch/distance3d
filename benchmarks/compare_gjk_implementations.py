@@ -17,7 +17,7 @@ collider_classes = {
 
 
 def test_gjk_intersection_vs_gjk():
-    random_state = np.random.RandomState(27)
+    random_state = np.random.RandomState(29)
 
     collider_names = list(collider_classes.keys())
 
@@ -35,9 +35,9 @@ def test_gjk_intersection_vs_gjk():
 
         dist_original, closest_point1_original, closest_point2_original, _ = gjk.gjk_distance_original(collider1, collider2)
         dist_jolt, closest_point1_jolt, closest_point2_jolt, _ = gjk.gjk_distance_jolt(collider1, collider2)
-        gjk_intersection_original = dist_original < 1e-10
+        gjk_intersection_original = dist_original < 1e-5
         gjk_intersection_libccd = gjk.gjk_intersection_libccd(collider1, collider2)
-        gjk_intersection_jolt1 = dist_jolt < 1e-10
+        gjk_intersection_jolt1 = dist_jolt < 1e-5
         gjk_intersection_jolt2 = gjk.gjk_intersection_jolt(collider1, collider2)
 
         any_diff = (gjk_intersection_original != gjk_intersection_libccd
