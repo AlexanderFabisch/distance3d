@@ -8,6 +8,10 @@ EPSILON = 10.0 * np.finfo(float).eps
 def gjk_distance_original(collider1, collider2):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
 
+    The original implementation is quite slow, since the distance subalgorithm
+    with the backup procedure is very slow in comparison to simpler, modern
+    versions of the GJK algorithm.
+
     This is the original flavour of the GJK algorithm based on the translation
     to C of the original Fortran implementation:
     Ruspini, Diego. gilbert.c, a C version of the original Fortran

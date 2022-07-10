@@ -27,8 +27,19 @@ class GjkState(Enum):
 def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10):
     """Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.
 
+    This implementation differs in several ways from the libccd version:
+
+    * Support points will be interpolated
+    * A configurable numerical tolerance is used to check convergence
+    * Simplex selection is done via an integer of which the first 4 bits are
+      used to select or deselect points of the current simplex
+
     Implementation based on Jolt Physics, Copyright 2021 Jorrit Rouwe, MIT
     license.
+
+    Based on: A Fast and Robust GJK Implementation for Collision Detection of
+    Convex Objects - Gino van den Bergen,
+    http://www.dtecta.com/papers/jgt98convex.pdf
 
     Parameters
     ----------
@@ -126,8 +137,16 @@ def gjk_distance_jolt(
         collider1, collider2, tolerance=1e-10, max_distance_squared=100000.0):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
 
+    This implementation extends the intersection test by closest point
+    calculation after convergence. It is also possible to clip colliders that
+    are too far away early.
+
     Implementation based on Jolt Physics, Copyright 2021 Jorrit Rouwe, MIT
     license.
+
+    Based on: A Fast and Robust GJK Implementation for Collision Detection of
+    Convex Objects - Gino van den Bergen,
+    http://www.dtecta.com/papers/jgt98convex.pdf
 
     Parameters
     ----------
@@ -187,13 +206,13 @@ def gjk_distance_jolt(
             return MAX_FLOAT, None, None, None
         else:
             # Get the closest points
-            outPointA, outPointB = calculate_closest_points(Y, P, Q, n_points)
+            a, b = calculate_closest_points(Y, P, Q, n_points)
 
             assert abs(np.dot(search_direction, search_direction) - v_len_sq) < EPSILON
             dist = math.sqrt(v_len_sq)
             if dist < EPSILON:
-                outPointA = outPointB = 0.5 * (outPointA + outPointB)
-            return dist, outPointA, outPointB, Y
+                a = b = 0.5 * (a + b)
+            return dist, a, b, Y
 
 
 @numba.njit(cache=True)
@@ -215,10 +234,10 @@ def _distance_loop(
     Q[n_points] = q
     n_points += 1
 
-    success, ioV_new, v_len_sq_new, set_new = get_closest_point_to_origin(
+    success, ioV_new, v_len_sq_new, new_set = get_closest_point_to_origin(
         Y, n_points, prev_v_len_sq)
     if success:
-        search_direction[:], v_len_sq, simplex = ioV_new, v_len_sq_new, set_new
+        search_direction[:], v_len_sq, simplex = ioV_new, v_len_sq_new, new_set
     else:
         n_points -= 1  # Undo add last point
         simplex = 0b0000
