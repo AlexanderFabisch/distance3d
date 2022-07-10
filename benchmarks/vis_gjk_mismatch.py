@@ -5,28 +5,37 @@ import pytransform3d.visualizer as pv
 import pickle
 
 
-with open("testdata.pickle", "rb") as f:
-    vertices1, vertices2 = pickle.load(f)
+collider_classes = {
+    "sphere": colliders.Sphere,
+    "ellipsoid": colliders.Ellipsoid,
+    "capsule": colliders.Capsule,
+    "disk": colliders.Disk,
+    "ellipse": colliders.Ellipse,
+    "cone": colliders.Cone,
+    "cylinder": colliders.Cylinder,
+    "box": colliders.Box,
+    "mesh": colliders.MeshGraph,
+}
 
-convex1 = colliders.ConvexHullVertices(vertices1)
-convex2 = colliders.ConvexHullVertices(vertices2)
-intersection_libccd = gjk.gjk_intersection_libccd(convex1, convex2)
+
+with open("testdata.pickle", "rb") as f:
+    collider_name1, args1, collider_name2, args2 = pickle.load(f)
+
+collider1 = collider_classes[collider_name1](*args1)
+collider2 = collider_classes[collider_name2](*args2)
+intersection_libccd = gjk.gjk_intersection_libccd(collider1, collider2)
 print(f"{intersection_libccd=}")
-intersection_jolt = gjk.gjk_intersection_jolt(convex1, convex2)
+intersection_jolt = gjk.gjk_intersection_jolt(collider1, collider2)
 print(f"{intersection_jolt=}")
-intersection_mpr = mpr.mpr_intersection(convex1, convex2)
+intersection_mpr = mpr.mpr_intersection(collider1, collider2)
 print(f"{intersection_mpr=}")
-dist_original, cp1_original, cp2_original, _ = gjk.gjk_distance_original(convex1, convex2)
+dist_original, cp1_original, cp2_original, _ = gjk.gjk_distance_original(collider1, collider2)
 print(f"{dist_original=}, {cp1_original=}, {cp2_original=}")
-dist_jolt, cp1_jolt, cp2_jolt, _ = gjk.gjk_distance_jolt(convex1, convex2)
+dist_jolt, cp1_jolt, cp2_jolt, _ = gjk.gjk_distance_jolt(collider1, collider2)
 print(f"{dist_jolt=}, {cp1_jolt=}, {cp2_jolt=}")
 fig = pv.figure()
-triangles1 = mesh.make_convex_mesh(vertices1)
-convex1 = colliders.MeshGraph(np.eye(4), vertices1, triangles1)
-triangles2 = mesh.make_convex_mesh(vertices2)
-convex2 = colliders.MeshGraph(np.eye(4), vertices2, triangles2)
-convex1.make_artist((1, 0, 0))
-convex2.make_artist((0, 1, 0))
-convex1.artist_.add_artist(fig)
-convex2.artist_.add_artist(fig)
+collider1.make_artist((1, 0, 0))
+collider2.make_artist((0, 1, 0))
+collider1.artist_.add_artist(fig)
+collider2.artist_.add_artist(fig)
 fig.show()
