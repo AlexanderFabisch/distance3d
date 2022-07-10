@@ -1009,7 +1009,7 @@ def _backup_procedure_tetrahedron(simplex, backup, d, solution):
     if d.check_face_123_of_tetrahedron():
         solution_d.from_face(simplex, [3, 1, 2], d.d[3, 13], d.d[1, 13], d.d[2, 13])
         diff = solution_d.distance_squared - solution.distance_squared
-        if diff < 0.0 or n_simplex_points == 4 and diff < EPSILON:
+        if diff < 0.0 or n_simplex_points == 4 and diff <= 0.0:
             n_simplex_points = 3
             solution.copy_from(solution_d, n_simplex_points)
             ordered_indices[:3] = 3, 1, 2
