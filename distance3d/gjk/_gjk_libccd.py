@@ -14,10 +14,23 @@ EPSILON_SQRT = math.sqrt(EPSILON)
 def gjk_intersection_libccd(collider1, collider2, max_iterations=100):
     """Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.
 
+    This version of GJK does not interpolate between vertices of a mesh.
+    Hence, it might sometimes loop through the same vertices of a mesh
+    until the maximum number of iterations is reached. This does not occur
+    with parametrically represented primitive shapes.
+
+    An advantage of the implementation is that it implements the intersection
+    test much faster than the original implementation. It is also the shortest
+    implementation of all.
+
     This implementation of GJK is based on libccd (for details, see
     https://github.com/danfis/libccd). For the original code the copyright is
     of Daniel Fiser <danfis@danfis.cz>. It has been released under 3-clause BSD
     license.
+
+    Based on: A Fast and Robust GJK Implementation for Collision Detection of
+    Convex Objects - Gino van den Bergen,
+    http://www.dtecta.com/papers/jgt98convex.pdf
 
     Parameters
     ----------
