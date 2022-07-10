@@ -8,9 +8,6 @@ EPSILON = 10.0 * np.finfo(float).eps
 def gjk_distance_original(collider1, collider2):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
 
-    The GJK algorithm only works for convex shapes. Concave objects have to be
-    decomposed into convex shapes first.
-
     This is the original flavour of the GJK algorithm based on the translation
     to C of the original Fortran implementation:
     Ruspini, Diego. gilbert.c, a C version of the original Fortran
