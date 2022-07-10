@@ -191,6 +191,8 @@ def gjk_distance_jolt(
 
             assert np.dot(search_direction, search_direction) == v_len_sq
             dist = math.sqrt(v_len_sq)
+            if dist < EPSILON:
+                outPointA = outPointB = 0.5 * (outPointA + outPointB)
             return dist, outPointA, outPointB, Y
 
 
