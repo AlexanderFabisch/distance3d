@@ -243,7 +243,7 @@ def _distance_loop(
         v_len_sq = 0.0
         return GjkState.Intersection, n_points, prev_v_len_sq, v_len_sq
 
-    # The next seperation axis to test is the negative of the closest point of
+    # The next separation axis to test is the negative of the closest point of
     # the Minkowski sum to the origin
     # Note: This must be done before terminating as converged since the
     # separating axis is -v
@@ -253,7 +253,7 @@ def _distance_loop(
     # there is no collision
     assert prev_v_len_sq >= v_len_sq
     if prev_v_len_sq - v_len_sq <= EPSILON * prev_v_len_sq:
-        # v is a separating axis
+        # search_direction is a separating axis
         return GjkState.NoIntersection, n_points, prev_v_len_sq, v_len_sq
 
     prev_v_len_sq = v_len_sq
