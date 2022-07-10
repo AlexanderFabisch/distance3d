@@ -46,9 +46,13 @@ def test_gjk_intersection_vs_gjk():
         if any_diff:
             print(f"{dist_original=}\n{dist_jolt=}\n"
                   f"{gjk_intersection_libccd=}\n{gjk_intersection_jolt2=}")
-            with open("testdata.pickle", "wb") as f:
-                pickle.dump((collider_name1, args1, collider_name2, args2), f)
+            save_colliders(collider_name1, args1, collider_name2, args2)
             break
+
+
+def save_colliders(collider_name1, args1, collider_name2, args2):
+    with open("testdata.pickle", "wb") as f:
+        pickle.dump((collider_name1, args1, collider_name2, args2), f)
 
 
 def random_vertices(random_state):
