@@ -5,13 +5,14 @@ import numpy as np
 EPSILON = 10.0 * np.finfo(float).eps
 
 
-def gjk(collider1, collider2):
+def gjk_distance_original(collider1, collider2):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
 
     The GJK algorithm only works for convex shapes. Concave objects have to be
     decomposed into convex shapes first.
 
-    Based on the translation to C of the original Fortran implementation:
+    This is the original flavour of the GJK algorithm based on the translation
+    to C of the original Fortran implementation:
     Ruspini, Diego. gilbert.c, a C version of the original Fortran
     implementation of the GJK algorithm.
     ftp://labrea.stanford.edu/cs/robotics/sean/distance/gilbert.c,
@@ -97,9 +98,6 @@ def gjk(collider1, collider2):
             old_simplex.copy_from(simplex)
             if len(simplex) == 4:
                 simplex.reorder(simplex.nondecreasing_ordered_indices())
-
-
-gjk_with_simplex = gjk  # for backward compatibility
 
 
 class VertexCachedCollider:
