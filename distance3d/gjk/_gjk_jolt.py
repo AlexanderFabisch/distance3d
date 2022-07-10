@@ -547,7 +547,8 @@ def origin_outside_of_tetrahedron_planes(a, b, c, d):
     elif np.all(signd < 0.0):
         return signp <= EPSILON
     else:
-        raise ValueError("Mixed signs, degenerate tetrahedron")
+        # Mixed signs, degenerate tetrahedron
+        return np.ones(4) > np.zeros(4)  # TODO what is the type of this?
 
 
 @numba.njit(cache=True)
