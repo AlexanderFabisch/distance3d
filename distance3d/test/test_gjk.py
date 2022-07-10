@@ -4,6 +4,43 @@ from pytest import approx
 from numpy.testing import assert_array_almost_equal
 
 
+def test_gjk_points():
+    p1 = colliders.ConvexHullVertices(np.array([[0.0, 0.0, 0.0]]))
+    assert gjk.gjk_intersection_jolt(p1, p1)
+    assert gjk.gjk_intersection_libccd(p1, p1)
+    assert gjk.gjk_distance_original(p1, p1)[0] == 0.0
+    assert gjk.gjk_distance_jolt(p1, p1)[0] == 0.0
+
+    p2 = colliders.ConvexHullVertices(np.array([[1.0, 0.0, 0.0]]))
+    assert not gjk.gjk_intersection_jolt(p1, p2)
+    assert not gjk.gjk_intersection_libccd(p1, p2)
+    assert gjk.gjk_distance_original(p1, p2)[0] == 1.0
+    assert gjk.gjk_distance_jolt(p1, p2)[0] == 1.0
+
+
+def test_gjk_line_segments():
+    s1 = colliders.ConvexHullVertices(np.array([
+        [0.0, 0.0, 0.0], [1.0, 0.0, 0.0]]))
+    assert gjk.gjk_intersection_jolt(s1, s1)
+    assert gjk.gjk_intersection_libccd(s1, s1)
+    assert gjk.gjk_distance_original(s1, s1)[0] == 0.0
+    assert gjk.gjk_distance_jolt(s1, s1)[0] == 0.0
+
+    s2 = colliders.ConvexHullVertices(np.array([
+        [0.0, 1.0, 0.0], [1.0, 1.0, 0.0]]))
+    assert not gjk.gjk_intersection_jolt(s1, s2)
+    assert not gjk.gjk_intersection_libccd(s1, s2)
+    assert gjk.gjk_distance_original(s1, s2)[0] == 1.0
+    assert gjk.gjk_distance_jolt(s1, s2)[0] == 1.0
+
+    s2 = colliders.ConvexHullVertices(np.array([
+        [0.5, -1.0, 0.0], [0.5, 1.0, 0.0]]))
+    assert gjk.gjk_intersection_jolt(s1, s2)
+    assert gjk.gjk_intersection_libccd(s1, s2)
+    assert gjk.gjk_distance_original(s1, s2)[0] == 0.0
+    assert gjk.gjk_distance_jolt(s1, s2)[0] == 0.0
+
+
 def test_gjk_boxes():
     box2origin = np.eye(4)
     size = np.ones(3)
@@ -203,7 +240,7 @@ def test_gjk_ellipsoids():
         assert_array_almost_equal(closest_point1, closest_point21)
 
 
-def test_gjk_points():
+def test_gjk_random_points():
     random_state = np.random.RandomState(23)
 
     for _ in range(50):
