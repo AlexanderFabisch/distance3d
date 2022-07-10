@@ -1,6 +1,6 @@
 import numpy as np
 from distance3d import random, distance, utils, colliders
-from distance3d.gjk import gjk_distance_original
+from distance3d.gjk import gjk_distance_original, gjk_distance
 from distance3d.gjk._gjk_jolt import (
     get_barycentric_coordinates_line, get_barycentric_coordinates_plane,
     get_barycentric_coordinates_tetrahedron, closest_point_line,
@@ -83,3 +83,13 @@ def test_closest_point_tetrahedron():
         c2 = colliders.ConvexHullVertices(np.zeros((1, 3)))
         cp2 = gjk_distance_original(c1, c2)[1]
         assert_array_almost_equal(cp1, cp2)
+
+
+def test_too_far_away():
+    c1 = colliders.ConvexHullVertices(np.array([[0.0, 0.0, 0.0]]))
+    c2 = colliders.ConvexHullVertices(np.array([[100000000.0, 0.0, 0.0]]))
+    dist, p1, p2, simplex = gjk_distance(c1, c2)
+    assert dist == np.finfo(float).max
+    assert p1 is None
+    assert p2 is None
+    assert simplex is None
