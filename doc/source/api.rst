@@ -138,7 +138,12 @@ API Reference
    :toctree: _autosummary/
 
    ~distance3d.gjk.gjk
+   ~distance3d.gjk.gjk_distance
    ~distance3d.gjk.gjk_intersection
+   ~distance3d.gjk.gjk_distance_jolt
+   ~distance3d.gjk.gjk_intersection_jolt
+   ~distance3d.gjk.gjk_distance_original
+   ~distance3d.gjk.gjk_intersection_libccd
 
 
 :mod:`distance3d.epa`

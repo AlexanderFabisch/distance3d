@@ -11,7 +11,7 @@ from distance3d.distance import point_to_triangle
 EPSILON_SQRT = math.sqrt(EPSILON)
 
 
-def gjk_intersection(collider1, collider2, max_iterations=100):
+def gjk_intersection_libccd(collider1, collider2, max_iterations=100):
     """Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.
 
     This implementation of GJK is based on libccd (for details, see
