@@ -41,6 +41,10 @@ def test_gjk_boxes():
                             assert_array_almost_equal(
                                 closest_point1, closest_point2)
 
+                            dist2, _, _, _ = gjk.gjk_distance_jolt(
+                                box_collider, box_collider2)
+                            assert approx(dist2) == 0.0
+
     box2origin = np.array([
         [-0.29265666, -0.76990535, 0.56709596, 0.1867558],
         [0.93923897, -0.12018753, 0.32153556, -0.09772779],
@@ -59,8 +63,11 @@ def test_gjk_boxes():
 
     dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
         box_collider, box_collider2)
-
     assert approx(dist) == 1.7900192730149391
+
+    dist2, _, _, _ = gjk.gjk_distance_jolt(
+        box_collider, box_collider2)
+    assert approx(dist2) == 1.7900192730149391
 
 
 def test_gjk_spheres():
@@ -71,12 +78,18 @@ def test_gjk_spheres():
     assert_array_almost_equal(closest_point1, np.array([0, 0, 1]))
     assert_array_almost_equal(closest_point1, closest_point2)
 
+    dist, _, _, _ = gjk.gjk_distance_jolt(sphere1, sphere1)
+    assert approx(dist) == 0.0
+
     sphere2 = colliders.Sphere(center=np.array([1, 1, 1], dtype=float), radius=1.0)
     dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
         sphere1, sphere2)
     assert approx(dist) == 0.0
     assert_array_almost_equal(closest_point1, np.array([0.5, 0.5, 0.633975]))
     assert_array_almost_equal(closest_point1, closest_point2)
+
+    dist, _, _, _ = gjk.gjk_distance_jolt(sphere1, sphere2)
+    assert approx(dist) == 0.0
 
     sphere1 = colliders.Sphere(center=np.array([0, 0, 0], dtype=float), radius=1.0)
     sphere2 = colliders.Sphere(center=np.array([0, 0, 3], dtype=float), radius=1.0)
@@ -85,6 +98,9 @@ def test_gjk_spheres():
     assert approx(dist) == 1
     assert_array_almost_equal(closest_point1, np.array([0, 0, 1]))
     assert_array_almost_equal(closest_point2, np.array([0, 0, 2]))
+
+    dist, _, _, _ = gjk.gjk_distance_jolt(sphere1, sphere2)
+    assert approx(dist) == 1.0
 
 
 def test_gjk_cylinders():
@@ -95,6 +111,9 @@ def test_gjk_cylinders():
     assert_array_almost_equal(closest_point1, np.array([1, 0, 0.5]))
     assert_array_almost_equal(closest_point2, np.array([1, 0, 0.5]))
 
+    dist, _, _, _ = gjk.gjk_distance_jolt(cylinder1, cylinder1)
+    assert approx(dist) == 0
+
     A2B = np.eye(4)
     A2B[:3, 3] = np.array([3, 0, 0])
     cylinder2 = colliders.Cylinder(A2B, 1, 1)
@@ -103,6 +122,9 @@ def test_gjk_cylinders():
     assert approx(dist) == 1
     assert_array_almost_equal(closest_point1, np.array([1, 0, 0.5]))
     assert_array_almost_equal(closest_point2, np.array([2, 0, 0.5]))
+
+    dist, _, _, _ = gjk.gjk_distance_jolt(cylinder1, cylinder2)
+    assert approx(dist) == 1
 
     A2B = np.eye(4)
     A2B[:3, 3] = np.array([0, 0, 4])
@@ -113,6 +135,9 @@ def test_gjk_cylinders():
     assert_array_almost_equal(closest_point1, np.array([1, 0, 0.5]))
     assert_array_almost_equal(closest_point2, np.array([1, 0, 3.5]))
 
+    dist, _, _, _ = gjk.gjk_distance_jolt(cylinder1, cylinder2)
+    assert approx(dist) == 3
+
 
 def test_gjk_capsules():
     capsule1 = colliders.Capsule(np.eye(4), 1, 1)
@@ -120,6 +145,9 @@ def test_gjk_capsules():
         capsule1, capsule1)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point1, closest_point2)
+
+    dist, _, _, _ = gjk.gjk_distance_jolt(capsule1, capsule1)
+    assert approx(dist) == 0
 
     A2B = np.eye(4)
     A2B[:3, 3] = np.array([3, 0, 0])
@@ -130,6 +158,9 @@ def test_gjk_capsules():
     assert_array_almost_equal(closest_point1, np.array([1, 0, -0.5]))
     assert_array_almost_equal(closest_point2, np.array([2, 0, -0.5]))
 
+    dist, _, _, _ = gjk.gjk_distance_jolt(capsule1, capsule2)
+    assert approx(dist) == 1
+
     A2B = np.eye(4)
     A2B[:3, 3] = np.array([0, 0, 4])
     capsule2 = colliders.Capsule(A2B, 1, 1)
@@ -138,6 +169,38 @@ def test_gjk_capsules():
     assert approx(dist) == 1
     assert_array_almost_equal(closest_point1, np.array([0, 0, 1.5]))
     assert_array_almost_equal(closest_point2, np.array([0, 0, 2.5]))
+
+    dist, _, _, _ = gjk.gjk_distance_jolt(capsule1, capsule2)
+    assert approx(dist) == 1
+
+
+def test_gjk_ellipsoids():
+    random_state = np.random.RandomState(83)
+    for _ in range(10):
+        ellipsoid2origin1, radii1 = random.rand_ellipsoid(
+            random_state, center_scale=2.0)
+        ellipsoid2origin2, radii2 = random.rand_ellipsoid(
+            random_state, center_scale=2.0)
+        dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
+            colliders.Ellipsoid(ellipsoid2origin1, radii1),
+            colliders.Ellipsoid(ellipsoid2origin2, radii2))
+
+        dist12, closest_point12 = distance.point_to_ellipsoid(
+            closest_point1, ellipsoid2origin2, radii2)
+        dist21, closest_point21 = distance.point_to_ellipsoid(
+            closest_point2, ellipsoid2origin1, radii1)
+        assert approx(dist) == dist12
+        assert_array_almost_equal(closest_point2, closest_point12)
+        assert approx(dist) == dist21
+        assert_array_almost_equal(closest_point1, closest_point21)
+
+        dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
+            colliders.Ellipsoid(ellipsoid2origin1, radii1),
+            colliders.Ellipsoid(ellipsoid2origin2, radii2))
+        assert approx(dist) == dist12
+        assert_array_almost_equal(closest_point2, closest_point12)
+        assert approx(dist) == dist21
+        assert_array_almost_equal(closest_point1, closest_point21)
 
 
 def test_gjk_points():
@@ -199,7 +262,7 @@ def test_gjk_triangle_to_triangle():
     for _ in range(10):
         triangle_points = random.randn_triangle(random_state)
         triangle_points2 = random.randn_triangle(random_state)
-        dist, closest_point_triangle, closest_point_triangle2, _ = gjk.gjk(
+        dist, closest_point_triangle, closest_point_triangle2, _ = gjk.gjk_distance_original(
             colliders.ConvexHullVertices(triangle_points), colliders.ConvexHullVertices(triangle_points2))
         dist2, closest_point_triangle_2, closest_point_triangle2_2 = distance.triangle_to_triangle(
             triangle_points, triangle_points2)
@@ -208,6 +271,13 @@ def test_gjk_triangle_to_triangle():
             closest_point_triangle, closest_point_triangle_2)
         assert_array_almost_equal(
             closest_point_triangle2, closest_point_triangle2_2)
+        dist3, closest_point_triangle_3, closest_point_triangle2_3, _ = gjk.gjk_distance_original(
+            colliders.ConvexHullVertices(triangle_points), colliders.ConvexHullVertices(triangle_points2))
+        assert approx(dist) == dist3
+        assert_array_almost_equal(
+            closest_point_triangle, closest_point_triangle_3)
+        assert_array_almost_equal(
+            closest_point_triangle2, closest_point_triangle2_3)
 
 
 def test_gjk_triangle_to_rectangle():
@@ -227,27 +297,13 @@ def test_gjk_triangle_to_rectangle():
             closest_point_triangle, closest_point_triangle2)
         assert_array_almost_equal(
             closest_point_rectangle, closest_point_rectangle2)
-
-
-def test_gjk_ellipsoids():
-    random_state = np.random.RandomState(83)
-    for _ in range(10):
-        ellipsoid2origin1, radii1 = random.rand_ellipsoid(
-            random_state, center_scale=2.0)
-        ellipsoid2origin2, radii2 = random.rand_ellipsoid(
-            random_state, center_scale=2.0)
-        dist, closest_point1, closest_point2, _ = gjk.gjk(
-            colliders.Ellipsoid(ellipsoid2origin1, radii1),
-            colliders.Ellipsoid(ellipsoid2origin2, radii2))
-
-        dist12, closest_point12 = distance.point_to_ellipsoid(
-            closest_point1, ellipsoid2origin2, radii2)
-        dist21, closest_point21 = distance.point_to_ellipsoid(
-            closest_point2, ellipsoid2origin1, radii1)
-        assert approx(dist) == dist12
-        assert_array_almost_equal(closest_point2, closest_point12)
-        assert approx(dist) == dist21
-        assert_array_almost_equal(closest_point1, closest_point21)
+        dist3, closest_point_triangle3, closest_point_rectangle3 = distance.triangle_to_rectangle(
+            triangle_points, rectangle_center, rectangle_axes, rectangle_lengths)
+        assert approx(dist) == dist3
+        assert_array_almost_equal(
+            closest_point_triangle, closest_point_triangle3)
+        assert_array_almost_equal(
+            closest_point_rectangle, closest_point_rectangle3)
 
 
 def test_gjk_floating_point_accuracy_of_barycentric_coordinates_of_face():
