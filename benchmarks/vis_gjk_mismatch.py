@@ -1,6 +1,5 @@
-import numpy as np
-from distance3d import colliders, gjk
-from distance3d import mesh, mpr
+import pprint
+from distance3d import colliders, gjk, mpr
 import pytransform3d.visualizer as pv
 import pickle
 
@@ -20,6 +19,10 @@ collider_classes = {
 
 with open("testdata.pickle", "rb") as f:
     collider_name1, args1, collider_name2, args2 = pickle.load(f)
+print(collider_name1)
+pprint.pprint(args1)
+print(collider_name2)
+pprint.pprint(args2)
 
 collider1 = collider_classes[collider_name1](*args1)
 collider2 = collider_classes[collider_name2](*args2)
