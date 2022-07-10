@@ -1,6 +1,7 @@
 """Colliders used for collision detection with GJK and MPR algorithms."""
 import abc
 
+import numba
 import numpy as np
 from .geometry import (
     support_function_capsule, support_function_cylinder,
@@ -96,6 +97,15 @@ class ConvexCollider(abc.ABC):
             Axis-aligned bounding box.
         """
 
+    def make_support_function(self):
+        """Extract support function from collider.
+
+        Returns
+        -------
+        support_function : object
+            Has the function "support_function(search_direction)".
+        """
+
 
 class ConvexHullVertices(ConvexCollider):
     """Convex hull of a set of vertices.
@@ -130,6 +140,18 @@ class ConvexHullVertices(ConvexCollider):
 
     def aabb(self):
         return AABB(np.array(axis_aligned_bounding_box(self.vertices)).T)
+
+    def make_support_function(self):
+        return ConvexHullVerticesSupportFunction(self.vertices)
+
+
+@numba.experimental.jitclass(spec={"vertices": numba.float64[:, ::1]})
+class ConvexHullVerticesSupportFunction:
+    def __init__(self, vertices):
+        self.vertices = vertices
+
+    def support_function(self, search_direction):
+        return self.vertices[np.argmax(self.vertices.dot(search_direction))]
 
 
 class Box(ConvexHullVertices):
@@ -221,6 +243,9 @@ class MeshGraph(ConvexCollider):
             self.mesh2origin[np.newaxis, :3, 3] + np.dot(
                 self.vertices, self.mesh2origin[:3, :3].T))).T)
 
+    def make_support_function(self):
+        return self._support_function.make_support_function()
+
 
 class Sphere(ConvexCollider):
     """Sphere collider.
@@ -264,6 +289,21 @@ class Sphere(ConvexCollider):
 
     def aabb(self):
         return AABB(np.array(sphere_aabb(self.c, self.radius)).T)
+
+    def make_support_function(self):
+        return SphereSupportFunction(self.c, self.radius)
+
+
+@numba.experimental.jitclass(spec={
+    "center": numba.float64[::1], "radius": numba.float64})
+class SphereSupportFunction:
+    def __init__(self, center, radius):
+        self.center = center
+        self.radius = radius
+
+    def support_function(self, search_direction):
+        return support_function_sphere(
+            search_direction, self.center, self.radius)
 
 
 class Capsule(ConvexCollider):
@@ -315,6 +355,24 @@ class Capsule(ConvexCollider):
         return AABB(np.array(capsule_aabb(
             self.capsule2origin, self.radius, self.height)).T)
 
+    def make_support_function(self):
+        return CapsuleSupportFunction(
+            self.capsule2origin, self.radius, self.height)
+
+
+@numba.experimental.jitclass(spec={
+    "capsule2origin": numba.float64[:, ::1], "radius": numba.float64,
+    "height": numba.float64})
+class CapsuleSupportFunction:
+    def __init__(self, capsule2origin, radius, height):
+        self.capsule2origin = capsule2origin
+        self.radius = radius
+        self.height = height
+
+    def support_function(self, search_direction):
+        return support_function_capsule(
+            search_direction, self.capsule2origin, self.radius, self.height)
+
 
 class Ellipsoid(ConvexCollider):
     """Ellipsoid collider.
@@ -359,6 +417,21 @@ class Ellipsoid(ConvexCollider):
     def aabb(self):
         return AABB(
             np.array(ellipsoid_aabb(self.ellipsoid2origin, self.radii)).T)
+
+    def make_support_function(self):
+        return EllipsoidSupportFunction(self.ellipsoid2origin, self.radii)
+
+
+@numba.experimental.jitclass(spec={
+    "capsule2origin": numba.float64[:, ::1], "radii": numba.float64[::1]})
+class EllipsoidSupportFunction:
+    def __init__(self, ellipsoid2origin, radii):
+        self.ellipsoid2origin = ellipsoid2origin
+        self.radii = radii
+
+    def support_function(self, search_direction):
+        return support_function_ellipsoid(
+            search_direction, self.ellipsoid2origin, self.radii)
 
 
 class Cylinder(ConvexCollider):
@@ -409,6 +482,24 @@ class Cylinder(ConvexCollider):
     def aabb(self):
         return AABB(np.array(cylinder_aabb(
             self.cylinder2origin, self.radius, self.length)).T)
+
+    def make_support_function(self):
+        return CylinderSupportFunction(
+            self.cylinder2origin, self.radius, self.length)
+
+
+@numba.experimental.jitclass(spec={
+    "cylinder2origin": numba.float64[:, ::1], "radius": numba.float64,
+    "length": numba.float64})
+class CylinderSupportFunction:
+    def __init__(self, cylinder2origin, radius, length):
+        self.cylinder2origin = cylinder2origin
+        self.radius = radius
+        self.length = length
+
+    def support_function(self, search_direction):
+        return support_function_cylinder(
+            search_direction, self.cylinder2origin, self.radius, self.length)
 
 
 class Disk(ConvexCollider):
@@ -464,6 +555,23 @@ class Disk(ConvexCollider):
     def aabb(self):
         return AABB(np.array(disk_aabb(self.c, self.radius, self.normal)).T)
 
+    def make_support_function(self):
+        return DiskSupportFunction(self.c, self.radius, self.normal)
+
+
+@numba.experimental.jitclass(spec={
+    "center": numba.float64[::1], "radius": numba.float64,
+    "normal": numba.float64[::1]})
+class DiskSupportFunction:
+    def __init__(self, center, radius, normal):
+        self.center = center
+        self.radius = radius
+        self.normal = normal
+
+    def support_function(self, search_direction):
+        return support_function_cylinder(
+            search_direction, self.center, self.radius, self.normal)
+
 
 class Ellipse(ConvexCollider):
     """Ellipse collider.
@@ -510,6 +618,23 @@ class Ellipse(ConvexCollider):
 
     def aabb(self):
         return AABB(np.array(ellipse_aabb(self.c, self.axes, self.radii)).T)
+
+    def make_support_function(self):
+        return EllipseSupportFunction(self.c, self.axes, self.radii)
+
+
+@numba.experimental.jitclass(spec={
+    "center": numba.float64[::1], "axes": numba.float64[:, ::1],
+    "radii": numba.float64[::1]})
+class EllipseSupportFunction:
+    def __init__(self, center, axes, radii):
+        self.center = center
+        self.axes = axes
+        self.radii = radii
+
+    def support_function(self, search_direction):
+        return support_function_ellipse(
+            search_direction, self.center, self.axes, self.radii)
 
 
 class Cone(ConvexCollider):
@@ -561,6 +686,23 @@ class Cone(ConvexCollider):
         return AABB(np.array(cone_aabb(
             self.cone2origin, self.radius, self.height)).T)
 
+    def make_support_function(self):
+        return ConeSupportFunction(self.cone2origin, self.radius, self.height)
+
+
+@numba.experimental.jitclass(spec={
+    "cone2origin": numba.float64[:, ::1], "radius": numba.float64,
+    "height": numba.float64})
+class ConeSupportFunction:
+    def __init__(self, cone2origin, radius, height):
+        self.cone2origin = cone2origin
+        self.radius = radius
+        self.height = height
+
+    def support_function(self, search_direction):
+        return support_function_cone(
+            search_direction, self.cone2origin, self.radius, self.height)
+
 
 class Margin(ConvexCollider):
     """Margin around collider.
@@ -600,3 +742,21 @@ class Margin(ConvexCollider):
         mins = aabb.limits[:, 0] - self.margin
         maxs = aabb.limits[:, 1] + self.margin
         return AABB(np.array([mins, maxs]).T)
+
+    def make_support_function(self):
+        return MarginSupportFunction(
+            self.collider.make_support_function().support_function,
+            self.margin)
+
+
+#@numba.experimental.jitclass(spec={
+#    "support_function": numba.float64[::1](numba.float64[::1]),
+#    "margin": numba.float64})
+class MarginSupportFunction:
+    def __init__(self, support_function, margin):
+        self.support_function = support_function
+        self.margin = margin
+
+    def support_function(self, search_direction):
+        return self.support_function(
+            search_direction) + self.margin * norm_vector(search_direction)

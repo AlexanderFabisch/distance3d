@@ -44,6 +44,9 @@ def _gjk(collider1, collider2, simplex, max_iterations):
     simplex.add_point(*support_point)
     search_direction = -support_point[0]
 
+    collider1 = collider1.make_support_function()
+    collider2 = collider2.make_support_function()
+
     for _ in range(max_iterations):
         support_point = support_function(collider1, collider2, search_direction)
         is_origin = np.dot(support_point[0], support_point[0]) < EPSILON

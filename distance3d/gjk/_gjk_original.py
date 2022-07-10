@@ -58,6 +58,9 @@ def gjk_distance_original(collider1, collider2):
     new_idx2, new_vertex2 = collider2.first_vertex()
     simplex.set_first_point(new_idx1, new_idx2, new_vertex1 - new_vertex2)
 
+    collider1 = collider1.make_support_function()
+    collider2 = collider2.make_support_function()
+
     iteration = 0
     backup = False
     while True:

@@ -47,7 +47,14 @@ def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10):
     intersection : bool
         Do the two colliders intersect?
     """
-    Y = np.empty((4, 3))  # Support points on A - B
+    collider1 = collider1.make_support_function()
+    collider2 = collider2.make_support_function()
+    return _gjk_intersection_jolt(collider1, collider2, tolerance)
+
+
+@numba.njit(cache=True)
+def _gjk_intersection_jolt(collider1, collider2, tolerance):
+    Y = np.empty((4, 3), dtype=numba.float64)  # Support points on A - B
     n_points = 0  # Number of points in Y that are valid
 
     tolerance_sq = tolerance * tolerance
