@@ -1236,7 +1236,7 @@ def test_gjk_boxes():
     box_collider = colliders.Box(box2origin, size)
 
     # complete overlap
-    dist, closest_point1, closest_point2, _ = gjk.gjk(
+    dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
         box_collider, box_collider)
     assert approx(dist) == 0.0
     assert_array_almost_equal(closest_point1, np.array([-0.5, -0.5, -0.5]))
@@ -1256,7 +1256,7 @@ def test_gjk_boxes():
                             size2 = np.ones(3)
                             box_collider2 = colliders.Box(box2origin2, size2)
 
-                            dist, closest_point1, closest_point2, _ = gjk.gjk(
+                            dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
                                 box_collider, box_collider2)
                             assert approx(dist) == 0.0
                             expected = -0.5 * np.ones(3)
@@ -1283,7 +1283,7 @@ def test_gjk_boxes():
     size2 = np.array([0.96366276, 0.38344152, 0.79172504])
     box_collider2 = colliders.Box(box2origin2, size2)
 
-    dist, closest_point1, closest_point2, _ = gjk.gjk(
+    dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
         box_collider, box_collider2)
 
     assert approx(dist) == 1.7900192730149391
@@ -1291,14 +1291,14 @@ def test_gjk_boxes():
 
 def test_gjk_spheres():
     sphere1 = colliders.Sphere(center=np.array([0, 0, 0], dtype=float), radius=1.0)
-    dist, closest_point1, closest_point2, _ = gjk.gjk(
+    dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
         sphere1, sphere1)
     assert approx(dist) == 0.0
     assert_array_almost_equal(closest_point1, np.array([0, 0, 1]))
     assert_array_almost_equal(closest_point1, closest_point2)
 
     sphere2 = colliders.Sphere(center=np.array([1, 1, 1], dtype=float), radius=1.0)
-    dist, closest_point1, closest_point2, _ = gjk.gjk(
+    dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
         sphere1, sphere2)
     assert approx(dist) == 0.0
     assert_array_almost_equal(closest_point1, np.array([0.5, 0.5, 0.633975]))
@@ -1306,7 +1306,7 @@ def test_gjk_spheres():
 
     sphere1 = colliders.Sphere(center=np.array([0, 0, 0], dtype=float), radius=1.0)
     sphere2 = colliders.Sphere(center=np.array([0, 0, 3], dtype=float), radius=1.0)
-    dist, closest_point1, closest_point2, _ = gjk.gjk(
+    dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
         sphere1, sphere2)
     assert approx(dist) == 1
     assert_array_almost_equal(closest_point1, np.array([0, 0, 1]))
@@ -1315,7 +1315,7 @@ def test_gjk_spheres():
 
 def test_gjk_cylinders():
     cylinder1 = colliders.Cylinder(np.eye(4), 1, 1)
-    dist, closest_point1, closest_point2, _ = gjk.gjk(
+    dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
         cylinder1, cylinder1)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point1, np.array([1, 0, 0.5]))
@@ -1324,7 +1324,7 @@ def test_gjk_cylinders():
     A2B = np.eye(4)
     A2B[:3, 3] = np.array([3, 0, 0])
     cylinder2 = colliders.Cylinder(A2B, 1, 1)
-    dist, closest_point1, closest_point2, _ = gjk.gjk(
+    dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
         cylinder1, cylinder2)
     assert approx(dist) == 1
     assert_array_almost_equal(closest_point1, np.array([1, 0, 0.5]))
@@ -1333,7 +1333,7 @@ def test_gjk_cylinders():
     A2B = np.eye(4)
     A2B[:3, 3] = np.array([0, 0, 4])
     cylinder2 = colliders.Cylinder(A2B, 1, 1)
-    dist, closest_point1, closest_point2, _ = gjk.gjk(
+    dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
         cylinder1, cylinder2)
     assert approx(dist) == 3
     assert_array_almost_equal(closest_point1, np.array([1, 0, 0.5]))
@@ -1412,7 +1412,7 @@ def test_gjk_point_subset():
         convex1 = colliders.ConvexHullVertices(vertices1)
         vertices2 = vertices1[::2]
         convex2 = colliders.ConvexHullVertices(vertices2)
-        dist, closest_point1, closest_point2, _ = gjk.gjk(
+        dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
             convex1, convex2)
         assert approx(dist) == 0.0
         assert_array_almost_equal(closest_point1, closest_point2)
