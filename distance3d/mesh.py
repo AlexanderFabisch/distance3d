@@ -6,6 +6,9 @@ from scipy.spatial import ConvexHull
 from .utils import EPSILON, HALF_PI, angles_between_vectors
 
 
+PROJECTION_LENGTH_EPSILON = 10.0 * EPSILON
+
+
 class MeshHillClimbingSupportFunction:
     """Mesh support function with hill climbing.
 
@@ -119,7 +122,7 @@ def hill_climb_mesh_extreme(
             vertex_diff = np.ascontiguousarray(
                 vertices[connected_idx] - vertices[best_idx])
             projected_length = search_direction.dot(vertex_diff)
-            if projected_length > EPSILON:
+            if projected_length > PROJECTION_LENGTH_EPSILON:
                 best_idx = connected_idx
 
     converged = False
@@ -129,7 +132,7 @@ def hill_climb_mesh_extreme(
             vertex_diff = np.ascontiguousarray(
                 vertices[connected_idx] - vertices[best_idx])
             projected_length = search_direction.dot(vertex_diff)
-            if projected_length > EPSILON:
+            if projected_length > PROJECTION_LENGTH_EPSILON:
                 best_idx = connected_idx
                 converged = False
 
