@@ -46,14 +46,16 @@ def _gjk(collider1, collider2, simplex, max_iterations):
 
     for _ in range(max_iterations):
         support_point = support_function(collider1, collider2, search_direction)
-        is_origin = np.dot(support_point[0], support_point[0]) < EPSILON
-        if is_origin:
+        support_point_is_origin = np.dot(
+            support_point[0], support_point[0]) < EPSILON
+        if support_point_is_origin:
             _set_point(simplex.v, simplex.v1, simplex.v2, 0, *support_point)
             simplex.n_points = 1
             return True, simplex
 
-        is_before_origin = np.dot(support_point[0], search_direction) < -EPSILON_SQRT
-        if is_before_origin:
+        support_point_is_before_origin = np.dot(
+            support_point[0], search_direction) < -EPSILON_SQRT
+        if support_point_is_before_origin:
             return False, simplex
 
         simplex.add_point(*support_point)
@@ -101,15 +103,15 @@ def _line_segment(v, v1, v2):
 
     AB = B - A[0]
     AO = -A[0]
-    dot = np.dot(AB, AO)
+    origin_on_AB = np.dot(AB, AO)
 
     tmp = np.cross(AB, AO)
-    origin_on_AB_segment = abs(np.dot(tmp, tmp)) < EPSILON and dot > 0.0
+    origin_on_AB_segment = (
+        abs(np.dot(tmp, tmp)) < EPSILON and origin_on_AB > 0.0)
     if origin_on_AB_segment:
-        return GjkState.CONTACT, None, 0
+        return GjkState.CONTACT, None, 2
 
-    origin_is_outside_of_A = dot < EPSILON
-    if origin_is_outside_of_A:
+    if origin_on_AB < EPSILON:
         _set_point(v, v1, v2, 0, *A)
         n_points = 1
         search_direction = AO
@@ -129,7 +131,7 @@ def _triangle(v, v1, v2):
     touching_contact = abs(point_to_triangle(
         np.zeros(3), np.row_stack((A[0], B[0], C[0])))[0]) < EPSILON_SQRT
     if touching_contact:
-        return GjkState.CONTACT, None, 0
+        return GjkState.CONTACT, None, 1
 
     degenerated_triangle = (np.all(np.abs(A[0] - B[0]) < EPSILON)
                             or np.all(np.abs(A[0] - C[0]) < EPSILON))
@@ -199,7 +201,7 @@ def _tetrahedron(v, v1, v2):
         or point_to_triangle(origin, np.row_stack((B[0], C[0], D[0])))[0] < EPSILON_SQRT
     )
     if origin_lies_on_tetrahedrons_face:
-        return GjkState.CONTACT, None, 0
+        return GjkState.CONTACT, None, 3
 
     # compute AO, AB, AC, AD segments and ABC, ACD, ADB normal vectors
     AO = -A[0]
@@ -224,7 +226,7 @@ def _tetrahedron(v, v1, v2):
 
     origin_is_in_tetrahedron = AB_O and AC_O and AD_O
     if origin_is_in_tetrahedron:
-        return GjkState.CONTACT, None, 0
+        return GjkState.CONTACT, None, 4
 
     _rearrange_simplex_to_triangle(A, B, C, D, AB_O, AC_O, v, v1, v2)
 
