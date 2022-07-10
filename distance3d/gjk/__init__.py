@@ -1,6 +1,21 @@
 """Gilbert-Johnson-Keerthi (GJK) for distance calculation of convex shapes."""
-from .gjk_distance import gjk, gjk_with_simplex
-from .gjk_intersection import gjk_intersection
+from ._gjk_original import gjk_distance_original
+from ._gjk_libccd import gjk_intersection_libccd
+from ._gjk_jolt import gjk_distance_jolt, gjk_intersection_jolt
 
 
-__all__ = ["gjk", "gjk_with_simplex", "gjk_intersection"]
+# Aliases
+gjk = gjk_distance_jolt
+gjk_distance = gjk_distance_jolt
+gjk_intersection = gjk_intersection_jolt
+
+
+__all__ = [
+    "gjk_distance_original",
+    "gjk_intersection_libccd",
+    "gjk_distance_jolt",
+    "gjk_intersection_jolt",
+    "gjk_distance",
+    "gjk_intersection",
+    "gjk"
+]

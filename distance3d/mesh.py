@@ -83,6 +83,39 @@ class MeshHillClimbingSupportFunction:
         return idx, self.mesh2origin[:3, 3] + np.dot(
             self.mesh2origin[:3, :3], self.vertices[idx])
 
+    def make_support_function(self):
+        return MeshHillClimbingSupportFunctionImplementation(
+            self.mesh2origin, self.vertices, self.connections,
+            self.shortcut_connections, self.first_idx)
+
+
+@numba.experimental.jitclass(spec={
+    "mesh2origin": numba.float64[:, ::1],
+    "vertices": numba.float64[:, ::1],
+    "first_idx": numba.int64,
+    "shortcut_connections": numba.int64[::1],
+    "connections": numba.types.DictType(numba.int64, numba.int64[:])
+})
+class MeshHillClimbingSupportFunctionImplementation:
+    def __init__(
+            self, mesh2origin, vertices, connections, shortcut_connections,
+            first_idx):
+        self.mesh2origin = mesh2origin
+        self.vertices = vertices
+        self.connections = connections
+        self.shortcut_connections = shortcut_connections
+        self.first_idx = first_idx
+
+    def support_function(self, search_direction):
+        search_direction_in_mesh = np.dot(
+            self.mesh2origin[:3, :3].T, search_direction)
+        idx = hill_climb_mesh_extreme(
+            search_direction_in_mesh, self.first_idx, self.vertices,
+            self.connections, self.shortcut_connections)
+        self.first_idx = idx  # vertex caching
+        return idx, self.mesh2origin[:3, 3] + np.dot(
+            self.mesh2origin[:3, :3], self.vertices[idx])
+
 
 @numba.njit(
     numba.int64(numba.float64[:], numba.int64, numba.float64[:, :],

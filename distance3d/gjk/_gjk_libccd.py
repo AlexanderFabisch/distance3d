@@ -11,7 +11,7 @@ from distance3d.distance import point_to_triangle
 EPSILON_SQRT = math.sqrt(EPSILON)
 
 
-def gjk_intersection(collider1, collider2, max_iterations=100):
+def gjk_intersection_libccd(collider1, collider2, max_iterations=100):
     """Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.
 
     This implementation of GJK is based on libccd (for details, see
@@ -43,6 +43,9 @@ def _gjk(collider1, collider2, simplex, max_iterations):
         collider1.first_vertex(), collider2.first_vertex())
     simplex.add_point(*support_point)
     search_direction = -support_point[0]
+
+    collider1 = collider1.make_support_function()
+    collider2 = collider2.make_support_function()
 
     for _ in range(max_iterations):
         support_point = support_function(collider1, collider2, search_direction)

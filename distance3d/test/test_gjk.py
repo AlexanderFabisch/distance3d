@@ -1,6 +1,6 @@
 import numpy as np
 from distance3d import colliders, gjk, geometry, random, distance
-from distance3d.gjk.gjk_distance import (
+from distance3d.gjk._gjk_original import (
     SimplexInfo, Solution, BarycentricCoordinates,
     distance_subalgorithm_with_backup_procedure)
 from pytest import approx
@@ -1565,7 +1565,7 @@ def test_gjk_max_iterations():
     c2 = colliders.MeshGraph(*random.randn_convex(
         random_state, n_vertices=10000, center_scale=1.0))
     # not enough iterations to find correct solution
-    intersection = gjk.gjk_intersection(c1, c2, max_iterations=2)
+    intersection = gjk.gjk_intersection_libccd(c1, c2, max_iterations=2)
     assert not intersection
 
 

@@ -1,5 +1,5 @@
 """Self-collision detection."""
-from . import mpr
+from . import gjk
 
 
 def detect(bvh):
@@ -29,7 +29,7 @@ def detect(bvh):
 
         contacts[frame] = False
         for frame2, collider2 in candidates.items():
-            if mpr.mpr_intersection(collider, collider2):
+            if gjk.gjk_intersection(collider, collider2):
                 contacts[frame] = True
                 contacts[frame2] = True
                 break
@@ -59,6 +59,6 @@ def detect_any(bvh):
             collider, whitelist=bvh.self_collision_whitelists_[frame])
 
         for frame2, collider2 in candidates.items():
-            if mpr.mpr_intersection(collider, collider2):
+            if gjk.gjk_intersection(collider, collider2):
                 return True
     return False
