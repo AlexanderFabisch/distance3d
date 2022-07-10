@@ -75,7 +75,7 @@ def _intersection_loop(
 
     # If the support point is in the opposite direction as search_direction,
     # then we have found a separating axis and there is no intersection
-    if search_direction.dot(support_point) < 0.0:
+    if search_direction.dot(support_point) < -EPSILON:
         # Separating axis found
         return GjkState.NoIntersection, n_points, prev_v_len_sq
 
