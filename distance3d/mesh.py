@@ -3,7 +3,7 @@ import numba
 import numpy as np
 from scipy.spatial import ConvexHull
 
-from .utils import HALF_PI, angles_between_vectors
+from .utils import EPSILON, HALF_PI, angles_between_vectors
 
 
 class MeshHillClimbingSupportFunction:
@@ -119,7 +119,7 @@ def hill_climb_mesh_extreme(
             vertex_diff = np.ascontiguousarray(
                 vertices[connected_idx] - vertices[best_idx])
             projected_length = search_direction.dot(vertex_diff)
-            if projected_length > 0.0:
+            if projected_length > EPSILON:
                 best_idx = connected_idx
 
     converged = False
@@ -129,7 +129,7 @@ def hill_climb_mesh_extreme(
             vertex_diff = np.ascontiguousarray(
                 vertices[connected_idx] - vertices[best_idx])
             projected_length = search_direction.dot(vertex_diff)
-            if projected_length > 0.0:
+            if projected_length > EPSILON:
                 best_idx = connected_idx
                 converged = False
 
