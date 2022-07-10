@@ -589,29 +589,29 @@ def closest_point_tetrahedron(a, b, c, d):
 
     # Repeat test for face acd
     if origin_out_of_planes[1]:  # OriginOutsideOfPlane(a, c, d, b)
-        q, set = closest_point_triangle(a, c, d)
+        q, new_set = closest_point_triangle(a, c, d)
         dist_sq = np.dot(q, q)
         if dist_sq < best_dist_sq:
             best_dist_sq = dist_sq
             closest_point = q
-            closest_set = (set & 0b0001) + ((set & 0b0110) << 1)
+            closest_set = (new_set & 0b0001) + ((new_set & 0b0110) << 1)
 
     # Repeat test for face adb
     if origin_out_of_planes[2]:  # OriginOutsideOfPlane(a, d, b, c)
-        q, set = closest_point_triangle(a, d, b)
+        q, new_set = closest_point_triangle(a, d, b)
         dist_sq = np.dot(q, q)
         if dist_sq < best_dist_sq:
             best_dist_sq = dist_sq
             closest_point = q
-            closest_set = (set & 0b0001) + ((set & 0b0010) << 2) + ((set & 0b0100) >> 1)
+            closest_set = (new_set & 0b0001) + ((new_set & 0b0010) << 2) + ((new_set & 0b0100) >> 1)
 
     # Repeat test for face bdc
     if origin_out_of_planes[3]:  # OriginOutsideOfPlane(b, d, c, a)
-        q, set = closest_point_triangle(b, d, c)
+        q, new_set = closest_point_triangle(b, d, c)
         dist_sq = np.dot(q, q)
         if dist_sq < best_dist_sq:
             closest_point = q
-            closest_set = ((set & 0b0001) << 1) + ((set & 0b0010) << 2) + (set & 0b0100)
+            closest_set = ((new_set & 0b0001) << 1) + ((new_set & 0b0010) << 2) + (new_set & 0b0100)
 
     return closest_point, closest_set
 
