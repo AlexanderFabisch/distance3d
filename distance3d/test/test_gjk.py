@@ -252,6 +252,39 @@ def test_gjk_ellipsoids():
         assert_array_almost_equal(closest_point1, closest_point21)
 
 
+def test_compare_gjk_intersection_flavours_with_random_shapes():
+    random_state = np.random.RandomState(84)
+    shape_names = list(colliders.COLLIDERS.keys())
+    for _ in range(100):
+        shape1 = shape_names[random_state.randint(len(shape_names))]
+        args1 = random.RANDOM_GENERATORS[shape1](random_state)
+        shape2 = shape_names[random_state.randint(len(shape_names))]
+        args2 = random.RANDOM_GENERATORS[shape2](random_state)
+        collider1 = colliders.COLLIDERS[shape1](*args1)
+        collider2 = colliders.COLLIDERS[shape2](*args2)
+
+        intersection_jolt = gjk.gjk_intersection_jolt(collider1, collider2)
+        intersection_libccd = gjk.gjk_intersection_libccd(collider1, collider2)
+        assert intersection_jolt == intersection_libccd
+
+
+def test_compare_gjk_distance_flavours_with_random_shapes():
+    random_state = np.random.RandomState(85)
+    shape_names = list(colliders.COLLIDERS.keys())
+    for _ in range(100):
+        shape1 = shape_names[random_state.randint(len(shape_names))]
+        args1 = random.RANDOM_GENERATORS[shape1](random_state)
+        shape2 = shape_names[random_state.randint(len(shape_names))]
+        args2 = random.RANDOM_GENERATORS[shape2](random_state)
+        collider1 = colliders.COLLIDERS[shape1](*args1)
+        collider2 = colliders.COLLIDERS[shape2](*args2)
+
+        dist_jolt, cp1_jolt, cp2_jolt, _ = gjk.gjk_distance_jolt(collider1, collider2)
+        dist_orig, cp1_orig, cp2_orig, _ = gjk.gjk_distance_original(collider1, collider2)
+        assert approx(dist_jolt) == dist_orig
+        assert approx(np.linalg.norm(cp1_orig - cp2_orig)) == np.linalg.norm(cp1_jolt - cp2_jolt)
+
+
 def test_gjk_random_points():
     random_state = np.random.RandomState(23)
 
@@ -353,25 +386,6 @@ def test_gjk_triangle_to_rectangle():
             closest_point_triangle, closest_point_triangle3)
         assert_array_almost_equal(
             closest_point_rectangle, closest_point_rectangle3)
-
-
-def test_gjk_floating_point_accuracy_of_barycentric_coordinates_of_face():
-    vertices1 = np.array([
-        [0.3302341224102143, 0.19050359211588797, 1.3411105874214977],
-        [1.8078177759995258, 0.20620691174863182, 1.0702191106030559],
-        [0.7979462705135667, 1.2183177500830087, 0.8211438441965184],
-        [1.4524872148245276, 0.7965455117961597, 1.0991113134742683],
-        [1.8445208896122431, 1.2876443386590763, 1.5700034764677797],
-        [0.7550697105384843, 0.18477518020505856, 1.3471929737602069]])
-    vertices2 = np.array([
-        [0.3527386248034806, 0.035237715006153913, 0.8756651090484097],
-        [0.8866579336737807, 0.2548857692642903, 0.184959080850696],
-        [0.2900323943660029, 0.2810156342173158, 0.12167462536248075],
-        [0.46786979185146715, 0.1591897910580864, 0.47912132312107114],
-        [0.9895873763930331, 0.5549956997906568, 0.6427151977095377],
-        [0.07800999236334982, 0.8380559395155408, 0.24411711979617723]])
-    dist = gjk.gjk(colliders.ConvexHullVertices(vertices1), colliders.ConvexHullVertices(vertices2))[0]
-    assert dist > 0.0
 
 
 def test_gjk_distance_with_margin():
