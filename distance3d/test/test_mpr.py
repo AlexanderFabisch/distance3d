@@ -20,7 +20,40 @@ def test_intersection_mpr_vs_gjk():
         assert gjk_intersection == mpr_intersection
 
 
-def test_penetration():
+def test_mpr_penetration_points():
+    p1 = colliders.ConvexHullVertices(np.array([[0.0, 0.0, 0.0]]))
+    intersection, depth, penetration_direction, contact_position = mpr.mpr_penetration(p1, p1)
+    assert intersection
+    assert approx(depth) == 0.0
+    assert_array_almost_equal(penetration_direction, np.zeros(3))
+    assert_array_almost_equal(contact_position, np.zeros(3))
+
+
+def test_mpr_penetration_line_segments():
+    s1 = colliders.ConvexHullVertices(np.array([
+        [0.0, 0.0, 0.0], [1.0, 0.0, 0.0]]))
+    intersection, depth, penetration_direction, contact_position = mpr.mpr_penetration(s1, s1)
+    assert intersection
+    assert approx(depth) == 1.0
+    assert_array_almost_equal(penetration_direction, np.array([-1, 0, 0]))
+    assert_array_almost_equal(contact_position, np.array([0.5, 0, 0]))
+
+    p1 = colliders.ConvexHullVertices(np.array([[0.0, 0.0, 0.0]]))
+    intersection, depth, penetration_direction, contact_position = mpr.mpr_penetration(s1, p1)
+    assert intersection
+    assert approx(depth) == 0.0
+    assert_array_almost_equal(penetration_direction, np.zeros(3))
+    assert_array_almost_equal(contact_position, np.zeros(3))
+
+    p2 = colliders.ConvexHullVertices(np.array([[1.0, 0.0, 0.0]]))
+    intersection, depth, penetration_direction, contact_position = mpr.mpr_penetration(s1, p2)
+    assert intersection
+    assert approx(depth) == 0.0
+    assert_array_almost_equal(penetration_direction, np.zeros(3))
+    assert_array_almost_equal(contact_position, np.array([1, 0, 0]))
+
+
+def test_mpr_penetration():
     sphere1 = colliders.Sphere(np.array([0.0, 0.0, 0.0]), 1.0)
     sphere2 = colliders.Sphere(np.array([0.0, 0.0, 0.0]), 1.0)
     intersection, depth, penetration_direction, contact_point = mpr.mpr_penetration(
