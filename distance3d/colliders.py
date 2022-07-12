@@ -600,3 +600,16 @@ class Margin(ConvexCollider):
         mins = aabb.limits[:, 0] - self.margin
         maxs = aabb.limits[:, 1] + self.margin
         return AABB(np.array([mins, maxs]).T)
+
+
+COLLIDERS = {
+    "sphere": Sphere,
+    "ellipsoid": Ellipsoid,
+    "capsule": Capsule,
+    "disk": Disk,
+    "ellipse": Ellipse,
+    "cone": Cone,
+    "cylinder": Cylinder,
+    "box": Box,
+    "mesh": MeshGraph,
+}

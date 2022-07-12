@@ -479,3 +479,16 @@ def rand_ellipse(random_state, center_scale=1.0, radii_scale=1.0):
     """
     return randn_rectangle(
         random_state, center_scale=center_scale, length_scale=radii_scale)
+
+
+RANDOM_GENERATORS = {
+    "sphere": rand_sphere,
+    "ellipsoid": rand_ellipsoid,
+    "capsule": rand_capsule,
+    "disk": rand_circle,
+    "ellipse": rand_ellipse,
+    "cone": rand_cone,
+    "cylinder": rand_cylinder,
+    "box": rand_box,
+    "mesh": randn_convex,
+}

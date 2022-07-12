@@ -4,23 +4,11 @@ from distance3d import colliders, random
 from numpy.testing import assert_array_almost_equal
 
 
-collider_classes = {
-    "sphere": (colliders.Sphere, random.rand_sphere),
-    "ellipsoid": (colliders.Ellipsoid, random.rand_ellipsoid),
-    "capsule": (colliders.Capsule, random.rand_capsule),
-    "disk": (colliders.Disk, random.rand_circle),
-    "ellipse": (colliders.Ellipse, random.rand_ellipse),
-    "cone": (colliders.Cone, random.rand_cone),
-    "cylinder": (colliders.Cylinder, random.rand_cylinder),
-    "box": (colliders.Box, random.rand_box),
-    "mesh": (colliders.MeshGraph, random.randn_convex),
-}
-
-
 def test_all_colliders():
     random_state = np.random.RandomState(4)
-    for Collider, rand in collider_classes.values():
-        print(Collider)
+    for name in colliders.COLLIDERS.keys():
+        Collider = colliders.COLLIDERS[name]
+        rand = random.RANDOM_GENERATORS[name]
         c = Collider(*rand(random_state))
         limits = np.array(c.aabb().limits)
         center = c.center()
