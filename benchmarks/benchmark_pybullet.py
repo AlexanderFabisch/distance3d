@@ -97,8 +97,8 @@ def test_benchmark_distance3d(random_state, n_collision_objects, gui=False):
     timer.start("distance3d")
     for c1 in collision_objects:
         for c2 in collision_objects:
-            #dist = gjk.gjk_distance(c1, c2)[0]
-            dist = gjk.gjk_intersection(c1, c2)
+            dist = gjk.gjk_distance(c1, c2)[0]
+            #dist = gjk.gjk_intersection(c1, c2)
             #dist = mpr.mpr_intersection(c1, c2)
             distances.append(dist)
     duration = timer.stop("distance3d")
@@ -116,7 +116,7 @@ def test_benchmark_distance3d(random_state, n_collision_objects, gui=False):
 
 
 seed = 31
-n_collision_objects = 500
+n_collision_objects = 300
 duration, distances = test_benchmark_pybullet(
     np.random.RandomState(seed), n_collision_objects, gui=False)
 print(f"PyBullet: {duration}")
