@@ -598,13 +598,9 @@ def closest_point_tetrahedron(a, b, c, d):
 
     # If point outside face abc then compute the closest point on abc
     if origin_out_of_planes[0]:  # OriginOutsideOfPlane(a, b, c, d)
-        q, closest_set = closest_point_triangle(a, b, c)
-        dist_sq = np.dot(q, q)
-
-        # Update best closest point if (squared) distance is less than best
-        if dist_sq < best_dist_sq:
-            best_dist_sq = dist_sq
-            closest_point = q
+        # Update best closest point because distance is less than MAX_FLOAT
+        closest_point, closest_set = closest_point_triangle(a, b, c)
+        best_dist_sq = np.dot(closest_point, closest_point)
 
     # Repeat test for face acd
     if origin_out_of_planes[1]:  # OriginOutsideOfPlane(a, c, d, b)
