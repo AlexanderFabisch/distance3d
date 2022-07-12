@@ -4,18 +4,33 @@ import pytransform3d.rotations as pr
 from distance3d import random, colliders, benchmark, gjk, mpr
 
 
+COLLISION_SHAPES = [
+    "cylinder", "box"
+]
+
+
 def test_benchmark_pybullet(random_state, n_collision_objects, gui=False):
     pcid = pb.connect(pb.GUI if gui else pb.DIRECT)
     collision_objects = []
     for _ in range(n_collision_objects):
-        cylinder2origin, radius, length = random.rand_cylinder(
-            random_state, center_scale=5, min_radius=0.1, min_length=0.5)
-        pos = cylinder2origin[:3, 3]
-        orn = pr.quaternion_xyzw_from_wxyz(
-            pr.quaternion_from_matrix(cylinder2origin[:3, :3]))
-        collision = pb.createCollisionShape(
-            shapeType=pb.GEOM_CYLINDER, radius=radius, height=length,
-            physicsClientId=pcid)
+        shape_name = COLLISION_SHAPES[random_state.randint(len(COLLISION_SHAPES))]
+        args = random.RANDOM_GENERATORS[shape_name](
+            random_state, center_scale=5)
+
+        if shape_name == "cylinder":
+            cylinder2origin, radius, length = args
+            pos, orn = _pybullet_pos_orn(cylinder2origin)
+            collision = pb.createCollisionShape(
+                shapeType=pb.GEOM_CYLINDER, radius=radius, height=length,
+                physicsClientId=pcid)
+        else:
+            assert shape_name == "box"
+            box2origin, size = args
+            pos, orn = _pybullet_pos_orn(box2origin)
+            collision = pb.createCollisionShape(
+                shapeType=pb.GEOM_BOX, halfExtents=0.5 * size,
+                physicsClientId=pcid)
+
         multibody = pb.createMultiBody(
             baseMass=1, baseInertialFramePosition=[0, 0, 0],
             baseCollisionShapeIndex=collision, physicsClientId=pcid)
@@ -44,12 +59,20 @@ def test_benchmark_pybullet(random_state, n_collision_objects, gui=False):
     return duration, distances
 
 
+def _pybullet_pos_orn(A2B):
+    pos = A2B[:3, 3]
+    orn = pr.quaternion_xyzw_from_wxyz(
+        pr.quaternion_from_matrix(A2B[:3, :3]))
+    return pos, orn
+
+
 def test_benchmark_distance3d(random_state, n_collision_objects, gui=False):
     collision_objects = []
     for _ in range(n_collision_objects):
-        cylinder2origin, radius, length = random.rand_cylinder(
-            random_state, center_scale=5, min_radius=0.1, min_length=0.5)
-        collision_object = colliders.Cylinder(cylinder2origin, radius, length)
+        shape_name = COLLISION_SHAPES[random_state.randint(len(COLLISION_SHAPES))]
+        args = random.RANDOM_GENERATORS[shape_name](
+            random_state, center_scale=5)
+        collision_object = colliders.COLLIDERS[shape_name](*args)
         collision_objects.append(collision_object)
 
     distances = []
@@ -58,8 +81,8 @@ def test_benchmark_distance3d(random_state, n_collision_objects, gui=False):
     timer.start("distance3d")
     for c1 in collision_objects:
         for c2 in collision_objects:
-            #dist = gjk.gjk(c1, c2)[0]
-            dist = gjk.gjk_intersection(c1, c2)
+            dist = gjk.gjk_distance(c1, c2)[0]
+            #dist = gjk.gjk_intersection(c1, c2)
             #dist = mpr.mpr_intersection(c1, c2)
             distances.append(dist)
     duration = timer.stop("distance3d")
@@ -76,12 +99,13 @@ def test_benchmark_distance3d(random_state, n_collision_objects, gui=False):
     return duration, distances
 
 
-n_collision_objects = 500
-random_state = np.random.RandomState(31)
-duration, distances = test_benchmark_pybullet(random_state, n_collision_objects, gui=False)
+seed = 31
+n_collision_objects = 100
+duration, distances = test_benchmark_pybullet(
+    np.random.RandomState(seed), n_collision_objects, gui=False)
 print(f"PyBullet: {duration}")
 print(distances[:20])
-random_state = np.random.RandomState(31)
-duration, distances = test_benchmark_distance3d(random_state, n_collision_objects, gui=False)
+duration, distances = test_benchmark_distance3d(
+    np.random.RandomState(seed), n_collision_objects, gui=False)
 print(f"distance3d: {duration}")
 print(distances[:20])
