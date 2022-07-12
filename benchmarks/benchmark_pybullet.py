@@ -5,7 +5,7 @@ from distance3d import random, colliders, benchmark, gjk, mpr
 
 
 COLLISION_SHAPES = [
-    "cylinder", "box"
+    "cylinder", "box", "capsule", "sphere"
 ]
 
 
@@ -16,21 +16,8 @@ def test_benchmark_pybullet(random_state, n_collision_objects, gui=False):
         shape_name = COLLISION_SHAPES[random_state.randint(len(COLLISION_SHAPES))]
         args = random.RANDOM_GENERATORS[shape_name](
             random_state, center_scale=5)
-
-        if shape_name == "cylinder":
-            cylinder2origin, radius, length = args
-            pos, orn = _pybullet_pos_orn(cylinder2origin)
-            collision = pb.createCollisionShape(
-                shapeType=pb.GEOM_CYLINDER, radius=radius, height=length,
-                physicsClientId=pcid)
-        else:
-            assert shape_name == "box"
-            box2origin, size = args
-            pos, orn = _pybullet_pos_orn(box2origin)
-            collision = pb.createCollisionShape(
-                shapeType=pb.GEOM_BOX, halfExtents=0.5 * size,
-                physicsClientId=pcid)
-
+        collision, orn, pos = _make_collision_objects_in_pybullet(
+            args, pcid, shape_name)
         multibody = pb.createMultiBody(
             baseMass=1, baseInertialFramePosition=[0, 0, 0],
             baseCollisionShapeIndex=collision, physicsClientId=pcid)
@@ -59,6 +46,35 @@ def test_benchmark_pybullet(random_state, n_collision_objects, gui=False):
     return duration, distances
 
 
+def _make_collision_objects_in_pybullet(args, pcid, shape_name):
+    if shape_name == "cylinder":
+        cylinder2origin, radius, length = args
+        pos, orn = _pybullet_pos_orn(cylinder2origin)
+        collision = pb.createCollisionShape(
+            shapeType=pb.GEOM_CYLINDER, radius=radius, height=length,
+            physicsClientId=pcid)
+    elif shape_name == "capsule":
+        capsule2origin, radius, height = args
+        pos, orn = _pybullet_pos_orn(capsule2origin)
+        collision = pb.createCollisionShape(
+            shapeType=pb.GEOM_CAPSULE, radius=radius, height=height,
+            physicsClientId=pcid)
+    elif shape_name == "sphere":
+        center, radius = args
+        pos, orn = center, np.array([0.0, 0.0, 0.0, 1.0])
+        collision = pb.createCollisionShape(
+            shapeType=pb.GEOM_SPHERE, radius=radius,
+            physicsClientId=pcid)
+    else:
+        assert shape_name == "box"
+        box2origin, size = args
+        pos, orn = _pybullet_pos_orn(box2origin)
+        collision = pb.createCollisionShape(
+            shapeType=pb.GEOM_BOX, halfExtents=0.5 * size,
+            physicsClientId=pcid)
+    return collision, orn, pos
+
+
 def _pybullet_pos_orn(A2B):
     pos = A2B[:3, 3]
     orn = pr.quaternion_xyzw_from_wxyz(
@@ -81,8 +97,8 @@ def test_benchmark_distance3d(random_state, n_collision_objects, gui=False):
     timer.start("distance3d")
     for c1 in collision_objects:
         for c2 in collision_objects:
-            dist = gjk.gjk_distance(c1, c2)[0]
-            #dist = gjk.gjk_intersection(c1, c2)
+            #dist = gjk.gjk_distance(c1, c2)[0]
+            dist = gjk.gjk_intersection(c1, c2)
             #dist = mpr.mpr_intersection(c1, c2)
             distances.append(dist)
     duration = timer.stop("distance3d")
@@ -100,7 +116,7 @@ def test_benchmark_distance3d(random_state, n_collision_objects, gui=False):
 
 
 seed = 31
-n_collision_objects = 100
+n_collision_objects = 500
 duration, distances = test_benchmark_pybullet(
     np.random.RandomState(seed), n_collision_objects, gui=False)
 print(f"PyBullet: {duration}")
