@@ -1,4 +1,5 @@
-import numpy as np
+import jax
+import jax.numpy as np
 from .utils import EPSILON, invert_transform
 
 
@@ -26,6 +27,7 @@ def points_in_sphere(points, center, radius):
     return squared_dist <= radius * radius
 
 
+@jax.jit
 def points_in_capsule(points, capsule2origin, radius, height):
     """Test if points are in capsule.
 
