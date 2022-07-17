@@ -1,12 +1,12 @@
 """Broad-phase collision detection."""
 import warnings
 
-import numpy as np
 from aabbtree import AABBTree
 from pytransform3d import urdf
 
 from .colliders import Sphere, Box, Cylinder, MeshGraph
 from .urdf_utils import self_collision_whitelists
+from .io import load_mesh
 
 
 class BoundingVolumeHierarchy:
@@ -85,7 +85,7 @@ class BoundingVolumeHierarchy:
                 length=obj.length)
         else:
             assert isinstance(obj, urdf.Mesh)
-            vertices, triangles = _load_mesh(obj)
+            vertices, triangles = load_mesh(obj.filename, obj.scale)
             collider = MeshGraph(A2B, vertices, triangles)
         if make_artists:
             collider.make_artist()
@@ -171,25 +171,3 @@ class BoundingVolumeHierarchy:
             Collider frames.
         """
         return self.collider_frames
-
-
-def _load_mesh(obj):
-    try:
-        import open3d as o3d
-        mesh = o3d.io.read_triangle_mesh(obj.filename)
-        vertices = np.asarray(mesh.vertices)
-        triangles = np.asarray(mesh.triangles)
-        try_trimesh = False
-    except OSError:
-        try_trimesh = True
-    except ImportError:
-        try_trimesh = True
-
-    if try_trimesh:
-        import trimesh
-        mesh = trimesh.load(obj.filename)
-        vertices = np.asarray(mesh.vertices)
-        triangles = np.asarray(mesh.faces)
-
-    vertices *= obj.scale
-    return vertices, triangles
