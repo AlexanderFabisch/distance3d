@@ -344,3 +344,13 @@ def _tetrahedral_mesh_volumes(tetrahedra_vertices):
     return np.abs(np.sum(
         np.cross(tetrahedra_edges[:, 0], tetrahedra_edges[:, 1])
         * tetrahedra_edges[:, 2], axis=1)) / 6.0
+
+
+def tetrahedral_mesh_aabbs(mesh2origin, vertices, tetrahedra):
+    """TODO"""
+    vertices = np.dot(vertices, mesh2origin[:3, :3].T) + mesh2origin[np.newaxis, :3, 3]
+    tetrahedra_vertices = vertices[tetrahedra]
+    mins = np.min(tetrahedra_vertices, axis=1)
+    maxs = np.max(tetrahedra_vertices, axis=1)
+    aabbs = np.dstack((mins, maxs))
+    return aabbs

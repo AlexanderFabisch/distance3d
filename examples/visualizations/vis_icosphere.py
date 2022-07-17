@@ -22,6 +22,10 @@ com = mesh.center_of_mass_tetrahedral_mesh(np.eye(4), vertices2, tetrahedra)
 print(timer.stop("center_of_mass_tetrahedral_mesh"))
 print(com)
 
+timer.start("tetrahedral_mesh_aabbs")
+aabbs = mesh.tetrahedral_mesh_aabbs(np.eye(4), vertices2, tetrahedra)
+print(timer.stop("tetrahedral_mesh_aabbs"))
+
 fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
 tri_mesh = visualization.Mesh(np.eye(4), vertices1, triangles)
