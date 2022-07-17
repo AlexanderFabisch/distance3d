@@ -226,7 +226,8 @@ def _distance_loop(
 
     dot = search_direction.dot(support_point)
 
-    # Test if we have a separation of more than inMaxDistSq, in which case we terminate early
+    # Test if we have a separation of more than max_distance_squared,
+    # in which case we terminate early
     if dot < 0.0 and dot * dot > v_len_sq * max_distance_squared:
         return GjkState.Clipped, None, None, None
 
@@ -246,7 +247,8 @@ def _distance_loop(
         for i in range(n_points):
             simplex |= 1 << i
 
-    # If there are 4 points, the origin is inside the tetrahedron and we're done
+    # If there are 4 points, the origin is inside the tetrahedron,
+    # and we're done
     if simplex == 0xf:
         v_len_sq = 0.0
         return GjkState.Intersection, n_points, prev_v_len_sq, v_len_sq
@@ -259,7 +261,8 @@ def _distance_loop(
         v_len_sq = 0.0
         return GjkState.Intersection, n_points, prev_v_len_sq, v_len_sq
 
-    # If v is very small compared to the length of y, we also consider this a collision
+    # If v is very small compared to the length of y, we also consider
+    # this a collision
     if v_len_sq <= EPSILON * max_y_length_squared(Y, n_points):
         v_len_sq = 0.0
         return GjkState.Intersection, n_points, prev_v_len_sq, v_len_sq
@@ -310,9 +313,10 @@ def get_barycentric_coordinates_plane(a, b, c):
     """Barycentric coordinates of closest point to origin for plane.
 
     Point can then be computed as a * u + b * v + c * w.
-    Taken from: Real-Time Collision Detection - Christer Ericson (Section: Barycentric Coordinates)
-    With p = 0
-    Adjusted to always include the shortest edge of the triangle in the calculation to improve numerical accuracy.
+    Taken from: Real-Time Collision Detection - Christer Ericson
+    (Section: Barycentric Coordinates) with p = 0.
+    Adjusted to always include the shortest edge of the triangle in the
+    calculation to improve numerical accuracy.
     """
     # First calculate the three edges
     v0 = b - a
