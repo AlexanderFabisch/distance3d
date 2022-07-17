@@ -4,7 +4,7 @@ import numba
 import numpy as np
 from scipy.spatial import ConvexHull
 
-from .utils import EPSILON, HALF_PI, angles_between_vectors
+from .utils import EPSILON, HALF_PI, angles_between_vectors, transform_point
 
 
 PROJECTION_LENGTH_EPSILON = 10.0 * EPSILON
@@ -258,7 +258,7 @@ def make_triangular_icosphere(center, radius, order=4):
         [5, 11, 4], [1, 5, 9], [7, 1, 8], [10, 7, 6], [3, 9, 4], [3, 4, 2],
         [3, 2, 6], [3, 6, 8], [3, 8, 9], [9, 8, 1], [4, 9, 5], [2, 4, 11],
         [6, 2, 10], [8, 6, 7]
-    ])
+    ], dtype=int)
     v = 12
     mid_cache = dict()  # midpoint vertices cache to avoid duplicating shared vertices
 
@@ -326,5 +326,17 @@ def make_tetrahedral_icosphere(center, radius, order=4):
     center_idx = len(vertices)
     vertices = np.vstack((vertices, center[np.newaxis]))
     tetrahedra = np.hstack(
-        (triangles, center_idx * np.ones((len(triangles), 1))))
+        (triangles, center_idx * np.ones((len(triangles), 1), dtype=int)))
     return vertices, tetrahedra
+
+
+def center_of_mass_tetrahedral_mesh(mesh2origin, vertices, tetrahedra):
+    """TODO"""
+    tetrahedra_vertices = vertices[tetrahedra]
+    centers = tetrahedra_vertices.mean(axis=1)
+    tetrahedra_edges = tetrahedra_vertices[:, 1:] - tetrahedra_vertices[:, np.newaxis, 0]
+    volumes = np.abs(np.sum(
+        np.cross(tetrahedra_edges[:, 0], tetrahedra_edges[:, 1])
+        * tetrahedra_edges[:, 2], axis=1)) / 6.0
+    center = np.dot(volumes, centers) / np.sum(volumes)
+    return transform_point(mesh2origin, center)

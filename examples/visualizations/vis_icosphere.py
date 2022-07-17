@@ -17,6 +17,11 @@ timer.start("make_tetrahedral_icosphere")
 vertices2, tetrahedra = mesh.make_tetrahedral_icosphere(0.1 * np.ones(3), 0.15, 4)
 print(timer.stop("make_tetrahedral_icosphere"))
 
+timer.start("center_of_mass_tetrahedral_mesh")
+com = mesh.center_of_mass_tetrahedral_mesh(np.eye(4), vertices2, tetrahedra)
+print(timer.stop("center_of_mass_tetrahedral_mesh"))
+print(com)
+
 fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
 tri_mesh = visualization.Mesh(np.eye(4), vertices1, triangles)
