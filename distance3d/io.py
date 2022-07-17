@@ -52,8 +52,9 @@ def load_tetrahedral_mesh(filename, scale=1.0):
 
     Tetrahedral meshes are used mainly for simulation of deformable objects.
 
-    Note that only the VTK format is currently supported. You can use
-    TetWild (https://github.com/Yixin-Hu/TetWild) to convert triangular
+    Note that only the VTK format is currently supported
+    (https://vtk.org/wp-content/uploads/2015/04/file-formats.pdf). You can
+    use TetWild (https://github.com/Yixin-Hu/TetWild) to convert triangular
     meshes to tetrahedral meshes.
 
     Parameters
@@ -72,6 +73,8 @@ def load_tetrahedral_mesh(filename, scale=1.0):
     tetrahedra : array, shape (n_tetrahedra, 4)
         Indices of vertices that form tetrahedra of the mesh.
     """
+    assert filename.endswith(".vtk")
+
     with open(filename, "r") as f:
         content = f.read()
     lines = content.split(os.linesep)
