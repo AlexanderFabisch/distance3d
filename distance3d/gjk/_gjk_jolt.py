@@ -639,7 +639,7 @@ def max_y_length_squared(y, n_points):
 
 @numba.njit(cache=True)
 def update_simplex_y(Y, n_points, simplex):
-    """Remove points that are not in the set, only updates mY."""
+    """Remove points that are not in the set, only updates Y."""
     n_new_points = 0
     for i in range(n_points):
         if (simplex & (1 << i)) != 0:
@@ -650,7 +650,7 @@ def update_simplex_y(Y, n_points, simplex):
 
 @numba.njit(cache=True)
 def update_simplex_ypq(Y, P, Q, n_points, simplex):
-    """Remove points that are not in the set, updates mY, mP and mQ."""
+    """Remove points that are not in the set, updates Y, P and Q."""
     n_new_points = 0
     for i in range(n_points):
         if (simplex & (1 << i)) != 0:
