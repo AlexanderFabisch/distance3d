@@ -1,7 +1,7 @@
 import numpy as np
 from distance3d.geometry import (
     support_function_box, support_function_cone, support_function_disk,
-    support_function_ellipse)
+    support_function_ellipse, barycentric_coordinates_tetrahedron)
 from distance3d.random import rand_cone, rand_circle, rand_ellipse
 from distance3d.utils import plane_basis_from_normal
 from distance3d.containment import ellipse_aabb
@@ -81,3 +81,21 @@ def test_ellipse_support_function():
         support_function_ellipse(np.array([0.0, 1.0, 0.0]), center, axes, radii),
         support_function_ellipse(np.array([0.0, 0.0, 1.0]), center, axes, radii)))
     assert_array_almost_equal(np.max(positive_vertices, axis=0), maxs)
+
+
+def test_barycentric_coordinates_tetrahedron():
+    random_state = np.random.RandomState(874)
+    for _ in range(100):
+        tetrahedron_points = random_state.randn(4, 3)
+
+        coordinates = random_state.rand(4)
+        coordinates[random_state.rand(4) > 0.75] = 0.0
+        if np.all(coordinates == 0.0):
+            coordinates[0] = 1.0
+        coordinates /= np.sum(coordinates)
+
+        p = np.dot(coordinates, tetrahedron_points)
+
+        reconstructed_coordinates = barycentric_coordinates_tetrahedron(
+            p, tetrahedron_points)
+        assert_array_almost_equal(coordinates, reconstructed_coordinates)

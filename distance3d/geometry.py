@@ -3,7 +3,9 @@ import math
 from itertools import product
 import numba
 import numpy as np
-from .utils import norm_vector, transform_point, plane_basis_from_normal
+from .utils import (
+    norm_vector, transform_point, plane_basis_from_normal,
+    scalar_triple_product)
 
 
 def convert_rectangle_to_segment(rectangle_center, rectangle_extents, i0, i1):
@@ -505,3 +507,42 @@ def line_from_pluecker(line_direction, line_moment):
         line_point /= line_dir_norm_squared
         line_direction /= math.sqrt(line_dir_norm_squared)
     return line_point, line_direction
+
+
+@numba.njit(cache=True)
+def barycentric_coordinates_tetrahedron(p, tetrahedron_points):
+    """Barycentric coordinates of a point for tetrahedron.
+
+    Source: https://stackoverflow.com/a/38546111/915743
+
+    Parameters
+    ----------
+    p : array, shape (3,)
+        Point of which we want to determine barycentric coordinates.
+
+    tetrahedron_points : array, shape (4, 3)
+        Each row represents a point of the tetrahedron.
+
+    Returns
+    -------
+    array, shape (4,)
+        Barycentric coordinates of p in the tetrahedron.
+    """
+    vap = p - tetrahedron_points[0]
+    vbp = p - tetrahedron_points[1]
+
+    vab = tetrahedron_points[1] - tetrahedron_points[0]
+    vac = tetrahedron_points[2] - tetrahedron_points[0]
+    vad = tetrahedron_points[3] - tetrahedron_points[0]
+
+    vbc = tetrahedron_points[2] - tetrahedron_points[1]
+    vbd = tetrahedron_points[3] - tetrahedron_points[1]
+
+    va6 = scalar_triple_product(vbp, vbd, vbc)
+    vb6 = scalar_triple_product(vap, vac, vad)
+    vc6 = scalar_triple_product(vap, vad, vab)
+    vd6 = scalar_triple_product(vap, vab, vac)
+
+    v6 = 1.0 / scalar_triple_product(vab, vac, vad)
+
+    return np.array([va6 * v6, vb6 * v6, vc6 * v6, vd6 * v6])
