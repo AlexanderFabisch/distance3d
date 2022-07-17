@@ -6,19 +6,21 @@ Visualize Icosphere
 print(__doc__)
 import numpy as np
 import pytransform3d.visualizer as pv
-from distance3d import mesh, visualization, benchmark, mpr, colliders, geometry
+from distance3d import mesh, visualization, benchmark, mpr, colliders, geometry, io
 
 
 timer = benchmark.Timer()
 timer.start("make_tetrahedral_icosphere")
-vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(0.1 * np.ones(3), 0.15, 4)
-vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(0.25 * np.ones(3), 0.15, 4)
+vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(0.1 * np.ones(3), 0.15, 2)
+vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(0.25 * np.ones(3), 0.15, 2)
 print(timer.stop("make_tetrahedral_icosphere"))
+#vertices2, tetrahedra2 = io.load_tetrahedral_mesh("test/data/insole.vtk")
 
 c1 = colliders.ConvexHullVertices(vertices1)
 c2 = colliders.ConvexHullVertices(vertices2)
 timer.start("mpr_penetration")
 intersection, depth, normal, contact_point = mpr.mpr_penetration(c1, c2)
+assert intersection
 print(timer.stop("mpr_penetration"))
 
 # TODO mesh2origin
@@ -46,7 +48,7 @@ potentials2 = np.zeros(len(vertices1))
 potentials2[-1] = 0.15
 
 indices1 = intersecting_tetrahedra(vertices1, tetrahedra1)
-tetras1 = vertices1[tetrahedra2[indices1]]
+tetras1 = vertices1[tetrahedra1[indices1]]
 tetras1_on_plane = np.array([point_in_plane(contact_point, normal, t) for t in tetras1])
 coords1 = np.array([geometry.barycentric_coordinates_tetrahedron(p, t) for p, t in zip(tetras1_on_plane, tetras1)])
 pressure1 = np.array([np.dot(c, potentials1[t]) for c, t in zip(coords1, tetrahedra1)])
@@ -77,8 +79,8 @@ tetra_mesh1.add_artist(fig)
 tetra_mesh2 = visualization.TetraMesh(np.eye(4), vertices2, tetrahedra2)
 tetra_mesh2.add_artist(fig)
 #fig.plot_plane(normal=normal, point_in_plane=contact_point)
-fig.scatter(tetras1_on_plane, s=0.001, c=(1, 0, 0))
-fig.scatter(tetras2_on_plane, s=0.001, c=(0, 1, 0))
+fig.scatter(tetras1_on_plane, s=0.003, c=(1, 0, 0))
+fig.scatter(tetras2_on_plane, s=0.003, c=(0, 1, 0))
 fig.view_init()
 
 if "__file__" in globals():
