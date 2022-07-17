@@ -370,23 +370,18 @@ def get_barycentric_coordinates_plane(a, b, c):
 
 @numba.njit(cache=True)
 def get_barycentric_coordinates_tetrahedron(a, b, c, d):
-    """Barycentric coordinates of closest point to origin for tetrahedron.
+    """Barycentric coordinates of the closest point to origin for tetrahedron.
 
     Source: https://stackoverflow.com/a/38546111/915743
     """
-    vap = -a
-    vbp = -b
-
     vab = b - a
     vac = c - a
     vad = d - a
 
-    vbc = c - b
-    vbd = d - b
-    va6 = scalar_triple_product(vbp, vbd, vbc)
-    vb6 = scalar_triple_product(vap, vac, vad)
-    vc6 = scalar_triple_product(vap, vad, vab)
-    vd6 = scalar_triple_product(vap, vab, vac)
+    va6 = -scalar_triple_product(b, d - b, c - b)
+    vb6 = -scalar_triple_product(a, vac, vad)
+    vc6 = -scalar_triple_product(a, vad, vab)
+    vd6 = -scalar_triple_product(a, vab, vac)
     v6 = 1.0 / scalar_triple_product(vab, vac, vad)
     return va6 * v6, vb6 * v6, vc6 * v6, vd6 * v6
 
