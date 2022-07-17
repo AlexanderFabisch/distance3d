@@ -333,10 +333,14 @@ def make_tetrahedral_icosphere(center, radius, order=4):
 def center_of_mass_tetrahedral_mesh(mesh2origin, vertices, tetrahedra):
     """TODO"""
     tetrahedra_vertices = vertices[tetrahedra]
+    volumes = _tetrahedral_mesh_volumes(tetrahedra_vertices)
     centers = tetrahedra_vertices.mean(axis=1)
-    tetrahedra_edges = tetrahedra_vertices[:, 1:] - tetrahedra_vertices[:, np.newaxis, 0]
-    volumes = np.abs(np.sum(
-        np.cross(tetrahedra_edges[:, 0], tetrahedra_edges[:, 1])
-        * tetrahedra_edges[:, 2], axis=1)) / 6.0
     center = np.dot(volumes, centers) / np.sum(volumes)
     return transform_point(mesh2origin, center)
+
+
+def _tetrahedral_mesh_volumes(tetrahedra_vertices):
+    tetrahedra_edges = tetrahedra_vertices[:, 1:] - tetrahedra_vertices[:, np.newaxis, 0]
+    return np.abs(np.sum(
+        np.cross(tetrahedra_edges[:, 0], tetrahedra_edges[:, 1])
+        * tetrahedra_edges[:, 2], axis=1)) / 6.0
