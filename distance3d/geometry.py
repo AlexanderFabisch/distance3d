@@ -528,21 +528,16 @@ def barycentric_coordinates_tetrahedron(p, tetrahedron_points):
     array, shape (4,)
         Barycentric coordinates of p in the tetrahedron.
     """
-    vap = p - tetrahedron_points[0]
-    vbp = p - tetrahedron_points[1]
+    result = np.empty(4, dtype=np.dtype("float"))
 
-    vab = tetrahedron_points[1] - tetrahedron_points[0]
-    vac = tetrahedron_points[2] - tetrahedron_points[0]
-    vad = tetrahedron_points[3] - tetrahedron_points[0]
+    b_to_cd = tetrahedron_points[2:] - tetrahedron_points[1]
+    bp = p - tetrahedron_points[1]
+    result[0] = scalar_triple_product(bp, b_to_cd[1], b_to_cd[0])
 
-    vbc = tetrahedron_points[2] - tetrahedron_points[1]
-    vbd = tetrahedron_points[3] - tetrahedron_points[1]
+    a_to_bcd = tetrahedron_points[1:] - tetrahedron_points[0]
+    ap = p - tetrahedron_points[0]
+    result[1] = scalar_triple_product(ap, a_to_bcd[1], a_to_bcd[2])
+    result[2] = scalar_triple_product(ap, a_to_bcd[2], a_to_bcd[0])
+    result[3] = scalar_triple_product(ap, a_to_bcd[0], a_to_bcd[1])
 
-    va6 = scalar_triple_product(vbp, vbd, vbc)
-    vb6 = scalar_triple_product(vap, vac, vad)
-    vc6 = scalar_triple_product(vap, vad, vab)
-    vd6 = scalar_triple_product(vap, vab, vac)
-
-    v6 = 1.0 / scalar_triple_product(vab, vac, vad)
-
-    return np.array([va6 * v6, vb6 * v6, vc6 * v6, vd6 * v6])
+    return result / scalar_triple_product(a_to_bcd[0], a_to_bcd[1], a_to_bcd[2])
