@@ -30,6 +30,47 @@ def norm_vector(v):
     return v / norm
 
 
+@numba.njit(cache=True)
+def scalar_triple_product(a, b, c):
+    r"""Scalar triple product: :math:`a \cdot (b \cross c)`.
+
+    Also known as triple scalar product or box product and written as
+    :math:`\left[ a b c \right]`.
+
+    The value of the scalar triple product is the signed volume of a
+    parallelepiped formed by the three independent vectors a, b, c. It is
+    six times the volume of a tetrahedron spanned by these three vectors.
+
+    The cross and dot product can be interchanged without changing the result:
+    :math:`a \cdot (b \cross c) = (a \cross b) \cdot c`. The result also
+    remains constant under cyclic permutation of the arguments:
+    :math:`(a \cross b) \cdot c = (b \cross c) \cdot a = (c \cross a) \cdot c`.
+
+    The scalar triple product is also the determinant of the matrix
+    :math:`\left[ a b c \right]^T` (each vector corresponds to a row).
+
+    The vectors a, b, c lie in the same plane if and only if the scalar
+    triple product is 0.
+
+    Parameters
+    ----------
+    a : array, shape (3,)
+        Vector a.
+
+    b : array shape (3,)
+        Vector b.
+
+    c : array, shape (3,)
+        Vector c.
+
+    Returns
+    -------
+    d : float
+        Scalar triple product.
+    """
+    return np.dot(a, np.cross(b, c))
+
+
 @numba.njit(numba.types.Tuple(
     (numba.float64[::1], numba.float64[::1]))(numba.float64[::1]), cache=True)
 def plane_basis_from_normal(plane_normal):

@@ -12,7 +12,7 @@ from enum import Enum
 
 import numba
 import numpy as np
-from distance3d.utils import EPSILON, MAX_FLOAT
+from distance3d.utils import EPSILON, MAX_FLOAT, scalar_triple_product
 
 EPSILON_SQR = EPSILON * EPSILON
 
@@ -383,11 +383,6 @@ def get_barycentric_coordinates_tetrahedron(a, b, c, d):
     vd6 = scalar_triple_product(vap, vab, vac)
     v6 = 1.0 / scalar_triple_product(vab, vac, vad)
     return va6 * v6, vb6 * v6, vc6 * v6, vd6 * v6
-
-
-@numba.njit(cache=True)
-def scalar_triple_product(a, b, c):
-    return np.dot(a, np.cross(b, c))
 
 
 @numba.njit(cache=True)

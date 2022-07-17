@@ -1,7 +1,8 @@
 import numpy as np
 import pytransform3d.transformations as pt
 from distance3d.utils import (
-    norm_vector, invert_transform, transform_point, inverse_transform_point)
+    norm_vector, invert_transform, transform_point, inverse_transform_point,
+    scalar_triple_product)
 from numpy.testing import assert_array_almost_equal
 from pytest import approx
 
@@ -30,3 +31,15 @@ def test_inverse_transform_point():
         B2A = invert_transform(A2B)
         assert_array_almost_equal(transform_point(B2A, point_in_B),
                                   inverse_transform_point(A2B, point_in_B))
+
+
+def test_scalar_triple_product():
+    a = np.array([1.0, 0.0, 0.0])
+    b = np.array([0.0, 1.0, 0.0])
+    c = np.array([0.0, 0.0, 1.0])
+
+    assert approx(scalar_triple_product(a, b, c)) == 1
+
+    assert approx(scalar_triple_product(a, b, -c)) == -1
+
+    assert approx(scalar_triple_product(a, b, b)) == 0
