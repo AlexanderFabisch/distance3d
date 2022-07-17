@@ -16,6 +16,7 @@ from ..utils import EPSILON, MAX_FLOAT, scalar_triple_product
 
 
 EPSILON_SQR = EPSILON * EPSILON
+ALL_TRUE = np.array([True, True, True, True], dtype=np.dtype("bool"))
 
 
 class GjkState(Enum):
@@ -563,7 +564,7 @@ def origin_outside_of_tetrahedron_planes(a, b, c, d):
         return signp <= EPSILON
     else:
         # Mixed signs, degenerate tetrahedron
-        return np.ones(4) > np.zeros(4)  # TODO what is the type of this?
+        return ALL_TRUE
 
 
 @numba.njit(cache=True)
