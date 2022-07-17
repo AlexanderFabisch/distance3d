@@ -115,7 +115,7 @@ def _intersection_loop(
     if v_len_sq <= EPSILON * max_y_length_squared(Y, n_points):
         return GjkState.Intersection, n_points, prev_v_len_sq
 
-    # The next seperation axis to test is the negative of the closest point of
+    # The next separation axis to test is the negative of the closest point of
     # the Minkowski sum to the origin.
     # Note: This must be done before terminating as converged since the
     # separating axis is -search_direction.
