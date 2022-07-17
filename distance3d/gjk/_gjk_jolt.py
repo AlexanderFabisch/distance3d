@@ -12,7 +12,8 @@ from enum import Enum
 
 import numba
 import numpy as np
-from distance3d.utils import EPSILON, MAX_FLOAT, scalar_triple_product
+from ..utils import EPSILON, MAX_FLOAT, scalar_triple_product
+
 
 EPSILON_SQR = EPSILON * EPSILON
 
@@ -281,7 +282,7 @@ def _distance_loop(
 
 @numba.njit(cache=True)
 def get_barycentric_coordinates_line(a, b):
-    """Barycentric coordinates of closest point to origin for infinite line.
+    """Barycentric coordinates of the closest point to origin for infinite line.
 
     Point can then be computed as a * u + b * v.
     """
