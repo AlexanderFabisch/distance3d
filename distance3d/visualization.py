@@ -72,11 +72,16 @@ class TetraMesh(pv.Artist):
 
     tetrahedra : array, shape (n_tetrahedra, 4)
         Indices of vertices that form tetrahedra of the mesh.
+
+    c : array-like, shape (3,), optional (default: None)
+        Color(s)
     """
-    def __init__(self, mesh2origin, vertices, tetrahedra):
+    def __init__(self, mesh2origin, vertices, tetrahedra, c=None):
         self.mesh = o3d.geometry.TetraMesh(
             o3d.utility.Vector3dVector(vertices),
             o3d.utility.Vector4iVector(tetrahedra))
+        if c is not None:
+            self.mesh.paint_uniform_color(c)
         self.mesh2origin = None
         self.set_data(mesh2origin)
 
