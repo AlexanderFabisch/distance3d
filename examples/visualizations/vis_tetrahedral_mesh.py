@@ -13,7 +13,7 @@ vertices, tetrahedra = io.load_tetrahedral_mesh("test/data/insole.vtk")
 
 fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
-mesh = visualization.TetraMesh(np.eye(4), vertices, tetrahedra)
+mesh = visualization.TetraMesh(np.eye(4), vertices, tetrahedra, c=(1, 0, 0))
 mesh.add_artist(fig)
 fig.view_init()
 if "__file__" in globals():
