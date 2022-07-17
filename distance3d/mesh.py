@@ -222,8 +222,8 @@ def make_convex_mesh(vertices):
     return triangles
 
 
-def make_icosphere(center, radius, order):
-    """Creates an icosphere triangular mesh.
+def make_triangular_icosphere(center, radius, order=4):
+    """Creates an triangular icosphere mesh.
 
     Source: https://observablehq.com/@mourner/fast-icosphere-mesh
 
@@ -235,7 +235,7 @@ def make_icosphere(center, radius, order):
     radius : float
         Radius of the sphere.
 
-    order : int
+    order : int, optional (default: 4)
         Number of subdivisions of initial 20 triangles.
 
     Returns
@@ -296,3 +296,35 @@ def make_icosphere(center, radius, order):
     vertices /= 1.0 / radius * np.linalg.norm(vertices, axis=1)[:, np.newaxis]
     vertices += center[np.newaxis]
     return vertices, triangles
+
+
+def make_tetrahedral_icosphere(center, radius, order=4):
+    """Creates an tetrahedral icosphere mesh.
+
+    Source: https://github.com/ekzhang/hydroelastics
+
+    Parameters
+    ----------
+    center : array, shape (3,)
+        Center of the sphere.
+
+    radius : float
+        Radius of the sphere.
+
+    order : int, optional (default: 4)
+        Number of subdivisions of initial 20 triangles.
+
+    Returns
+    -------
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    tetrahedra : array, shape (n_tetrahedra, 4)
+        Indices of vertices that form tetrahedra of the mesh.
+    """
+    vertices, triangles = make_triangular_icosphere(center, radius, order)
+    center_idx = len(vertices)
+    vertices = np.vstack((vertices, center[np.newaxis]))
+    tetrahedra = np.hstack(
+        (triangles, center_idx * np.ones((len(triangles), 1))))
+    return vertices, tetrahedra
