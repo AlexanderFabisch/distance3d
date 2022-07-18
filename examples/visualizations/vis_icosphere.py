@@ -19,6 +19,7 @@ print(timer.stop("make_tetrahedral_icosphere"))
 mesh2origin1 = np.eye(4)
 mesh2origin2 = np.eye(4)
 
+# TODO we can also use the pressure functions for this. does it work with concave objects? which one is faster?
 # TODO mesh2origin
 c1 = colliders.ConvexHullVertices(vertices1)
 c2 = colliders.ConvexHullVertices(vertices2)
@@ -65,6 +66,8 @@ for i, aabb in zip(indices1, aabbs1):
     broad_overlapping_pairs[i] = overlapping_indices2
 print(timer.stop("prescreening"))
 
+# TODO the paper suggests computing surface area, com of the contact surface and p(com)
+# How do we compute p(com)?
 timer.start("compute pressures")
 pressures1 = dict()
 pressures2 = dict()
