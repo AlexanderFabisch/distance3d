@@ -51,10 +51,12 @@ potentials2 = np.zeros(len(vertices1))
 potentials2[-1] = 0.15
 
 timer.start("prescreening")
+# TODO swap AABB tests and this?
 # TODO mesh2origin
 indices1 = intersecting_tetrahedra(vertices1, tetrahedra1, contact_point, normal)
 indices2 = intersecting_tetrahedra(vertices2, tetrahedra2, contact_point, normal)
 
+# TODO transform vertices1 into mesh2 frame to be able to reuse AABB tree
 aabbs1 = mesh.tetrahedral_mesh_aabbs(mesh2origin1, vertices1, tetrahedra1[indices1])
 aabbs2 = mesh.tetrahedral_mesh_aabbs(mesh2origin2, vertices2, tetrahedra2[indices2])
 broad_overlapping_pairs = dict()
