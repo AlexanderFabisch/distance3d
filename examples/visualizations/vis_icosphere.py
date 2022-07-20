@@ -14,7 +14,7 @@ from distance3d import mesh, visualization, benchmark, mpr, colliders, geometry,
 
 timer = benchmark.Timer()
 timer.start("make_tetrahedral_icosphere")
-vertices1_in_mesh1, tetrahedra1 = mesh.make_tetrahedral_icosphere(0.1 * np.ones(3), 0.15, 2)
+vertices1_in_mesh1, tetrahedra1 = mesh.make_tetrahedral_icosphere(0.13 * np.ones(3), 0.15, 2)
 vertices2_in_mesh2, tetrahedra2 = mesh.make_tetrahedral_icosphere(0.25 * np.ones(3), 0.15, 2)
 print(timer.stop("make_tetrahedral_icosphere"))
 #vertices2_in_mesh2, tetrahedra2 = io.load_tetrahedral_mesh("test/data/insole.vtk")
@@ -180,7 +180,7 @@ for pressure, point, _ in pressures2.values():
     c.append((0, pressure / max_pressure2, 0))
 fig.scatter(P, s=0.003, c=c)
 
-for _, _, points in pressures1.values():
+for pressure, _, points in pressures1.values():
     if len(points) == 3:
         triangles = np.array([[0, 1, 2], [2, 1, 0]], dtype=int)
     else:
@@ -190,7 +190,23 @@ for _, _, points in pressures1.values():
         o3d.utility.Vector3dVector(points),
         o3d.utility.Vector3iVector(triangles)
     )
+    contact_surface_mesh.paint_uniform_color((pressure / max_pressure1, 0, 0))
     fig.add_geometry(contact_surface_mesh)
+
+"""
+for pressure, _, points in pressures2.values():
+    if len(points) == 3:
+        triangles = np.array([[0, 1, 2], [2, 1, 0]], dtype=int)
+    else:
+        assert len(points) == 4
+        triangles = np.array([[0, 1, 2], [2, 1, 0], [3, 1, 2], [2, 1, 3]], dtype=int)
+    contact_surface_mesh = o3d.geometry.TriangleMesh(
+        o3d.utility.Vector3dVector(points),
+        o3d.utility.Vector3iVector(triangles)
+    )
+    contact_surface_mesh.paint_uniform_color((0, pressure / max_pressure2, 0))
+    fig.add_geometry(contact_surface_mesh)
+"""
 
 fig.view_init()
 
