@@ -6,6 +6,7 @@ Visualize Icosphere
 print(__doc__)
 import aabbtree
 import numpy as np
+import open3d as o3d
 import pytransform3d.visualizer as pv
 import pytransform3d.transformations as pt
 from distance3d import mesh, visualization, benchmark, mpr, colliders, geometry, io
@@ -27,7 +28,6 @@ mesh12mesh2 = pt.concat(mesh12origin, origin2mesh2)
 vertices1_in_mesh2 = pt.transform(mesh12mesh2, pt.vectors_to_points(vertices1_in_mesh1))[:, :3]
 
 # TODO we can also use the pressure functions for this. does it work with concave objects? which one is faster?
-# TODO mesh2origin
 c1 = colliders.ConvexHullVertices(vertices1_in_mesh2)
 c2 = colliders.ConvexHullVertices(vertices2_in_mesh2)
 timer.start("mpr_penetration")
@@ -146,8 +146,8 @@ for i in range(len(broad_overlapping_indices1)):
         c2 = geometry.barycentric_coordinates_tetrahedron(p2, tetra2)
         pressure2 = c2.dot(potentials2[tetrahedra2[idx2]])
 
-        pressures1[idx1] = (area1 * pressure1, p1)
-        pressures2[idx2] = (area2 * pressure2, p2)
+        pressures1[idx1] = (area1 * pressure1, p1, poly1)
+        pressures2[idx2] = (area2 * pressure2, p2, poly2)
 print(timer.stop("compute pressures"))
 
 print(f"force 1: {sum([p[0] for p in pressures1.values()])}")
@@ -168,17 +168,29 @@ tetra_mesh2.add_artist(fig)
 max_pressure1 = max([p[0] for p in pressures1.values()])
 P = []
 c = []
-for pressure, point in pressures1.values():
+for pressure, point, _ in pressures1.values():
     P.append(point)
     c.append((pressure / max_pressure1, 0, 0))
 fig.scatter(P, s=0.003, c=c)
 max_pressure2 = max([p[0] for p in pressures2.values()])
 P = []
 c = []
-for pressure, point in pressures2.values():
+for pressure, point, _ in pressures2.values():
     P.append(point)
     c.append((0, pressure / max_pressure2, 0))
 fig.scatter(P, s=0.003, c=c)
+
+for _, _, points in pressures1.values():
+    if len(points) == 3:
+        triangles = np.array([[0, 1, 2], [2, 1, 0]], dtype=int)
+    else:
+        assert len(points) == 4
+        triangles = np.array([[0, 1, 2], [2, 1, 0], [3, 1, 2], [2, 1, 3]], dtype=int)
+    contact_surface_mesh = o3d.geometry.TriangleMesh(
+        o3d.utility.Vector3dVector(points),
+        o3d.utility.Vector3iVector(triangles)
+    )
+    fig.add_geometry(contact_surface_mesh)
 
 fig.view_init()
 
