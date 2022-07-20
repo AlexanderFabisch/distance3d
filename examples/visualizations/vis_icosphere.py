@@ -44,7 +44,7 @@ def intersecting_tetrahedra(vertices, tetrahedra, contact_point, normal):
     d = points_to_plane_signed(vertices, contact_point, normal)[tetrahedra]
     mins = np.min(d, axis=1)
     maxs = np.max(d, axis=1)
-    return np.where(np.sign(mins) != np.sign(maxs))[0]
+    return np.sign(mins) != np.sign(maxs)
 
 from distance3d.distance import point_to_plane
 def point_in_plane(plane_point, plane_normal, tetrahedron_points):  # TODO triangle projection?
@@ -69,23 +69,27 @@ potentials2[-1] = 0.15
 # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 
 timer.start("prescreening")
-
 aabbs1 = mesh.tetrahedral_mesh_aabbs(vertices1_in_mesh2, tetrahedra1)
 aabbs2 = mesh.tetrahedral_mesh_aabbs(vertices2_in_mesh2, tetrahedra2)
-broad_overlapping_pairs = []
+broad_overlapping_indices1 = []
+broad_overlapping_indices2 = []
 tree2 = aabbtree.AABBTree()
 for j, aabb in enumerate(aabbs2):
     tree2.add(aabbtree.AABB(aabb), j)
 for i, aabb in enumerate(aabbs1):
-    overlapping_indices2 = tree2.overlap_values(aabbtree.AABB(aabb))
-    overlapping_indices1 = [i] * len(overlapping_indices2)
-    new_indices = list(zip(overlapping_indices1, overlapping_indices2))
-    broad_overlapping_pairs.extend(new_indices)
+    new_indices2 = tree2.overlap_values(aabbtree.AABB(aabb))
+    broad_overlapping_indices2.extend(new_indices2)
+    broad_overlapping_indices1.extend([i] * len(new_indices2))
 
-# TODO mesh2origin
-# TODO prescreen with this
-#indices1 = intersecting_tetrahedra(vertices1_in_mesh1, tetrahedra1, contact_point, normal)
-#indices2 = intersecting_tetrahedra(vertices2_in_mesh2, tetrahedra2, contact_point, normal)
+broad_overlapping_indices1 = np.asarray(broad_overlapping_indices1, dtype=int)
+broad_overlapping_indices2 = np.asarray(broad_overlapping_indices2, dtype=int)
+candidates1 = tetrahedra1[broad_overlapping_indices1]
+candidates2 = tetrahedra2[broad_overlapping_indices2]
+keep1 = intersecting_tetrahedra(vertices1_in_mesh2, candidates1, contact_point, normal)
+keep2 = intersecting_tetrahedra(vertices2_in_mesh2, candidates2, contact_point, normal)
+keep = np.logical_and(keep1, keep2)
+broad_overlapping_indices1 = broad_overlapping_indices1[keep]
+broad_overlapping_indices2 = broad_overlapping_indices2[keep]
 print(timer.stop("prescreening"))
 
 # TODO the paper suggests computing surface area, com of the contact surface and p(com)
@@ -93,7 +97,7 @@ print(timer.stop("prescreening"))
 timer.start("compute pressures")
 pressures1 = dict()
 pressures2 = dict()
-for idx1, idx2 in broad_overlapping_pairs:
+for idx1, idx2 in zip(broad_overlapping_indices1, broad_overlapping_indices2):
     # TODO don't recompute every time
     tetra1 = vertices1_in_mesh2[tetrahedra1[idx1]]
     t1 = colliders.ConvexHullVertices(tetra1)
