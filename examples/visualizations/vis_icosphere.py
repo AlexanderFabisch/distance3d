@@ -44,28 +44,42 @@ def point_in_plane(plane_point, plane_normal, tetrahedron_points):  # TODO trian
     return np.mean(np.array([point_to_plane(p, plane_point, plane_normal)[1]
                              for p in tetrahedron_points]), axis=0)
 
+# The pressure function assigns to each point in the interior of the object
+# a nonnegative real number representing the pressure at that point, which
+# is an intuitive notion of how much resistance a foreign body protruding
+# into the object would experience at that point.
+# Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 # TODO general distance to surface
 potentials1 = np.zeros(len(vertices1))
 potentials1[-1] = 0.15
 potentials2 = np.zeros(len(vertices1))
 potentials2[-1] = 0.15
 
+# When two objects with pressure functions p1(*), p2(*) intersect, there is
+# a surface S inside the space of intersection at which the values of p1 and
+# p2 are equal. After identifying this surface, we then define the total force
+# exerted by one object on another [..].
+# Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
+
 timer.start("prescreening")
-# TODO swap AABB tests and this?
-# TODO mesh2origin
-indices1 = intersecting_tetrahedra(vertices1, tetrahedra1, contact_point, normal)
-indices2 = intersecting_tetrahedra(vertices2, tetrahedra2, contact_point, normal)
 
 # TODO transform vertices1 into mesh2 frame to be able to reuse AABB tree
-aabbs1 = mesh.tetrahedral_mesh_aabbs(mesh2origin1, vertices1, tetrahedra1[indices1])
-aabbs2 = mesh.tetrahedral_mesh_aabbs(mesh2origin2, vertices2, tetrahedra2[indices2])
-broad_overlapping_pairs = dict()
+aabbs1 = mesh.tetrahedral_mesh_aabbs(mesh2origin1, vertices1, tetrahedra1)
+aabbs2 = mesh.tetrahedral_mesh_aabbs(mesh2origin2, vertices2, tetrahedra2)
+broad_overlapping_pairs = []
 tree2 = aabbtree.AABBTree()
-for j, aabb in zip(indices2, aabbs2):
+for j, aabb in enumerate(aabbs2):
     tree2.add(aabbtree.AABB(aabb), j)
-for i, aabb in zip(indices1, aabbs1):
+for i, aabb in enumerate(aabbs1):
     overlapping_indices2 = tree2.overlap_values(aabbtree.AABB(aabb))
-    broad_overlapping_pairs[i] = overlapping_indices2
+    overlapping_indices1 = [i] * len(overlapping_indices2)
+    new_indices = list(zip(overlapping_indices1, overlapping_indices2))
+    broad_overlapping_pairs.extend(new_indices)
+
+# TODO mesh2origin
+# TODO prescreen with this
+#indices1 = intersecting_tetrahedra(vertices1, tetrahedra1, contact_point, normal)
+#indices2 = intersecting_tetrahedra(vertices2, tetrahedra2, contact_point, normal)
 print(timer.stop("prescreening"))
 
 # TODO the paper suggests computing surface area, com of the contact surface and p(com)
@@ -73,27 +87,27 @@ print(timer.stop("prescreening"))
 timer.start("compute pressures")
 pressures1 = dict()
 pressures2 = dict()
-for idx1 in broad_overlapping_pairs.keys():
+for idx1, idx2 in broad_overlapping_pairs:
+    # TODO don't recompute every time
     tetra1 = vertices1[tetrahedra1[idx1]]
     t1 = colliders.ConvexHullVertices(tetra1)
     p1 = point_in_plane(contact_point, normal, tetra1)
     c1 = geometry.barycentric_coordinates_tetrahedron(p1, tetra1)
     pressure1 = c1.dot(potentials1[tetrahedra1[idx1]])
-    for idx2 in broad_overlapping_pairs[idx1]:
-        # TODO tetra-tetra intersection, something with halfplanes?
-        tetra2 = vertices2[tetrahedra2[idx2]]
-        t2 = colliders.ConvexHullVertices(tetra2)
-        if mpr.mpr_intersection(t1, t2):
-            # TODO compute triangle projection on contact surface, compute
-            # area and use it as a weight for the pressure in integral
-            p2 = point_in_plane(contact_point, normal, tetra2)
-            c2 = geometry.barycentric_coordinates_tetrahedron(p2, tetra2)
-            pressure2 = c2.dot(potentials2[tetrahedra2[idx2]])
+    # TODO tetra-tetra intersection, something with halfplanes?
+    tetra2 = vertices2[tetrahedra2[idx2]]
+    t2 = colliders.ConvexHullVertices(tetra2)
+    if mpr.mpr_intersection(t1, t2):
+        # TODO compute triangle projection on contact surface, compute
+        # area and use it as a weight for the pressure in integral
+        p2 = point_in_plane(contact_point, normal, tetra2)
+        c2 = geometry.barycentric_coordinates_tetrahedron(p2, tetra2)
+        pressure2 = c2.dot(potentials2[tetrahedra2[idx2]])
 
-            v1, _ = pressures1.get(idx1, [0.0, p1])
-            pressures1[idx1] = [v1 + pressure1, p1]
-            v2, _ = pressures2.get(idx2, [0.0, p2])
-            pressures2[idx2] = [v2 + pressure2, p2]
+        v1, _ = pressures1.get(idx1, [0.0, p1])
+        pressures1[idx1] = [v1 + pressure1, p1]
+        v2, _ = pressures2.get(idx2, [0.0, p2])
+        pressures2[idx2] = [v2 + pressure2, p2]
 print(timer.stop("compute pressures"))
 
 print(f"force 1: {sum([p[0] for p in pressures1.values()])}")
