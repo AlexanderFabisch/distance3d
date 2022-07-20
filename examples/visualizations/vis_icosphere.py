@@ -46,10 +46,30 @@ def intersecting_tetrahedra(vertices, tetrahedra, contact_point, normal):
     maxs = np.max(d, axis=1)
     return np.sign(mins) != np.sign(maxs)
 
-from distance3d.distance import point_to_plane
-def point_in_plane(plane_point, plane_normal, tetrahedron_points):  # TODO triangle projection?
-    return np.mean(np.array([point_to_plane(p, plane_point, plane_normal)[1]
-                             for p in tetrahedron_points]), axis=0)
+from distance3d.distance import line_segment_to_plane
+def contact_plane_projection(plane_point, plane_normal, tetrahedron_points):
+    d = np.sign(points_to_plane_signed(tetrahedron_points, plane_point, plane_normal))
+    neg = np.where(d < 0)[0]
+    pos = np.where(d >= 0)[0]
+    triangle_points = []
+    for n in neg:
+        for p in pos:
+            triangle_points.append(
+                line_segment_to_plane(
+                    tetrahedron_points[n], tetrahedron_points[p],
+                    plane_point, plane_normal)[2])
+    assert len(triangle_points) >= 3, f"{triangle_points}"
+    triangle_points = np.asarray(triangle_points)
+    return triangle_points
+
+def polygon_area(points):
+    if len(points) == 3:
+        return 0.5 * np.linalg.norm(np.cross(points[1] - points[0], points[2] - points[0]))
+    else:
+        assert len(points) == 4
+        return 0.5 * (
+            np.linalg.norm(np.cross(points[1] - points[0], points[2] - points[0]))
+            + np.linalg.norm(np.cross(points[1] - points[3], points[2] - points[3])))
 
 # The pressure function assigns to each point in the interior of the object
 # a nonnegative real number representing the pressure at that point, which
@@ -107,24 +127,27 @@ for i in range(len(broad_overlapping_indices1)):
     if idx1 != last1:
         tetra1 = vertices1_in_mesh2[tetrahedra1[idx1]]
         t1 = colliders.ConvexHullVertices(tetra1)
-        p1 = point_in_plane(contact_point, normal, tetra1)
+        poly1 = contact_plane_projection(contact_point, normal, tetra1)
+        area1 = polygon_area(poly1)
+        p1 = np.mean(poly1, axis=0)
         c1 = geometry.barycentric_coordinates_tetrahedron(p1, tetra1)
         pressure1 = c1.dot(potentials1[tetrahedra1[idx1]])
 
-    # TODO tetra-tetra intersection, something with halfplanes?
+    # TODO tetra-tetra intersection to compute triangle, something with halfplanes?
+    # instead we try to compute surface for each object individually
     tetra2 = vertices2_in_mesh2[tetrahedra2[idx2]]
     t2 = colliders.ConvexHullVertices(tetra2)
     if mpr.mpr_intersection(t1, t2):
         # TODO compute triangle projection on contact surface, compute
         # area and use it as a weight for the pressure in integral
-        p2 = point_in_plane(contact_point, normal, tetra2)
+        poly2 = contact_plane_projection(contact_point, normal, tetra2)
+        area2 = polygon_area(poly2)
+        p2 = np.mean(poly2, axis=0)
         c2 = geometry.barycentric_coordinates_tetrahedron(p2, tetra2)
         pressure2 = c2.dot(potentials2[tetrahedra2[idx2]])
 
-        v1, _ = pressures1.get(idx1, [0.0, p1])
-        pressures1[idx1] = [v1 + pressure1, p1]
-        v2, _ = pressures2.get(idx2, [0.0, p2])
-        pressures2[idx2] = [v2 + pressure2, p2]
+        pressures1[idx1] = (area1 * pressure1, p1)
+        pressures2[idx2] = (area2 * pressure2, p2)
 print(timer.stop("compute pressures"))
 
 print(f"force 1: {sum([p[0] for p in pressures1.values()])}")
@@ -141,7 +164,6 @@ tetra_mesh1 = visualization.TetraMesh(mesh22origin, vertices1_in_mesh2, tetrahed
 tetra_mesh1.add_artist(fig)
 tetra_mesh2 = visualization.TetraMesh(mesh22origin, vertices2_in_mesh2, tetrahedra2)
 tetra_mesh2.add_artist(fig)
-#fig.plot_plane(normal=normal, point_in_plane=contact_point)
 
 max_pressure1 = max([p[0] for p in pressures1.values()])
 P = []
