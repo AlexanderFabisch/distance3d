@@ -69,6 +69,7 @@ potentials2[-1] = 0.15
 # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 
 timer.start("prescreening")
+# Initial check of bounding boxes of tetrahedra
 aabbs1 = mesh.tetrahedral_mesh_aabbs(vertices1_in_mesh2, tetrahedra1)
 aabbs2 = mesh.tetrahedral_mesh_aabbs(vertices2_in_mesh2, tetrahedra2)
 broad_overlapping_indices1 = []
@@ -81,6 +82,7 @@ for i, aabb in enumerate(aabbs1):
     broad_overlapping_indices2.extend(new_indices2)
     broad_overlapping_indices1.extend([i] * len(new_indices2))
 
+# Check if the tetrahedra actually intersect the contact plane
 broad_overlapping_indices1 = np.asarray(broad_overlapping_indices1, dtype=int)
 broad_overlapping_indices2 = np.asarray(broad_overlapping_indices2, dtype=int)
 candidates1 = tetrahedra1[broad_overlapping_indices1]
@@ -97,13 +99,18 @@ print(timer.stop("prescreening"))
 timer.start("compute pressures")
 pressures1 = dict()
 pressures2 = dict()
-for idx1, idx2 in zip(broad_overlapping_indices1, broad_overlapping_indices2):
-    # TODO don't recompute every time
-    tetra1 = vertices1_in_mesh2[tetrahedra1[idx1]]
-    t1 = colliders.ConvexHullVertices(tetra1)
-    p1 = point_in_plane(contact_point, normal, tetra1)
-    c1 = geometry.barycentric_coordinates_tetrahedron(p1, tetra1)
-    pressure1 = c1.dot(potentials1[tetrahedra1[idx1]])
+last1 = -1
+for i in range(len(broad_overlapping_indices1)):
+    idx1 = broad_overlapping_indices1[i]
+    idx2 = broad_overlapping_indices2[i]
+
+    if idx1 != last1:
+        tetra1 = vertices1_in_mesh2[tetrahedra1[idx1]]
+        t1 = colliders.ConvexHullVertices(tetra1)
+        p1 = point_in_plane(contact_point, normal, tetra1)
+        c1 = geometry.barycentric_coordinates_tetrahedron(p1, tetra1)
+        pressure1 = c1.dot(potentials1[tetrahedra1[idx1]])
+
     # TODO tetra-tetra intersection, something with halfplanes?
     tetra2 = vertices2_in_mesh2[tetrahedra2[idx2]]
     t2 = colliders.ConvexHullVertices(tetra2)
