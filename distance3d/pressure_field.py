@@ -7,6 +7,7 @@ from .gjk import gjk_intersection
 from .distance import line_segment_to_plane
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from .geometry import barycentric_coordinates_tetrahedron
+from .utils import transform_point
 
 
 def contact_forces(
@@ -110,6 +111,7 @@ def contact_forces(
             "object2_coms": np.array([forces2[f][1] for f in forces2]),
             "object1_polys": [forces1[f][2] for f in forces1],
             "object2_polys": [forces2[f][2] for f in forces2],
+            "contact_point": transform_point(mesh22origin, contact_point)
         }
         return intersection, wrench12, wrench21, details
     else:

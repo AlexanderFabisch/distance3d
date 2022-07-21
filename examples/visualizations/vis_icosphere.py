@@ -53,6 +53,9 @@ fig.scatter(details["object1_coms"], s=0.003, c=c1)
 c2 = [(0, pressure / max_pressure2, 0) for pressure in details["object2_pressures"]]
 fig.scatter(details["object2_coms"], s=0.003, c=c2)
 
+fig.plot_vector(details["contact_point"], 100 * wrench21[:3], (1, 0, 0))
+fig.plot_vector(details["contact_point"], 100 * wrench12[:3], (0, 1, 0))
+
 for color, points in zip(c1, details["object1_polys"]):
     if len(points) == 3:
         triangles = np.array([[0, 1, 2], [2, 1, 0]], dtype=int)
