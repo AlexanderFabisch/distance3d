@@ -7,7 +7,7 @@ from .gjk import gjk_intersection
 from .distance import line_segment_to_plane
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from .geometry import barycentric_coordinates_tetrahedron
-from .utils import transform_point
+from .utils import transform_point, invert_transform
 
 
 def contact_forces(
@@ -16,9 +16,10 @@ def contact_forces(
         return_details=False):
     # We transform vertices of mesh1 to mesh2 frame to be able to reuse the AABB
     # tree of mesh2.
-    origin2mesh2 = pt.invert_transform(mesh22origin)
-    mesh12mesh2 = pt.concat(mesh12origin, origin2mesh2)
-    vertices1_in_mesh2 = pt.transform(mesh12mesh2, pt.vectors_to_points(vertices1_in_mesh1))[:, :3]
+    origin2mesh2 = invert_transform(mesh22origin)
+    mesh12mesh2 = np.dot(origin2mesh2, mesh12origin)
+    vertices1_in_mesh2 = np.dot(
+        vertices1_in_mesh1, mesh12mesh2[:3, :3].T) + mesh12mesh2[np.newaxis, :3, 3]
 
     # TODO we can also use the pressure functions for this. does it work with concave objects? which one is faster?
     c1 = ConvexHullVertices(vertices1_in_mesh2)
