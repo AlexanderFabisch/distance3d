@@ -37,32 +37,14 @@ def contact_forces(
     # exerted by one object on another [..].
     # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 
-    # Initial check of bounding boxes of tetrahedra
-    aabbs1 = tetrahedral_mesh_aabbs(vertices1_in_mesh2, tetrahedra1)
-    aabbs2 = tetrahedral_mesh_aabbs(vertices2_in_mesh2, tetrahedra2)
-    broad_overlapping_indices1 = []
-    broad_overlapping_indices2 = []
-    tree2 = aabbtree.AABBTree()
-    for j, aabb in enumerate(aabbs2):
-        tree2.add(aabbtree.AABB(aabb), j)
-    for i, aabb in enumerate(aabbs1):
-        new_indices2 = tree2.overlap_values(aabbtree.AABB(aabb))
-        broad_overlapping_indices2.extend(new_indices2)
-        broad_overlapping_indices1.extend([i] * len(new_indices2))
+    broad_overlapping_indices1, broad_overlapping_indices2 = _check_aabbs_of_tetrahedra(
+        vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2)
 
-    # Check if the tetrahedra actually intersect the contact plane
-    broad_overlapping_indices1 = np.asarray(broad_overlapping_indices1, dtype=int)
-    broad_overlapping_indices2 = np.asarray(broad_overlapping_indices2, dtype=int)
-    candidates1 = tetrahedra1[broad_overlapping_indices1]
-    candidates2 = tetrahedra2[broad_overlapping_indices2]
-    keep1 = intersecting_tetrahedra(vertices1_in_mesh2, candidates1, contact_point, normal)
-    keep2 = intersecting_tetrahedra(vertices2_in_mesh2, candidates2, contact_point, normal)
-    keep = np.logical_and(keep1, keep2)
-    broad_overlapping_indices1 = broad_overlapping_indices1[keep]
-    broad_overlapping_indices2 = broad_overlapping_indices2[keep]
+    broad_overlapping_indices1, broad_overlapping_indices2 = _check_tetrahedra_intersect_contact_plane(
+        vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2,
+        contact_point, normal, broad_overlapping_indices1,
+        broad_overlapping_indices2)
 
-    # TODO the paper suggests computing surface area, com of the contact surface and p(com)
-    # How do we compute p(com)?
     forces1 = dict()
     forces2 = dict()
     last1 = -1
@@ -117,6 +99,39 @@ def contact_forces(
         return intersection, wrench12, wrench21, details
     else:
         return intersection, wrench12, wrench21
+
+
+def _check_tetrahedra_intersect_contact_plane(
+        vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2,
+        contact_point, normal, broad_overlapping_indices1,
+        broad_overlapping_indices2):
+    """Check if the tetrahedra actually intersect the contact plane."""
+    broad_overlapping_indices1 = np.asarray(broad_overlapping_indices1, dtype=int)
+    broad_overlapping_indices2 = np.asarray(broad_overlapping_indices2, dtype=int)
+    candidates1 = tetrahedra1[broad_overlapping_indices1]
+    candidates2 = tetrahedra2[broad_overlapping_indices2]
+    keep1 = intersecting_tetrahedra(vertices1_in_mesh2, candidates1, contact_point, normal)
+    keep2 = intersecting_tetrahedra(vertices2_in_mesh2, candidates2, contact_point, normal)
+    keep = np.logical_and(keep1, keep2)
+    broad_overlapping_indices1 = broad_overlapping_indices1[keep]
+    broad_overlapping_indices2 = broad_overlapping_indices2[keep]
+    return broad_overlapping_indices1, broad_overlapping_indices2
+
+
+def _check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2):
+    """Initial check of bounding boxes of tetrahedra."""
+    aabbs1 = tetrahedral_mesh_aabbs(vertices1_in_mesh2, tetrahedra1)
+    aabbs2 = tetrahedral_mesh_aabbs(vertices2_in_mesh2, tetrahedra2)
+    broad_overlapping_indices1 = []
+    broad_overlapping_indices2 = []
+    tree2 = aabbtree.AABBTree()
+    for j, aabb in enumerate(aabbs2):
+        tree2.add(aabbtree.AABB(aabb), j)
+    for i, aabb in enumerate(aabbs1):
+        new_indices2 = tree2.overlap_values(aabbtree.AABB(aabb))
+        broad_overlapping_indices2.extend(new_indices2)
+        broad_overlapping_indices1.extend([i] * len(new_indices2))
+    return broad_overlapping_indices1, broad_overlapping_indices2
 
 
 def points_to_plane_signed(points, plane_point, plane_normal):
