@@ -1,6 +1,6 @@
 import aabbtree
+import numba
 import numpy as np
-import pytransform3d.transformations as pt
 from .colliders import ConvexHullVertices
 from .mpr import mpr_penetration
 from .gjk import gjk_intersection
@@ -40,11 +40,48 @@ def contact_forces(
     broad_overlapping_indices1, broad_overlapping_indices2 = _check_aabbs_of_tetrahedra(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2)
 
+    broad_overlapping_indices1 = np.asarray(broad_overlapping_indices1, dtype=int)
+    broad_overlapping_indices2 = np.asarray(broad_overlapping_indices2, dtype=int)
     broad_overlapping_indices1, broad_overlapping_indices2 = _check_tetrahedra_intersect_contact_plane(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2,
         contact_point, normal, broad_overlapping_indices1,
         broad_overlapping_indices2)
 
+    forces1, forces2 = _contact_surface(
+        vertices1_in_mesh2, tetrahedra1, potentials1,
+        vertices2_in_mesh2, tetrahedra2, potentials2,
+        broad_overlapping_indices1, broad_overlapping_indices2,
+        contact_point, normal)
+
+    # TODO
+    #com1 = center_of_mass_tetrahedral_mesh(mesh12origin, vertices1_in_mesh2, tetrahedra1)
+
+    normal_in_world = mesh22origin[:3, :3].dot(normal)
+    force12 = sum([forces1[f][0] for f in forces1]) * normal_in_world
+    wrench12 = np.hstack((force12, np.zeros(3)))
+    force21 = sum([forces2[f][0] for f in forces2]) * -normal_in_world
+    wrench21 = np.hstack((force21, np.zeros(3)))
+
+    if return_details:
+        details = {
+            "object1_pressures": np.array([forces1[f][0] for f in forces1]),
+            "object2_pressures": np.array([forces2[f][0] for f in forces2]),
+            "object1_coms": np.array([forces1[f][1] for f in forces1]),
+            "object2_coms": np.array([forces2[f][1] for f in forces2]),
+            "object1_polys": [forces1[f][2] for f in forces1],
+            "object2_polys": [forces2[f][2] for f in forces2],
+            "contact_point": transform_point(mesh22origin, contact_point)
+        }
+        return intersection, wrench12, wrench21, details
+    else:
+        return intersection, wrench12, wrench21
+
+
+def _contact_surface(
+        vertices1_in_mesh2, tetrahedra1, potentials1,
+        vertices2_in_mesh2, tetrahedra2, potentials2,
+        broad_overlapping_indices1, broad_overlapping_indices2,
+        contact_point, normal):
     forces1 = dict()
     forces2 = dict()
     last1 = -1
@@ -76,46 +113,7 @@ def contact_forces(
 
             forces1[idx1] = (area1 * pressure1, p1, poly1)
             forces2[idx2] = (area2 * pressure2, p2, poly2)
-
-    # TODO
-    #com1 = center_of_mass_tetrahedral_mesh(mesh12origin, vertices1_in_mesh2, tetrahedra1)
-
-    normal_in_world = mesh22origin[:3, :3].dot(normal)
-    force12 = sum([forces1[f][0] for f in forces1]) * normal_in_world
-    wrench12 = np.hstack((force12, np.zeros(3)))
-    force21 = sum([forces2[f][0] for f in forces2]) * -normal_in_world
-    wrench21 = np.hstack((force21, np.zeros(3)))
-
-    if return_details:
-        details = {
-            "object1_pressures": np.array([forces1[f][0] for f in forces1]),
-            "object2_pressures": np.array([forces2[f][0] for f in forces2]),
-            "object1_coms": np.array([forces1[f][1] for f in forces1]),
-            "object2_coms": np.array([forces2[f][1] for f in forces2]),
-            "object1_polys": [forces1[f][2] for f in forces1],
-            "object2_polys": [forces2[f][2] for f in forces2],
-            "contact_point": transform_point(mesh22origin, contact_point)
-        }
-        return intersection, wrench12, wrench21, details
-    else:
-        return intersection, wrench12, wrench21
-
-
-def _check_tetrahedra_intersect_contact_plane(
-        vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2,
-        contact_point, normal, broad_overlapping_indices1,
-        broad_overlapping_indices2):
-    """Check if the tetrahedra actually intersect the contact plane."""
-    broad_overlapping_indices1 = np.asarray(broad_overlapping_indices1, dtype=int)
-    broad_overlapping_indices2 = np.asarray(broad_overlapping_indices2, dtype=int)
-    candidates1 = tetrahedra1[broad_overlapping_indices1]
-    candidates2 = tetrahedra2[broad_overlapping_indices2]
-    keep1 = intersecting_tetrahedra(vertices1_in_mesh2, candidates1, contact_point, normal)
-    keep2 = intersecting_tetrahedra(vertices2_in_mesh2, candidates2, contact_point, normal)
-    keep = np.logical_and(keep1, keep2)
-    broad_overlapping_indices1 = broad_overlapping_indices1[keep]
-    broad_overlapping_indices2 = broad_overlapping_indices2[keep]
-    return broad_overlapping_indices1, broad_overlapping_indices2
+    return forces1, forces2
 
 
 def _check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2):
@@ -134,19 +132,42 @@ def _check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mes
     return broad_overlapping_indices1, broad_overlapping_indices2
 
 
+@numba.njit(cache=True)
+def _check_tetrahedra_intersect_contact_plane(
+        vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2,
+        contact_point, normal, broad_overlapping_indices1,
+        broad_overlapping_indices2):
+    """Check if the tetrahedra actually intersect the contact plane."""
+    candidates1 = tetrahedra1[broad_overlapping_indices1]
+    candidates2 = tetrahedra2[broad_overlapping_indices2]
+    keep1 = intersecting_tetrahedra(vertices1_in_mesh2, candidates1, contact_point, normal)
+    keep2 = intersecting_tetrahedra(vertices2_in_mesh2, candidates2, contact_point, normal)
+    keep = np.logical_and(keep1, keep2)
+    broad_overlapping_indices1 = broad_overlapping_indices1[keep]
+    broad_overlapping_indices2 = broad_overlapping_indices2[keep]
+    return broad_overlapping_indices1, broad_overlapping_indices2
+
+
+@numba.njit(
+    numba.float64[:](numba.float64[:, ::1], numba.float64[:], numba.float64[:]),
+    cache=True)
 def points_to_plane_signed(points, plane_point, plane_normal):
-    return np.dot(points - plane_point.reshape(1, -1), plane_normal)
+    return np.dot(points - np.ascontiguousarray(plane_point).reshape(1, -1), plane_normal)
 
 
+@numba.njit(
+    numba.boolean[:](numba.float64[:, :], numba.int64[:, :], numba.float64[:], numba.float64[:]),
+    cache=True)
 def intersecting_tetrahedra(vertices, tetrahedra, contact_point, normal):
-    d = points_to_plane_signed(vertices, contact_point, normal)[tetrahedra]
-    mins = np.min(d, axis=1)
-    maxs = np.max(d, axis=1)
-    return np.sign(mins) != np.sign(maxs)
+    candidates = np.empty(len(tetrahedra), dtype=np.dtype("bool"))
+    for i, tetrahedron in enumerate(tetrahedra):
+        d = points_to_plane_signed(vertices[tetrahedron], contact_point, normal)
+        candidates[i] = np.sign(min(d)) != np.sign(max(d))
+    return candidates
 
 
 def contact_plane_projection(plane_point, plane_normal, tetrahedron_points):
-    d = np.sign(points_to_plane_signed(tetrahedron_points, plane_point, plane_normal))
+    d = points_to_plane_signed(tetrahedron_points, plane_point, plane_normal)
     neg = np.where(d < 0)[0]
     pos = np.where(d >= 0)[0]
     triangle_points = []
@@ -156,11 +177,11 @@ def contact_plane_projection(plane_point, plane_normal, tetrahedron_points):
                 line_segment_to_plane(
                     tetrahedron_points[n], tetrahedron_points[p],
                     plane_point, plane_normal)[2])
-    assert len(triangle_points) >= 3, f"{triangle_points}"
     triangle_points = np.asarray(triangle_points)
     return triangle_points
 
 
+@numba.njit(cache=True)
 def polygon_area(points):
     if len(points) == 3:
         return 0.5 * np.linalg.norm(np.cross(points[1] - points[0], points[2] - points[0]))
