@@ -1,0 +1,33 @@
+"""
+====================================
+Visualize Intersection of Tetrahedra
+====================================
+"""
+print(__doc__)
+import numpy as np
+import pytransform3d.visualizer as pv
+from distance3d import mesh, geometry, pressure_field
+
+
+vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.1, 0.1]), 1.0, order=2)
+vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.1, 1.6]), 1.0, order=2)
+
+tetrahedron1 = vertices1[tetrahedra1[257]]
+tetrahedron2 = vertices2[tetrahedra2[310]]
+
+
+epsilon1 = np.array([0.0, 0.0, 0.0, 1.0])
+epsilon2 = np.array([0.0, 0.0, 0.0, 1.0])
+plane_hnf = pressure_field.contact_plane(tetrahedron1, tetrahedron2, epsilon1, epsilon2)
+
+fig = pv.figure()
+fig.scatter(tetrahedron1, s=0.01, c=(1, 0, 0))
+fig.scatter(tetrahedron2, s=0.01, c=(0, 0, 1))
+fig.plot_transform(np.eye(4), s=0.05)
+fig.plot_plane(normal=plane_hnf[:3], d=plane_hnf[3])
+fig.view_init()
+
+if "__file__" in globals():
+    fig.show()
+else:
+    fig.save_image("__open3d_rendered_image.jpg")
