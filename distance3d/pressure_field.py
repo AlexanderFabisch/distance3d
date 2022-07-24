@@ -190,3 +190,19 @@ def polygon_area(points):
         return 0.5 * (
             np.linalg.norm(np.cross(points[1] - points[0], points[2] - points[0]))
             + np.linalg.norm(np.cross(points[1] - points[3], points[2] - points[3])))
+
+
+def barycentric_transform(vertices):  # TODO is there a faster implementation possible?
+    """Returns X. X.dot(coords) = (r, 1), where r is a Cartesian vector."""
+    # NOTE that in the original paper it is not obvious that we have to take
+    # the inverse
+    return np.linalg.pinv(np.vstack((vertices.T, np.ones((1, len(vertices))))))
+
+
+def contact_plane(tetrahedron1, tetrahedron2, epsilon1, epsilon2):
+    X1 = barycentric_transform(tetrahedron1)
+    X2 = barycentric_transform(tetrahedron2)
+    plane_hnf = epsilon1.dot(X1) - epsilon2.dot(X2)  # TODO Young's modulus, see Eq. 16 of paper
+    plane_hnf /= np.linalg.norm(plane_hnf[:3])
+    plane_hnf[3] *= -1  # TODO where does the -1 come from?
+    return plane_hnf
