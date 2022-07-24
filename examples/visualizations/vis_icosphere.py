@@ -8,7 +8,7 @@ print(__doc__)
 import numpy as np
 import open3d as o3d
 import pytransform3d.visualizer as pv
-from distance3d import mesh, visualization, pressure_field, benchmark
+from distance3d import mesh, visualization, pressure_field, benchmark, io
 
 
 mesh12origin = np.eye(4)
@@ -53,8 +53,10 @@ fig.scatter(details["object1_coms"], s=0.003, c=c1)
 c2 = [(0, pressure / max_pressure2, 0) for pressure in details["object2_pressures"]]
 fig.scatter(details["object2_coms"], s=0.003, c=c2)
 
-fig.plot_vector(details["contact_point"], 100 * wrench21[:3], (1, 0, 0))
-fig.plot_vector(details["contact_point"], 100 * wrench12[:3], (0, 1, 0))
+if np.linalg.norm(wrench21) > 0:
+    fig.plot_vector(details["contact_point"], 100 * wrench21[:3], (1, 0, 0))
+if np.linalg.norm(wrench12) > 0:
+    fig.plot_vector(details["contact_point"], 100 * wrench12[:3], (0, 1, 0))
 
 for color, points in zip(c1, details["object1_polys"]):
     if len(points) == 3:
