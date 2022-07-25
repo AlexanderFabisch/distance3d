@@ -295,7 +295,7 @@ def remove_duplicates(halfplanes):
     return result
 
 
-def intersect_halfplanes(halfplanes):  # TODO check correctness
+def intersect_halfplanes(halfplanes):
     halfplanes = remove_duplicates(halfplanes)
     dq = deque()
     for hp in halfplanes:
