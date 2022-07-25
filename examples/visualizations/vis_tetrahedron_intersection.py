@@ -19,6 +19,7 @@ tetrahedron2 = vertices2[tetrahedra2[310]]
 epsilon1 = np.array([0.0, 0.0, 0.0, 1.0])
 epsilon2 = np.array([0.0, 0.0, 0.0, 1.0])
 plane_hnf = pressure_field.contact_plane(tetrahedron1, tetrahedron2, epsilon1, epsilon2)
+assert pressure_field.check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, plane_hnf)
 
 plane_normal = plane_hnf[:3]
 plane_point = plane_hnf[:3] * plane_hnf[3]
