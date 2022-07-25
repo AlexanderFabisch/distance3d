@@ -10,7 +10,7 @@ from distance3d import mesh, pressure_field, utils
 
 
 vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.2, 0.1]), 1.0, order=2)
-vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(np.array([0.0, 0.1, 1.6]), 1.0, order=2)
+vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(np.array([0.05, 0.15, 1.6]), 1.0, order=2)
 
 tetrahedron1 = vertices1[tetrahedra1[257]]
 tetrahedron2 = vertices2[tetrahedra2[310]]
@@ -39,7 +39,6 @@ for tetrahedron in (tetrahedron1, tetrahedron2):
             halfplanes.append(pressure_field.HalfPlane(p, normal2d))
 
 poly = pressure_field.intersect_halfplanes(halfplanes)
-
 poly3d = np.row_stack([plane2cart.dot(p) + plane2cart_offset for p in poly])
 
 #"""

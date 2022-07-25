@@ -266,7 +266,9 @@ class HalfPlane:
         self.p = p
         self.pq = norm_vector(np.array([normal2d[1], -normal2d[0]]))
         self.normal2d = normal2d
-        self.angle = math.atan(self.pq[1] / self.pq[0])
+        #self.angle = math.atan(self.pq[1] / self.pq[0])  # TODO atan2(y, x)?
+        self.angle = math.atan2(self.pq[1], self.pq[0])
+        #print(math.atan(self.pq[1] / self.pq[0]), math.atan2(self.pq[1], self.pq[0]))
 
     def out(self, point):
         return float(np.cross(self.pq, point - self.p)) < 1e-9
@@ -293,7 +295,7 @@ def remove_duplicates(halfplanes):
     return result
 
 
-def intersect_halfplanes(halfplanes):
+def intersect_halfplanes(halfplanes):  # TODO check correctness
     halfplanes = remove_duplicates(halfplanes)
     dq = deque()
     for hp in halfplanes:
@@ -305,7 +307,7 @@ def intersect_halfplanes(halfplanes):
 
     while len(dq) >= 3 and dq[0].out(dq[-1].isect(dq[-2])):
         dq.pop()
-    while len(dq) >= 3 and dq[-1].out(dq[0].isect(dq[2])):
+    while len(dq) >= 3 and dq[-1].out(dq[0].isect(dq[1])):
         dq.popleft()
 
     if len(dq) < 3:
