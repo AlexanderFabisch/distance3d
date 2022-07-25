@@ -88,7 +88,7 @@ halfplanes = []
 for tetrahedron in (tetrahedron1, tetrahedron2):
     X = pressure_field.barycentric_transform(tetrahedron)
     for i in range(4):
-        halfspace = X[:, i]
+        halfspace = X[i]
         normal2d = cart2plane.dot(halfspace[:3])
         if np.linalg.norm(normal2d) > 1e-9:
             p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
