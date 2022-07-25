@@ -9,6 +9,15 @@ import pytransform3d.visualizer as pv
 from distance3d import mesh, pressure_field, utils
 
 
+import math
+class HalfPlane:
+    def __init__(self, p, normal2d):
+        self.p = p
+        self.pq = utils.norm_vector(np.array([normal2d[1], -normal2d[0]]))
+        self.normal2d = normal2d
+        self.angle = math.atan(self.pq[1] / self.pq[0])
+
+
 vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.1, 0.1]), 1.0, order=2)
 vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.1, 1.6]), 1.0, order=2)
 
@@ -27,6 +36,28 @@ plane2origin = np.vstack((np.column_stack((x, y, plane_normal, plane_point)),
                           np.array([0.0, 0.0, 0.0, 1.0])))
 
 cart2plane, plane2cart, plane2cart_offset = pressure_field.plane_projection(plane_hnf)
+
+halfplanes = []
+for tetrahedron in (tetrahedron1, tetrahedron2):
+    X = pressure_field.barycentric_transform(tetrahedron)
+    for i in range(4):
+        halfspace = X[:, i]
+        normal2d = halfspace[:3].dot(plane2cart).T
+        if np.linalg.norm(normal2d) > 1e-9:
+            p = normal2d.dot(-halfspace[3] - halfspace[:3].dot(plane2cart)) / np.dot(normal2d, normal2d)
+            halfplanes.append(HalfPlane(p, normal2d))
+
+import matplotlib.pyplot as plt
+
+plt.figure()
+ax = plt.subplot(111, aspect="equal")
+for halfplane in halfplanes:
+    line = halfplane.p + np.linspace(-10.0, 10.0, 101)[:, np.newaxis] * halfplane.pq
+    plt.plot(line[:, 0], line[:, 1], lw=3)
+    normal = halfplane.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * halfplane.normal2d
+    plt.plot(normal[:, 0], normal[:, 1])
+plt.show()
+exit()
 
 fig = pv.figure()
 fig.scatter(tetrahedron1, s=0.01, c=(1, 0, 0))
