@@ -220,3 +220,39 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
         and max(plane_distances1) > epsilon
         and min(plane_distances2) < -epsilon
         and max(plane_distances2) > epsilon)
+
+
+def plane_projection(plane_hnf):
+    """Find a 2x3 projection from the plane onto two dimensions, along with an inverse 3x2 projection that has the following properties:
+
+    1. cart2plane * plane2cart = I
+    2. plane_hnf[:3]' * (plane2cart * x + plane2cart_offset) + plane_hnf[3] = 0
+
+    Source: https://github.com/ekzhang/hydroelastics/blob/d2c1e02aa1dd7e791212bdb930d80dee221bff1a/src/forces.jl#L152
+    (MIT license)
+    """
+    if abs(plane_hnf[0]) / np.linalg.norm(plane_hnf[:3]) > 1e-3:
+        cart2plane = np.array([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+        plane2cart = np.array(
+            [[-plane_hnf[1] / plane_hnf[0], plane_hnf[2] / plane_hnf[0]],
+             [1.0, 0.0],
+             [0.0, 1.0]])
+        plane2cart_offset = np.array([-plane_hnf[3] / plane_hnf[0], 0.0, 0.0])
+    elif abs(plane_hnf[1]) / np.linalg.norm(plane_hnf[:3]) > 1e-3:
+        cart2plane = np.array([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
+        plane2cart = np.array([
+            [1.0, 0.0],
+            [-plane_hnf[0] / plane_hnf[1], plane_hnf[2] / plane_hnf[1]],
+            [0.0, 1.0]
+        ])
+        plane2cart_offset = np.array([0.0, -plane_hnf[3] / plane_hnf[1], 0.0])
+    else:
+        assert abs(plane_hnf[2]) / np.linalg.norm(plane_hnf[:3]) > 1e-3
+        cart2plane = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+        plane2cart = np.array([
+            [1.0, 0.0],
+            [0.0, 1.0],
+            [plane_hnf[0] / plane_hnf[2], plane_hnf[1] / plane_hnf[2]]
+        ])
+        plane2cart_offset = np.array([0.0, 0.0, plane_hnf[3] / plane_hnf[2]])
+    return cart2plane, plane2cart, plane2cart_offset
