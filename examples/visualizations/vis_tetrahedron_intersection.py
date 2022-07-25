@@ -17,6 +17,53 @@ class HalfPlane:
         self.normal2d = normal2d
         self.angle = math.atan(self.pq[1] / self.pq[0])
 
+    def out(self, point):
+        return float(np.cross(self.pq, point - self.p)) < 1e-9
+
+    def isless(self, halfplane):
+        if abs(self.angle - halfplane.angle) < 1e-6:
+            return float(np.cross(self.pq, halfplane.p - self.p)) < 0.0
+        return self.angle < halfplane.angle
+
+    def isect(self, halfplane):
+        alpha = np.cross((halfplane.p - self.p), halfplane.pq) / np.cross(
+            self.pq, halfplane.pq)
+        return self.p + self.pq * alpha
+
+
+def remove_duplicates(halfplanes):
+    angles = np.array([hp.angle for hp in halfplanes])
+    indices = np.argsort(angles)
+    halfplanes = [halfplanes[i] for i in indices]
+    result = []
+    for hp in halfplanes:
+        if len(result) == 0 or abs(result[-1].angle - hp.angle) > 1e-12:
+            result.append(hp)
+    return result
+
+
+from collections import deque
+def intersect_halfplanes(halfplanes):
+    halfplanes = remove_duplicates(halfplanes)
+    dq = deque()
+    for hp in halfplanes:
+        while len(dq) >= 2 and hp.out(dq[-1].isect(dq[-2])):
+            dq.pop()
+        while len(dq) >= 2 and hp.out(dq[0].isect(dq[1])):
+            dq.popleft()
+        dq.append(hp)
+
+    while len(dq) >= 3 and dq[0].out(dq[-1].isect(dq[-2])):
+        dq.pop()
+    while len(dq) >= 3 and dq[-1].out(dq[0].isect(dq[2])):
+        dq.popleft()
+
+    if len(dq) < 3:
+        return None
+    else:
+        return np.row_stack([dq[i].isect(dq[(i + 1) % len(dq)])
+                             for i in range(len(dq))])
+
 
 vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.1, 0.1]), 1.0, order=2)
 vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.1, 1.6]), 1.0, order=2)
@@ -44,8 +91,10 @@ for tetrahedron in (tetrahedron1, tetrahedron2):
         halfspace = X[:, i]
         normal2d = halfspace[:3].dot(plane2cart).T
         if np.linalg.norm(normal2d) > 1e-9:
-            p = normal2d.dot(-halfspace[3] - halfspace[:3].dot(plane2cart)) / np.dot(normal2d, normal2d)
+            p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
             halfplanes.append(HalfPlane(p, normal2d))
+
+poly = intersect_halfplanes(halfplanes)
 
 import matplotlib.pyplot as plt
 
@@ -56,8 +105,8 @@ for halfplane in halfplanes:
     plt.plot(line[:, 0], line[:, 1], lw=3)
     normal = halfplane.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * halfplane.normal2d
     plt.plot(normal[:, 0], normal[:, 1])
+plt.scatter(poly[:, 0], poly[:, 1], s=100)
 plt.show()
-exit()
 
 fig = pv.figure()
 fig.scatter(tetrahedron1, s=0.01, c=(1, 0, 0))
