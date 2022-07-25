@@ -65,8 +65,8 @@ def intersect_halfplanes(halfplanes):
                              for i in range(len(dq))])
 
 
-vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.1, 0.1]), 1.0, order=2)
-vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.1, 1.6]), 1.0, order=2)
+vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.2, 0.1]), 1.0, order=2)
+vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(np.array([0.0, 0.1, 1.6]), 1.0, order=2)
 
 tetrahedron1 = vertices1[tetrahedra1[257]]
 tetrahedron2 = vertices2[tetrahedra2[310]]
@@ -102,11 +102,12 @@ poly3d = np.row_stack([plane2cart.dot(p) + plane2cart_offset for p in poly])
 import matplotlib.pyplot as plt
 plt.figure()
 ax = plt.subplot(111, aspect="equal")
-for halfplane in halfplanes:
-    line = halfplane.p + np.linspace(-10.0, 10.0, 101)[:, np.newaxis] * halfplane.pq
-    plt.plot(line[:, 0], line[:, 1], lw=3)
+colors = "rb"
+for i, halfplane in enumerate(halfplanes):
+    line = halfplane.p + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * halfplane.pq
+    plt.plot(line[:, 0], line[:, 1], lw=3, c=colors[i // 4])
     normal = halfplane.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * halfplane.normal2d
-    plt.plot(normal[:, 0], normal[:, 1])
+    plt.plot(normal[:, 0], normal[:, 1], c=colors[i // 4])
 plt.scatter(poly[:, 0], poly[:, 1], s=100)
 plt.show()
 #"""
