@@ -266,9 +266,7 @@ class HalfPlane:
         self.p = p
         self.pq = norm_vector(np.array([normal2d[1], -normal2d[0]]))
         self.normal2d = normal2d
-        #self.angle = math.atan(self.pq[1] / self.pq[0])  # TODO atan2(y, x)?
         self.angle = math.atan2(self.pq[1], self.pq[0])
-        #print(math.atan(self.pq[1] / self.pq[0]), math.atan2(self.pq[1], self.pq[0]))
 
     def out(self, point):
         return float(np.cross(self.pq, point - self.p)) < 1e-9
