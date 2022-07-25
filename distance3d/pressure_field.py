@@ -292,12 +292,12 @@ class HalfPlane:
     def out(self, point):
         return float(np.cross(self.pq, point - self.p)) < 1e-9
 
-    def isless(self, halfplane):
+    def less(self, halfplane):
         if abs(self.angle - halfplane.angle) < 1e-6:
             return float(np.cross(self.pq, halfplane.p - self.p)) < 0.0
         return self.angle < halfplane.angle
 
-    def isect(self, halfplane):
+    def intersect(self, halfplane):
         alpha = np.cross((halfplane.p - self.p), halfplane.pq) / np.cross(
             self.pq, halfplane.pq)
         return self.p + self.pq * alpha
@@ -331,19 +331,19 @@ def intersect_halfplanes(halfplanes):
     halfplanes = remove_duplicates(halfplanes)
     dq = deque()
     for hp in halfplanes:
-        while len(dq) >= 2 and hp.out(dq[-1].isect(dq[-2])):
+        while len(dq) >= 2 and hp.out(dq[-1].intersect(dq[-2])):
             dq.pop()
-        while len(dq) >= 2 and hp.out(dq[0].isect(dq[1])):
+        while len(dq) >= 2 and hp.out(dq[0].intersect(dq[1])):
             dq.popleft()
         dq.append(hp)
 
-    while len(dq) >= 3 and dq[0].out(dq[-1].isect(dq[-2])):
+    while len(dq) >= 3 and dq[0].out(dq[-1].intersect(dq[-2])):
         dq.pop()
-    while len(dq) >= 3 and dq[-1].out(dq[0].isect(dq[1])):
+    while len(dq) >= 3 and dq[-1].out(dq[0].intersect(dq[1])):
         dq.popleft()
 
     if len(dq) < 3:
         return None
     else:
-        return np.row_stack([dq[i].isect(dq[(i + 1) % len(dq)])
+        return np.row_stack([dq[i].intersect(dq[(i + 1) % len(dq)])
                              for i in range(len(dq))])
