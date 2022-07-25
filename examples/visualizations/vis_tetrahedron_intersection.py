@@ -15,7 +15,6 @@ vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.1, 1.6
 tetrahedron1 = vertices1[tetrahedra1[257]]
 tetrahedron2 = vertices2[tetrahedra2[310]]
 
-
 epsilon1 = np.array([0.0, 0.0, 0.0, 1.0])
 epsilon2 = np.array([0.0, 0.0, 0.0, 1.0])
 plane_hnf = pressure_field.contact_plane(tetrahedron1, tetrahedron2, epsilon1, epsilon2)
@@ -26,6 +25,8 @@ plane_point = plane_hnf[:3] * plane_hnf[3]
 x, y = utils.plane_basis_from_normal(plane_normal)
 plane2origin = np.vstack((np.column_stack((x, y, plane_normal, plane_point)),
                           np.array([0.0, 0.0, 0.0, 1.0])))
+
+cart2plane, plane2cart, plane2cart_offset = pressure_field.plane_projection(plane_hnf)
 
 fig = pv.figure()
 fig.scatter(tetrahedron1, s=0.01, c=(1, 0, 0))
