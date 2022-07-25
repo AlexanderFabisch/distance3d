@@ -89,15 +89,17 @@ for tetrahedron in (tetrahedron1, tetrahedron2):
     X = pressure_field.barycentric_transform(tetrahedron)
     for i in range(4):
         halfspace = X[:, i]
-        normal2d = halfspace[:3].dot(plane2cart).T
+        normal2d = cart2plane.dot(halfspace[:3])
         if np.linalg.norm(normal2d) > 1e-9:
             p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
             halfplanes.append(HalfPlane(p, normal2d))
 
 poly = intersect_halfplanes(halfplanes)
 
-import matplotlib.pyplot as plt
+poly3d = np.row_stack([plane2cart.dot(p) + plane2cart_offset for p in poly])
 
+#"""
+import matplotlib.pyplot as plt
 plt.figure()
 ax = plt.subplot(111, aspect="equal")
 for halfplane in halfplanes:
@@ -107,6 +109,7 @@ for halfplane in halfplanes:
     plt.plot(normal[:, 0], normal[:, 1])
 plt.scatter(poly[:, 0], poly[:, 1], s=100)
 plt.show()
+#"""
 
 fig = pv.figure()
 fig.scatter(tetrahedron1, s=0.01, c=(1, 0, 0))
@@ -114,6 +117,7 @@ fig.scatter(tetrahedron2, s=0.01, c=(0, 0, 1))
 fig.plot_transform(np.eye(4), s=0.05)
 fig.plot_plane(normal=plane_hnf[:3], d=plane_hnf[3])
 fig.plot_transform(plane2origin, s=0.05)
+fig.scatter(poly3d, s=0.01, c=(1, 0, 1))
 fig.view_init()
 
 if "__file__" in globals():
