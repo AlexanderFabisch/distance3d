@@ -204,5 +204,19 @@ def contact_plane(tetrahedron1, tetrahedron2, epsilon1, epsilon2):
     X2 = barycentric_transform(tetrahedron2)
     plane_hnf = epsilon1.dot(X1) - epsilon2.dot(X2)  # TODO Young's modulus, see Eq. 16 of paper
     plane_hnf /= np.linalg.norm(plane_hnf[:3])
-    plane_hnf[3] *= -1  # TODO where does the -1 come from?
+    # NOTE in order to obtain proper Hesse normal form of the contact plane
+    # we have to multiply the scalar by -1, since it appears as -d in the
+    # equation np.dot(normal, x) - d = 0. However, it appears as
+    # np.dot(normal, x) + d = 0 in the paper (page 7).
+    plane_hnf[3] *= -1
     return plane_hnf
+
+
+def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact_plane_hnf, epsilon=1e-6):
+    plane_distances1 = tetrahedron1.dot(contact_plane_hnf[:3]) - contact_plane_hnf[3]
+    plane_distances2 = tetrahedron2.dot(contact_plane_hnf[:3]) - contact_plane_hnf[3]
+    return (
+        min(plane_distances1) < -epsilon
+        and max(plane_distances1) > epsilon
+        and min(plane_distances2) < -epsilon
+        and max(plane_distances2) > epsilon)
