@@ -347,3 +347,26 @@ def intersect_halfplanes(halfplanes):
     else:
         return np.row_stack([dq[i].intersect(dq[(i + 1) % len(dq)])
                              for i in range(len(dq))])
+
+
+def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
+    normal = contact_plane_hnf[:3]
+
+    total_force = 0.0
+    intersection_com = np.zeros(3)
+    total_area = 0.0
+
+    X = np.vstack((tetrahedron.T, np.ones((1, 4))))
+    for i in range(2, len(contact_polygon)):
+        vertices = contact_polygon[np.array([0, i - 1, i], dtype=int)]
+        com = np.hstack((np.mean(vertices, axis=0), (1,)))
+        res = np.linalg.solve(X, com)
+        pressure = sum(res * epsilon)
+        area = 0.5 * np.linalg.norm(np.cross(vertices[1] - vertices[0], vertices[2] - vertices[0]))
+        total_force += pressure * area
+        total_area += area
+        intersection_com += area * com[:3]
+
+    intersection_com /= total_area
+    force_vector = total_force * normal
+    return intersection_com, force_vector
