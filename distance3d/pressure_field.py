@@ -24,16 +24,6 @@ def contact_forces(
     vertices1_in_mesh2 = np.dot(
         vertices1_in_mesh1, mesh12mesh2[:3, :3].T) + mesh12mesh2[np.newaxis, :3, 3]
 
-    # TODO we can also use the pressure functions for this. does it work with concave objects? which one is faster?
-    c1 = ConvexHullVertices(vertices1_in_mesh2)
-    c2 = ConvexHullVertices(vertices2_in_mesh2)
-    intersection, depth, normal, contact_point = mpr_penetration(c1, c2)
-    if not intersection:
-        if return_details:
-            return intersection, None, None, None
-        else:
-            return intersection, None, None
-
     # When two objects with pressure functions p1(*), p2(*) intersect, there is
     # a surface S inside the space of intersection at which the values of p1 and
     # p2 are equal. After identifying this surface, we then define the total force
@@ -43,37 +33,68 @@ def contact_forces(
     broad_overlapping_indices1, broad_overlapping_indices2 = _check_aabbs_of_tetrahedra(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2)
 
-    broad_overlapping_indices1 = np.asarray(broad_overlapping_indices1, dtype=int)
-    broad_overlapping_indices2 = np.asarray(broad_overlapping_indices2, dtype=int)
-    broad_overlapping_indices1, broad_overlapping_indices2 = _check_tetrahedra_intersect_contact_plane(
-        vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2,
-        contact_point, normal, broad_overlapping_indices1,
-        broad_overlapping_indices2)
-
-    forces1, forces2 = _contact_surface(
-        vertices1_in_mesh2, tetrahedra1, potentials1,
-        vertices2_in_mesh2, tetrahedra2, potentials2,
-        broad_overlapping_indices1, broad_overlapping_indices2,
-        contact_point, normal)
-
     # TODO
     #com1 = center_of_mass_tetrahedral_mesh(mesh12origin, vertices1_in_mesh2, tetrahedra1)
 
-    normal_in_world = mesh22origin[:3, :3].dot(normal)
-    force12 = sum([forces1[f][0] for f in forces1]) * normal_in_world
-    wrench12 = np.hstack((force12, np.zeros(3)))
-    force21 = sum([forces2[f][0] for f in forces2]) * -normal_in_world
-    wrench21 = np.hstack((force21, np.zeros(3)))
+    intersection = False
+    total_force_vector = np.zeros(3)
+    contact_polygons = []
+    contact_coms = []
+    contact_forces = []
+    contact_areas = []
+    previous_i = -1
+    for i, j in zip(broad_overlapping_indices1, broad_overlapping_indices2):
+        if i != previous_i:
+            tetrahedron1 = vertices1_in_mesh2[tetrahedra1[i]]
+            epsilon1 = potentials1[tetrahedra1[i]]
+        previous_i = i
+
+        tetrahedron2 = vertices2_in_mesh2[tetrahedra2[j]]
+        epsilon2 = potentials2[tetrahedra2[j]]
+        contact_plane_hnf = contact_plane(
+            tetrahedron1, tetrahedron2, epsilon1, epsilon2)
+        if not check_tetrahedra_intersect_contact_plane(
+                tetrahedron1, tetrahedron2, contact_plane_hnf):
+            continue
+
+        contact_polygon = compute_contact_polygon(
+            tetrahedron1, tetrahedron2, contact_plane_hnf)
+        if len(contact_polygon) == 0:
+            continue
+        intersection = True
+
+        # assert np.dot(normal, mesh12world[:3, :3].dot(com1) + mesh12world[:3, 3]) - np.dot(normal, mesh22world[:3, :3].dot(com2) + mesh22world[:3, 3]) >= 0.0  # Otherwise normal *= -1
+        intersection_com, force_vector, area = contact_force(
+            tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon)
+
+        total_force_vector += force_vector
+        # TODO use intersection com to compute torque
+
+        contact_polygons.append(contact_polygon)
+        contact_coms.append(intersection_com)
+        contact_forces.append(force_vector)
+        contact_areas.append(area)
+
+    force_in_world = mesh22origin[:3, :3].dot(total_force_vector)
+    wrench21 = np.hstack((force_in_world, np.zeros(3)))
+    wrench12 = -wrench21
 
     if return_details:
+        contact_coms = np.asarray(contact_coms)
+        contact_coms = contact_coms.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
+        contact_forces = np.asarray(contact_forces)
+        contact_forces = contact_forces.dot(mesh22origin[:3, :3].T)
+        contact_areas = np.asarray(contact_areas)
+        contact_point = np.sum(
+            contact_coms * contact_areas[:, np.newaxis],
+            axis=0) / sum(contact_areas)
+        contact_point = mesh22origin[:3, :3].dot(contact_point) + mesh22origin[:3, 3]
         details = {
-            "object1_pressures": np.array([forces1[f][0] for f in forces1]),
-            "object2_pressures": np.array([forces2[f][0] for f in forces2]),
-            "object1_coms": np.array([forces1[f][1] for f in forces1]),
-            "object2_coms": np.array([forces2[f][1] for f in forces2]),
-            "object1_polys": [forces1[f][2] for f in forces1],
-            "object2_polys": [forces2[f][2] for f in forces2],
-            "contact_point": transform_point(mesh22origin, contact_point)
+            "contact_polygons": contact_polygons,
+            "contact_coms": contact_coms,
+            "contact_forces": contact_forces,
+            "contact_areas": contact_areas,
+            "contact_point": contact_point,
         }
         return intersection, wrench12, wrench21, details
     else:
@@ -225,12 +246,12 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
         and max(plane_distances2) > epsilon)
 
 
-def contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
+def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=True):
     cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
     halfplanes = make_halfplanes(tetrahedron1, tetrahedron2, cart2plane, plane2cart_offset)
     poly = intersect_halfplanes(halfplanes)
 
-    if debug:
+    if debug and len(poly) > 0:
         import matplotlib.pyplot as plt
         plt.figure()
         plt.subplot(111, aspect="equal")
@@ -243,7 +264,10 @@ def contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
         plt.scatter(poly[:, 0], poly[:, 1], s=100)
         plt.show()
 
-    return np.row_stack([plane2cart.dot(p) + plane2cart_offset for p in poly])
+    if len(poly) == 0:
+        return poly
+    else:
+        return np.row_stack([plane2cart.dot(p) + plane2cart_offset for p in poly])
 
 
 def plane_projection(plane_hnf):
@@ -343,7 +367,7 @@ def intersect_halfplanes(halfplanes):
         dq.popleft()
 
     if len(dq) < 3:
-        return None
+        return np.array([])
     else:
         return np.row_stack([dq[i].intersect(dq[(i + 1) % len(dq)])
                              for i in range(len(dq))])
@@ -358,7 +382,7 @@ def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
 
     X = np.vstack((tetrahedron.T, np.ones((1, 4))))
     for i in range(2, len(contact_polygon)):
-        vertices = contact_polygon[np.array([0, i - 1, i], dtype=int)]
+        vertices = contact_polygon[np.array([0, i - 1, i], dtype=int)]  # TODO check
         com = np.hstack((np.mean(vertices, axis=0), (1,)))
         res = np.linalg.solve(X, com)
         pressure = sum(res * epsilon)
@@ -369,4 +393,4 @@ def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
 
     intersection_com /= total_area
     force_vector = total_force * normal
-    return intersection_com, force_vector
+    return intersection_com, force_vector, total_area
