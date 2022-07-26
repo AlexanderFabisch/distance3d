@@ -24,7 +24,6 @@ assert pressure_field.check_tetrahedra_intersect_contact_plane(
     tetrahedron1, tetrahedron2, contact_plane_hnf)
 contact_polygon = pressure_field.compute_contact_polygon(
     tetrahedron1, tetrahedron2, contact_plane_hnf)
-#assert np.dot(normal, mesh12world[:3, :3].dot(com1) + mesh12world[:3, 3]) - np.dot(normal, mesh22world[:3, :3].dot(com2) + mesh22world[:3, 3]) >= 0.0  # Otherwise normal *= -1
 
 intersection_com, force_vector, _ = pressure_field.contact_force(
     tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon)
