@@ -34,7 +34,8 @@ def contact_forces(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2)
 
     # TODO
-    #com1 = center_of_mass_tetrahedral_mesh(mesh12origin, vertices1_in_mesh2, tetrahedra1)
+    #com1 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices1_in_mesh2, tetrahedra1)
+    #com2 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices2_in_mesh2, tetrahedra2)
 
     intersection = False
     total_force_vector = np.zeros(3)
@@ -63,7 +64,7 @@ def contact_forces(
             continue
         intersection = True
 
-        # assert np.dot(normal, mesh12world[:3, :3].dot(com1) + mesh12world[:3, 3]) - np.dot(normal, mesh22world[:3, :3].dot(com2) + mesh22world[:3, 3]) >= 0.0  # Otherwise normal *= -1
+        #assert np.dot(contact_plane_hnf[:3], mesh22origin[:3, :3].dot(com1) + mesh22origin[:3, 3]) - np.dot(contact_plane_hnf[:3], mesh22origin[:3, :3].dot(com2) + mesh22origin[:3, 3]) >= 0.0  # Otherwise contact_plane_hnf[:3] *= -1
         intersection_com, force_vector, area = contact_force(
             tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon)
 
@@ -246,7 +247,7 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
         and max(plane_distances2) > epsilon)
 
 
-def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=True):
+def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
     cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
     halfplanes = make_halfplanes(tetrahedron1, tetrahedron2, cart2plane, plane2cart_offset)
     poly = intersect_halfplanes(halfplanes)
