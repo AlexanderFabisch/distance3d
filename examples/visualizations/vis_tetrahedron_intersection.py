@@ -18,12 +18,16 @@ tetrahedron2 = vertices2[tetrahedra2[310]]
 epsilon1 = np.array([0.0, 0.0, 0.0, 1.0])
 epsilon2 = np.array([0.0, 0.0, 0.0, 1.0])
 
-contact_plane_hnf = pressure_field.contact_plane(tetrahedron1, tetrahedron2, epsilon1, epsilon2)
-assert pressure_field.check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact_plane_hnf)
-contact_polygon = pressure_field.contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf)
+contact_plane_hnf = pressure_field.contact_plane(
+    tetrahedron1, tetrahedron2, epsilon1, epsilon2)
+assert pressure_field.check_tetrahedra_intersect_contact_plane(
+    tetrahedron1, tetrahedron2, contact_plane_hnf)
+contact_polygon = pressure_field.compute_contact_polygon(
+    tetrahedron1, tetrahedron2, contact_plane_hnf)
 #assert np.dot(normal, mesh12world[:3, :3].dot(com1) + mesh12world[:3, 3]) - np.dot(normal, mesh22world[:3, :3].dot(com2) + mesh22world[:3, 3]) >= 0.0  # Otherwise normal *= -1
 
-intersection_com, force_vector = pressure_field.contact_force(tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon)
+intersection_com, force_vector, _ = pressure_field.contact_force(
+    tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon)
 
 fig = pv.figure()
 fig.scatter(tetrahedron1, s=0.01, c=(1, 0, 0))
