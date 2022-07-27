@@ -297,13 +297,10 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
     if debug:
         import matplotlib.pyplot as plt
         plt.figure()
-        plt.subplot(111, aspect="equal")
+        ax = plt.subplot(111, aspect="equal")
         colors = "rb"
         for i, halfplane in enumerate(halfplanes):
-            line = halfplane.p + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(halfplane.pq)
-            plt.plot(line[:, 0], line[:, 1], lw=3, c=colors[i // 4])
-            normal = halfplane.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(halfplane.normal2d)
-            plt.plot(normal[:, 0], normal[:, 1], c=colors[i // 4])
+            halfplane.plot(ax, colors[i // 4])
         if len(poly) > 0:
             plt.scatter(poly[:, 0], poly[:, 1], s=100)
         plt.show()
@@ -312,6 +309,33 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         return poly
     else:
         return np.row_stack([plane2cart.dot(p) + plane2cart_offset for p in poly])
+
+
+class HalfPlane:
+    def __init__(self, p, normal2d):
+        self.p = p
+        self.pq = norm_vector(np.array([normal2d[1], -normal2d[0]]))
+        self.normal2d = normal2d
+        self.angle = math.atan2(self.pq[1], self.pq[0])
+
+    def out(self, point):
+        return float(np.cross(self.pq, point - self.p)) < 1e-9
+
+    def less(self, halfplane):
+        if abs(self.angle - halfplane.angle) < 1e-6:
+            return float(np.cross(self.pq, halfplane.p - self.p)) < 0.0
+        return self.angle < halfplane.angle
+
+    def intersect(self, halfplane):
+        alpha = np.cross((halfplane.p - self.p), halfplane.pq) / np.cross(
+            self.pq, halfplane.pq)
+        return self.p + self.pq * alpha
+
+    def plot(self, ax, c):
+        line = self.p + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(self.pq)
+        ax.plot(line[:, 0], line[:, 1], lw=3, c=c)
+        normal = self.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(self.normal2d)
+        ax.plot(normal[:, 0], normal[:, 1], c=c)
 
 
 def plane_projection(plane_hnf):
@@ -348,27 +372,6 @@ def plane_projection(plane_hnf):
         ])
         plane2cart_offset = np.array([0.0, 0.0, plane_hnf[3] / plane_hnf[2]])
     return cart2plane, plane2cart, plane2cart_offset
-
-
-class HalfPlane:
-    def __init__(self, p, normal2d):
-        self.p = p
-        self.pq = norm_vector(np.array([normal2d[1], -normal2d[0]]))
-        self.normal2d = normal2d
-        self.angle = math.atan2(self.pq[1], self.pq[0])
-
-    def out(self, point):
-        return float(np.cross(self.pq, point - self.p)) < 1e-9
-
-    def less(self, halfplane):
-        if abs(self.angle - halfplane.angle) < 1e-6:
-            return float(np.cross(self.pq, halfplane.p - self.p)) < 0.0
-        return self.angle < halfplane.angle
-
-    def intersect(self, halfplane):
-        alpha = np.cross((halfplane.p - self.p), halfplane.pq) / np.cross(
-            self.pq, halfplane.pq)
-        return self.p + self.pq * alpha
 
 
 def make_halfplanes(tetrahedron1, tetrahedron2, cart2plane, plane2cart_offset):
