@@ -28,16 +28,22 @@ def test_plane_projection():
     plane_hnf[:3] = utils.norm_vector(plane_hnf[:3])
     x, y = utils.plane_basis_from_normal(plane_hnf[:3])
     plane2world = np.column_stack((x, y, plane_hnf[:3]))
+    world2plane = np.linalg.inv(plane2world)
     plane_offset = plane_hnf[:3] * plane_hnf[3]
 
     cart2plane, plane2cart, plane2cart_offset = pressure_field.plane_projection(plane_hnf)
+    I = np.dot(cart2plane, plane2cart)
+    assert_array_almost_equal(I, np.eye(2))
 
     for _ in range(10):
-        x_plane_cart = random_state.randn(3)
-        x_cart = plane2world.dot(x_plane_cart) + plane_offset
-        x_plane = cart2plane.dot(x_cart)
+        x_plane = random_state.randn(2)
+        assert approx(plane_hnf[:3].dot(plane2cart.dot(x_plane) + plane2cart_offset) - plane_hnf[3]) == 0.0
+
+    for _ in range(10):
+        x_cart = random_state.randn(3)
+        d = (world2plane.dot(x_cart) + plane_offset).dot(plane_hnf[:3])
+        x_plane = cart2plane.dot(x_cart - plane2cart_offset)
         x_cart2 = plane2cart.dot(x_plane) + plane2cart_offset
-        print(x_plane_cart)
         print(x_cart)
         print(x_cart2)
-        assert approx(np.linalg.norm(x_cart - x_cart2)) == abs(plane_hnf[:3].dot(x_cart) - plane_hnf[:3].dot(x_cart2))
+        assert approx(np.linalg.norm(x_cart - x_cart2)) == abs(d)
