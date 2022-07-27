@@ -346,7 +346,7 @@ class HalfPlane:
     def intersect(self, halfplane):
         denom = np.cross(self.pq, halfplane.pq)
         if abs(denom) < EPSILON:
-            return np.inf
+            return np.array([np.inf, np.inf])
         alpha = np.cross((halfplane.p - self.p), halfplane.pq) / denom
         return self.p + self.pq * alpha
 
@@ -407,7 +407,6 @@ def make_halfplanes(tetrahedron, cart2plane, plane2cart_offset):
         normal2d = cart2plane.dot(halfspace[:3])
         norm = np.linalg.norm(normal2d)
         if norm > 1e-9:
-            print(norm)
             p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
             halfplanes.append(HalfPlane(p, normal2d))
     return halfplanes
