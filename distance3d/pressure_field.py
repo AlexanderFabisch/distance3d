@@ -61,8 +61,9 @@ def contact_forces(
                 tetrahedron1, tetrahedron2, contact_plane_hnf):
             continue
 
+        debug = i == 9 and j == 144
         contact_polygon = compute_contact_polygon(
-            tetrahedron1, tetrahedron2, contact_plane_hnf)
+            tetrahedron1, tetrahedron2, contact_plane_hnf, debug=debug)
         if len(contact_polygon) == 0:
             continue
         intersection = True
@@ -293,17 +294,18 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
     halfplanes = make_halfplanes(tetrahedron1, tetrahedron2, cart2plane, plane2cart_offset)
     poly = intersect_halfplanes(halfplanes)
 
-    if debug and len(poly) > 0:
+    if debug:
         import matplotlib.pyplot as plt
         plt.figure()
         plt.subplot(111, aspect="equal")
         colors = "rb"
         for i, halfplane in enumerate(halfplanes):
-            line = halfplane.p + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * halfplane.pq
+            line = halfplane.p + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(halfplane.pq)
             plt.plot(line[:, 0], line[:, 1], lw=3, c=colors[i // 4])
-            normal = halfplane.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * halfplane.normal2d
+            normal = halfplane.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(halfplane.normal2d)
             plt.plot(normal[:, 0], normal[:, 1], c=colors[i // 4])
-        plt.scatter(poly[:, 0], poly[:, 1], s=100)
+        if len(poly) > 0:
+            plt.scatter(poly[:, 0], poly[:, 1], s=100)
         plt.show()
 
     if len(poly) == 0:
