@@ -210,32 +210,6 @@ def intersecting_tetrahedra(vertices, tetrahedra, contact_point, normal):
     return candidates
 
 
-def contact_plane_projection(plane_point, plane_normal, tetrahedron_points):
-    d = points_to_plane_signed(tetrahedron_points, plane_point, plane_normal)
-    neg = np.where(d < 0)[0]
-    pos = np.where(d >= 0)[0]
-    triangle_points = []
-    for n in neg:
-        for p in pos:
-            triangle_points.append(
-                line_segment_to_plane(
-                    tetrahedron_points[n], tetrahedron_points[p],
-                    plane_point, plane_normal)[2])
-    triangle_points = np.asarray(triangle_points)
-    return triangle_points
-
-
-@numba.njit(cache=True)
-def polygon_area(points):
-    if len(points) == 3:
-        return 0.5 * np.linalg.norm(np.cross(points[1] - points[0], points[2] - points[0]))
-    else:
-        assert len(points) == 4
-        return 0.5 * (
-            np.linalg.norm(np.cross(points[1] - points[0], points[2] - points[0]))
-            + np.linalg.norm(np.cross(points[1] - points[3], points[2] - points[3])))
-
-
 def barycentric_transform(vertices):  # TODO is there a faster implementation possible?
     """Returns X. X.dot(coords) = (r, 1), where r is a Cartesian vector."""
     # NOTE that in the original paper it is not obvious that we have to take
