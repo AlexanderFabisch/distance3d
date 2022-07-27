@@ -1,5 +1,6 @@
 """Pressure field model for contact wrenches."""
 from collections import deque
+import functools
 import math
 import aabbtree
 import numba
@@ -10,7 +11,7 @@ from .gjk import gjk_intersection
 from .distance import line_segment_to_plane
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from .geometry import barycentric_coordinates_tetrahedron
-from .utils import transform_point, invert_transform, norm_vector
+from .utils import transform_point, invert_transform, norm_vector, EPSILON
 
 
 def contact_forces(
@@ -323,13 +324,8 @@ class HalfPlane:
         self.normal2d = normal2d
         self.angle = math.atan2(self.pq[1], self.pq[0])
 
-    def out(self, point):
-        return float(np.cross(self.pq, point - self.p)) < 1e-9
-
-    def less(self, halfplane):
-        if abs(self.angle - halfplane.angle) < 1e-6:
-            return float(np.cross(self.pq, halfplane.p - self.p)) < 0.0
-        return self.angle < halfplane.angle
+    def outside_of(self, point):
+        return float(np.cross(self.pq, point - self.p)) < EPSILON
 
     def intersect(self, halfplane):
         alpha = np.cross((halfplane.p - self.p), halfplane.pq) / np.cross(
@@ -341,6 +337,12 @@ class HalfPlane:
         ax.plot(line[:, 0], line[:, 1], lw=3, c=c, alpha=alpha)
         normal = self.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(self.normal2d)
         ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=alpha)
+
+
+def cmp_halfplanes(halfplane1, halfplane2):
+    if abs(halfplane1.angle - halfplane2.angle) < EPSILON:
+        return float(np.cross(halfplane1.pq, halfplane2.p - halfplane1.p))
+    return halfplane1.angle - halfplane2.angle
 
 
 def plane_projection(plane_hnf):
@@ -393,11 +395,10 @@ def make_halfplanes(tetrahedron1, tetrahedron2, cart2plane, plane2cart_offset):
 
 
 def remove_duplicates(halfplanes):
-    angles = np.array([hp.angle for hp in halfplanes])
-    indices = np.argsort(angles)
-    halfplanes = [halfplanes[i] for i in indices]
+    compare_key = functools.cmp_to_key(cmp_halfplanes)
+    halfplanes = sorted(halfplanes, key=compare_key)
     result = []
-    for hp in halfplanes:
+    for hp in halfplanes:  # TODO this is not the right way to handle this!
         if len(result) == 0 or abs(result[-1].angle - hp.angle) > 1e-12:
             result.append(hp)
     return result
@@ -406,15 +407,15 @@ def remove_duplicates(halfplanes):
 def intersect_halfplanes(halfplanes):
     dq = deque()
     for hp in halfplanes:
-        while len(dq) >= 2 and hp.out(dq[-1].intersect(dq[-2])):
+        while len(dq) >= 2 and hp.outside_of(dq[-1].intersect(dq[-2])):
             dq.pop()
-        while len(dq) >= 2 and hp.out(dq[0].intersect(dq[1])):
+        while len(dq) >= 2 and hp.outside_of(dq[0].intersect(dq[1])):
             dq.popleft()
         dq.append(hp)
 
-    while len(dq) >= 3 and dq[0].out(dq[-1].intersect(dq[-2])):
+    while len(dq) >= 3 and dq[0].outside_of(dq[-1].intersect(dq[-2])):
         dq.pop()
-    while len(dq) >= 3 and dq[-1].out(dq[0].intersect(dq[1])):
+    while len(dq) >= 3 and dq[-1].outside_of(dq[0].intersect(dq[1])):
         dq.popleft()
 
     if len(dq) < 3:
