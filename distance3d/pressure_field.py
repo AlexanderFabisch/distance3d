@@ -242,7 +242,6 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
     cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
-    #print(contact_plane_hnf[:3].dot(plane2cart.dot(np.ones(2)) + plane2cart_offset) - contact_plane_hnf[3])
     halfplanes = (make_halfplanes(tetrahedron1, cart2plane, plane2cart_offset)
                   + make_halfplanes(tetrahedron2, cart2plane, plane2cart_offset))
     unique_halfplanes = remove_duplicates(halfplanes)
@@ -345,7 +344,9 @@ def cmp_halfplanes(halfplane1, halfplane2):
 
 
 def plane_projection(plane_hnf):  # TODO check sign of d
-    """Find a 2x3 projection from the plane onto two dimensions, along with an inverse 3x2 projection that has the following properties:
+    """Find a 2x3 projection from Cartesian space onto two dimensions.
+
+    Also find an inverse 3x2 projection that has the following properties:
 
     1. cart2plane * plane2cart = I
     2. plane_hnf[:3]' * (plane2cart * x + plane2cart_offset) - plane_hnf[3] = 0
@@ -355,14 +356,16 @@ def plane_projection(plane_hnf):  # TODO check sign of d
     """
     assert abs(1.0 - np.linalg.norm(plane_hnf[:3])) < 10 * EPSILON, repr(np.linalg.norm(plane_hnf[:3]))
     if abs(plane_hnf[0]) > 1e-3:
-        cart2plane = np.array([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+        cart2plane = np.array([[0.0, 1.0, 0.0],
+                               [0.0, 0.0, 1.0]])
         plane2cart = np.array(
             [[-plane_hnf[1] / plane_hnf[0], -plane_hnf[2] / plane_hnf[0]],
              [1.0, 0.0],
              [0.0, 1.0]])
         plane2cart_offset = np.array([plane_hnf[3] / plane_hnf[0], 0.0, 0.0])
     elif abs(plane_hnf[1]) > 1e-3:
-        cart2plane = np.array([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
+        cart2plane = np.array([[1.0, 0.0, 0.0],
+                               [0.0, 0.0, 1.0]])
         plane2cart = np.array([
             [1.0, 0.0],
             [-plane_hnf[0] / plane_hnf[1], -plane_hnf[2] / plane_hnf[1]],
@@ -371,7 +374,8 @@ def plane_projection(plane_hnf):  # TODO check sign of d
         plane2cart_offset = np.array([0.0, plane_hnf[3] / plane_hnf[1], 0.0])
     else:
         assert abs(plane_hnf[2]) > 1e-3
-        cart2plane = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+        cart2plane = np.array([[1.0, 0.0, 0.0],
+                               [0.0, 1.0, 0.0]])
         plane2cart = np.array([
             [1.0, 0.0],
             [0.0, 1.0],
