@@ -46,6 +46,11 @@ tetra_mesh1.add_artist(fig)
 tetra_mesh2 = visualization.TetraMesh(mesh22origin, vertices2, tetrahedra2)
 tetra_mesh2.add_artist(fig)
 
+fig.plot_plane(normal=details["plane_normals"][0], point_in_plane=details["plane_points"][0])
+fig.scatter(details["contact_polygons"][0], s=0.01, c=(1, 0, 1))
+fig.scatter(details["intersecting_tetrahedra1"][0], s=0.01, c=(1, 0, 0))
+fig.scatter(details["intersecting_tetrahedra2"][0], s=0.01, c=(0, 0, 1))
+"""
 pressures = np.linalg.norm(details["contact_forces"], axis=1) / np.asarray(details["contact_areas"])
 max_pressure = max(pressures)
 c = [(pressure / max_pressure, 0, 0) for pressure in pressures]
@@ -64,6 +69,7 @@ for color, points in zip(c, details["contact_polygons"]):
         o3d.utility.Vector3iVector(triangles))
     contact_surface_mesh.paint_uniform_color(color)
     fig.add_geometry(contact_surface_mesh)
+"""
 
 fig.view_init()
 
