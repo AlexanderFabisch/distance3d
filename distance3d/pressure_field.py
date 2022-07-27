@@ -62,6 +62,7 @@ def contact_forces(
                 tetrahedron1, tetrahedron2, contact_plane_hnf):
             continue
 
+        """
         if i * len(tetrahedra2) + j > 8 * len(tetrahedra2) + 91:
             print(i, j)
             import pytransform3d.visualizer as pv
@@ -73,9 +74,10 @@ def contact_forces(
             Tetrahedron(tetrahedron2).add_artist(fig)
             fig.plot_plane(normal=contact_plane_hnf[:3], d=contact_plane_hnf[3])
             fig.show()
+        """
 
         debug = False
-        debug = i == 8 and j == 95
+        #debug = i == 8 and j == 95
         contact_polygon = compute_contact_polygon(
             tetrahedron1, tetrahedron2, contact_plane_hnf, debug=debug)
         if contact_polygon is None:
@@ -363,37 +365,38 @@ def cmp_halfplanes(halfplane1, halfplane2):
     return halfplane1.angle - halfplane2.angle
 
 
-def plane_projection(plane_hnf):
+def plane_projection(plane_hnf):  # TODO check sign of d
     """Find a 2x3 projection from the plane onto two dimensions, along with an inverse 3x2 projection that has the following properties:
 
     1. cart2plane * plane2cart = I
-    2. plane_hnf[:3]' * (plane2cart * x + plane2cart_offset) + plane_hnf[3] = 0
+    2. plane_hnf[:3]' * (plane2cart * x + plane2cart_offset) - plane_hnf[3] = 0
 
     Source: https://github.com/ekzhang/hydroelastics/blob/d2c1e02aa1dd7e791212bdb930d80dee221bff1a/src/forces.jl#L152
     (MIT license)
     """
+    assert abs(1.0 - np.linalg.norm(plane_hnf[:3])) < 10 * EPSILON, repr(np.linalg.norm(plane_hnf[:3]))
     if abs(plane_hnf[0]) > 1e-3:
         cart2plane = np.array([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
         plane2cart = np.array(
-            [[-plane_hnf[1] / plane_hnf[0], plane_hnf[2] / plane_hnf[0]],
+            [[-plane_hnf[1] / plane_hnf[0], -plane_hnf[2] / plane_hnf[0]],
              [1.0, 0.0],
              [0.0, 1.0]])
-        plane2cart_offset = np.array([-plane_hnf[3] / plane_hnf[0], 0.0, 0.0])
+        plane2cart_offset = np.array([plane_hnf[3] / plane_hnf[0], 0.0, 0.0])
     elif abs(plane_hnf[1]) > 1e-3:
         cart2plane = np.array([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
         plane2cart = np.array([
             [1.0, 0.0],
-            [-plane_hnf[0] / plane_hnf[1], plane_hnf[2] / plane_hnf[1]],
+            [-plane_hnf[0] / plane_hnf[1], -plane_hnf[2] / plane_hnf[1]],
             [0.0, 1.0]
         ])
-        plane2cart_offset = np.array([0.0, -plane_hnf[3] / plane_hnf[1], 0.0])
+        plane2cart_offset = np.array([0.0, plane_hnf[3] / plane_hnf[1], 0.0])
     else:
         assert abs(plane_hnf[2]) > 1e-3
         cart2plane = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
         plane2cart = np.array([
             [1.0, 0.0],
             [0.0, 1.0],
-            [plane_hnf[0] / plane_hnf[2], plane_hnf[1] / plane_hnf[2]]
+            [-plane_hnf[0] / plane_hnf[2], -plane_hnf[1] / plane_hnf[2]]
         ])
         plane2cart_offset = np.array([0.0, 0.0, plane_hnf[3] / plane_hnf[2]])
     return cart2plane, plane2cart, plane2cart_offset
