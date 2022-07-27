@@ -268,6 +268,7 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
     cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
+    #print(contact_plane_hnf[:3].dot(plane2cart.dot(np.ones(2)) + plane2cart_offset) - contact_plane_hnf[3])
     halfplanes = (make_halfplanes(tetrahedron1, cart2plane, plane2cart_offset)
                   + make_halfplanes(tetrahedron2, cart2plane, plane2cart_offset))
     unique_halfplanes = remove_duplicates(halfplanes)
