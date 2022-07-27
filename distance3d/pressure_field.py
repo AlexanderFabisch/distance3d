@@ -64,7 +64,7 @@ def contact_forces(
         debug = i == 9 and j == 144
         contact_polygon = compute_contact_polygon(
             tetrahedron1, tetrahedron2, contact_plane_hnf, debug=debug)
-        if len(contact_polygon) == 0:
+        if contact_polygon is None:
             continue
         intersection = True
 
@@ -292,7 +292,8 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
     cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
     halfplanes = make_halfplanes(tetrahedron1, tetrahedron2, cart2plane, plane2cart_offset)
-    poly = intersect_halfplanes(halfplanes)
+    unique_halfplanes = remove_duplicates(halfplanes)
+    poly, poly_halfplanes = intersect_halfplanes(unique_halfplanes)
 
     if debug:
         import matplotlib.pyplot as plt
@@ -300,12 +301,16 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         ax = plt.subplot(111, aspect="equal")
         colors = "rb"
         for i, halfplane in enumerate(halfplanes):
-            halfplane.plot(ax, colors[i // 4])
-        if len(poly) > 0:
+            halfplane.plot(ax, colors[i // 4], 0.1)
+        for i, halfplane in enumerate(unique_halfplanes):
+            halfplane.plot(ax, "orange", 0.5)
+        for i, halfplane in enumerate(poly_halfplanes):
+            halfplane.plot(ax, "g", 1.0)
+        if poly is not None:
             plt.scatter(poly[:, 0], poly[:, 1], s=100)
         plt.show()
 
-    if len(poly) == 0:
+    if poly is None:
         return poly
     else:
         return np.row_stack([plane2cart.dot(p) + plane2cart_offset for p in poly])
@@ -331,11 +336,11 @@ class HalfPlane:
             self.pq, halfplane.pq)
         return self.p + self.pq * alpha
 
-    def plot(self, ax, c):
+    def plot(self, ax, c, alpha):
         line = self.p + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(self.pq)
-        ax.plot(line[:, 0], line[:, 1], lw=3, c=c)
+        ax.plot(line[:, 0], line[:, 1], lw=3, c=c, alpha=alpha)
         normal = self.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(self.normal2d)
-        ax.plot(normal[:, 0], normal[:, 1], c=c)
+        ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=alpha)
 
 
 def plane_projection(plane_hnf):
@@ -399,7 +404,6 @@ def remove_duplicates(halfplanes):
 
 
 def intersect_halfplanes(halfplanes):
-    halfplanes = remove_duplicates(halfplanes)
     dq = deque()
     for hp in halfplanes:
         while len(dq) >= 2 and hp.out(dq[-1].intersect(dq[-2])):
@@ -414,10 +418,11 @@ def intersect_halfplanes(halfplanes):
         dq.popleft()
 
     if len(dq) < 3:
-        return np.array([])
+        return None, []
     else:
-        return np.row_stack([dq[i].intersect(dq[(i + 1) % len(dq)])
-                             for i in range(len(dq))])
+        polygon = np.row_stack([dq[i].intersect(dq[(i + 1) % len(dq)])
+                                for i in range(len(dq))])
+        return polygon, list(dq)
 
 
 def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
