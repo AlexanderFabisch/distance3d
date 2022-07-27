@@ -113,6 +113,22 @@ class TetraMesh(pv.Artist):
         return [self.mesh]
 
 
+class Tetrahedron(Mesh):
+    def __init__(self, tetrahedron_points):
+        mesh2origin = np.eye(4)
+        triangles = np.array([
+            [0, 1, 2],
+            [2, 1, 0],
+            [0, 1, 3],
+            [3, 1, 0],
+            [1, 3, 2],
+            [2, 3, 1],
+            [0, 3, 2],
+            [2, 3, 0]
+        ])
+        super(Tetrahedron, self).__init__(mesh2origin, tetrahedron_points, triangles)
+
+
 class Ellipse(pv.Artist):
     """An ellipse.
 

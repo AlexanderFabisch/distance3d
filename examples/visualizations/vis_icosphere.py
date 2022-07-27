@@ -50,6 +50,10 @@ fig.plot_plane(normal=details["plane_normals"][0], point_in_plane=details["plane
 fig.scatter(details["contact_polygons"][0], s=0.01, c=(1, 0, 1))
 fig.scatter(details["intersecting_tetrahedra1"][0], s=0.01, c=(1, 0, 0))
 fig.scatter(details["intersecting_tetrahedra2"][0], s=0.01, c=(0, 0, 1))
+t1 = visualization.Tetrahedron(details["intersecting_tetrahedra1"][0])
+t1.add_artist(fig)
+t2 = visualization.Tetrahedron(details["intersecting_tetrahedra2"][0])
+t2.add_artist(fig)
 """
 pressures = np.linalg.norm(details["contact_forces"], axis=1) / np.asarray(details["contact_areas"])
 max_pressure = max(pressures)

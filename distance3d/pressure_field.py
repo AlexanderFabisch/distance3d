@@ -87,47 +87,60 @@ def contact_forces(
     wrench12 = -wrench21
 
     if return_details:
-        # TODO what if no intersection?
-        contact_polygons = [contact_polygon.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
-                            for contact_polygon in contact_polygons]
-        contact_coms = np.asarray(contact_coms)
-        contact_coms = contact_coms.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
-        contact_forces = np.asarray(contact_forces)
-        contact_forces = contact_forces.dot(mesh22origin[:3, :3].T)
-        contact_areas = np.asarray(contact_areas)
-        contact_point = np.sum(
-            contact_coms * contact_areas[:, np.newaxis],
-            axis=0) / sum(contact_areas)
-        contact_point = mesh22origin[:3, :3].dot(contact_point) + mesh22origin[:3, 3]
-        contact_planes = np.asarray(contact_planes)
-        plane_points = contact_planes[:, :3] * contact_planes[:, 3, np.newaxis]
-        plane_points = plane_points.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
-        plane_normals = contact_planes[:, :3].dot(mesh22origin[:3, :3].T)
-        intersecting_tetrahedra1 = np.asarray(intersecting_tetrahedra1)
-        n_intersections = len(intersecting_tetrahedra1)
-        intersecting_tetrahedra1 = (
-            intersecting_tetrahedra1.reshape(
-                n_intersections * 4, 3).dot(mesh22origin[:3, :3].T)
-            + mesh22origin[:3, 3]).reshape(n_intersections, 4, 3)
-        intersecting_tetrahedra2 = np.asarray(intersecting_tetrahedra2)
-        intersecting_tetrahedra2 = (
-            intersecting_tetrahedra2.reshape(
-                n_intersections * 4, 3).dot(mesh22origin[:3, :3].T)
-            + mesh22origin[:3, 3]).reshape(n_intersections, 4, 3)
-        details = {
-            "contact_polygons": contact_polygons,
-            "contact_coms": contact_coms,
-            "contact_forces": contact_forces,
-            "contact_areas": contact_areas,
-            "contact_point": contact_point,
-            "plane_points": plane_points,
-            "plane_normals": plane_normals,
-            "intersecting_tetrahedra1": intersecting_tetrahedra1,
-            "intersecting_tetrahedra2": intersecting_tetrahedra2,
-        }
+        if intersection:
+            details = make_details(
+                contact_areas, contact_coms, contact_forces, contact_planes,
+                contact_polygons, intersecting_tetrahedra1,
+                intersecting_tetrahedra2, mesh22origin)
+        else:
+            details = {}
         return intersection, wrench12, wrench21, details
     else:
         return intersection, wrench12, wrench21
+
+
+def make_details(
+        contact_areas, contact_coms, contact_forces, contact_planes,
+        contact_polygons, intersecting_tetrahedra1, intersecting_tetrahedra2,
+        mesh22origin):
+    contact_polygons = [contact_polygon.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
+                        for contact_polygon in contact_polygons]
+    contact_coms = np.asarray(contact_coms)
+    contact_coms = contact_coms.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
+    contact_forces = np.asarray(contact_forces)
+    contact_forces = contact_forces.dot(mesh22origin[:3, :3].T)
+    contact_areas = np.asarray(contact_areas)
+    contact_point = np.sum(
+        contact_coms * contact_areas[:, np.newaxis],
+        axis=0) / sum(contact_areas)
+    contact_point = mesh22origin[:3, :3].dot(contact_point) + mesh22origin[:3, 3]
+    contact_planes = np.asarray(contact_planes)
+    plane_points = contact_planes[:, :3] * contact_planes[:, 3, np.newaxis]
+    plane_points = plane_points.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
+    plane_normals = contact_planes[:, :3].dot(mesh22origin[:3, :3].T)
+    intersecting_tetrahedra1 = np.asarray(intersecting_tetrahedra1)
+    n_intersections = len(intersecting_tetrahedra1)
+    intersecting_tetrahedra1 = (
+            intersecting_tetrahedra1.reshape(
+                n_intersections * 4, 3).dot(mesh22origin[:3, :3].T)
+            + mesh22origin[:3, 3]).reshape(n_intersections, 4, 3)
+    intersecting_tetrahedra2 = np.asarray(intersecting_tetrahedra2)
+    intersecting_tetrahedra2 = (
+            intersecting_tetrahedra2.reshape(
+                n_intersections * 4, 3).dot(mesh22origin[:3, :3].T)
+            + mesh22origin[:3, 3]).reshape(n_intersections, 4, 3)
+    details = {
+        "contact_polygons": contact_polygons,
+        "contact_coms": contact_coms,
+        "contact_forces": contact_forces,
+        "contact_areas": contact_areas,
+        "contact_point": contact_point,
+        "plane_points": plane_points,
+        "plane_normals": plane_normals,
+        "intersecting_tetrahedra1": intersecting_tetrahedra1,
+        "intersecting_tetrahedra2": intersecting_tetrahedra2,
+    }
+    return details
 
 
 def _contact_surface(
