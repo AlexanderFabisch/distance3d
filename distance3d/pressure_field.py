@@ -273,22 +273,7 @@ def compute_contact_polygon2(tetrahedron1, tetrahedron2, contact_plane_hnf, debu
     cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
     halfplanes = (make_halfplanes(tetrahedron1, cart2plane, plane2cart_offset)
                   + make_halfplanes(tetrahedron2, cart2plane, plane2cart_offset))
-    points = []
-    for hp1 in halfplanes:
-        for hp2 in halfplanes:
-            if hp1 is not hp2:
-                p = hp1.intersect(hp2)
-                if all(np.isfinite(p)):
-                    points.append(p)
-    validated_points = []
-    for point in points:
-        valid = True
-        for hp in halfplanes:
-            if hp.outside_of(point):
-                valid = False
-                break
-        if valid:
-            validated_points.append(point)
+    validated_points = intersect_halfplanes2(halfplanes)
 
     if len(validated_points) == 0:
         poly = None
@@ -310,6 +295,25 @@ def compute_contact_polygon2(tetrahedron1, tetrahedron2, contact_plane_hnf, debu
     return poly
 
 
+def intersect_halfplanes2(halfplanes):
+    points = []
+    for i in range(len(halfplanes)):
+        for j in range(i, len(halfplanes)):
+            p = halfplanes[i].intersect(halfplanes[j])
+            if all(np.isfinite(p)):
+                points.append(p)
+    validated_points = []
+    for point in points:
+        valid = True
+        for hp in halfplanes:
+            if hp.outside_of(point):
+                valid = False
+                break
+        if valid:
+            validated_points.append(point)
+    return validated_points
+
+
 class HalfPlane:
     def __init__(self, p, normal2d):
         self.p = p
@@ -318,7 +322,7 @@ class HalfPlane:
         self.angle = math.atan2(self.pq[1], self.pq[0])
 
     def outside_of(self, point):
-        return float(np.cross(self.pq, point - self.p)) < EPSILON
+        return float(np.cross(self.pq, point - self.p)) < -EPSILON
 
     def intersect(self, halfplane):
         denom = np.cross(self.pq, halfplane.pq)
