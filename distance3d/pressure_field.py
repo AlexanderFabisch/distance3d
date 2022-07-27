@@ -11,7 +11,7 @@ from .gjk import gjk_intersection
 from .distance import line_segment_to_plane
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from .geometry import barycentric_coordinates_tetrahedron
-from .utils import transform_point, invert_transform, norm_vector, EPSILON
+from .utils import transform_point, invert_transform, norm_vector, plane_basis_from_normal, EPSILON
 
 
 def contact_forces(
@@ -62,7 +62,20 @@ def contact_forces(
                 tetrahedron1, tetrahedron2, contact_plane_hnf):
             continue
 
-        debug = i == 9 and j == 144
+        if i * len(tetrahedra2) + j > 8 * len(tetrahedra2) + 91:
+            print(i, j)
+            import pytransform3d.visualizer as pv
+            from distance3d.visualization import TetraMesh, Tetrahedron
+            fig = pv.figure()
+            TetraMesh(mesh22origin, vertices1_in_mesh2, tetrahedra1).add_artist(fig)
+            TetraMesh(mesh22origin, vertices2_in_mesh2, tetrahedra2).add_artist(fig)
+            Tetrahedron(tetrahedron1).add_artist(fig)
+            Tetrahedron(tetrahedron2).add_artist(fig)
+            fig.plot_plane(normal=contact_plane_hnf[:3], d=contact_plane_hnf[3])
+            fig.show()
+
+        debug = False
+        debug = i == 8 and j == 95
         contact_polygon = compute_contact_polygon(
             tetrahedron1, tetrahedron2, contact_plane_hnf, debug=debug)
         if contact_polygon is None:
@@ -143,45 +156,6 @@ def make_details(
         "intersecting_tetrahedra2": intersecting_tetrahedra2,
     }
     return details
-
-
-def _contact_surface(
-        vertices1_in_mesh2, tetrahedra1, potentials1,
-        vertices2_in_mesh2, tetrahedra2, potentials2,
-        broad_overlapping_indices1, broad_overlapping_indices2,
-        contact_point, normal):
-    forces1 = dict()
-    forces2 = dict()
-    last1 = -1
-    for i in range(len(broad_overlapping_indices1)):
-        idx1 = broad_overlapping_indices1[i]
-        idx2 = broad_overlapping_indices2[i]
-
-        if idx1 != last1:
-            tetra1 = vertices1_in_mesh2[tetrahedra1[idx1]]
-            t1 = ConvexHullVertices(tetra1)
-            poly1 = contact_plane_projection(contact_point, normal, tetra1)
-            area1 = polygon_area(poly1)
-            p1 = np.mean(poly1, axis=0)
-            c1 = barycentric_coordinates_tetrahedron(p1, tetra1)
-            pressure1 = c1.dot(potentials1[tetrahedra1[idx1]])
-
-        # TODO tetra-tetra intersection to compute triangle, something with halfplanes?
-        # instead we try to compute surface for each object individually
-        tetra2 = vertices2_in_mesh2[tetrahedra2[idx2]]
-        t2 = ConvexHullVertices(tetra2)
-        if gjk_intersection(t1, t2):
-            # TODO compute triangle projection on contact surface, compute
-            # area and use it as a weight for the pressure in integral
-            poly2 = contact_plane_projection(contact_point, normal, tetra2)
-            area2 = polygon_area(poly2)
-            p2 = np.mean(poly2, axis=0)
-            c2 = barycentric_coordinates_tetrahedron(p2, tetra2)
-            pressure2 = c2.dot(potentials2[tetrahedra2[idx2]])
-
-            forces1[idx1] = (area1 * pressure1, p1, poly1)
-            forces2[idx2] = (area2 * pressure2, p2, poly2)
-    return forces1, forces2
 
 
 def _check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2):
@@ -292,7 +266,8 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
     cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
-    halfplanes = make_halfplanes(tetrahedron1, tetrahedron2, cart2plane, plane2cart_offset)
+    halfplanes = (make_halfplanes(tetrahedron1, cart2plane, plane2cart_offset)
+                  + make_halfplanes(tetrahedron2, cart2plane, plane2cart_offset))
     unique_halfplanes = remove_duplicates(halfplanes)
     poly, poly_halfplanes = intersect_halfplanes(unique_halfplanes)
 
@@ -317,6 +292,47 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         return np.row_stack([plane2cart.dot(p) + plane2cart_offset for p in poly])
 
 
+def compute_contact_polygon2(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
+    cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
+    halfplanes = (make_halfplanes(tetrahedron1, cart2plane, plane2cart_offset)
+                  + make_halfplanes(tetrahedron2, cart2plane, plane2cart_offset))
+    points = []
+    for hp1 in halfplanes:
+        for hp2 in halfplanes:
+            if hp1 is not hp2:
+                p = hp1.intersect(hp2)
+                if all(np.isfinite(p)):
+                    points.append(p)
+    validated_points = []
+    for point in points:
+        valid = True
+        for hp in halfplanes:
+            if hp.outside_of(point):
+                valid = False
+                break
+        if valid:
+            validated_points.append(point)
+
+    if len(validated_points) == 0:
+        poly = None
+    else:
+        poly = np.row_stack([
+            plane2cart.dot(p) + plane2cart_offset for p in validated_points])
+
+    if debug:
+        import matplotlib.pyplot as plt
+        plt.figure()
+        ax = plt.subplot(111, aspect="equal")
+        colors = "rb"
+        for i, halfplane in enumerate(halfplanes):
+            halfplane.plot(ax, colors[i // 4], 0.1)
+        if poly is not None:
+            plt.scatter(poly[:, 0], poly[:, 1], s=100)
+        plt.show()
+
+    return poly
+
+
 class HalfPlane:
     def __init__(self, p, normal2d):
         self.p = p
@@ -328,8 +344,10 @@ class HalfPlane:
         return float(np.cross(self.pq, point - self.p)) < EPSILON
 
     def intersect(self, halfplane):
-        alpha = np.cross((halfplane.p - self.p), halfplane.pq) / np.cross(
-            self.pq, halfplane.pq)
+        denom = np.cross(self.pq, halfplane.pq)
+        if abs(denom) < EPSILON:
+            return np.inf
+        alpha = np.cross((halfplane.p - self.p), halfplane.pq) / denom
         return self.p + self.pq * alpha
 
     def plot(self, ax, c, alpha):
@@ -354,14 +372,14 @@ def plane_projection(plane_hnf):
     Source: https://github.com/ekzhang/hydroelastics/blob/d2c1e02aa1dd7e791212bdb930d80dee221bff1a/src/forces.jl#L152
     (MIT license)
     """
-    if abs(plane_hnf[0]) / np.linalg.norm(plane_hnf[:3]) > 1e-3:
+    if abs(plane_hnf[0]) > 1e-3:
         cart2plane = np.array([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
         plane2cart = np.array(
             [[-plane_hnf[1] / plane_hnf[0], plane_hnf[2] / plane_hnf[0]],
              [1.0, 0.0],
              [0.0, 1.0]])
         plane2cart_offset = np.array([-plane_hnf[3] / plane_hnf[0], 0.0, 0.0])
-    elif abs(plane_hnf[1]) / np.linalg.norm(plane_hnf[:3]) > 1e-3:
+    elif abs(plane_hnf[1]) > 1e-3:
         cart2plane = np.array([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
         plane2cart = np.array([
             [1.0, 0.0],
@@ -370,7 +388,7 @@ def plane_projection(plane_hnf):
         ])
         plane2cart_offset = np.array([0.0, -plane_hnf[3] / plane_hnf[1], 0.0])
     else:
-        assert abs(plane_hnf[2]) / np.linalg.norm(plane_hnf[:3]) > 1e-3
+        assert abs(plane_hnf[2]) > 1e-3
         cart2plane = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
         plane2cart = np.array([
             [1.0, 0.0],
@@ -381,16 +399,17 @@ def plane_projection(plane_hnf):
     return cart2plane, plane2cart, plane2cart_offset
 
 
-def make_halfplanes(tetrahedron1, tetrahedron2, cart2plane, plane2cart_offset):
+def make_halfplanes(tetrahedron, cart2plane, plane2cart_offset):
     halfplanes = []
-    for tetrahedron in (tetrahedron1, tetrahedron2):
-        X = barycentric_transform(tetrahedron)
-        for i in range(4):
-            halfspace = X[i]
-            normal2d = cart2plane.dot(halfspace[:3])
-            if np.linalg.norm(normal2d) > 1e-9:
-                p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
-                halfplanes.append(HalfPlane(p, normal2d))
+    X = barycentric_transform(tetrahedron)
+    for i in range(4):
+        halfspace = X[i]
+        normal2d = cart2plane.dot(halfspace[:3])
+        norm = np.linalg.norm(normal2d)
+        if norm > 1e-9:
+            print(norm)
+            p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
+            halfplanes.append(HalfPlane(p, normal2d))
     return halfplanes
 
 
