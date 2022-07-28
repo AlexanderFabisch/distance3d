@@ -242,8 +242,11 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
     cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
-    halfplanes = (make_halfplanes(tetrahedron1, cart2plane, plane2cart_offset)
-                  + make_halfplanes(tetrahedron2, cart2plane, plane2cart_offset))
+    #halfplanes = (make_halfplanes(tetrahedron1, cart2plane, plane2cart_offset)
+    #              + make_halfplanes(tetrahedron2, cart2plane, plane2cart_offset))
+    # TODO
+    halfplanes = (make_halfplanes2(tetrahedron1, contact_plane_hnf)
+                  + make_halfplanes2(tetrahedron2, contact_plane_hnf))
     unique_halfplanes = remove_duplicates(halfplanes)
     poly, poly_halfplanes = intersect_halfplanes(unique_halfplanes)
 
@@ -265,6 +268,7 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
     if poly is None:
         return poly
     else:
+        # TODO transform plane back to cartesian correctly!
         return np.row_stack([plane2cart.dot(p) + plane2cart_offset for p in poly])
 
 
@@ -395,6 +399,45 @@ def make_halfplanes(tetrahedron, cart2plane, plane2cart_offset):
         if norm > 1e-9:
             p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
             halfplanes.append(HalfPlane(p, normal2d))
+    return halfplanes
+
+
+def make_halfplanes2(tetrahedron_points, plane_hnf):
+    plane_normal = plane_hnf[:3]
+    plane_point = plane_normal * plane_hnf[3]
+
+    triangles = np.array([[2, 1, 0], [2, 3, 1], [2, 0, 3], [1, 3, 0]], dtype=int)
+    line_segments = np.array([[0, 1], [1, 2], [2, 0]])
+
+    x, y = plane_basis_from_normal(plane_normal)
+    cart2plane = np.row_stack((x, y))
+
+    halfplanes = []
+    for triangle in triangles:
+        triangle_points = tetrahedron_points[triangle]
+        normal = np.cross(triangle_points[1] - triangle_points[0], triangle_points[2] - triangle_points[0])
+
+        intersection_points = []
+        for line_segment in line_segments:
+            segment_start, segment_end = triangle_points[line_segment]
+            dist, p, _ = line_segment_to_plane(segment_start, segment_end, plane_point, plane_normal)
+            if dist < EPSILON:
+                intersection_points.append(p)
+        if len(intersection_points) != 2:  # TODO what if 3 points?
+            continue
+
+        normal2d = cart2plane.dot(normal)
+        intersection_points = np.row_stack(intersection_points)
+        intersection_points -= plane_point[np.newaxis]
+        intersection_points = intersection_points.dot(cart2plane.T)
+        print(intersection_points)
+
+        p, q = intersection_points
+        pq = q - p
+        print(np.cross(pq, normal2d))
+        if np.cross(pq, normal2d) < 0:
+            p = q
+        halfplanes.append(HalfPlane(p, normal2d))
     return halfplanes
 
 
