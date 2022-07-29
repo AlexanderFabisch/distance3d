@@ -41,39 +41,35 @@ print(f"force 21: {wrench21}")
 
 fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
-tetra_mesh1 = visualization.TetraMesh(mesh12origin, vertices1, tetrahedra1)
-tetra_mesh1.add_artist(fig)
-tetra_mesh2 = visualization.TetraMesh(mesh22origin, vertices2, tetrahedra2)
-tetra_mesh2.add_artist(fig)
+visualization.TetraMesh(mesh12origin, vertices1, tetrahedra1).add_artist(fig)
+visualization.TetraMesh(mesh22origin, vertices2, tetrahedra2).add_artist(fig)
 
-fig.plot_plane(normal=details["plane_normals"][0], point_in_plane=details["plane_points"][0])
-fig.scatter(details["contact_polygons"][0], s=0.01, c=(1, 0, 1))
-fig.scatter(details["intersecting_tetrahedra1"][0], s=0.01, c=(1, 0, 0))
-fig.scatter(details["intersecting_tetrahedra2"][0], s=0.01, c=(0, 0, 1))
-t1 = visualization.Tetrahedron(details["intersecting_tetrahedra1"][0])
-t1.add_artist(fig)
-t2 = visualization.Tetrahedron(details["intersecting_tetrahedra2"][0])
-t2.add_artist(fig)
-"""
+isect_idx = 3
+fig.scatter(details["contact_polygons"][isect_idx], s=0.001, c=(1, 0, 1))
+fig.scatter(details["intersecting_tetrahedra1"][isect_idx], s=0.001, c=(1, 0, 0))
+fig.scatter(details["intersecting_tetrahedra2"][isect_idx], s=0.001, c=(0, 0, 1))
+#visualization.Tetrahedron(details["intersecting_tetrahedra1"][isect_idx]).add_artist(fig)
+#visualization.Tetrahedron(details["intersecting_tetrahedra2"][isect_idx]).add_artist(fig)
+
 pressures = np.linalg.norm(details["contact_forces"], axis=1) / np.asarray(details["contact_areas"])
 max_pressure = max(pressures)
 c = [(pressure / max_pressure, 0, 0) for pressure in pressures]
-fig.scatter(details["contact_coms"], s=0.003, c=c)
+#fig.scatter(details["contact_coms"], s=0.003, c=c)
 
 if np.linalg.norm(wrench21) > 0:
-    fig.plot_vector(details["contact_point"], 0.1 * wrench21[:3], (1, 0, 0))
+    fig.plot_vector(details["contact_point"], 1000 * wrench21[:3], (1, 0, 0))
 if np.linalg.norm(wrench12) > 0:
-    fig.plot_vector(details["contact_point"], 0.1 * wrench12[:3], (0, 1, 0))
+    fig.plot_vector(details["contact_point"], 1000 * wrench12[:3], (0, 1, 0))
 
-for color, points in zip(c, details["contact_polygons"]):
-    # TODO improve
+contact_polygons = zip(c, details["contact_polygons"])
+contact_polygons = list(contact_polygons)[isect_idx:isect_idx + 1]
+for color, points in contact_polygons:
     triangles = np.array([[0, i - 1, i] for i in range(2, len(points))], dtype=int)
     contact_surface_mesh = o3d.geometry.TriangleMesh(
         o3d.utility.Vector3dVector(points),
         o3d.utility.Vector3iVector(triangles))
     contact_surface_mesh.paint_uniform_color(color)
     fig.add_geometry(contact_surface_mesh)
-"""
 
 fig.view_init()
 
