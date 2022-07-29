@@ -241,7 +241,6 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 
 
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
-    cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
     #halfplanes = (make_halfplanes(tetrahedron1, cart2plane, plane2cart_offset)
     #              + make_halfplanes(tetrahedron2, cart2plane, plane2cart_offset))
     # TODO
@@ -269,7 +268,9 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         return poly
     else:
         # TODO transform plane back to cartesian correctly!
-        return np.row_stack([plane2cart.dot(p) + plane2cart_offset for p in poly])
+        plane2cart = np.column_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
+        plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
+        return np.row_stack([plane2cart.dot(p) + plane_point for p in poly])
 
 
 def compute_contact_polygon2(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
@@ -430,11 +431,9 @@ def make_halfplanes2(tetrahedron_points, plane_hnf):
         intersection_points = np.row_stack(intersection_points)
         intersection_points -= plane_point[np.newaxis]
         intersection_points = intersection_points.dot(cart2plane.T)
-        print(intersection_points)
 
         p, q = intersection_points
         pq = q - p
-        print(np.cross(pq, normal2d))
         if np.cross(pq, normal2d) < 0:
             p = q
         halfplanes.append(HalfPlane(p, normal2d))
