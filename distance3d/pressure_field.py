@@ -77,7 +77,7 @@ def contact_forces(
         """
 
         debug = False
-        #debug = i == 8 and j == 95
+        #debug = len(contact_planes) == 3
         contact_polygon = compute_contact_polygon(
             tetrahedron1, tetrahedron2, contact_plane_hnf, debug=debug)
         if contact_polygon is None:
@@ -246,8 +246,9 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
     # TODO
     halfplanes = (make_halfplanes2(tetrahedron1, contact_plane_hnf)
                   + make_halfplanes2(tetrahedron2, contact_plane_hnf))
-    unique_halfplanes = remove_duplicates(halfplanes)
-    poly, poly_halfplanes = intersect_halfplanes(unique_halfplanes)
+    poly = intersect_halfplanes2(halfplanes)
+    #unique_halfplanes = remove_duplicates(halfplanes)
+    #poly, poly_halfplanes = intersect_halfplanes(unique_halfplanes)
 
     if debug:
         import matplotlib.pyplot as plt
@@ -256,10 +257,10 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         colors = "rb"
         for i, halfplane in enumerate(halfplanes):
             halfplane.plot(ax, colors[i // 4], 0.1)
-        for i, halfplane in enumerate(unique_halfplanes):
-            halfplane.plot(ax, "orange", 0.5)
-        for i, halfplane in enumerate(poly_halfplanes):
-            halfplane.plot(ax, "g", 1.0)
+        #for i, halfplane in enumerate(unique_halfplanes):
+        #    halfplane.plot(ax, "orange", 0.5)
+        #for i, halfplane in enumerate(poly_halfplanes):
+        #    halfplane.plot(ax, "g", 1.0)
         if poly is not None:
             plt.scatter(poly[:, 0], poly[:, 1], s=100)
         plt.show()
@@ -315,6 +316,8 @@ def intersect_halfplanes2(halfplanes):
                 break
         if valid:
             validated_points.append(point)
+    if len(validated_points) < 3:
+        return None
     return validated_points
 
 
