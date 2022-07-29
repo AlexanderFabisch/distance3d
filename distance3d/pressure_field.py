@@ -48,6 +48,8 @@ def contact_forces(
     intersecting_tetrahedra1 = []
     intersecting_tetrahedra2 = []
     previous_i = -1
+    #for i in range(len(tetrahedra1)):
+    #    for j in range(len(tetrahedra2)):
     for i, j in zip(broad_overlapping_indices1, broad_overlapping_indices2):
         if i != previous_i:
             tetrahedron1 = vertices1_in_mesh2[tetrahedra1[i]]
@@ -318,7 +320,7 @@ def intersect_halfplanes2(halfplanes):
             validated_points.append(point)
     if len(validated_points) < 3:
         return None
-    return validated_points
+    return np.asarray(validated_points)
 
 
 class HalfPlane:
