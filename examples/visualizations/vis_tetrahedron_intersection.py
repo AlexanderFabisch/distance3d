@@ -6,7 +6,7 @@ Visualize Intersection of Tetrahedra
 print(__doc__)
 import numpy as np
 import pytransform3d.visualizer as pv
-from distance3d import mesh, pressure_field
+from distance3d import mesh, pressure_field, visualization
 
 
 vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(np.array([0.1, 0.2, 0.1]), 1.0, order=2)
@@ -36,6 +36,8 @@ fig.plot_transform(np.eye(4), s=0.05)
 fig.plot_plane(normal=contact_plane_hnf[:3], d=contact_plane_hnf[3])
 fig.scatter(contact_polygon, s=0.01, c=(1, 0, 1))
 fig.plot_vector(intersection_com, 100.0 * force_vector, c=(1, 0, 0))
+visualization.Tetrahedron(tetrahedron1).add_artist(fig)
+visualization.Tetrahedron(tetrahedron2).add_artist(fig)
 fig.view_init()
 
 if "__file__" in globals():
