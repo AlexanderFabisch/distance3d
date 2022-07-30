@@ -329,22 +329,28 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
         if len(intersection_points) != 2:  # TODO what if 3 points?
             continue
 
-        # normal pointing inwards
-        normal = np.cross(directions[triangle[1], triangle[0]],
-                          directions[triangle[2], triangle[0]])
-
-        normal2d = cart2plane.dot(normal)
         intersection_points = np.row_stack(intersection_points)
-        intersection_points -= plane_point[np.newaxis]
-        intersection_points = intersection_points.dot(cart2plane.T)
-
-        p, q = intersection_points
-        pq = q - p
-        if np.cross(pq, normal2d) < 0:
-            p = q
-            pq *= -1.0
+        p, pq, normal2d = make_halfplane(
+            cart2plane, directions, intersection_points, plane_point, triangle)
         halfplanes.append(HalfPlane(p, pq, normal2d))
     return halfplanes
+
+
+@numba.njit(cache=True)
+def make_halfplane(
+        cart2plane, directions, intersection_points, plane_point, triangle):
+    # normal pointing inwards
+    normal = np.cross(directions[triangle[1], triangle[0]],
+                      directions[triangle[2], triangle[0]])
+    normal2d = cart2plane.dot(normal)
+    intersection_points -= plane_point
+    intersection_points = intersection_points.dot(cart2plane.T)
+    p, q = intersection_points
+    pq = q - p
+    if cross2d(pq, normal2d) < 0:
+        p = q
+        pq *= -1.0
+    return p, pq, normal2d
 
 
 @numba.njit(cache=True)
