@@ -244,13 +244,10 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 
 
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
-    timer = Timer()
     cart2plane = np.row_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
     halfplanes = (make_halfplanes(tetrahedron1, contact_plane_hnf, cart2plane)
                   + make_halfplanes(tetrahedron2, contact_plane_hnf, cart2plane))
-    timer.start("halfplanes")
     poly = intersect_halfplanes(halfplanes)
-    print(f"{timer.stop('halfplanes')}")
 
     if debug:
         import matplotlib.pyplot as plt
