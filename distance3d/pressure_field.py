@@ -245,8 +245,9 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
     timer = Timer()
-    halfplanes = (make_halfplanes(tetrahedron1, contact_plane_hnf)
-                  + make_halfplanes(tetrahedron2, contact_plane_hnf))
+    cart2plane = np.row_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
+    halfplanes = (make_halfplanes(tetrahedron1, contact_plane_hnf, cart2plane)
+                  + make_halfplanes(tetrahedron2, contact_plane_hnf, cart2plane))
     timer.start("halfplanes")
     poly = intersect_halfplanes(halfplanes)
     print(f"{timer.stop('halfplanes')}")
@@ -267,7 +268,7 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
     else:
         ch = Delaunay(poly)
         triangles = ch.simplices
-        plane2cart = np.column_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
+        plane2cart = cart2plane.T
         plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
         return np.row_stack([plane2cart.dot(p) + plane_point for p in poly]), triangles
 
@@ -301,7 +302,7 @@ LINE_SEGMENTS = np.array([[0, 1], [1, 2], [2, 0]], dtype=int)
 TRIANGLE_LINE_SEGMENTS = np.array([triangle[LINE_SEGMENTS] for triangle in TRIANGLES], dtype=int)
 
 
-def make_halfplanes(tetrahedron_points, plane_hnf):
+def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
     plane_normal = plane_hnf[:3]
     d = plane_hnf[3]
     plane_point = plane_normal * d
@@ -309,13 +310,8 @@ def make_halfplanes(tetrahedron_points, plane_hnf):
     P, d_signs, directions = _precompute_edge_intersections(
         d, plane_normal, tetrahedron_points)
 
-    cart2plane = np.row_stack(plane_basis_from_normal(plane_normal))
-
     halfplanes = []
     for i, triangle in enumerate(TRIANGLES):
-        normal = np.cross(directions[triangle[1], triangle[0]],
-                          directions[triangle[2], triangle[0]])
-
         intersection_points = []
         for line_segment in TRIANGLE_LINE_SEGMENTS[i]:
             i = min(line_segment)
@@ -325,6 +321,10 @@ def make_halfplanes(tetrahedron_points, plane_hnf):
 
         if len(intersection_points) != 2:  # TODO what if 3 points?
             continue
+
+        # normal pointing inwards
+        normal = np.cross(directions[triangle[1], triangle[0]],
+                          directions[triangle[2], triangle[0]])
 
         normal2d = cart2plane.dot(normal)
         intersection_points = np.row_stack(intersection_points)
