@@ -282,7 +282,8 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
             triangles = ch.simplices
         plane2cart = cart2plane.T
         plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
-        return np.row_stack([plane2cart.dot(p) + plane_point for p in poly]), triangles
+        poly3d = poly.dot(plane2cart.T) + plane_point
+        return poly3d, triangles
 
 
 @numba.experimental.jitclass(
