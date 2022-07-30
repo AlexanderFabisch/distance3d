@@ -263,8 +263,11 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
     if poly is None:
         return None, None
     else:
-        ch = Delaunay(poly)
-        triangles = ch.simplices
+        if len(poly) == 3:
+            triangles = np.array([[0, 1, 2]], dtype=np.dtype("int32"))
+        else:
+            ch = Delaunay(poly)
+            triangles = ch.simplices
         plane2cart = cart2plane.T
         plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
         return np.row_stack([plane2cart.dot(p) + plane_point for p in poly]), triangles
@@ -334,23 +337,6 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
 
 
 @numba.njit(cache=True)
-def make_halfplane(
-        cart2plane, directions, intersection_points, plane_point, triangle):
-    # normal pointing inwards
-    normal = np.cross(directions[triangle[1], triangle[0]],
-                      directions[triangle[2], triangle[0]])
-    normal2d = cart2plane.dot(normal)
-    intersection_points -= plane_point
-    intersection_points = intersection_points.dot(cart2plane.T)
-    p, q = intersection_points
-    pq = q - p
-    if cross2d(pq, normal2d) < 0:
-        p = q
-        pq *= -1.0
-    return p, pq, normal2d
-
-
-@numba.njit(cache=True)
 def _precompute_edge_intersections(d, plane_normal, tetrahedron_points):
     directions = np.empty((4, 4, 3), np.dtype("float"))
     for i in range(4):
@@ -366,6 +352,23 @@ def _precompute_edge_intersections(d, plane_normal, tetrahedron_points):
                 t = unnormalized_distances[i] / normal_direction
                 P[i, j] = tetrahedron_points[i] + t * directions[i, j]
     return P, d_signs, directions
+
+
+@numba.njit(cache=True)
+def make_halfplane(
+        cart2plane, directions, intersection_points, plane_point, triangle):
+    # normal pointing inwards
+    normal = np.cross(directions[triangle[1], triangle[0]],
+                      directions[triangle[2], triangle[0]])
+    normal2d = cart2plane.dot(normal)
+    intersection_points -= plane_point
+    intersection_points = intersection_points.dot(cart2plane.T)
+    p, q = intersection_points
+    pq = q - p
+    if cross2d(pq, normal2d) < 0:
+        p = q
+        pq *= -1.0
+    return p, pq, normal2d
 
 
 def make_halfplanes2(tetrahedron, cart2plane, plane2cart_offset):  # TODO can we fix this?
