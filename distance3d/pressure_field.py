@@ -8,18 +8,23 @@ from scipy.spatial import Delaunay
 from .distance import line_segment_to_plane
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from .utils import invert_transform, norm_vector, plane_basis_from_normal, EPSILON
+from .benchmark import Timer
 
 
 def contact_forces(
         mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1,
         mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2,
         return_details=False):
+    timer = Timer()
+
+    timer.start("transformation")
     # We transform vertices of mesh1 to mesh2 frame to be able to reuse the AABB
     # tree of mesh2.
     origin2mesh2 = invert_transform(mesh22origin)
     mesh12mesh2 = np.dot(origin2mesh2, mesh12origin)
     vertices1_in_mesh2 = np.dot(
         vertices1_in_mesh1, mesh12mesh2[:3, :3].T) + mesh12mesh2[np.newaxis, :3, 3]
+    print(f"transformation: {timer.stop('transformation')}")
 
     # When two objects with pressure functions p1(*), p2(*) intersect, there is
     # a surface S inside the space of intersection at which the values of p1 and
@@ -27,8 +32,10 @@ def contact_forces(
     # exerted by one object on another [..].
     # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 
+    timer.start("broad phase")
     broad_overlapping_indices1, broad_overlapping_indices2 = check_aabbs_of_tetrahedra(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2)
+    print(f"broad phase: {timer.stop('broad phase')}")
 
     # TODO
     #com1 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices1_in_mesh2, tetrahedra1)
@@ -53,21 +60,28 @@ def contact_forces(
 
         tetrahedron2 = vertices2_in_mesh2[tetrahedra2[j]]
         epsilon2 = potentials2[tetrahedra2[j]]
+
+        timer.start("contact_plane")
         contact_plane_hnf = contact_plane(
             tetrahedron1, tetrahedron2, epsilon1, epsilon2)
+        timer.stop_and_add_to_total("contact_plane")
         if not check_tetrahedra_intersect_contact_plane(
                 tetrahedron1, tetrahedron2, contact_plane_hnf):
             continue
 
+        timer.start("compute_contact_polygon")
         contact_polygon, triangles = compute_contact_polygon(
             tetrahedron1, tetrahedron2, contact_plane_hnf)
+        timer.stop_and_add_to_total("compute_contact_polygon")
         if contact_polygon is None:
             continue
         intersection = True
 
+        timer.start("compute_contact_force")
         intersection_com, force_vector, area = compute_contact_force(
             tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon,
             triangles)
+        timer.stop_and_add_to_total("compute_contact_force")
 
         total_force_vector += force_vector
         # TODO use intersection com to compute torque
@@ -80,6 +94,8 @@ def contact_forces(
         contact_planes.append(contact_plane_hnf)
         intersecting_tetrahedra1.append(tetrahedron1)
         intersecting_tetrahedra2.append(tetrahedron2)
+
+    print(timer.total_time_)
 
     force_in_world = mesh22origin[:3, :3].dot(total_force_vector)
     wrench21 = np.hstack((force_in_world, np.zeros(3)))
@@ -160,6 +176,13 @@ def check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh
     return broad_overlapping_indices1, broad_overlapping_indices2
 
 
+@numba.njit(
+    numba.float64[:](numba.float64[:, ::1], numba.float64[:], numba.float64[:]),
+    cache=True)
+def points_to_plane_signed(points, plane_point, plane_normal):
+    return np.dot(points - np.ascontiguousarray(plane_point).reshape(1, -1), plane_normal)
+
+
 @numba.njit(cache=True)  # TODO can we use this?
 def _check_tetrahedra_intersect_contact_plane(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2,
@@ -174,13 +197,6 @@ def _check_tetrahedra_intersect_contact_plane(
     broad_overlapping_indices1 = broad_overlapping_indices1[keep]
     broad_overlapping_indices2 = broad_overlapping_indices2[keep]
     return broad_overlapping_indices1, broad_overlapping_indices2
-
-
-@numba.njit(
-    numba.float64[:](numba.float64[:, ::1], numba.float64[:], numba.float64[:]),
-    cache=True)
-def points_to_plane_signed(points, plane_point, plane_normal):
-    return np.dot(points - np.ascontiguousarray(plane_point).reshape(1, -1), plane_normal)
 
 
 @numba.njit(
@@ -228,9 +244,12 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 
 
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
+    timer = Timer()
     halfplanes = (make_halfplanes(tetrahedron1, contact_plane_hnf)
                   + make_halfplanes(tetrahedron2, contact_plane_hnf))
+    timer.start("halfplanes")
     poly = intersect_halfplanes(halfplanes)
+    print(f"{timer.stop('halfplanes')}")
 
     if debug:
         import matplotlib.pyplot as plt
@@ -277,27 +296,33 @@ class HalfPlane:
         ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=alpha)
 
 
+TRIANGLES = np.array([[2, 1, 0], [2, 3, 1], [2, 0, 3], [1, 3, 0]], dtype=int)
+LINE_SEGMENTS = np.array([[0, 1], [1, 2], [2, 0]], dtype=int)
+TRIANGLE_LINE_SEGMENTS = np.array([triangle[LINE_SEGMENTS] for triangle in TRIANGLES], dtype=int)
+
+
 def make_halfplanes(tetrahedron_points, plane_hnf):
     plane_normal = plane_hnf[:3]
-    plane_point = plane_normal * plane_hnf[3]
+    d = plane_hnf[3]
+    plane_point = plane_normal * d
 
-    triangles = np.array([[2, 1, 0], [2, 3, 1], [2, 0, 3], [1, 3, 0]], dtype=int)
-    line_segments = np.array([[0, 1], [1, 2], [2, 0]])
+    P, d_signs, directions = _precompute_edge_intersections(
+        d, plane_normal, tetrahedron_points)
 
-    x, y = plane_basis_from_normal(plane_normal)
-    cart2plane = np.row_stack((x, y))
+    cart2plane = np.row_stack(plane_basis_from_normal(plane_normal))
 
     halfplanes = []
-    for triangle in triangles:
-        triangle_points = tetrahedron_points[triangle]
-        normal = np.cross(triangle_points[1] - triangle_points[0], triangle_points[2] - triangle_points[0])
+    print("==")
+    for i, triangle in enumerate(TRIANGLES):
+        normal = np.cross(directions[triangle[1], triangle[0]],
+                          directions[triangle[2], triangle[0]])
 
         intersection_points = []
-        for line_segment in line_segments:
-            segment_start, segment_end = triangle_points[line_segment]
-            dist, p, _ = line_segment_to_plane(segment_start, segment_end, plane_point, plane_normal)
-            if dist < EPSILON:
-                intersection_points.append(p)
+        for line_segment in TRIANGLE_LINE_SEGMENTS[i]:
+            #print(line_segment)
+            if d_signs[line_segment[0]] != d_signs[line_segment[1]]:
+                intersection_points.append(P[line_segment[0], line_segment[1]])
+
         if len(intersection_points) != 2:  # TODO what if 3 points?
             continue
 
@@ -312,6 +337,18 @@ def make_halfplanes(tetrahedron_points, plane_hnf):
             p = q
         halfplanes.append(HalfPlane(p, normal2d))
     return halfplanes
+
+
+def _precompute_edge_intersections(d, plane_normal, tetrahedron_points):
+    directions = np.array([[s - e for s in tetrahedron_points] for e in tetrahedron_points])
+    unnormalized_distances = d - np.dot(tetrahedron_points, plane_normal)
+    d_signs = np.sign(unnormalized_distances)
+    normal_directions = np.dot(directions.reshape(-1, 3), plane_normal).reshape(4, 4)
+    T = np.array([[unnormalized_distances[i] / normal_directions[i, j]
+                   for j in range(4)] for i in range(4)])
+    P = np.array([[tetrahedron_points[i] + T[i, j] * directions[i, j]
+                   for j in range(4)] for i in range(4)])
+    return P, d_signs, directions
 
 
 def make_halfplanes2(tetrahedron, cart2plane, plane2cart_offset):  # TODO can we fix this?
