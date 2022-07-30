@@ -311,6 +311,7 @@ LINE_SEGMENTS = np.array([[0, 1], [1, 2], [2, 0]], dtype=int)
 TRIANGLE_LINE_SEGMENTS = np.array([triangle[LINE_SEGMENTS] for triangle in TRIANGLES], dtype=int)
 
 
+@numba.njit(cache=True)
 def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
     plane_normal = plane_hnf[:3]
     d = plane_hnf[3]
@@ -321,6 +322,7 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
 
     halfplanes = np.empty((4, 4))
     hp_idx = 0
+    isect_points = np.empty((2, 3))
     for i, triangle in enumerate(TRIANGLES):
         intersection_points = []
         for line_segment in TRIANGLE_LINE_SEGMENTS[i]:
@@ -332,9 +334,10 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
         if len(intersection_points) != 2:  # TODO what if 3 points?
             continue
 
-        intersection_points = np.row_stack(intersection_points)
+        isect_points[0] = intersection_points[0]
+        isect_points[1] = intersection_points[1]
         halfplanes[hp_idx, :2], halfplanes[hp_idx, 2:] = make_halfplane(
-            cart2plane, directions, intersection_points, plane_point, triangle)
+            cart2plane, directions, isect_points, plane_point, triangle)
         hp_idx += 1
     return halfplanes[:hp_idx]
 
