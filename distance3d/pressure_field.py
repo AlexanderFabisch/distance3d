@@ -1,6 +1,5 @@
 """Pressure field model for contact wrenches."""
 from collections import deque
-import functools
 import math
 import aabbtree
 import numba
@@ -28,7 +27,7 @@ def contact_forces(
     # exerted by one object on another [..].
     # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 
-    broad_overlapping_indices1, broad_overlapping_indices2 = _check_aabbs_of_tetrahedra(
+    broad_overlapping_indices1, broad_overlapping_indices2 = check_aabbs_of_tetrahedra(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2)
 
     # TODO
@@ -147,7 +146,7 @@ def make_details(
     return details
 
 
-def _check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2):
+def check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2):
     """Initial check of bounding boxes of tetrahedra."""
     aabbs1 = tetrahedral_mesh_aabbs(vertices1_in_mesh2, tetrahedra1)
     aabbs2 = tetrahedral_mesh_aabbs(vertices2_in_mesh2, tetrahedra2)
@@ -163,7 +162,7 @@ def _check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mes
     return broad_overlapping_indices1, broad_overlapping_indices2
 
 
-@numba.njit(cache=True)
+@numba.njit(cache=True)  # TODO can we use this?
 def _check_tetrahedra_intersect_contact_plane(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2,
         contact_point, normal, broad_overlapping_indices1,
@@ -197,6 +196,7 @@ def intersecting_tetrahedra(vertices, tetrahedra, contact_point, normal):
     return candidates
 
 
+@numba.njit(cache=True)
 def barycentric_transform(vertices):  # TODO is there a faster implementation possible?
     """Returns X. X.dot(coords) = (r, 1), where r is a Cartesian vector."""
     # NOTE that in the original paper it is not obvious that we have to take
@@ -204,6 +204,7 @@ def barycentric_transform(vertices):  # TODO is there a faster implementation po
     return np.linalg.pinv(np.vstack((vertices.T, np.ones((1, len(vertices))))))
 
 
+@numba.njit(cache=True)
 def contact_plane(tetrahedron1, tetrahedron2, epsilon1, epsilon2):
     X1 = barycentric_transform(tetrahedron1)
     X2 = barycentric_transform(tetrahedron2)
@@ -217,6 +218,7 @@ def contact_plane(tetrahedron1, tetrahedron2, epsilon1, epsilon2):
     return plane_hnf
 
 
+@numba.njit(cache=True)
 def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact_plane_hnf, epsilon=1e-6):
     plane_distances1 = tetrahedron1.dot(contact_plane_hnf[:3]) - contact_plane_hnf[3]
     plane_distances2 = tetrahedron2.dot(contact_plane_hnf[:3]) - contact_plane_hnf[3]
@@ -228,14 +230,9 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 
 
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
-    #halfplanes = (make_halfplanes(tetrahedron1, cart2plane, plane2cart_offset)
-    #              + make_halfplanes(tetrahedron2, cart2plane, plane2cart_offset))
-    # TODO
-    halfplanes = (make_halfplanes2(tetrahedron1, contact_plane_hnf)
-                  + make_halfplanes2(tetrahedron2, contact_plane_hnf))
-    poly = intersect_halfplanes2(halfplanes)
-    #unique_halfplanes = remove_duplicates(halfplanes)
-    #poly, poly_halfplanes = intersect_halfplanes(unique_halfplanes)
+    halfplanes = (make_halfplanes(tetrahedron1, contact_plane_hnf)
+                  + make_halfplanes(tetrahedron2, contact_plane_hnf))
+    poly = intersect_halfplanes(halfplanes)
 
     if debug:
         import matplotlib.pyplot as plt
@@ -244,10 +241,6 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         colors = "rb"
         for i, halfplane in enumerate(halfplanes):
             halfplane.plot(ax, colors[i // 4], 0.1)
-        #for i, halfplane in enumerate(unique_halfplanes):
-        #    halfplane.plot(ax, "orange", 0.5)
-        #for i, halfplane in enumerate(poly_halfplanes):
-        #    halfplane.plot(ax, "g", 1.0)
         if poly is not None:
             plt.scatter(poly[:, 0], poly[:, 1], s=100)
         plt.show()
@@ -260,53 +253,6 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         plane2cart = np.column_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
         plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
         return np.row_stack([plane2cart.dot(p) + plane_point for p in poly]), triangles
-
-
-def compute_contact_polygon2(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
-    cart2plane, plane2cart, plane2cart_offset = plane_projection(contact_plane_hnf)
-    halfplanes = (make_halfplanes(tetrahedron1, cart2plane, plane2cart_offset)
-                  + make_halfplanes(tetrahedron2, cart2plane, plane2cart_offset))
-    validated_points = intersect_halfplanes2(halfplanes)
-
-    if len(validated_points) == 0:
-        poly = None
-    else:
-        poly = np.row_stack([
-            plane2cart.dot(p) + plane2cart_offset for p in validated_points])
-
-    if debug:
-        import matplotlib.pyplot as plt
-        plt.figure()
-        ax = plt.subplot(111, aspect="equal")
-        colors = "rb"
-        for i, halfplane in enumerate(halfplanes):
-            halfplane.plot(ax, colors[i // 4], 0.1)
-        if poly is not None:
-            plt.scatter(poly[:, 0], poly[:, 1], s=100)
-        plt.show()
-
-    return poly
-
-
-def intersect_halfplanes2(halfplanes):
-    points = []
-    for i in range(len(halfplanes)):
-        for j in range(i, len(halfplanes)):
-            p = halfplanes[i].intersect(halfplanes[j])
-            if all(np.isfinite(p)):
-                points.append(p)
-    validated_points = []
-    for point in points:
-        valid = True
-        for hp in halfplanes:
-            if hp.outside_of(point):
-                valid = False
-                break
-        if valid:
-            validated_points.append(point)
-    if len(validated_points) < 3:
-        return None
-    return np.asarray(validated_points)
 
 
 class HalfPlane:
@@ -333,68 +279,7 @@ class HalfPlane:
         ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=alpha)
 
 
-def cmp_halfplanes(halfplane1, halfplane2):
-    if abs(halfplane1.angle - halfplane2.angle) < EPSILON:
-        return float(np.cross(halfplane1.pq, halfplane2.p - halfplane1.p))
-    return halfplane1.angle - halfplane2.angle
-
-
-def plane_projection(plane_hnf):  # TODO check sign of d
-    """Find a 2x3 projection from Cartesian space onto two dimensions.
-
-    Also find an inverse 3x2 projection that has the following properties:
-
-    1. cart2plane * plane2cart = I
-    2. plane_hnf[:3]' * (plane2cart * x + plane2cart_offset) - plane_hnf[3] = 0
-
-    Source: https://github.com/ekzhang/hydroelastics/blob/d2c1e02aa1dd7e791212bdb930d80dee221bff1a/src/forces.jl#L152
-    (MIT license)
-    """
-    assert abs(1.0 - np.linalg.norm(plane_hnf[:3])) < 10 * EPSILON, repr(np.linalg.norm(plane_hnf[:3]))
-    if abs(plane_hnf[0]) > 1e-3:
-        cart2plane = np.array([[0.0, 1.0, 0.0],
-                               [0.0, 0.0, 1.0]])
-        plane2cart = np.array(
-            [[-plane_hnf[1] / plane_hnf[0], -plane_hnf[2] / plane_hnf[0]],
-             [1.0, 0.0],
-             [0.0, 1.0]])
-        plane2cart_offset = np.array([plane_hnf[3] / plane_hnf[0], 0.0, 0.0])
-    elif abs(plane_hnf[1]) > 1e-3:
-        cart2plane = np.array([[1.0, 0.0, 0.0],
-                               [0.0, 0.0, 1.0]])
-        plane2cart = np.array([
-            [1.0, 0.0],
-            [-plane_hnf[0] / plane_hnf[1], -plane_hnf[2] / plane_hnf[1]],
-            [0.0, 1.0]
-        ])
-        plane2cart_offset = np.array([0.0, plane_hnf[3] / plane_hnf[1], 0.0])
-    else:
-        assert abs(plane_hnf[2]) > 1e-3
-        cart2plane = np.array([[1.0, 0.0, 0.0],
-                               [0.0, 1.0, 0.0]])
-        plane2cart = np.array([
-            [1.0, 0.0],
-            [0.0, 1.0],
-            [-plane_hnf[0] / plane_hnf[2], -plane_hnf[1] / plane_hnf[2]]
-        ])
-        plane2cart_offset = np.array([0.0, 0.0, plane_hnf[3] / plane_hnf[2]])
-    return cart2plane, plane2cart, plane2cart_offset
-
-
-def make_halfplanes(tetrahedron, cart2plane, plane2cart_offset):
-    halfplanes = []
-    X = barycentric_transform(tetrahedron)
-    for i in range(4):
-        halfspace = X[i]
-        normal2d = cart2plane.dot(halfspace[:3])
-        norm = np.linalg.norm(normal2d)
-        if norm > 1e-9:
-            p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
-            halfplanes.append(HalfPlane(p, normal2d))
-    return halfplanes
-
-
-def make_halfplanes2(tetrahedron_points, plane_hnf):
+def make_halfplanes(tetrahedron_points, plane_hnf):
     plane_normal = plane_hnf[:3]
     plane_point = plane_normal * plane_hnf[3]
 
@@ -431,17 +316,41 @@ def make_halfplanes2(tetrahedron_points, plane_hnf):
     return halfplanes
 
 
-def remove_duplicates(halfplanes):
-    compare_key = functools.cmp_to_key(cmp_halfplanes)
-    halfplanes = sorted(halfplanes, key=compare_key)
-    result = []
-    for hp in halfplanes:  # TODO this is not the right way to handle this!
-        if len(result) == 0 or abs(result[-1].angle - hp.angle) > 1e-12:
-            result.append(hp)
-    return result
+def make_halfplanes2(tetrahedron, cart2plane, plane2cart_offset):  # TODO can we fix this?
+    halfplanes = []
+    X = barycentric_transform(tetrahedron)
+    for i in range(4):
+        halfspace = X[i]
+        normal2d = cart2plane.dot(halfspace[:3])
+        norm = np.linalg.norm(normal2d)
+        if norm > 1e-9:
+            p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
+            halfplanes.append(HalfPlane(p, normal2d))
+    return halfplanes
 
 
 def intersect_halfplanes(halfplanes):
+    points = []
+    for i in range(len(halfplanes)):
+        for j in range(i, len(halfplanes)):
+            p = halfplanes[i].intersect(halfplanes[j])
+            if all(np.isfinite(p)):
+                points.append(p)
+    validated_points = []
+    for point in points:
+        valid = True
+        for hp in halfplanes:
+            if hp.outside_of(point):
+                valid = False
+                break
+        if valid:
+            validated_points.append(point)
+    if len(validated_points) < 3:
+        return None
+    return np.asarray(validated_points)
+
+
+def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with parallel lines?
     dq = deque()
     for hp in halfplanes:
         while len(dq) >= 2 and hp.outside_of(dq[-1].intersect(dq[-2])):
@@ -463,6 +372,7 @@ def intersect_halfplanes(halfplanes):
         return polygon, list(dq)
 
 
+@numba.njit(cache=True)
 def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon,
                   triangles):
     normal = contact_plane_hnf[:3]
@@ -472,9 +382,11 @@ def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon,
     total_area = 0.0
 
     X = np.vstack((tetrahedron.T, np.ones((1, 4))))
+    com = np.empty(4, dtype=np.dtype("float"))
+    com[3] = 1.0
     for triangle in triangles:
         vertices = contact_polygon[triangle]
-        com = np.hstack((np.mean(vertices, axis=0), (1,)))
+        com[:3] = (vertices[0] + vertices[1] + vertices[2]) / 3.0
         res = np.linalg.solve(X, com)
         pressure = sum(res * epsilon)
         area = 0.5 * np.linalg.norm(np.cross(vertices[1] - vertices[0],
