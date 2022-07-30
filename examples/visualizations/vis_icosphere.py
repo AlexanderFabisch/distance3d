@@ -65,7 +65,12 @@ if np.linalg.norm(wrench12) > 0:
 contact_polygons = zip(c, details["contact_polygons"])
 #contact_polygons = list(contact_polygons)[isect_idx:isect_idx + 1]
 for color, points in contact_polygons:
-    triangles = np.array([[0, i - 1, i] for i in range(2, len(points))], dtype=int)
+    if len(points) == 3:
+        triangles = np.array([[0, 1, 2], [2, 1, 0]], dtype=int)
+    else:
+        from scipy.spatial import ConvexHull
+        ch = ConvexHull(points, qhull_options="QJ")
+        triangles = np.vstack((ch.simplices, [t[::-1] for t in ch.simplices]))
     contact_surface_mesh = o3d.geometry.TriangleMesh(
         o3d.utility.Vector3dVector(points),
         o3d.utility.Vector3iVector(triangles))
