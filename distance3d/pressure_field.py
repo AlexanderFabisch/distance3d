@@ -332,7 +332,7 @@ def make_halfplanes2(tetrahedron, cart2plane, plane2cart_offset):  # TODO can we
 def intersect_halfplanes(halfplanes):
     points = []
     for i in range(len(halfplanes)):
-        for j in range(i, len(halfplanes)):
+        for j in range(i + 1, len(halfplanes)):
             p = halfplanes[i].intersect(halfplanes[j])
             if all(np.isfinite(p)):
                 points.append(p)
