@@ -5,7 +5,7 @@ import math
 import aabbtree
 import numba
 import numpy as np
-from scipy.spatial import ConvexHull
+from scipy.spatial import Delaunay
 from .distance import line_segment_to_plane
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from .utils import invert_transform, norm_vector, plane_basis_from_normal, EPSILON
@@ -38,6 +38,7 @@ def contact_forces(
     intersection = False
     total_force_vector = np.zeros(3)
     contact_polygons = []
+    contact_polygon_triangles = []
     contact_coms = []
     contact_forces = []
     contact_areas = []
@@ -77,7 +78,7 @@ def contact_forces(
 
         debug = False
         #debug = len(contact_planes) == 3
-        contact_polygon = compute_contact_polygon(
+        contact_polygon, triangles = compute_contact_polygon(
             tetrahedron1, tetrahedron2, contact_plane_hnf, debug=debug)
         if contact_polygon is None:
             continue
@@ -85,12 +86,14 @@ def contact_forces(
 
         #assert np.dot(contact_plane_hnf[:3], mesh22origin[:3, :3].dot(com1) + mesh22origin[:3, 3]) - np.dot(contact_plane_hnf[:3], mesh22origin[:3, :3].dot(com2) + mesh22origin[:3, 3]) >= 0.0  # Otherwise contact_plane_hnf[:3] *= -1
         intersection_com, force_vector, area = contact_force(
-            tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon)
+            tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon,
+            triangles)
 
         total_force_vector += force_vector
         # TODO use intersection com to compute torque
 
         contact_polygons.append(contact_polygon)
+        contact_polygon_triangles.append(triangles)
         contact_coms.append(intersection_com)
         contact_forces.append(force_vector)
         contact_areas.append(area)
@@ -106,8 +109,9 @@ def contact_forces(
         if intersection:
             details = make_details(
                 contact_areas, contact_coms, contact_forces, contact_planes,
-                contact_polygons, intersecting_tetrahedra1,
-                intersecting_tetrahedra2, mesh22origin)
+                contact_polygons, contact_polygon_triangles,
+                intersecting_tetrahedra1, intersecting_tetrahedra2,
+                mesh22origin)
         else:
             details = {}
         return intersection, wrench12, wrench21, details
@@ -117,8 +121,8 @@ def contact_forces(
 
 def make_details(
         contact_areas, contact_coms, contact_forces, contact_planes,
-        contact_polygons, intersecting_tetrahedra1, intersecting_tetrahedra2,
-        mesh22origin):
+        contact_polygons, contact_polygon_triangles, intersecting_tetrahedra1,
+        intersecting_tetrahedra2, mesh22origin):
     contact_polygons = [contact_polygon.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
                         for contact_polygon in contact_polygons]
     contact_coms = np.asarray(contact_coms)
@@ -147,6 +151,7 @@ def make_details(
             + mesh22origin[:3, 3]).reshape(n_intersections, 4, 3)
     details = {
         "contact_polygons": contact_polygons,
+        "contact_polygon_triangles": contact_polygon_triangles,
         "contact_coms": contact_coms,
         "contact_forces": contact_forces,
         "contact_areas": contact_areas,
@@ -265,12 +270,13 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         plt.show()
 
     if poly is None:
-        return poly
+        return None, None
     else:
-        # TODO transform plane back to cartesian correctly!
+        ch = Delaunay(poly)
+        triangles = ch.simplices
         plane2cart = np.column_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
         plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
-        return np.row_stack([plane2cart.dot(p) + plane_point for p in poly])
+        return np.row_stack([plane2cart.dot(p) + plane_point for p in poly]), triangles
 
 
 def compute_contact_polygon2(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
@@ -474,7 +480,8 @@ def intersect_halfplanes(halfplanes):
         return polygon, list(dq)
 
 
-def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
+def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon,
+                  triangles):
     normal = contact_plane_hnf[:3]
 
     total_force = 0.0
@@ -482,11 +489,6 @@ def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
     total_area = 0.0
 
     X = np.vstack((tetrahedron.T, np.ones((1, 4))))
-    if len(contact_polygon) == 3:
-        triangles = np.array([[0, 1, 2]], dtype=int)
-    else:
-        ch = ConvexHull(contact_polygon, qhull_options="QJ")
-        triangles = ch.simplices
     for triangle in triangles:
         vertices = contact_polygon[triangle]
         com = np.hstack((np.mean(vertices, axis=0), (1,)))
