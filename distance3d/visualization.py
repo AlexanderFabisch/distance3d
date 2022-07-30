@@ -5,7 +5,7 @@ import open3d as o3d
 
 
 class Mesh(pv.Artist):
-    """A mesh.
+    """A triangular mesh.
 
     Parameters
     ----------
@@ -57,6 +57,67 @@ class Mesh(pv.Artist):
             List of geometries that can be added to the visualizer.
         """
         return [self.mesh]
+
+
+class TetraMesh(pv.Artist):
+    """A tetrahedral mesh.
+
+    Parameters
+    ----------
+    mesh2origin : array, shape (4, 4)
+        Pose of the mesh.
+
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    tetrahedra : array, shape (n_tetrahedra, 4)
+        Indices of vertices that form tetrahedra of the mesh.
+
+    c : array-like, shape (3,), optional (default: None)
+        Color(s)
+    """
+    def __init__(self, mesh2origin, vertices, tetrahedra, c=None):
+        self.mesh = o3d.geometry.TetraMesh(
+            o3d.utility.Vector3dVector(vertices),
+            o3d.utility.Vector4iVector(tetrahedra))
+        if c is not None:
+            self.mesh.paint_uniform_color(c)
+        self.mesh2origin = None
+        self.set_data(mesh2origin)
+
+    def set_data(self, mesh2origin):
+        """Update data.
+
+        Parameters
+        ----------
+        mesh2origin : array-like, shape (4, 4)
+            Pose of the mesh.
+        """
+        previous_mesh2origin = self.mesh2origin
+        if previous_mesh2origin is None:
+            previous_mesh2origin = np.eye(4)
+        self.mesh2origin = mesh2origin
+
+        self.mesh.transform(np.linalg.inv(previous_mesh2origin))
+        self.mesh.transform(self.mesh2origin)
+
+    @property
+    def geometries(self):
+        """Expose geometries.
+
+        Returns
+        -------
+        geometries : list
+            List of geometries that can be added to the visualizer.
+        """
+        return [self.mesh]
+
+
+class Tetrahedron(Mesh):
+    def __init__(self, tetrahedron_points):
+        mesh2origin = np.eye(4)
+        triangles = np.array([[0, 1, 2], [1, 3, 2], [3, 0, 2], [0, 3, 1]], dtype=int)
+        super(Tetrahedron, self).__init__(mesh2origin, tetrahedron_points, triangles)
 
 
 class Ellipse(pv.Artist):
