@@ -7,16 +7,14 @@ print(__doc__)
 
 import numpy as np
 import open3d as o3d
-from scipy.spatial import ConvexHull
 import pytransform3d.visualizer as pv
-from distance3d import mesh, visualization, pressure_field, benchmark, io
+from distance3d import mesh, visualization, pressure_field, benchmark
 
 
 mesh12origin = np.eye(4)
 mesh22origin = np.eye(4)
 vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(0.13 * np.ones(3), 0.15, 2)
 vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(0.25 * np.ones(3), 0.15, 2)
-#vertices2_in_mesh2, tetrahedra2 = io.load_tetrahedral_mesh("test/data/insole.vtk")
 
 # The pressure function assigns to each point in the interior of the object
 # a nonnegative real number representing the pressure at that point, which
@@ -58,10 +56,8 @@ max_pressure = max(pressures)
 c = [(pressure / max_pressure, 0, 0) for pressure in pressures]
 #fig.scatter(details["contact_coms"], s=0.003, c=c)
 
-if np.linalg.norm(wrench21) > 0:
-    fig.plot_vector(details["contact_point"], 100 * wrench21[:3], (1, 0, 0))
-if np.linalg.norm(wrench12) > 0:
-    fig.plot_vector(details["contact_point"], 100 * wrench12[:3], (0, 1, 0))
+fig.plot_vector(details["contact_point"], 100 * wrench21[:3], (1, 0, 0))
+fig.plot_vector(details["contact_point"], 100 * wrench12[:3], (0, 1, 0))
 
 contact_polygons = zip(c, details["contact_polygons"], details["contact_polygon_triangles"])
 for color, points, triangles in contact_polygons:
