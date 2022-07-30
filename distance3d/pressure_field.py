@@ -71,7 +71,7 @@ def contact_forces(
 
         timer.start("compute_contact_polygon")
         contact_polygon, triangles = compute_contact_polygon(
-            tetrahedron1, tetrahedron2, contact_plane_hnf)
+            tetrahedron1, tetrahedron2, contact_plane_hnf, timer=timer)
         timer.stop_and_add_to_total("compute_contact_polygon")
         if contact_polygon is None:
             continue
@@ -243,11 +243,18 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
         and max(plane_distances2) > epsilon)
 
 
-def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False):
+def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False, timer=None):
     cart2plane = np.row_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
+    if timer is not None:
+        timer.start("make_halfplanes")
     halfplanes = (make_halfplanes(tetrahedron1, contact_plane_hnf, cart2plane)
                   + make_halfplanes(tetrahedron2, contact_plane_hnf, cart2plane))
+    if timer is not None:
+        timer.stop_and_add_to_total("make_halfplanes")
+        timer.start("intersect_halfplanes")
     poly = intersect_halfplanes(halfplanes)
+    if timer is not None:
+        timer.stop_and_add_to_total("intersect_halfplanes")
 
     if debug:
         import matplotlib.pyplot as plt
