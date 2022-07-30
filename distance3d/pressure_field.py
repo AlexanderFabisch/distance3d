@@ -383,22 +383,19 @@ def intersect_halfplanes(halfplanes):
     for i in range(len(halfplanes)):
         for j in range(i + 1, len(halfplanes)):
             try:
-                points.append(halfplanes[i].intersect(halfplanes[j].p,
-                                                      halfplanes[j].pq))
+                p = halfplanes[i].intersect(halfplanes[j].p, halfplanes[j].pq)
             except ValueError:
-                pass  # parallel halfplanes
-    validated_points = []
-    for point in points:
-        valid = True
-        for hp in halfplanes:
-            if hp.outside_of(point):
-                valid = False
-                break
-        if valid:
-            validated_points.append(point)
-    if len(validated_points) < 3:
+                continue  # parallel halfplanes
+            valid = True
+            for hp in halfplanes:
+                if hp.outside_of(p):
+                    valid = False
+                    break
+            if valid:
+                points.append(p)
+    if len(points) < 3:
         return None
-    return np.asarray(validated_points)
+    return np.asarray(points)
 
 
 def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with parallel lines?
