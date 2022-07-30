@@ -280,9 +280,7 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         else:
             ch = Delaunay(poly)
             triangles = ch.simplices
-        plane2cart = cart2plane.T
-        plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
-        poly3d = poly.dot(plane2cart.T) + plane_point
+        poly3d = cartesian_intersection_polygon(poly, cart2plane, contact_plane_hnf)
         return poly3d, triangles
 
 
@@ -437,6 +435,14 @@ def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with p
         polygon = np.row_stack([dq[i].intersect(dq[(i + 1) % len(dq)])
                                 for i in range(len(dq))])
         return polygon, list(dq)
+
+
+@numba.njit(cache=True)
+def cartesian_intersection_polygon(poly, cart2plane, contact_plane_hnf):
+    plane2cart = cart2plane.T
+    plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
+    poly3d = poly.dot(plane2cart.T) + plane_point
+    return poly3d
 
 
 @numba.njit(cache=True)
