@@ -3,9 +3,9 @@ from collections import deque
 import math
 import aabbtree
 import numba
+from numba.np.extensions import cross2d
 import numpy as np
 from scipy.spatial import Delaunay
-from .distance import line_segment_to_plane
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from .utils import invert_transform, norm_vector, plane_basis_from_normal, EPSILON
 from .benchmark import Timer
@@ -258,7 +258,7 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         ax = plt.subplot(111, aspect="equal")
         colors = "rb"
         for i, halfplane in enumerate(halfplanes):
-            halfplane.plot(ax, colors[i // 4], 0.1)
+            plot_halfplane(halfplane, ax, colors[i // 4], 0.1)
         if poly is not None:
             plt.scatter(poly[:, 0], poly[:, 1], s=100)
         plt.show()
@@ -273,6 +273,12 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         return np.row_stack([plane2cart.dot(p) + plane_point for p in poly]), triangles
 
 
+@numba.experimental.jitclass(
+    [("p", numba.float64[:]),
+     ("pq", numba.float64[:]),
+     ("normal2d", numba.float64[:]),
+     ("angle", numba.float64)]
+)
 class HalfPlane:
     def __init__(self, p, pq, normal2d):
         self.p = p
@@ -281,20 +287,21 @@ class HalfPlane:
         self.angle = math.atan2(self.pq[1], self.pq[0])
 
     def outside_of(self, point):
-        return float(np.cross(self.pq, point - self.p)) < -EPSILON
+        return cross2d(self.pq, point - self.p) < -EPSILON
 
-    def intersect(self, halfplane):
-        denom = np.cross(self.pq, halfplane.pq)
-        if abs(denom) < EPSILON:
-            return np.array([np.inf, np.inf])
-        alpha = np.cross((halfplane.p - self.p), halfplane.pq) / denom
+    def intersect(self, p2, pq2):
+        denom = cross2d(self.pq, pq2)
+        if np.abs(denom) < EPSILON:
+            return np.array([np.inf, np.inf], dtype=np.dtype("float"))
+        alpha = cross2d((p2 - self.p), pq2) / denom
         return self.p + self.pq * alpha
 
-    def plot(self, ax, c, alpha):
-        line = self.p + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(self.pq)
-        ax.plot(line[:, 0], line[:, 1], lw=3, c=c, alpha=alpha)
-        normal = self.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(self.normal2d)
-        ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=alpha)
+
+def plot_halfplane(self, ax, c, alpha):
+    line = self.p + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(self.pq)
+    ax.plot(line[:, 0], line[:, 1], lw=3, c=c, alpha=alpha)
+    normal = self.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(self.normal2d)
+    ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=alpha)
 
 
 TRIANGLES = np.array([[2, 1, 0], [2, 3, 1], [2, 0, 3], [1, 3, 0]], dtype=int)
@@ -375,7 +382,8 @@ def intersect_halfplanes(halfplanes):
     points = []
     for i in range(len(halfplanes)):
         for j in range(i + 1, len(halfplanes)):
-            p = halfplanes[i].intersect(halfplanes[j])
+            p = halfplanes[i].intersect(
+                halfplanes[j].p, halfplanes[j].pq)
             if all(np.isfinite(p)):
                 points.append(p)
     validated_points = []
