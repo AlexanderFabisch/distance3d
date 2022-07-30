@@ -283,16 +283,11 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         return poly3d, triangles
 
 
-@numba.experimental.jitclass(
-    [("p", numba.float64[:]),
-     ("pq", numba.float64[:]),
-     ("normal2d", numba.float64[:])]
-)
+@numba.experimental.jitclass([("p", numba.float64[:]), ("pq", numba.float64[:])])
 class HalfPlane:
-    def __init__(self, p, pq, normal2d):
+    def __init__(self, p, pq):
         self.p = p
         self.pq = pq
-        self.normal2d = normal2d
 
 
 @numba.njit(cache=True)
@@ -312,7 +307,8 @@ def intersect_two_halfplanes(p1, pq1, p2, pq2):
 def plot_halfplane(self, ax, c, alpha):
     line = self.p + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(self.pq)
     ax.plot(line[:, 0], line[:, 1], lw=3, c=c, alpha=alpha)
-    normal = self.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(self.normal2d)
+    normal2d = np.array([-self.pq[1], self.pq[0]])
+    normal = self.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(normal2d)
     ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=alpha)
 
 
@@ -342,9 +338,9 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
             continue
 
         intersection_points = np.row_stack(intersection_points)
-        p, pq, normal2d = make_halfplane(
+        p, pq = make_halfplane(
             cart2plane, directions, intersection_points, plane_point, triangle)
-        halfplanes.append(HalfPlane(p, pq, normal2d))
+        halfplanes.append(HalfPlane(p, pq))
     return halfplanes
 
 
@@ -380,7 +376,7 @@ def make_halfplane(
     if cross2d(pq, normal2d) < 0:
         p = q
         pq *= -1.0
-    return p, pq, normal2d
+    return p, pq
 
 
 def make_halfplanes2(tetrahedron, cart2plane, plane2cart_offset):  # TODO can we fix this?
