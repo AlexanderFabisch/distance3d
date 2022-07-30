@@ -6,7 +6,7 @@ import numba
 from numba.np.extensions import cross2d
 import numpy as np
 from pytransform3d.transformations import adjoint_from_transform
-from scipy.spatial import Delaunay
+from scipy import spatial
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from .utils import invert_transform, norm_vector, plane_basis_from_normal, EPSILON
 from .benchmark import Timer
@@ -278,8 +278,7 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         if len(poly) == 3:
             triangles = np.array([[0, 1, 2]], dtype=np.dtype("int32"))
         else:
-            ch = Delaunay(poly)
-            triangles = ch.simplices
+            triangles = spatial.Delaunay(poly).simplices
         poly3d = cartesian_intersection_polygon(poly, cart2plane, contact_plane_hnf)
         return poly3d, triangles
 
@@ -412,7 +411,8 @@ def intersect_halfplanes(halfplanes):
                 points.append(p)
     if len(points) < 3:
         return None
-    return np.asarray(points)
+    # this approach sometimes results in duplicate points, remove them
+    return np.unique(points, axis=0)
 
 
 def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with parallel lines?
