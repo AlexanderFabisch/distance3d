@@ -286,15 +286,13 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
 @numba.experimental.jitclass(
     [("p", numba.float64[:]),
      ("pq", numba.float64[:]),
-     ("normal2d", numba.float64[:]),
-     ("angle", numba.float64)]
+     ("normal2d", numba.float64[:])]
 )
 class HalfPlane:
     def __init__(self, p, pq, normal2d):
         self.p = p
         self.pq = pq
         self.normal2d = normal2d
-        self.angle = math.atan2(self.pq[1], self.pq[0])
 
 
 @numba.njit(cache=True)
