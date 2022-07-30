@@ -400,8 +400,8 @@ def intersect_halfplanes(halfplanes):
             except ValueError:
                 continue  # parallel halfplanes
             valid = True
-            for hp in halfplanes:
-                if hp.outside_of(p):
+            for k in range(len(halfplanes)):
+                if k != i and k != j and halfplanes[k].outside_of(p):
                     valid = False
                     break
             if valid:
