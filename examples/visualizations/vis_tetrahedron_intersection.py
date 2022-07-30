@@ -26,7 +26,7 @@ contact_polygon, triangles = pressure_field.compute_contact_polygon(
     tetrahedron1, tetrahedron2, contact_plane_hnf)
 assert contact_polygon is not None
 
-intersection_com, force_vector, _ = pressure_field.contact_force(
+intersection_com, force_vector, _ = pressure_field.compute_contact_force(
     tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon, triangles)
 
 fig = pv.figure()

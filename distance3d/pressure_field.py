@@ -1,6 +1,5 @@
 """Pressure field model for contact wrenches."""
 from collections import deque
-import math
 import aabbtree
 import numba
 from numba.np.extensions import cross2d
@@ -25,7 +24,7 @@ def contact_forces(
     mesh12mesh2 = np.dot(origin2mesh2, mesh12origin)
     vertices1_in_mesh2 = np.dot(
         vertices1_in_mesh1, mesh12mesh2[:3, :3].T) + mesh12mesh2[np.newaxis, :3, 3]
-    print(f"transformation: {timer.stop('transformation')}")
+    timer.stop_and_add_to_total("transformation")
 
     # When two objects with pressure functions p1(*), p2(*) intersect, there is
     # a surface S inside the space of intersection at which the values of p1 and
@@ -36,7 +35,7 @@ def contact_forces(
     timer.start("broad phase")
     broad_overlapping_indices1, broad_overlapping_indices2 = check_aabbs_of_tetrahedra(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2)
-    print(f"broad phase: {timer.stop('broad phase')}")
+    timer.stop_and_add_to_total("broad phase")
 
     com1 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices1_in_mesh2, tetrahedra1)
     com2 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices2_in_mesh2, tetrahedra2)
@@ -248,7 +247,7 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
         and max(plane_distances2) > epsilon)
 
 
-def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug=False, timer=None):
+def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, timer=None):
     cart2plane = np.row_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
     if timer is not None:
         timer.start("make_halfplanes")
@@ -265,16 +264,17 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
     if timer is not None:
         timer.stop_and_add_to_total("intersect_halfplanes")
 
-    if debug:
-        import matplotlib.pyplot as plt
-        plt.figure()
-        ax = plt.subplot(111, aspect="equal")
-        colors = "rb"
-        for i, halfplane in enumerate(halfplanes):
-            plot_halfplane(halfplane, ax, colors[i // 4], 0.1)
-        if poly is not None:
-            plt.scatter(poly[:, 0], poly[:, 1], s=100)
-        plt.show()
+    """
+    import matplotlib.pyplot as plt
+    plt.figure()
+    ax = plt.subplot(111, aspect="equal")
+    colors = "rb"
+    for i, halfplane in enumerate(halfplanes):
+        plot_halfplane(halfplane, ax, colors[i // 4], 0.1)
+    if poly is not None:
+        plt.scatter(poly[:, 0], poly[:, 1], s=100)
+    plt.show()
+    """
 
     if poly is None:
         return None, None
