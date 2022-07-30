@@ -45,8 +45,6 @@ def contact_forces(
     intersecting_tetrahedra1 = []
     intersecting_tetrahedra2 = []
     previous_i = -1
-    #for i in range(len(tetrahedra1)):
-    #    for j in range(len(tetrahedra2)):
     for i, j in zip(broad_overlapping_indices1, broad_overlapping_indices2):
         if i != previous_i:
             tetrahedron1 = vertices1_in_mesh2[tetrahedra1[i]]
@@ -67,7 +65,7 @@ def contact_forces(
             continue
         intersection = True
 
-        intersection_com, force_vector, area = contact_force(
+        intersection_com, force_vector, area = compute_contact_force(
             tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon,
             triangles)
 
@@ -373,8 +371,8 @@ def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with p
 
 
 @numba.njit(cache=True)
-def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon,
-                  triangles):
+def compute_contact_force(
+        tetrahedron, epsilon, contact_plane_hnf, contact_polygon, triangles):
     normal = contact_plane_hnf[:3]
 
     total_force = 0.0

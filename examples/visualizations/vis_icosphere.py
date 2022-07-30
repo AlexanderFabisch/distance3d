@@ -44,22 +44,20 @@ visualization.TetraMesh(mesh12origin, vertices1, tetrahedra1).add_artist(fig)
 visualization.TetraMesh(mesh22origin, vertices2, tetrahedra2).add_artist(fig)
 
 isect_idx = 3
-#fig.plot_plane(normal=details["plane_normals"][isect_idx], point_in_plane=details["plane_points"][isect_idx])
+fig.plot_plane(normal=details["plane_normals"][isect_idx], point_in_plane=details["contact_coms"][isect_idx], s=0.05)
 fig.scatter(details["contact_polygons"][isect_idx], s=0.001, c=(1, 0, 1))
 fig.scatter(details["intersecting_tetrahedra1"][isect_idx], s=0.001, c=(1, 0, 0))
 fig.scatter(details["intersecting_tetrahedra2"][isect_idx], s=0.001, c=(0, 0, 1))
-#visualization.Tetrahedron(details["intersecting_tetrahedra1"][isect_idx]).add_artist(fig)
-#visualization.Tetrahedron(details["intersecting_tetrahedra2"][isect_idx]).add_artist(fig)
-
-pressures = np.linalg.norm(details["contact_forces"], axis=1) / np.asarray(details["contact_areas"])
-max_pressure = max(pressures)
-c = [(pressure / max_pressure, 0, 0) for pressure in pressures]
-#fig.scatter(details["contact_coms"], s=0.003, c=c)
+visualization.Tetrahedron(details["intersecting_tetrahedra1"][isect_idx]).add_artist(fig)
+visualization.Tetrahedron(details["intersecting_tetrahedra2"][isect_idx]).add_artist(fig)
 
 fig.plot_vector(details["contact_point"], 100 * wrench21[:3], (1, 0, 0))
 fig.plot_vector(details["contact_point"], 100 * wrench12[:3], (0, 1, 0))
 
-contact_polygons = zip(c, details["contact_polygons"], details["contact_polygon_triangles"])
+pressures = np.linalg.norm(details["contact_forces"], axis=1) / np.asarray(details["contact_areas"])
+max_pressure = max(pressures)
+colors = [(pressure / max_pressure, 0, 0) for pressure in pressures]
+contact_polygons = zip(colors, details["contact_polygons"], details["contact_polygon_triangles"])
 for color, points, triangles in contact_polygons:
     triangles = np.vstack((triangles, triangles[:, ::-1]))
     contact_surface_mesh = o3d.geometry.TriangleMesh(
