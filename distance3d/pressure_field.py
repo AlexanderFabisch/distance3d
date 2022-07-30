@@ -31,7 +31,7 @@ def contact_forces(
     # exerted by one object on another [..].
     # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 
-    timer.start("broad phase")
+    timer.start("broad phase")  # TODO speed up broad phase
     broad_overlapping_indices1, broad_overlapping_indices2 = check_aabbs_of_tetrahedra(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2, timer=timer)
     timer.stop_and_add_to_total("broad phase")
@@ -57,14 +57,15 @@ def contact_forces(
         if i != previous_i:
             tetrahedron1 = vertices1_in_mesh2[tetrahedra1[i]]
             epsilon1 = potentials1[tetrahedra1[i]]
+            X1 = barycentric_transform(tetrahedron1)
         previous_i = i
 
         tetrahedron2 = vertices2_in_mesh2[tetrahedra2[j]]
         epsilon2 = potentials2[tetrahedra2[j]]
+        X2 = barycentric_transform(tetrahedron2)  # TODO avoid recomputation
 
         timer.start("contact_plane")
-        contact_plane_hnf = contact_plane(
-            tetrahedron1, tetrahedron2, epsilon1, epsilon2)
+        contact_plane_hnf = contact_plane(X1, X2, epsilon1, epsilon2)
         timer.stop_and_add_to_total("contact_plane")
         if not check_tetrahedra_intersect_contact_plane(
                 tetrahedron1, tetrahedron2, contact_plane_hnf):
@@ -237,9 +238,7 @@ def barycentric_transform(vertices):  # TODO is there a faster implementation po
 
 
 @numba.njit(cache=True)
-def contact_plane(tetrahedron1, tetrahedron2, epsilon1, epsilon2):
-    X1 = barycentric_transform(tetrahedron1)
-    X2 = barycentric_transform(tetrahedron2)
+def contact_plane(X1, X2, epsilon1, epsilon2):
     plane_hnf = epsilon1.dot(X1) - epsilon2.dot(X2)  # TODO Young's modulus, see Eq. 16 of paper
     plane_hnf /= np.linalg.norm(plane_hnf[:3])
     # NOTE in order to obtain proper Hesse normal form of the contact plane
