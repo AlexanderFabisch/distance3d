@@ -2,7 +2,6 @@
 from collections import deque
 import aabbtree
 import numba
-from numba.np.extensions import cross2d
 import numpy as np
 from pytransform3d.transformations import adjoint_from_transform
 from scipy import spatial
@@ -300,6 +299,13 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, timer
         triangles = spatial.Delaunay(poly).simplices
     poly3d = cartesian_intersection_polygon(poly, cart2plane, contact_plane_hnf)
     return poly3d, triangles
+
+
+# replaces from numba.np.extensions import cross2d, which seems to have a bug
+# when called with NUMBA_DISABLE_JIT=1
+@numba.njit(cache=True)
+def cross2d(a, b):
+    return a[0] * b[1] - a[1] * b[0]
 
 
 @numba.njit(cache=True)
