@@ -252,8 +252,9 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
     cart2plane = np.row_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
     if timer is not None:
         timer.start("make_halfplanes")
-    halfplanes = (make_halfplanes(tetrahedron1, contact_plane_hnf, cart2plane)
-                  + make_halfplanes(tetrahedron2, contact_plane_hnf, cart2plane))
+    halfplanes = np.vstack((
+        make_halfplanes(tetrahedron1, contact_plane_hnf, cart2plane),
+        make_halfplanes(tetrahedron2, contact_plane_hnf, cart2plane)))
     if timer is not None:
         timer.stop_and_add_to_total("make_halfplanes")
         timer.start("intersect_halfplanes")
@@ -283,13 +284,6 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         return poly3d, triangles
 
 
-@numba.experimental.jitclass([("p", numba.float64[:]), ("pq", numba.float64[:])])
-class HalfPlane:
-    def __init__(self, p, pq):
-        self.p = p
-        self.pq = pq
-
-
 @numba.njit(cache=True)
 def point_outside_of_halfplane(p, pq, point):
     return cross2d(pq, point - p) < -EPSILON
@@ -304,11 +298,11 @@ def intersect_two_halfplanes(p1, pq1, p2, pq2):
     return p1 + pq1 * alpha
 
 
-def plot_halfplane(self, ax, c, alpha):
-    line = self.p + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(self.pq)
+def plot_halfplane(ppq, ax, c, alpha):
+    line = ppq[:2] + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(ppq[2:])
     ax.plot(line[:, 0], line[:, 1], lw=3, c=c, alpha=alpha)
-    normal2d = np.array([-self.pq[1], self.pq[0]])
-    normal = self.p + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(normal2d)
+    normal2d = np.array([-ppq[3], ppq[2]])
+    normal = ppq[:2] + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(normal2d)
     ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=alpha)
 
 
@@ -325,7 +319,8 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
     P, d_signs, directions = _precompute_edge_intersections(
         d, plane_normal, tetrahedron_points)
 
-    halfplanes = []
+    halfplanes = np.empty((4, 4))
+    hp_idx = 0
     for i, triangle in enumerate(TRIANGLES):
         intersection_points = []
         for line_segment in TRIANGLE_LINE_SEGMENTS[i]:
@@ -338,10 +333,10 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
             continue
 
         intersection_points = np.row_stack(intersection_points)
-        p, pq = make_halfplane(
+        halfplanes[hp_idx, :2], halfplanes[hp_idx, 2:] = make_halfplane(
             cart2plane, directions, intersection_points, plane_point, triangle)
-        halfplanes.append(HalfPlane(p, pq))
-    return halfplanes
+        hp_idx += 1
+    return halfplanes[:hp_idx]
 
 
 @numba.njit(cache=True)
@@ -398,14 +393,14 @@ def intersect_halfplanes(halfplanes):
         for j in range(i + 1, len(halfplanes)):
             try:
                 p = intersect_two_halfplanes(
-                    halfplanes[i].p, halfplanes[i].pq,
-                    halfplanes[j].p, halfplanes[j].pq)
+                    halfplanes[i, :2], halfplanes[i, 2:],
+                    halfplanes[j, :2], halfplanes[j, 2:])
             except ValueError:
                 continue  # parallel halfplanes
             valid = True
             for k in range(len(halfplanes)):
                 if k != i and k != j and point_outside_of_halfplane(
-                        halfplanes[k].p, halfplanes[k].pq, p):
+                        halfplanes[k, :2], halfplanes[k, 2:], p):
                     valid = False
                     break
             if valid:
