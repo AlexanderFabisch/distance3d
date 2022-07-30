@@ -274,9 +274,9 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
 
 
 class HalfPlane:
-    def __init__(self, p, normal2d):
+    def __init__(self, p, pq, normal2d):
         self.p = p
-        self.pq = norm_vector(np.array([normal2d[1], -normal2d[0]]))
+        self.pq = pq
         self.normal2d = normal2d
         self.angle = math.atan2(self.pq[1], self.pq[0])
 
@@ -335,7 +335,8 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
         pq = q - p
         if np.cross(pq, normal2d) < 0:
             p = q
-        halfplanes.append(HalfPlane(p, normal2d))
+            pq *= -1.0
+        halfplanes.append(HalfPlane(p, pq, normal2d))
     return halfplanes
 
 
