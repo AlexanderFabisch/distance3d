@@ -22,19 +22,19 @@ contact_plane_hnf = pressure_field.contact_plane(
     tetrahedron1, tetrahedron2, epsilon1, epsilon2)
 assert pressure_field.check_tetrahedra_intersect_contact_plane(
     tetrahedron1, tetrahedron2, contact_plane_hnf)
-contact_polygon = pressure_field.compute_contact_polygon(
+contact_polygon, triangles = pressure_field.compute_contact_polygon(
     tetrahedron1, tetrahedron2, contact_plane_hnf)
 assert contact_polygon is not None
 
 intersection_com, force_vector, _ = pressure_field.contact_force(
-    tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon)
+    tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon, triangles)
 
 fig = pv.figure()
 fig.scatter(tetrahedron1, s=0.01, c=(1, 0, 0))
 fig.scatter(tetrahedron2, s=0.01, c=(0, 0, 1))
 fig.plot_transform(np.eye(4), s=0.05)
 fig.plot_plane(normal=contact_plane_hnf[:3], d=contact_plane_hnf[3])
-fig.scatter(contact_polygon, s=0.01, c=(1, 0, 1))
+fig.scatter(contact_polygon, s=0.03, c=(1, 0, 1))
 fig.plot_vector(intersection_com, 100.0 * force_vector, c=(1, 0, 0))
 visualization.Tetrahedron(tetrahedron1).add_artist(fig)
 visualization.Tetrahedron(tetrahedron2).add_artist(fig)

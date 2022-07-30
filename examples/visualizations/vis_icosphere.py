@@ -63,14 +63,9 @@ if np.linalg.norm(wrench21) > 0:
 if np.linalg.norm(wrench12) > 0:
     fig.plot_vector(details["contact_point"], 100 * wrench12[:3], (0, 1, 0))
 
-contact_polygons = zip(c, details["contact_polygons"])
-#contact_polygons = list(contact_polygons)[isect_idx:isect_idx + 1]
-for color, points in contact_polygons:
-    if len(points) == 3:
-        triangles = np.array([[0, 1, 2], [2, 1, 0]], dtype=int)
-    else:
-        ch = ConvexHull(points, qhull_options="QJ")
-        triangles = np.vstack((ch.simplices, [t[::-1] for t in ch.simplices]))
+contact_polygons = zip(c, details["contact_polygons"], details["contact_polygon_triangles"])
+for color, points, triangles in contact_polygons:
+    triangles = np.vstack((triangles, triangles[:, ::-1]))
     contact_surface_mesh = o3d.geometry.TriangleMesh(
         o3d.utility.Vector3dVector(points),
         o3d.utility.Vector3iVector(triangles))
