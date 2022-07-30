@@ -5,13 +5,10 @@ import math
 import aabbtree
 import numba
 import numpy as np
-from .colliders import ConvexHullVertices
-from .mpr import mpr_penetration
-from .gjk import gjk_intersection
+from scipy.spatial import ConvexHull
 from .distance import line_segment_to_plane
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
-from .geometry import barycentric_coordinates_tetrahedron
-from .utils import transform_point, invert_transform, norm_vector, plane_basis_from_normal, EPSILON
+from .utils import invert_transform, norm_vector, plane_basis_from_normal, EPSILON
 
 
 def contact_forces(
@@ -485,12 +482,18 @@ def contact_force(tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
     total_area = 0.0
 
     X = np.vstack((tetrahedron.T, np.ones((1, 4))))
-    for i in range(2, len(contact_polygon)):
-        vertices = contact_polygon[np.array([0, i - 1, i], dtype=int)]  # TODO check
+    if len(contact_polygon) == 3:
+        triangles = np.array([[0, 1, 2]], dtype=int)
+    else:
+        ch = ConvexHull(contact_polygon, qhull_options="QJ")
+        triangles = ch.simplices
+    for triangle in triangles:
+        vertices = contact_polygon[triangle]
         com = np.hstack((np.mean(vertices, axis=0), (1,)))
         res = np.linalg.solve(X, com)
         pressure = sum(res * epsilon)
-        area = 0.5 * np.linalg.norm(np.cross(vertices[1] - vertices[0], vertices[2] - vertices[0]))
+        area = 0.5 * np.linalg.norm(np.cross(vertices[1] - vertices[0],
+                                             vertices[2] - vertices[0]))
         total_force += pressure * area
         total_area += area
         intersection_com += area * com[:3]

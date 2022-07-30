@@ -7,6 +7,7 @@ print(__doc__)
 
 import numpy as np
 import open3d as o3d
+from scipy.spatial import ConvexHull
 import pytransform3d.visualizer as pv
 from distance3d import mesh, visualization, pressure_field, benchmark, io
 
@@ -68,7 +69,6 @@ for color, points in contact_polygons:
     if len(points) == 3:
         triangles = np.array([[0, 1, 2], [2, 1, 0]], dtype=int)
     else:
-        from scipy.spatial import ConvexHull
         ch = ConvexHull(points, qhull_options="QJ")
         triangles = np.vstack((ch.simplices, [t[::-1] for t in ch.simplices]))
     contact_surface_mesh = o3d.geometry.TriangleMesh(
