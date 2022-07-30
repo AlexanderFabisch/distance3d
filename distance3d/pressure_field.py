@@ -199,7 +199,7 @@ def barycentric_transform(vertices):  # TODO is there a faster implementation po
     """Returns X. X.dot(coords) = (r, 1), where r is a Cartesian vector."""
     # NOTE that in the original paper it is not obvious that we have to take
     # the inverse
-    return np.linalg.pinv(np.vstack((vertices.T, np.ones((1, len(vertices))))))
+    return np.linalg.pinv(np.vstack((vertices.T, np.ones((1, 4)))))
 
 
 @numba.njit(cache=True)
