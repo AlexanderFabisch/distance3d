@@ -339,15 +339,21 @@ def make_halfplanes(tetrahedron_points, plane_hnf):
     return halfplanes
 
 
+@numba.njit(cache=True)
 def _precompute_edge_intersections(d, plane_normal, tetrahedron_points):
-    directions = np.array([[s - e for s in tetrahedron_points] for e in tetrahedron_points])
+    directions = np.empty((4, 4, 3), np.dtype("float"))
+    for i in range(4):
+        for j in range(4):
+            directions[i, j] = tetrahedron_points[j] - tetrahedron_points[i]
     unnormalized_distances = d - np.dot(tetrahedron_points, plane_normal)
     d_signs = np.sign(unnormalized_distances)
     normal_directions = np.dot(directions.reshape(-1, 3), plane_normal).reshape(4, 4)
-    T = np.array([[unnormalized_distances[i] / normal_directions[i, j]
-                   for j in range(4)] for i in range(4)])
-    P = np.array([[tetrahedron_points[i] + T[i, j] * directions[i, j]
-                   for j in range(4)] for i in range(4)])
+    P = np.empty((4, 4, 3), np.dtype("float"))
+    for i in range(4):
+        for j in range(4):
+            if normal_directions[i, j] != 0.0:
+                t = unnormalized_distances[i] / normal_directions[i, j]
+                P[i, j] = tetrahedron_points[i] + t * directions[i, j]
     return P, d_signs, directions
 
 
