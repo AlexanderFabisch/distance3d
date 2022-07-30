@@ -312,16 +312,16 @@ def make_halfplanes(tetrahedron_points, plane_hnf):
     cart2plane = np.row_stack(plane_basis_from_normal(plane_normal))
 
     halfplanes = []
-    print("==")
     for i, triangle in enumerate(TRIANGLES):
         normal = np.cross(directions[triangle[1], triangle[0]],
                           directions[triangle[2], triangle[0]])
 
         intersection_points = []
         for line_segment in TRIANGLE_LINE_SEGMENTS[i]:
-            #print(line_segment)
-            if d_signs[line_segment[0]] != d_signs[line_segment[1]]:
-                intersection_points.append(P[line_segment[0], line_segment[1]])
+            i = min(line_segment)
+            j = max(line_segment)
+            if d_signs[i] != d_signs[j]:
+                intersection_points.append(P[i, j])
 
         if len(intersection_points) != 2:  # TODO what if 3 points?
             continue
@@ -350,7 +350,7 @@ def _precompute_edge_intersections(d, plane_normal, tetrahedron_points):
     normal_directions = np.dot(directions.reshape(-1, 3), plane_normal).reshape(4, 4)
     P = np.empty((4, 4, 3), np.dtype("float"))
     for i in range(4):
-        for j in range(4):
+        for j in range(i + 1, 4):  # only fill upper triangle
             if normal_directions[i, j] != 0.0:
                 t = unnormalized_distances[i] / normal_directions[i, j]
                 P[i, j] = tetrahedron_points[i] + t * directions[i, j]
