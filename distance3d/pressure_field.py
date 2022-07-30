@@ -5,6 +5,7 @@ import aabbtree
 import numba
 from numba.np.extensions import cross2d
 import numpy as np
+from pytransform3d.transformations import adjoint_from_transform
 from scipy.spatial import Delaunay
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from .utils import invert_transform, norm_vector, plane_basis_from_normal, EPSILON
@@ -37,12 +38,13 @@ def contact_forces(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2)
     print(f"broad phase: {timer.stop('broad phase')}")
 
-    # TODO
-    #com1 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices1_in_mesh2, tetrahedra1)
-    #com2 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices2_in_mesh2, tetrahedra2)
+    com1 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices1_in_mesh2, tetrahedra1)
+    com2 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices2_in_mesh2, tetrahedra2)
 
     intersection = False
-    total_force_vector = np.zeros(3)
+    total_force_21 = np.zeros(3)
+    total_torque_12 = np.zeros(3)
+    total_torque_21 = np.zeros(3)
     contact_polygons = []
     contact_polygon_triangles = []
     contact_coms = []
@@ -83,8 +85,9 @@ def contact_forces(
             triangles)
         timer.stop_and_add_to_total("compute_contact_force")
 
-        total_force_vector += force_vector
-        # TODO use intersection com to compute torque
+        total_force_21 += force_vector
+        total_torque_21 += np.cross(intersection_com - com1, force_vector)
+        total_torque_12 += np.cross(intersection_com - com2, -force_vector)
 
         contact_polygons.append(contact_polygon)
         contact_polygon_triangles.append(triangles)
@@ -97,9 +100,11 @@ def contact_forces(
 
     print(timer.total_time_)
 
-    force_in_world = mesh22origin[:3, :3].dot(total_force_vector)
-    wrench21 = np.hstack((force_in_world, np.zeros(3)))
-    wrench12 = -wrench21
+    wrench21 = np.hstack((total_force_21, total_torque_21))
+    wrench12 = np.hstack((-total_force_21, total_torque_12))
+    mesh22origin_adjoint = adjoint_from_transform(mesh22origin, check=False)
+    wrench21_in_world = mesh22origin_adjoint.T.dot(wrench21)
+    wrench12_in_world = mesh22origin_adjoint.T.dot(wrench12)
 
     if return_details:
         if intersection:
@@ -110,9 +115,9 @@ def contact_forces(
                 mesh22origin)
         else:
             details = {}
-        return intersection, wrench12, wrench21, details
+        return intersection, wrench12_in_world, wrench21_in_world, details
     else:
-        return intersection, wrench12, wrench21
+        return intersection, wrench12_in_world, wrench21_in_world
 
 
 def make_details(

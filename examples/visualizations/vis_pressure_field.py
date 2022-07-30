@@ -38,8 +38,8 @@ intersection, wrench12, wrench21, details = pressure_field.contact_forces(
     return_details=True)
 print(f"time: {timer.stop('contact_forces')}")
 
-print(f"force 12: {wrench12}")
-print(f"force 21: {wrench21}")
+print(f"force 12: {np.round(wrench12, 8)}")
+print(f"force 21: {np.round(wrench21, 8)}")
 
 fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
