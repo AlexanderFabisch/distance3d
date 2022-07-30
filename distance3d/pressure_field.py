@@ -62,29 +62,12 @@ def contact_forces(
                 tetrahedron1, tetrahedron2, contact_plane_hnf):
             continue
 
-        """
-        if i * len(tetrahedra2) + j > 8 * len(tetrahedra2) + 91:
-            print(i, j)
-            import pytransform3d.visualizer as pv
-            from distance3d.visualization import TetraMesh, Tetrahedron
-            fig = pv.figure()
-            TetraMesh(mesh22origin, vertices1_in_mesh2, tetrahedra1).add_artist(fig)
-            TetraMesh(mesh22origin, vertices2_in_mesh2, tetrahedra2).add_artist(fig)
-            Tetrahedron(tetrahedron1).add_artist(fig)
-            Tetrahedron(tetrahedron2).add_artist(fig)
-            fig.plot_plane(normal=contact_plane_hnf[:3], d=contact_plane_hnf[3])
-            fig.show()
-        """
-
-        debug = False
-        #debug = len(contact_planes) == 3
         contact_polygon, triangles = compute_contact_polygon(
-            tetrahedron1, tetrahedron2, contact_plane_hnf, debug=debug)
+            tetrahedron1, tetrahedron2, contact_plane_hnf)
         if contact_polygon is None:
             continue
         intersection = True
 
-        #assert np.dot(contact_plane_hnf[:3], mesh22origin[:3, :3].dot(com1) + mesh22origin[:3, 3]) - np.dot(contact_plane_hnf[:3], mesh22origin[:3, :3].dot(com2) + mesh22origin[:3, 3]) >= 0.0  # Otherwise contact_plane_hnf[:3] *= -1
         intersection_com, force_vector, area = contact_force(
             tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon,
             triangles)
