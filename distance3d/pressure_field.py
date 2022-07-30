@@ -292,7 +292,7 @@ class HalfPlane:
     def intersect(self, p2, pq2):
         denom = cross2d(self.pq, pq2)
         if np.abs(denom) < EPSILON:
-            return np.array([np.inf, np.inf], dtype=np.dtype("float"))
+            raise ValueError("Parallel halfplanes")
         alpha = cross2d((p2 - self.p), pq2) / denom
         return self.p + self.pq * alpha
 
@@ -382,10 +382,11 @@ def intersect_halfplanes(halfplanes):
     points = []
     for i in range(len(halfplanes)):
         for j in range(i + 1, len(halfplanes)):
-            p = halfplanes[i].intersect(
-                halfplanes[j].p, halfplanes[j].pq)
-            if all(np.isfinite(p)):
-                points.append(p)
+            try:
+                points.append(halfplanes[i].intersect(halfplanes[j].p,
+                                                      halfplanes[j].pq))
+            except ValueError:
+                pass  # parallel halfplanes
     validated_points = []
     for point in points:
         valid = True
