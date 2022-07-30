@@ -34,7 +34,7 @@ def contact_forces(
 
     timer.start("broad phase")
     broad_overlapping_indices1, broad_overlapping_indices2 = check_aabbs_of_tetrahedra(
-        vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2)
+        vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2, timer=timer)
     timer.stop_and_add_to_total("broad phase")
 
     com1 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices1_in_mesh2, tetrahedra1)
@@ -53,6 +53,7 @@ def contact_forces(
     intersecting_tetrahedra1 = []
     intersecting_tetrahedra2 = []
     previous_i = -1
+    timer.start("intersection")
     for i, j in zip(broad_overlapping_indices1, broad_overlapping_indices2):
         if i != previous_i:
             tetrahedron1 = vertices1_in_mesh2[tetrahedra1[i]]
@@ -96,8 +97,7 @@ def contact_forces(
         contact_planes.append(contact_plane_hnf)
         intersecting_tetrahedra1.append(tetrahedron1)
         intersecting_tetrahedra2.append(tetrahedron2)
-
-    print(timer.total_time_)
+    timer.stop_and_add_to_total("intersection")
 
     wrench21 = np.hstack((total_force_21, total_torque_21))
     wrench12 = np.hstack((-total_force_21, total_torque_12))
@@ -106,6 +106,7 @@ def contact_forces(
     wrench12_in_world = mesh22origin_adjoint.T.dot(wrench12)
 
     if return_details:
+        timer.start("make_details")
         if intersection:
             details = make_details(
                 contact_areas, contact_coms, contact_forces, contact_planes,
@@ -114,6 +115,10 @@ def contact_forces(
                 mesh22origin)
         else:
             details = {}
+        timer.stop_and_add_to_total("make_details")
+
+        import pprint
+        pprint.pprint(timer.total_time_)
         return intersection, wrench12_in_world, wrench21_in_world, details
     else:
         return intersection, wrench12_in_world, wrench21_in_world
@@ -164,19 +169,29 @@ def make_details(
     return details
 
 
-def check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2):
+def check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2, timer=None):
     """Initial check of bounding boxes of tetrahedra."""
+    if timer is not None:
+        timer.start("broad phase - aabbs")
     aabbs1 = tetrahedral_mesh_aabbs(vertices1_in_mesh2, tetrahedra1)
     aabbs2 = tetrahedral_mesh_aabbs(vertices2_in_mesh2, tetrahedra2)
-    broad_overlapping_indices1 = []
-    broad_overlapping_indices2 = []
+    if timer is not None:
+        timer.stop_and_add_to_total("broad phase - aabbs")
+        timer.start("broad phase - aabb tree construction")
     tree2 = aabbtree.AABBTree()
     for j, aabb in enumerate(aabbs2):
         tree2.add(aabbtree.AABB(aabb), j)
+    if timer is not None:
+        timer.stop_and_add_to_total("broad phase - aabb tree construction")
+        timer.start("broad phase - aabb tree querying")
+    broad_overlapping_indices1 = []
+    broad_overlapping_indices2 = []
     for i, aabb in enumerate(aabbs1):
         new_indices2 = tree2.overlap_values(aabbtree.AABB(aabb))
         broad_overlapping_indices2.extend(new_indices2)
         broad_overlapping_indices1.extend([i] * len(new_indices2))
+    if timer is not None:
+        timer.stop_and_add_to_total("broad phase - aabb tree querying")
     return broad_overlapping_indices1, broad_overlapping_indices2
 
 
