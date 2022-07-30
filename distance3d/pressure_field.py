@@ -273,9 +273,6 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, timer
         timer.stop_and_add_to_total("make_halfplanes")
         timer.start("intersect_halfplanes")
     poly = intersect_halfplanes(halfplanes)
-    if poly is not None:
-        # this approach sometimes results in duplicate points, remove them
-        poly = np.unique(poly, axis=0)
     if timer is not None:
         timer.stop_and_add_to_total("intersect_halfplanes")
 
@@ -293,13 +290,16 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, timer
 
     if poly is None:
         return None, None
+
+    # this approach sometimes results in duplicate points, remove them
+    poly = np.unique(poly, axis=0)
+
+    if len(poly) == 3:
+        triangles = np.array([[0, 1, 2]], dtype=np.dtype("int32"))
     else:
-        if len(poly) == 3:
-            triangles = np.array([[0, 1, 2]], dtype=np.dtype("int32"))
-        else:
-            triangles = spatial.Delaunay(poly).simplices
-        poly3d = cartesian_intersection_polygon(poly, cart2plane, contact_plane_hnf)
-        return poly3d, triangles
+        triangles = spatial.Delaunay(poly).simplices
+    poly3d = cartesian_intersection_polygon(poly, cart2plane, contact_plane_hnf)
+    return poly3d, triangles
 
 
 @numba.njit(cache=True)
