@@ -259,6 +259,9 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, debug
         timer.stop_and_add_to_total("make_halfplanes")
         timer.start("intersect_halfplanes")
     poly = intersect_halfplanes(halfplanes)
+    if poly is not None:
+        # this approach sometimes results in duplicate points, remove them
+        poly = np.unique(poly, axis=0)
     if timer is not None:
         timer.stop_and_add_to_total("intersect_halfplanes")
 
@@ -386,10 +389,11 @@ def make_halfplanes2(tetrahedron, cart2plane, plane2cart_offset):  # TODO can we
         norm = np.linalg.norm(normal2d)
         if norm > 1e-9:
             p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
-            halfplanes.append(HalfPlane(p, normal2d))
+            halfplanes.append((p, normal2d))
     return halfplanes
 
 
+@numba.njit(cache=True)
 def intersect_halfplanes(halfplanes):
     points = []
     for i in range(len(halfplanes)):
@@ -398,7 +402,7 @@ def intersect_halfplanes(halfplanes):
                 p = intersect_two_halfplanes(
                     halfplanes[i, :2], halfplanes[i, 2:],
                     halfplanes[j, :2], halfplanes[j, 2:])
-            except ValueError:
+            except Exception:
                 continue  # parallel halfplanes
             valid = True
             for k in range(len(halfplanes)):
@@ -410,8 +414,7 @@ def intersect_halfplanes(halfplanes):
                 points.append(p)
     if len(points) < 3:
         return None
-    # this approach sometimes results in duplicate points, remove them
-    return np.unique(points, axis=0)
+    return points
 
 
 def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with parallel lines?
