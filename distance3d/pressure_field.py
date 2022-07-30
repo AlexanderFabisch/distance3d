@@ -296,15 +296,19 @@ class HalfPlane:
         self.normal2d = normal2d
         self.angle = math.atan2(self.pq[1], self.pq[0])
 
-    def outside_of(self, point):
-        return cross2d(self.pq, point - self.p) < -EPSILON
 
-    def intersect(self, p2, pq2):
-        denom = cross2d(self.pq, pq2)
-        if np.abs(denom) < EPSILON:
-            raise ValueError("Parallel halfplanes")
-        alpha = cross2d((p2 - self.p), pq2) / denom
-        return self.p + self.pq * alpha
+@numba.njit(cache=True)
+def point_outside_of_halfplane(p, pq, point):
+    return cross2d(pq, point - p) < -EPSILON
+
+
+@numba.njit(cache=True)
+def intersect_two_halfplanes(p1, pq1, p2, pq2):
+    denom = cross2d(pq1, pq2)
+    if np.abs(denom) < EPSILON:
+        raise ValueError("Parallel halfplanes")
+    alpha = cross2d((p2 - p1), pq2) / denom
+    return p1 + pq1 * alpha
 
 
 def plot_halfplane(self, ax, c, alpha):
@@ -399,12 +403,15 @@ def intersect_halfplanes(halfplanes):
     for i in range(len(halfplanes)):
         for j in range(i + 1, len(halfplanes)):
             try:
-                p = halfplanes[i].intersect(halfplanes[j].p, halfplanes[j].pq)
+                p = intersect_two_halfplanes(
+                    halfplanes[i].p, halfplanes[i].pq,
+                    halfplanes[j].p, halfplanes[j].pq)
             except ValueError:
                 continue  # parallel halfplanes
             valid = True
             for k in range(len(halfplanes)):
-                if k != i and k != j and halfplanes[k].outside_of(p):
+                if k != i and k != j and point_outside_of_halfplane(
+                        halfplanes[k].p, halfplanes[k].pq, p):
                     valid = False
                     break
             if valid:
