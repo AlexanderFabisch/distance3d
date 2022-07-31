@@ -73,7 +73,7 @@ def contact_forces(
 
         timer.start("compute_contact_polygon")
         contact_polygon, triangles = compute_contact_polygon(
-            tetrahedron1, tetrahedron2, contact_plane_hnf, timer=timer)
+            tetrahedron1, tetrahedron2, contact_plane_hnf)
         timer.stop_and_add_to_total("compute_contact_polygon")
         if contact_polygon is None:
             continue
@@ -260,19 +260,21 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
         and max(plane_distances2) > epsilon)
 
 
-def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, timer=None):
+def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     cart2plane = np.row_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
-    if timer is not None:
-        timer.start("make_halfplanes")
     halfplanes = np.vstack((
         make_halfplanes(tetrahedron1, contact_plane_hnf, cart2plane),
         make_halfplanes(tetrahedron2, contact_plane_hnf, cart2plane)))
-    if timer is not None:
-        timer.stop_and_add_to_total("make_halfplanes")
-        timer.start("intersect_halfplanes")
     poly = intersect_halfplanes(halfplanes)
-    if timer is not None:
-        timer.stop_and_add_to_total("intersect_halfplanes")
+
+    if poly is None:
+        return None, None
+
+    # this approach sometimes results in duplicate points, remove them
+    poly = np.vstack(poly)
+    poly = poly[np.argsort(poly[:, 0])]
+    unique = np.hstack((np.linalg.norm(poly[1:] - poly[:-1], axis=1) > 10.0 * EPSILON, (True,)))
+    poly = poly[unique]
 
     """
     import matplotlib.pyplot as plt
@@ -281,16 +283,12 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf, timer
     colors = "rb"
     for i, halfplane in enumerate(halfplanes):
         plot_halfplane(halfplane, ax, colors[i // 4], 0.1)
-    if poly is not None:
-        plt.scatter(poly[:, 0], poly[:, 1], s=100)
+    plt.scatter(
+        poly[:, 0], poly[:, 1],
+        c=["r", "g", "b", "orange", "magenta", "brown", "k"][:len(poly)],
+        s=100)
     plt.show()
-    """
-
-    if poly is None:
-        return None, None
-
-    # this approach sometimes results in duplicate points, remove them
-    poly = np.unique(poly, axis=0)
+    #"""
 
     if len(poly) == 3:
         triangles = np.array([[0, 1, 2]], dtype=np.dtype("int32"))
