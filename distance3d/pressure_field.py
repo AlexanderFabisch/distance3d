@@ -35,6 +35,11 @@ def contact_forces(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2, timer=timer)
     timer.stop_and_add_to_total("broad phase")
 
+    unique_indices1 = np.unique(broad_overlapping_indices1)
+    unique_indices2 = np.unique(broad_overlapping_indices2)
+    X1 = {i: barycentric_transform(vertices1_in_mesh2[tetrahedra1[i]]) for i in unique_indices1}
+    X2 = {i: barycentric_transform(vertices2_in_mesh2[tetrahedra2[i]]) for i in unique_indices2}
+
     com1 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices1_in_mesh2, tetrahedra1)
     com2 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices2_in_mesh2, tetrahedra2)
 
@@ -56,15 +61,13 @@ def contact_forces(
         if i != previous_i:
             tetrahedron1 = vertices1_in_mesh2[tetrahedra1[i]]
             epsilon1 = potentials1[tetrahedra1[i]]
-            X1 = barycentric_transform(tetrahedron1)
         previous_i = i
 
         tetrahedron2 = vertices2_in_mesh2[tetrahedra2[j]]
         epsilon2 = potentials2[tetrahedra2[j]]
-        X2 = barycentric_transform(tetrahedron2)  # TODO avoid recomputation
 
         timer.start("contact_plane")
-        contact_plane_hnf = contact_plane(X1, X2, epsilon1, epsilon2)
+        contact_plane_hnf = contact_plane(X1[i], X2[j], epsilon1, epsilon2)
         timer.stop_and_add_to_total("contact_plane")
         if not check_tetrahedra_intersect_contact_plane(
                 tetrahedron1, tetrahedron2, contact_plane_hnf):
