@@ -259,6 +259,7 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
         and max(plane_distances2) > epsilon)
 
 
+@numba.njit(cache=True)
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     cart2plane = np.row_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
     halfplanes = np.vstack((
@@ -269,13 +270,21 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     if poly is None:
         return None, None
 
-    poly = np.vstack(poly)
-    poly_centered = poly - np.mean(poly, axis=0)
+    points = np.empty((len(poly), 2))
+    for i in range(len(poly)):
+        points[i] = poly[i]
+
+    center = np.array([np.mean(points[:, 0]), np.mean(points[:, 1])])
+    poly_centered = points - center
     angles = np.arctan2(poly_centered[:, 1], poly_centered[:, 0])
-    poly = poly[np.argsort(angles)]
+    points = points[np.argsort(angles)]
     # this approach sometimes results in duplicate points, remove them
-    unique = np.hstack((np.linalg.norm(poly[1:] - poly[:-1], axis=1) > 10.0 * EPSILON, (True,)))
-    poly = poly[unique]
+    unique_points = np.empty((len(points), 2))
+    n_unique_points = 0
+    for j in range(len(points)):
+        if j == len(points) - 1 or np.linalg.norm(points[j + 1] - points[j]) > 10.0 * EPSILON:
+            unique_points[n_unique_points] = points[j]
+            n_unique_points += 1
 
     """
     import matplotlib.pyplot as plt
@@ -285,18 +294,15 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     for i, halfplane in enumerate(halfplanes):
         plot_halfplane(halfplane, ax, colors[i // 4], 0.1)
     plt.scatter(
-        poly[:, 0], poly[:, 1],
-        c=["r", "g", "b", "orange", "magenta", "brown", "k"][:len(poly)],
+        points[:, 0], points[:, 1],
+        c=["r", "g", "b", "orange", "magenta", "brown", "k"][:len(points)],
         s=100)
     plt.show()
     #"""
 
-    triangles = []
-    for i in range(2, len(poly)):
-        triangles.append([0, i - 1, i])
-    triangles = np.asarray(triangles, dtype=int)
+    triangles = tesselate_ordered_polygon(unique_points[:n_unique_points])
 
-    poly3d = cartesian_intersection_polygon(poly, cart2plane, contact_plane_hnf)
+    poly3d = cartesian_intersection_polygon(unique_points[:n_unique_points], cart2plane, contact_plane_hnf)
     return poly3d, triangles
 
 
@@ -457,6 +463,14 @@ def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with p
         polygon = np.row_stack([dq[i].intersect(dq[(i + 1) % len(dq)])
                                 for i in range(len(dq))])
         return polygon, list(dq)
+
+
+@numba.njit(cache=True)
+def tesselate_ordered_polygon(poly):
+    triangles = np.empty((len(poly) - 2, 3), dtype=np.dtype("int"))
+    for i in range(len(poly) - 2):
+        triangles[i] = (0, i + 1, i + 2)
+    return triangles
 
 
 @numba.njit(cache=True)
