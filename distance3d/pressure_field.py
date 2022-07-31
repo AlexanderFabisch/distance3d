@@ -4,7 +4,6 @@ import aabbtree
 import numba
 import numpy as np
 from pytransform3d.transformations import adjoint_from_transform
-from scipy import spatial
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from .utils import invert_transform, norm_vector, plane_basis_from_normal, EPSILON
 from .benchmark import Timer
@@ -270,9 +269,11 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     if poly is None:
         return None, None
 
-    # this approach sometimes results in duplicate points, remove them
     poly = np.vstack(poly)
-    poly = poly[np.argsort(poly[:, 0])]
+    poly_centered = poly - np.mean(poly, axis=0)
+    angles = np.arctan2(poly_centered[:, 1], poly_centered[:, 0])
+    poly = poly[np.argsort(angles)]
+    # this approach sometimes results in duplicate points, remove them
     unique = np.hstack((np.linalg.norm(poly[1:] - poly[:-1], axis=1) > 10.0 * EPSILON, (True,)))
     poly = poly[unique]
 
@@ -290,10 +291,11 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     plt.show()
     #"""
 
-    if len(poly) == 3:
-        triangles = np.array([[0, 1, 2]], dtype=np.dtype("int32"))
-    else:
-        triangles = spatial.Delaunay(poly).simplices
+    triangles = []
+    for i in range(2, len(poly)):
+        triangles.append([0, i - 1, i])
+    triangles = np.asarray(triangles, dtype=int)
+
     poly3d = cartesian_intersection_polygon(poly, cart2plane, contact_plane_hnf)
     return poly3d, triangles
 
