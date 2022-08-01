@@ -18,8 +18,8 @@ tetrahedron2 = vertices2[tetrahedra2[310]]
 epsilon1 = np.array([0.0, 0.0, 0.0, 1.0])
 epsilon2 = np.array([0.0, 0.0, 0.0, 1.0])
 
-X1 = pressure_field.barycentric_transform(tetrahedron1)
-X2 = pressure_field.barycentric_transform(tetrahedron2)
+X1 = pressure_field.barycentric_transforms(tetrahedron1[np.newaxis])[0]
+X2 = pressure_field.barycentric_transforms(tetrahedron2[np.newaxis])[0]
 contact_plane_hnf = pressure_field.contact_plane(X1, X2, epsilon1, epsilon2)
 assert pressure_field.check_tetrahedra_intersect_contact_plane(
     tetrahedron1, tetrahedron2, contact_plane_hnf)
