@@ -55,42 +55,25 @@ def contact_forces(
     contact_planes = []
     intersecting_tetrahedra1 = []
     intersecting_tetrahedra2 = []
-    previous_i = -1
     timer.start("intersection")
+    last_i = -1
     for i, j in zip(broad_overlapping_indices1, broad_overlapping_indices2):
-        if i != previous_i:
+        if i != last_i:
             tetrahedron1 = vertices1_in_mesh2[tetrahedra1[i]]
             epsilon1 = potentials1[tetrahedra1[i]]
-        previous_i = i
-
+            last_i = i
         tetrahedron2 = vertices2_in_mesh2[tetrahedra2[j]]
         epsilon2 = potentials2[tetrahedra2[j]]
-
-        timer.start("contact_plane")
-        contact_plane_hnf = contact_plane(X1[i], X2[j], epsilon1, epsilon2)
-        timer.stop_and_add_to_total("contact_plane")
-        if not check_tetrahedra_intersect_contact_plane(
-                tetrahedron1, tetrahedron2, contact_plane_hnf):
+        intersecting, contact_details = intersect_tetrahedra(
+            tetrahedron1, epsilon1, X1[i], com1,
+            tetrahedron2, epsilon2, X2[j], com2,
+            total_force_21, total_torque_21, total_torque_12)
+        if intersecting:
+            intersection = True
+        else:
             continue
 
-        timer.start("compute_contact_polygon")
-        contact_polygon, triangles = compute_contact_polygon(
-            tetrahedron1, tetrahedron2, contact_plane_hnf)
-        timer.stop_and_add_to_total("compute_contact_polygon")
-        if contact_polygon is None:
-            continue
-        intersection = True
-
-        timer.start("compute_contact_force")
-        intersection_com, force_vector, area = compute_contact_force(
-            tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon,
-            triangles)
-        timer.stop_and_add_to_total("compute_contact_force")
-
-        total_force_21 += force_vector
-        total_torque_21 += np.cross(intersection_com - com1, force_vector)
-        total_torque_12 += np.cross(intersection_com - com2, -force_vector)
-
+        contact_polygon, triangles, intersection_com, force_vector, area, contact_plane_hnf = contact_details
         contact_polygons.append(contact_polygon)
         contact_polygon_triangles.append(triangles)
         contact_coms.append(intersection_com)
@@ -124,6 +107,32 @@ def contact_forces(
         return intersection, wrench12_in_world, wrench21_in_world, details
     else:
         return intersection, wrench12_in_world, wrench21_in_world
+
+
+@numba.njit(cache=True)
+def intersect_tetrahedra(tetrahedron1, epsilon1, X1, com1,
+                         tetrahedron2, epsilon2, X2, com2,
+                         total_force_21, total_torque_21, total_torque_12):
+    contact_plane_hnf = contact_plane(X1, X2, epsilon1, epsilon2)
+    if not check_tetrahedra_intersect_contact_plane(
+            tetrahedron1, tetrahedron2, contact_plane_hnf):
+        return False, None
+
+    contact_polygon, triangles = compute_contact_polygon(
+        tetrahedron1, tetrahedron2, contact_plane_hnf)
+    if contact_polygon is None:
+        return False, None
+
+    intersection_com, force_vector, area = compute_contact_force(
+        tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon,
+        triangles)
+
+    total_force_21 += force_vector
+    total_torque_21 += np.cross(intersection_com - com1, force_vector)
+    total_torque_12 += np.cross(intersection_com - com2, -force_vector)
+
+    return True, (contact_polygon, triangles, intersection_com, force_vector,
+                  area, contact_plane_hnf)
 
 
 def make_details(
