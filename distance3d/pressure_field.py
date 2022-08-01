@@ -56,17 +56,14 @@ def contact_forces(
     intersecting_tetrahedra1 = []
     intersecting_tetrahedra2 = []
     timer.start("intersection")
-    last_i = -1
+    tetrahedra_points1 = vertices1_in_mesh2[tetrahedra1]
+    tetrahedra_points2 = vertices2_in_mesh2[tetrahedra2]
+    epsilon1 = potentials1[tetrahedra1]
+    epsilon2 = potentials2[tetrahedra2]
     for i, j in zip(broad_overlapping_indices1, broad_overlapping_indices2):
-        if i != last_i:
-            tetrahedron1 = vertices1_in_mesh2[tetrahedra1[i]]
-            epsilon1 = potentials1[tetrahedra1[i]]
-            last_i = i
-        tetrahedron2 = vertices2_in_mesh2[tetrahedra2[j]]
-        epsilon2 = potentials2[tetrahedra2[j]]
         intersecting, contact_details = intersect_tetrahedra(
-            tetrahedron1, epsilon1, X1[i], com1,
-            tetrahedron2, epsilon2, X2[j], com2,
+            tetrahedra_points1[i], epsilon1[i], X1[i], com1,
+            tetrahedra_points2[j], epsilon2[j], X2[j], com2,
             total_force_21, total_torque_21, total_torque_12)
         if intersecting:
             intersection = True
@@ -80,8 +77,8 @@ def contact_forces(
         contact_forces.append(force_vector)
         contact_areas.append(area)
         contact_planes.append(contact_plane_hnf)
-        intersecting_tetrahedra1.append(tetrahedron1)
-        intersecting_tetrahedra2.append(tetrahedron2)
+        intersecting_tetrahedra1.append(tetrahedra_points1[i])
+        intersecting_tetrahedra2.append(tetrahedra_points2[j])
     timer.stop_and_add_to_total("intersection")
 
     wrench21 = np.hstack((total_force_21, total_torque_21))
