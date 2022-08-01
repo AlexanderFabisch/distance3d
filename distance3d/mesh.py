@@ -346,10 +346,9 @@ def _tetrahedral_mesh_volumes(tetrahedra_vertices):
         * tetrahedra_edges[:, 2], axis=1)) / 6.0
 
 
-def tetrahedral_mesh_aabbs(vertices, tetrahedra):
+def tetrahedral_mesh_aabbs(tetrahedra_points):
     """TODO"""
-    tetrahedra_vertices = vertices[tetrahedra]
-    mins = np.min(tetrahedra_vertices, axis=1)
-    maxs = np.max(tetrahedra_vertices, axis=1)
+    mins = np.min(tetrahedra_points, axis=1)
+    maxs = np.max(tetrahedra_points, axis=1)
     aabbs = np.dstack((mins, maxs))
     return aabbs
