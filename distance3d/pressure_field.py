@@ -31,8 +31,10 @@ def contact_forces(
     # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 
     timer.start("broad phase")  # TODO speed up broad phase
+    tetrahedra_points1 = vertices1_in_mesh2[tetrahedra1]
+    tetrahedra_points2 = vertices2_in_mesh2[tetrahedra2]
     broad_overlapping_indices1, broad_overlapping_indices2 = check_aabbs_of_tetrahedra(
-        vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2, timer=timer)
+        tetrahedra_points1, tetrahedra_points2, timer=timer)
     timer.stop_and_add_to_total("broad phase")
 
     unique_indices1 = np.unique(broad_overlapping_indices1)
@@ -56,8 +58,6 @@ def contact_forces(
     intersecting_tetrahedra1 = []
     intersecting_tetrahedra2 = []
     timer.start("intersection")
-    tetrahedra_points1 = vertices1_in_mesh2[tetrahedra1]
-    tetrahedra_points2 = vertices2_in_mesh2[tetrahedra2]
     epsilon1 = potentials1[tetrahedra1]
     epsilon2 = potentials2[tetrahedra2]
     for i, j in zip(broad_overlapping_indices1, broad_overlapping_indices2):
@@ -177,12 +177,12 @@ def make_details(
     return details
 
 
-def check_aabbs_of_tetrahedra(vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2, timer=None):
+def check_aabbs_of_tetrahedra(tetrahedra_points1, tetrahedra_points2, timer=None):
     """Initial check of bounding boxes of tetrahedra."""
     if timer is not None:
         timer.start("broad phase - aabbs")
-    aabbs1 = tetrahedral_mesh_aabbs(vertices1_in_mesh2, tetrahedra1)
-    aabbs2 = tetrahedral_mesh_aabbs(vertices2_in_mesh2, tetrahedra2)
+    aabbs1 = tetrahedral_mesh_aabbs(tetrahedra_points1)
+    aabbs2 = tetrahedral_mesh_aabbs(tetrahedra_points2)
     if timer is not None:
         timer.stop_and_add_to_total("broad phase - aabbs")
         timer.start("broad phase - aabb tree construction")
