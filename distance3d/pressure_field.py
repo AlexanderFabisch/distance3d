@@ -500,7 +500,7 @@ def compute_contact_force(
         vertices = contact_polygon[triangle]
         com[:3] = (vertices[0] + vertices[1] + vertices[2]) / 3.0
         res = np.linalg.solve(X, com)
-        pressure = sum(res * epsilon)
+        pressure = np.sum(res * epsilon)
         area = 0.5 * np.linalg.norm(np.cross(vertices[1] - vertices[0],
                                              vertices[2] - vertices[0]))
         total_force += pressure * area
