@@ -38,10 +38,12 @@ def contact_forces(
         tetrahedra_points1, tetrahedra_points2, timer=timer)
     timer.stop_and_add_to_total("broad phase")
 
+    timer.start("barycentric_transform")
     unique_indices1 = np.unique(broad_overlapping_indices1)
     unique_indices2 = np.unique(broad_overlapping_indices2)
     X1 = {i: barycentric_transform(vertices1_in_mesh2[tetrahedra1[i]]) for i in unique_indices1}
     X2 = {i: barycentric_transform(vertices2_in_mesh2[tetrahedra2[i]]) for i in unique_indices2}
+    timer.stop_and_add_to_total("barycentric_transform")
 
     com1 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices1_in_mesh2, tetrahedra1)
     com2 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices2_in_mesh2, tetrahedra2)
