@@ -82,11 +82,8 @@ def contact_forces(
         intersecting_tetrahedra2.append(tetrahedra_points2[j])
     timer.stop_and_add_to_total("intersection")
 
-    wrench21 = np.hstack((total_force_21, total_torque_21))
-    wrench12 = np.hstack((-total_force_21, total_torque_12))
-    mesh22origin_adjoint = adjoint_from_transform(mesh22origin)
-    wrench21_in_world = mesh22origin_adjoint.T.dot(wrench21)
-    wrench12_in_world = mesh22origin_adjoint.T.dot(wrench12)
+    wrench12_in_world, wrench21_in_world = postprocess_output(
+        mesh22origin, total_force_21, total_torque_12, total_torque_21)
 
     if return_details:
         timer.start("make_details")
@@ -105,6 +102,16 @@ def contact_forces(
         return intersection, wrench12_in_world, wrench21_in_world, details
     else:
         return intersection, wrench12_in_world, wrench21_in_world
+
+
+@numba.njit(cache=True)
+def postprocess_output(mesh22origin, total_force_21, total_torque_12, total_torque_21):
+    wrench21 = np.hstack((total_force_21, total_torque_21))
+    wrench12 = np.hstack((-total_force_21, total_torque_12))
+    mesh22origin_adjoint = adjoint_from_transform(mesh22origin)
+    wrench21_in_world = mesh22origin_adjoint.T.dot(wrench21)
+    wrench12_in_world = mesh22origin_adjoint.T.dot(wrench12)
+    return wrench12_in_world, wrench21_in_world
 
 
 @numba.njit(cache=True)
