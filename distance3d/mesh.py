@@ -223,7 +223,7 @@ def make_convex_mesh(vertices):
 
 
 def make_triangular_icosphere(center, radius, order=4):
-    """Creates an triangular icosphere mesh.
+    """Creates a triangular icosphere mesh.
 
     Source: https://observablehq.com/@mourner/fast-icosphere-mesh
 
@@ -299,7 +299,7 @@ def make_triangular_icosphere(center, radius, order=4):
 
 
 def make_tetrahedral_icosphere(center, radius, order=4):
-    """Creates an tetrahedral icosphere mesh.
+    """Creates a tetrahedral icosphere mesh.
 
     Source: https://github.com/ekzhang/hydroelastics
 
@@ -328,6 +328,37 @@ def make_tetrahedral_icosphere(center, radius, order=4):
     tetrahedra = np.hstack(
         (triangles, center_idx * np.ones((len(triangles), 1), dtype=int)))
     return vertices, tetrahedra
+
+
+def make_tetrahedral_cube(size):
+    """TODO"""
+    vertices = size * np.array([
+        [-0.5, -0.5, -0.5],
+        [-0.5, -0.5, 0.5],
+        [-0.5, 0.5, -0.5],
+        [-0.5, 0.5, 0.5],
+        [0.5, -0.5, -0.5],
+        [0.5, -0.5, 0.5],
+        [0.5, 0.5, -0.5],
+        [0.5, 0.5, 0.5],
+        [0.0, 0.0, 0.0]
+    ])
+    tetrahedra = np.array([
+        [0, 2, 6, 8],
+        [0, 4, 5, 8],
+        [0, 1, 2, 8],
+        [1, 3, 2, 8],
+        [1, 5, 7, 8],
+        [1, 7, 3, 8],
+        [5, 1, 0, 8],
+        [5, 6, 7, 8],
+        [6, 2, 3, 8],
+        [6, 3, 7, 8],
+        [6, 4, 0, 8],
+        [6, 5, 4, 8],
+    ], dtype=int)
+    potentials = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, size / 2.0], dtype=float)
+    return vertices, tetrahedra, potentials
 
 
 def center_of_mass_tetrahedral_mesh(mesh2origin, vertices, tetrahedra):
