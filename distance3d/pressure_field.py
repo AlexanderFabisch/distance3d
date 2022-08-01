@@ -3,9 +3,10 @@ from collections import deque
 import aabbtree
 import numba
 import numpy as np
-from pytransform3d.transformations import adjoint_from_transform
 from .mesh import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
-from .utils import invert_transform, norm_vector, plane_basis_from_normal, EPSILON
+from .utils import (
+    invert_transform, norm_vector, plane_basis_from_normal,
+    adjoint_from_transform, EPSILON)
 from .benchmark import Timer
 
 
@@ -83,7 +84,7 @@ def contact_forces(
 
     wrench21 = np.hstack((total_force_21, total_torque_21))
     wrench12 = np.hstack((-total_force_21, total_torque_12))
-    mesh22origin_adjoint = adjoint_from_transform(mesh22origin, check=False)
+    mesh22origin_adjoint = adjoint_from_transform(mesh22origin)
     wrench21_in_world = mesh22origin_adjoint.T.dot(wrench21)
     wrench12_in_world = mesh22origin_adjoint.T.dot(wrench12)
 

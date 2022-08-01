@@ -186,6 +186,101 @@ def invert_transform(A2B):
     return B2A
 
 
+@numba.njit(cache=True)
+def cross_product_matrix(v):
+    r"""Generate the cross-product matrix of a vector.
+
+    The cross-product matrix :math:`\boldsymbol{V}` satisfies the equation
+
+    .. math::
+
+        \boldsymbol{V} \boldsymbol{w} = \boldsymbol{v} \times
+        \boldsymbol{w}
+
+    It is a skew-symmetric (antisymmetric) matrix, i.e.
+    :math:`-\boldsymbol{V} = \boldsymbol{V}^T`.
+
+    Parameters
+    ----------
+    v : array-like, shape (3,)
+        3d vector
+
+    Returns
+    -------
+    V : array-like, shape (3, 3)
+        Cross-product matrix
+    """
+    return np.array([[0.0, -v[2], v[1]],
+                     [v[2], 0.0, -v[0]],
+                     [-v[1], v[0], 0.0]])
+
+
+@numba.njit(cache=True)
+def adjoint_from_transform(A2B):
+    """Compute adjoint representation of a transformation matrix.
+
+    The adjoint representation of a transformation
+    :math:`\\left[Ad_{\\boldsymbol{T}_{BA}}\\right]`
+    from frame A to frame B translates a twist from frame A to frame B
+    through the adjoint map
+
+    .. math::
+
+        \\mathcal{V}_{B}
+        = \\left[Ad_{\\boldsymbol{T}_{BA}}\\right] \\mathcal{V}_A
+
+    The corresponding matrix form is
+
+    .. math::
+
+        \\left[\\mathcal{V}_{B}\\right]
+        = \\boldsymbol{T}_{BA} \\left[\\mathcal{V}_A\\right]
+        \\boldsymbol{T}_{BA}^{-1}
+
+    We can also use the adjoint representation to transform a wrench from frame
+    A to frame B:
+
+    .. math::
+
+        \\mathcal{F}_B
+        = \\left[ Ad_{\\boldsymbol{T}_{AB}} \\right]^T \\mathcal{F}_A
+
+    Note that not only the adjoint is transposed but also the transformation is
+    inverted.
+
+    Adjoint representations have the following properties:
+
+    .. math::
+
+        \\left[Ad_{\\boldsymbol{T}_1 \\boldsymbol{T}_2}\\right]
+        = \\left[Ad_{\\boldsymbol{T}_1}\\right]
+        \\left[Ad_{\\boldsymbol{T}_2}\\right]
+
+    .. math::
+
+        \\left[Ad_{\\boldsymbol{T}}\\right]^{-1} =
+        \\left[Ad_{\\boldsymbol{T}^{-1}}\\right]
+
+    Parameters
+    ----------
+    A2B : array-like, shape (4, 4)
+        Transform from frame A to frame B
+
+    Returns
+    -------
+    adj_A2B : array, shape (6, 6)
+        Adjoint representation of transformation matrix
+    """
+    R = A2B[:3, :3]
+    p = A2B[:3, 3]
+
+    adj_A2B = np.zeros((6, 6))
+    adj_A2B[:3, :3] = R
+    adj_A2B[3:, :3] = np.dot(cross_product_matrix(p), R)
+    adj_A2B[3:, 3:] = R
+    return adj_A2B
+
+
 def angles_between_vectors(A, B):
     """Compute angle between two vectors.
 
