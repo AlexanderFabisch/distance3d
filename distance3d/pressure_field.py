@@ -41,8 +41,10 @@ def contact_forces(
     timer.start("barycentric_transform")
     unique_indices1 = np.unique(broad_overlapping_indices1)
     unique_indices2 = np.unique(broad_overlapping_indices2)
-    X1 = {i: barycentric_transform(vertices1_in_mesh2[tetrahedra1[i]]) for i in unique_indices1}
-    X2 = {i: barycentric_transform(vertices2_in_mesh2[tetrahedra2[i]]) for i in unique_indices2}
+    X1 = barycentric_transforms(tetrahedra_points1[unique_indices1])
+    X2 = barycentric_transforms(tetrahedra_points2[unique_indices2])
+    X1 = {j: X1[i] for i, j in enumerate(unique_indices1)}
+    X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
     timer.stop_and_add_to_total("barycentric_transform")
 
     com1 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices1_in_mesh2, tetrahedra1)
@@ -247,12 +249,12 @@ def intersecting_tetrahedra(vertices, tetrahedra, contact_point, normal):
     return candidates
 
 
-@numba.njit(cache=True)
-def barycentric_transform(vertices):  # TODO is there a faster implementation possible?
+def barycentric_transforms(tetrahedra_points):
     """Returns X. X.dot(coords) = (r, 1), where r is a Cartesian vector."""
     # NOTE that in the original paper it is not obvious that we have to take
     # the inverse
-    return np.linalg.pinv(np.vstack((vertices.T, np.ones((1, 4)))))
+    return np.linalg.pinv(np.hstack((tetrahedra_points.transpose((0, 2, 1)),
+                                     np.ones((len(tetrahedra_points), 1, 4)))))
 
 
 @numba.njit(cache=True)
