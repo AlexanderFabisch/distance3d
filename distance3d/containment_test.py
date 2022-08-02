@@ -163,7 +163,7 @@ def points_in_cone(points, cone2origin, radius, height):
     dist_to_base_plane = dist_to_center_plane[inside_z] + half_height
     radii = (1.0 - dist_to_base_plane / height) * radius
     not_contained = sqr_dist_in_plane > radii * radii
-    inside_z_indices = np.where(inside_z)[0]
+    inside_z_indices = np.where(inside_z).block_until_ready()[0]
     not_contained_indices = inside_z_indices[not_contained]
     contained[not_contained_indices] = False
     return contained
