@@ -17,29 +17,22 @@ def contact_forces(
     timer = Timer()
 
     timer.start("transformation")
-    # We transform vertices of mesh1 to mesh2 frame to be able to reuse the AABB
-    # tree of mesh2.
-    origin2mesh2 = invert_transform(mesh22origin)
-    mesh12mesh2 = np.dot(origin2mesh2, mesh12origin)
-    vertices1_in_mesh2 = np.dot(
-        vertices1_in_mesh1, mesh12mesh2[:3, :3].T) + mesh12mesh2[np.newaxis, :3, 3]
-    timer.stop_and_add_to_total("transformation")
-
-    # When two objects with pressure functions p1(*), p2(*) intersect, there is
-    # a surface S inside the space of intersection at which the values of p1 and
-    # p2 are equal. After identifying this surface, we then define the total force
-    # exerted by one object on another [..].
-    # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
-
-    timer.start("broad phase")  # TODO speed up broad phase
+    vertices1_in_mesh2 = transform_vertices_to_mesh2(
+        mesh12origin, mesh22origin, vertices1_in_mesh1)
     tetrahedra_points1 = vertices1_in_mesh2[tetrahedra1]
     tetrahedra_points2 = vertices2_in_mesh2[tetrahedra2]
+    timer.stop_and_add_to_total("transformation")
+
+    """
+    # TODO fix broad phase for cube vs. sphere
+    timer.start("broad phase")  # TODO speed up broad phase
     broad_overlapping_indices1, broad_overlapping_indices2 = check_aabbs_of_tetrahedra(
         tetrahedra_points1, tetrahedra_points2, timer=timer)
     broad_overlapping_pairs = zip(broad_overlapping_indices1, broad_overlapping_indices2)
     timer.stop_and_add_to_total("broad phase")
+    """
 
-    # TODO fix broad phase; workaround:
+    # FIXME workaround for broad phase bug:
     from itertools import product
     broad_overlapping_indices1 = np.array(list(range(len(tetrahedra1))), dtype=int)
     broad_overlapping_indices2 = np.array(list(range(len(tetrahedra2))), dtype=int)
@@ -113,6 +106,16 @@ def contact_forces(
         return intersection, wrench12_in_world, wrench21_in_world, details
     else:
         return intersection, wrench12_in_world, wrench21_in_world
+
+
+def transform_vertices_to_mesh2(mesh12origin, mesh22origin, vertices1_in_mesh1):
+    # We transform vertices of mesh1 to mesh2 frame to be able to reuse the AABB
+    # tree of mesh2.
+    origin2mesh2 = invert_transform(mesh22origin)
+    mesh12mesh2 = np.dot(origin2mesh2, mesh12origin)
+    vertices1_in_mesh2 = np.dot(
+        vertices1_in_mesh1, mesh12mesh2[:3, :3].T) + mesh12mesh2[np.newaxis, :3, 3]
+    return vertices1_in_mesh2
 
 
 @numba.njit(cache=True)
