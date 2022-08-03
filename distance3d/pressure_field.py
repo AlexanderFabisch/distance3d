@@ -36,7 +36,14 @@ def contact_forces(
     tetrahedra_points2 = vertices2_in_mesh2[tetrahedra2]
     broad_overlapping_indices1, broad_overlapping_indices2 = check_aabbs_of_tetrahedra(
         tetrahedra_points1, tetrahedra_points2, timer=timer)
+    broad_overlapping_pairs = zip(broad_overlapping_indices1, broad_overlapping_indices2)
     timer.stop_and_add_to_total("broad phase")
+
+    # TODO fix broad phase; workaround:
+    from itertools import product
+    broad_overlapping_indices1 = np.array(list(range(len(tetrahedra1))), dtype=int)
+    broad_overlapping_indices2 = np.array(list(range(len(tetrahedra2))), dtype=int)
+    broad_overlapping_pairs = list(product(broad_overlapping_indices1, broad_overlapping_indices2))
 
     timer.start("barycentric_transform")
     unique_indices1 = np.unique(broad_overlapping_indices1)
@@ -65,7 +72,7 @@ def contact_forces(
     timer.start("intersection")
     epsilon1 = potentials1[tetrahedra1]
     epsilon2 = potentials2[tetrahedra2]
-    for i, j in zip(broad_overlapping_indices1, broad_overlapping_indices2):
+    for i, j in broad_overlapping_pairs:
         intersecting, contact_details = intersect_tetrahedra(
             tetrahedra_points1[i], epsilon1[i], X1[i], com1,
             tetrahedra_points2[j], epsilon2[j], X2[j], com2,
@@ -158,7 +165,6 @@ def make_details(
     contact_point = np.sum(
         contact_coms * contact_areas[:, np.newaxis],
         axis=0) / sum(contact_areas)
-    contact_point = mesh22origin[:3, :3].dot(contact_point) + mesh22origin[:3, 3]
     contact_planes = np.asarray(contact_planes)
     plane_points = contact_planes[:, :3] * contact_planes[:, 3, np.newaxis]
     plane_points = plane_points.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
