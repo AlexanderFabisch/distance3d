@@ -19,7 +19,7 @@ class Mesh(pv.Artist):
         Indices of vertices that form triangles of the mesh.
 
     c : array-like, shape (3,), optional (default: None)
-        Color(s)
+        Color
     """
     def __init__(self, mesh2origin, vertices, triangles, c=None):
         self.mesh = o3d.geometry.TriangleMesh()
@@ -74,7 +74,7 @@ class TetraMesh(pv.Artist):
         Indices of vertices that form tetrahedra of the mesh.
 
     c : array-like, shape (3,), optional (default: None)
-        Color(s)
+        Color
     """
     def __init__(self, mesh2origin, vertices, tetrahedra, c=None):
         self.mesh = o3d.geometry.TetraMesh(
@@ -114,10 +114,20 @@ class TetraMesh(pv.Artist):
 
 
 class Tetrahedron(Mesh):
-    def __init__(self, tetrahedron_points):
+    """Tetrahedron.
+
+    Parameters
+    ----------
+    tetrahedron_points : array, shape (4, 3)
+        Points of the tetrahedron.
+
+    c : array-like, shape (3,), optional (default: None)
+        Color
+    """
+    def __init__(self, tetrahedron_points, c=None):
         mesh2origin = np.eye(4)
         triangles = np.array([[0, 1, 2], [1, 3, 2], [3, 0, 2], [0, 3, 1]], dtype=int)
-        super(Tetrahedron, self).__init__(mesh2origin, tetrahedron_points, triangles)
+        super(Tetrahedron, self).__init__(mesh2origin, tetrahedron_points, triangles, c)
 
 
 class Ellipse(pv.Artist):

@@ -14,6 +14,7 @@ from distance3d import mesh, visualization, pressure_field, benchmark
 
 
 highlight_isect_idx = None
+show_broad_phase = False
 
 # The pressure function assigns to each point in the interior of the object
 # a nonnegative real number representing the pressure at that point, which
@@ -21,7 +22,7 @@ highlight_isect_idx = None
 # into the object would experience at that point.
 # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 mesh12origin = np.eye(4)
-vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(0.13 * np.ones(3), 0.15, 2)
+vertices1, tetrahedra1 = mesh.make_tetrahedral_icosphere(0.13 * np.ones(3), 0.15, 3)
 # TODO general distance to surface
 potentials1 = np.zeros(len(vertices1))
 potentials1[-1] = 0.15
@@ -47,6 +48,19 @@ fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
 visualization.TetraMesh(mesh12origin, vertices1, tetrahedra1).add_artist(fig)
 visualization.TetraMesh(mesh22origin, vertices2, tetrahedra2).add_artist(fig)
+
+if show_broad_phase:
+    vertices1_in_mesh2 = pressure_field.transform_vertices_to_mesh2(
+        mesh12origin, mesh22origin, vertices1)
+    tetrahedra_points1 = vertices1_in_mesh2[tetrahedra1]
+    tetrahedra_points2 = vertices2[tetrahedra2]
+    broad_overlapping_indices1, broad_overlapping_indices2 = pressure_field.check_aabbs_of_tetrahedra(
+        tetrahedra_points1, tetrahedra_points2, timer=timer)
+    for i, j in zip(broad_overlapping_indices1, broad_overlapping_indices2):
+        tetrahedron_points1 = vertices1[tetrahedra1[i]].dot(mesh12origin[:3, :3].T) + mesh12origin[:3, 3]
+        tetrahedron_points2 = vertices2[tetrahedra2[j]].dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
+        visualization.Tetrahedron(tetrahedron_points1, c=(1, 0, 0)).add_artist(fig)
+        visualization.Tetrahedron(tetrahedron_points2, c=(1, 0, 0)).add_artist(fig)
 
 if highlight_isect_idx is not None:
     fig.plot_plane(normal=details["plane_normals"][highlight_isect_idx],
