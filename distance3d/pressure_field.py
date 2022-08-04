@@ -47,8 +47,8 @@ def contact_forces(
     X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
     timer.stop_and_add_to_total("barycentric_transform")
 
-    com1 = center_of_mass_tetrahedral_mesh(tetrahedra_points1)
-    com2 = center_of_mass_tetrahedral_mesh(tetrahedra_points2)
+    com1_in_mesh2 = center_of_mass_tetrahedral_mesh(tetrahedra_points1)
+    com2_in_mesh2 = center_of_mass_tetrahedral_mesh(tetrahedra_points2)
 
     intersection = False
     total_force_21 = np.zeros(3)
@@ -67,8 +67,8 @@ def contact_forces(
     epsilon2 = potentials2[tetrahedra2]
     for i, j in broad_overlapping_pairs:
         intersecting, contact_details = intersect_tetrahedra(
-            tetrahedra_points1[i], epsilon1[i], X1[i], com1,
-            tetrahedra_points2[j], epsilon2[j], X2[j], com2,
+            tetrahedra_points1[i], epsilon1[i], X1[i], com1_in_mesh2,
+            tetrahedra_points2[j], epsilon2[j], X2[j], com2_in_mesh2,
             total_force_21, total_torque_21, total_torque_12)
         if intersecting:
             intersection = True
@@ -129,8 +129,8 @@ def postprocess_output(mesh22origin, total_force_21, total_torque_12, total_torq
 
 
 @numba.njit(cache=True)
-def intersect_tetrahedra(tetrahedron1, epsilon1, X1, com1,
-                         tetrahedron2, epsilon2, X2, com2,
+def intersect_tetrahedra(tetrahedron1, epsilon1, X1, com1_in_mesh2,
+                         tetrahedron2, epsilon2, X2, com2_in_mesh2,
                          total_force_21, total_torque_21, total_torque_12):
     contact_plane_hnf = contact_plane(X1, X2, epsilon1, epsilon2)
     if not check_tetrahedra_intersect_contact_plane(
@@ -147,8 +147,8 @@ def intersect_tetrahedra(tetrahedron1, epsilon1, X1, com1,
         triangles)
 
     total_force_21 += force_vector
-    total_torque_21 += np.cross(intersection_com - com1, force_vector)
-    total_torque_12 += np.cross(intersection_com - com2, -force_vector)
+    total_torque_21 += np.cross(intersection_com - com1_in_mesh2, force_vector)
+    total_torque_12 += np.cross(intersection_com - com2_in_mesh2, -force_vector)
 
     return True, (contact_polygon, triangles, intersection_com, force_vector,
                   area, contact_plane_hnf)
