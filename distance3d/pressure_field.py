@@ -638,13 +638,18 @@ def make_tetrahedral_icosphere(center, radius, order=4):
 
     tetrahedra : array, shape (n_tetrahedra, 4)
         Indices of vertices that form tetrahedra of the mesh.
+
+    potentials : array, shape (n_vertices, 3)
+        Potential of each vertex.
     """
     vertices, triangles = make_triangular_icosphere(center, radius, order)
     center_idx = len(vertices)
     vertices = np.vstack((vertices, center[np.newaxis]))
     tetrahedra = np.hstack(
         (triangles, center_idx * np.ones((len(triangles), 1), dtype=int)))
-    return vertices, tetrahedra
+    potentials = np.zeros(len(vertices))
+    potentials[-1] = radius
+    return vertices, tetrahedra, potentials
 
 
 def make_tetrahedral_cube(size):
