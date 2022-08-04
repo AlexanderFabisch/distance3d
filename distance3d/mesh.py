@@ -1,5 +1,4 @@
 """Tools for convex meshes."""
-import math
 import numba
 import numpy as np
 from scipy.spatial import ConvexHull
