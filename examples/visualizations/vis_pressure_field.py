@@ -22,16 +22,12 @@ show_broad_phase = False
 # into the object would experience at that point.
 # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 mesh12origin = np.eye(4)
-vertices1, tetrahedra1 = pressure_field.make_tetrahedral_icosphere(0.13 * np.ones(3), 0.15, 3)
-# TODO general distance to surface
-potentials1 = np.zeros(len(vertices1))
-potentials1[-1] = 0.15
+vertices1, tetrahedra1, potentials1 = pressure_field.make_tetrahedral_icosphere(0.13 * np.ones(3), 0.15, 3)
 mesh22origin = np.eye(4)
 mesh22origin[:3, :3] = pr.active_matrix_from_extrinsic_euler_zyx([0.1, 0.3, 0.5])
 mesh22origin[:3, 3] = 0.25 * np.ones(3)
 vertices2, tetrahedra2, potentials2 = pressure_field.make_tetrahedral_cube(0.15)
-#vertices2, tetrahedra2 = mesh.make_tetrahedral_icosphere(0.25 * np.ones(3), 0.15, 2)
-#potentials2 = potentials1
+#vertices2, tetrahedra2, potentials2 = mesh.make_tetrahedral_icosphere(0.25 * np.ones(3), 0.15, 2)
 
 timer = benchmark.Timer()
 timer.start("contact_forces")
