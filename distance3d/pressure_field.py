@@ -47,8 +47,8 @@ def contact_forces(
     X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
     timer.stop_and_add_to_total("barycentric_transform")
 
-    com1 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices1_in_mesh2, tetrahedra1)
-    com2 = center_of_mass_tetrahedral_mesh(mesh22origin, vertices2_in_mesh2, tetrahedra2)
+    com1 = center_of_mass_tetrahedral_mesh(tetrahedra_points1)
+    com2 = center_of_mass_tetrahedral_mesh(tetrahedra_points2)
 
     intersection = False
     total_force_21 = np.zeros(3)
@@ -653,7 +653,24 @@ def make_tetrahedral_icosphere(center, radius, order=4):
 
 
 def make_tetrahedral_cube(size):
-    """TODO"""
+    """Creates a tetrahedral cube mesh.
+
+    Parameters
+    ----------
+    size : float
+        Length of the edges in each dimension.
+
+    Returns
+    -------
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    tetrahedra : array, shape (n_tetrahedra, 4)
+        Indices of vertices that form tetrahedra of the mesh.
+
+    potentials : array, shape (n_vertices, 3)
+        Potential of each vertex.
+    """
     vertices = size * np.array([
         [-0.5, -0.5, -0.5],
         [-0.5, -0.5, 0.5],
@@ -683,24 +700,36 @@ def make_tetrahedral_cube(size):
     return vertices, tetrahedra, potentials
 
 
-def center_of_mass_tetrahedral_mesh(mesh2origin, vertices, tetrahedra):
-    """TODO"""
-    tetrahedra_vertices = vertices[tetrahedra]
-    volumes = _tetrahedral_mesh_volumes(tetrahedra_vertices)
-    centers = tetrahedra_vertices.mean(axis=1)
-    center = np.dot(volumes, centers) / np.sum(volumes)
-    return transform_point(mesh2origin, center)
+def center_of_mass_tetrahedral_mesh(tetrahedra_points):
+    """Compute center of mass of a tetrahedral mesh.
+
+    Assumes uniform density.
+
+    Parameters
+    ----------
+    tetrahedra_points : array, shape (n_tetrahedra, 4, 3)
+        Points that form the tetrahedra.
+
+    Returns
+    -------
+    com : array, shape (3,)
+        Center of mass.
+    """
+    volumes = _tetrahedral_mesh_volumes(tetrahedra_points)
+    centers = tetrahedra_points.mean(axis=1)
+    return np.dot(volumes, centers) / np.sum(volumes)
 
 
-def _tetrahedral_mesh_volumes(tetrahedra_vertices):
-    tetrahedra_edges = tetrahedra_vertices[:, 1:] - tetrahedra_vertices[:, np.newaxis, 0]
+def _tetrahedral_mesh_volumes(tetrahedra_points):
+    """Compute volumes of tetrahedra."""
+    tetrahedra_edges = tetrahedra_points[:, 1:] - tetrahedra_points[:, np.newaxis, 0]
     return np.abs(np.sum(
         np.cross(tetrahedra_edges[:, 0], tetrahedra_edges[:, 1])
         * tetrahedra_edges[:, 2], axis=1)) / 6.0
 
 
 def tetrahedral_mesh_aabbs(tetrahedra_points):
-    """TODO"""
+    """Compute axis-aligned bounding boxes of tetrahedra."""
     mins = np.min(tetrahedra_points, axis=1)
     maxs = np.max(tetrahedra_points, axis=1)
     aabbs = np.dstack((mins, maxs))
