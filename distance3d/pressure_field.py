@@ -5,7 +5,7 @@ import aabbtree
 import numba
 import numpy as np
 from .utils import (
-    invert_transform, transform_point, norm_vector, plane_basis_from_normal,
+    invert_transform, norm_vector, plane_basis_from_normal,
     adjoint_from_transform, EPSILON)
 from .benchmark import Timer
 
