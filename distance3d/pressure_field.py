@@ -721,7 +721,18 @@ def center_of_mass_tetrahedral_mesh(tetrahedra_points):
 
 
 def _tetrahedral_mesh_volumes(tetrahedra_points):
-    """Compute volumes of tetrahedra."""
+    """Compute volumes of tetrahedra.
+
+    Parameters
+    ----------
+    tetrahedra_points : array, shape (n_tetrahedra, 4, 3)
+        Points that form the tetrahedra.
+
+    Returns
+    -------
+    volumes : array, shape (n_tetrahedra,)
+        Volumes of tetrahedra.
+    """
     tetrahedra_edges = tetrahedra_points[:, 1:] - tetrahedra_points[:, np.newaxis, 0]
     return np.abs(np.sum(
         np.cross(tetrahedra_edges[:, 0], tetrahedra_edges[:, 1])
@@ -729,7 +740,18 @@ def _tetrahedral_mesh_volumes(tetrahedra_points):
 
 
 def tetrahedral_mesh_aabbs(tetrahedra_points):
-    """Compute axis-aligned bounding boxes of tetrahedra."""
+    """Compute axis-aligned bounding boxes of tetrahedra.
+
+    Parameters
+    ----------
+    tetrahedra_points : array, shape (n_tetrahedra, 4, 3)
+        Points that form the tetrahedra.
+
+    Returns
+    -------
+    aabbs : array, shape (n_tetrahedra, 3, 2)
+        Axis-aligned bounding boxes of tetrahedra.
+    """
     mins = np.min(tetrahedra_points, axis=1)
     maxs = np.max(tetrahedra_points, axis=1)
     aabbs = np.dstack((mins, maxs))
