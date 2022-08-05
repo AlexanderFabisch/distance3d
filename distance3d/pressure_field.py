@@ -69,15 +69,15 @@ class ContactSurface:
         self.contact_polygons = [transform_points(frame2world, contact_polygon)
                                  for contact_polygon in self.contact_polygons]
         plane_points = self.contact_planes[:, :3] * self.contact_planes[:, 3, np.newaxis]
-        plane_points = transform_points(self.frame2world, plane_points)
+        plane_points = transform_points(frame2world, plane_points)
         plane_normals = transform_directions(
-            self.frame2world, self.contact_planes[:, :3])
+            frame2world, self.contact_planes[:, :3])
         plane_distances = np.sum(plane_points * plane_normals, axis=1)
         self.contact_planes = np.hstack((plane_normals, plane_distances.reshape(-1, 1)))
         self.contact_coms = transform_points(
-            self.frame2world, np.asarray(self.contact_coms))
+            frame2world, np.asarray(self.contact_coms))
         self.contact_forces = transform_directions(
-            self.frame2world, np.asarray(self.contact_forces))
+            frame2world, np.asarray(self.contact_forces))
 
     def make_details(self, tetrahedra_points1, tetrahedra_points2):
         self._transform_to_world(self.frame2world)
