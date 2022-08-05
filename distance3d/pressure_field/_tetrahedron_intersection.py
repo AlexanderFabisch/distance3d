@@ -249,8 +249,9 @@ def plot_halfplane(ppq, ax, c, alpha):
 @numba.njit(cache=True)
 def tesselate_ordered_polygon(poly):
     triangles = np.empty((len(poly) - 2, 3), dtype=np.dtype("int"))
-    for i in range(len(poly) - 2):
-        triangles[i] = (0, i + 1, i + 2)
+    triangles[:, 0] = 0
+    triangles[:, 1] = np.arange(1, len(poly) - 1)
+    triangles[:, 2] = np.arange(2, len(poly))
     return triangles
 
 
