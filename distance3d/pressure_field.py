@@ -202,6 +202,14 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2):
     return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
 
 
+def barycentric_transforms(tetrahedra_points):
+    """Returns X. X.dot(coords) = (r, 1), where r is a Cartesian vector."""
+    # NOTE that in the original paper it is not obvious that we have to take
+    # the inverse
+    return np.linalg.pinv(np.hstack((tetrahedra_points.transpose((0, 2, 1)),
+                                     np.ones((len(tetrahedra_points), 1, 4)))))
+
+
 def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):
     tetrahedra_potentials1 = rigid_body1.tetrahedra_potentials
     n_contacts = len(contact_surface.intersecting_tetrahedra1)
@@ -222,19 +230,11 @@ def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):
         contact_forces[intersection_idx] = force
         contact_areas[intersection_idx] = area
 
+    total_force_21 = np.sum(contact_forces, axis=0)
     com1_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body1.tetrahedra_points)
     com2_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body2.tetrahedra_points)
-    total_force_21 = np.sum(contact_forces, axis=0)
-    com_minus_com1 = contact_coms - com1_in_mesh2
-    com_minus_com2 = contact_coms - com2_in_mesh2
-    torques_21 = np.vstack([
-        np.cross(com_diff, force)
-        for com_diff, force in zip(com_minus_com1, contact_forces)])
-    total_torque_21 = np.sum(torques_21, axis=0)
-    torques_12 = np.vstack([
-        np.cross(com_diff, -force)
-        for com_diff, force in zip(com_minus_com2, contact_forces)])
-    total_torque_12 = np.sum(torques_12, axis=0)
+    total_torque_21 = np.sum(np.cross(contact_coms - com1_in_mesh2, contact_forces), axis=0)
+    total_torque_12 = np.sum(np.cross(contact_coms - com2_in_mesh2, -contact_forces), axis=0)
     wrench12_in_world, wrench21_in_world = _transform_wrenches(
         contact_surface.frame2world, total_force_21, total_torque_12, total_torque_21)
     contact_surface.add_polygon_info(contact_areas, contact_coms, contact_forces)
@@ -296,14 +296,6 @@ def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
         return False, None
 
     return True, (contact_plane_hnf, contact_polygon, triangles)
-
-
-def barycentric_transforms(tetrahedra_points):
-    """Returns X. X.dot(coords) = (r, 1), where r is a Cartesian vector."""
-    # NOTE that in the original paper it is not obvious that we have to take
-    # the inverse
-    return np.linalg.pinv(np.hstack((tetrahedra_points.transpose((0, 2, 1)),
-                                     np.ones((len(tetrahedra_points), 1, 4)))))
 
 
 @numba.njit(cache=True)
