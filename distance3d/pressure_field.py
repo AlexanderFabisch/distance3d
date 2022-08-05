@@ -211,8 +211,17 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2):
     # TODO fix broad phase for cube vs. sphere
     # TODO speed up broad phase
     # TODO store result in RigidBody
-    broad_tetrahedra1, broad_tetrahedra2 = check_aabbs_of_tetrahedra(
-        rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points, timer=timer)
+    aabbs1 = tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
+    aabbs2 = tetrahedral_mesh_aabbs(rigid_body2.tetrahedra_points)
+    tree2 = aabbtree.AABBTree()
+    for j, aabb in enumerate(aabbs2):
+        tree2.add(aabbtree.AABB(aabb), j)
+    broad_tetrahedra1 = []
+    broad_tetrahedra2 = []
+    for i, aabb in enumerate(aabbs1):
+        new_indices2 = tree2.overlap_values(aabbtree.AABB(aabb))
+        broad_tetrahedra2.extend(new_indices2)
+        broad_tetrahedra1.extend([i] * len(new_indices2))
     broad_pairs = zip(broad_tetrahedra1, broad_tetrahedra2)
     """
 
@@ -285,32 +294,6 @@ def intersect_tetrahedra(tetrahedron1, epsilon1, X1,
         return False, None
 
     return True, (contact_plane_hnf, contact_polygon, triangles)
-
-
-def check_aabbs_of_tetrahedra(tetrahedra_points1, tetrahedra_points2, timer=None):
-    """Initial check of bounding boxes of tetrahedra."""
-    if timer is not None:
-        timer.start("broad phase - aabbs")
-    aabbs1 = tetrahedral_mesh_aabbs(tetrahedra_points1)
-    aabbs2 = tetrahedral_mesh_aabbs(tetrahedra_points2)
-    if timer is not None:
-        timer.stop_and_add_to_total("broad phase - aabbs")
-        timer.start("broad phase - aabb tree construction")
-    tree2 = aabbtree.AABBTree()
-    for j, aabb in enumerate(aabbs2):
-        tree2.add(aabbtree.AABB(aabb), j)
-    if timer is not None:
-        timer.stop_and_add_to_total("broad phase - aabb tree construction")
-        timer.start("broad phase - aabb tree querying")
-    broad_tetrahedra1 = []
-    broad_tetrahedra2 = []
-    for i, aabb in enumerate(aabbs1):
-        new_indices2 = tree2.overlap_values(aabbtree.AABB(aabb))
-        broad_tetrahedra2.extend(new_indices2)
-        broad_tetrahedra1.extend([i] * len(new_indices2))
-    if timer is not None:
-        timer.stop_and_add_to_total("broad phase - aabb tree querying")
-    return broad_tetrahedra1, broad_tetrahedra2
 
 
 @numba.njit(
