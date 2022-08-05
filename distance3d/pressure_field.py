@@ -10,73 +10,6 @@ from .utils import (
 from .benchmark import Timer
 
 
-def contact_forces(
-        mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1,
-        mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2,
-        return_details=False, timer=None):
-    if timer is None:
-        timer = Timer()
-
-    rigid_body1 = RigidBody(mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1)
-    rigid_body2 = RigidBody(mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2)
-
-    contact_surface = find_contact_plane(rigid_body1, rigid_body2, timer)
-
-    timer.start("accumulate_wrenches")
-    wrench12_in_world, wrench21_in_world = accumulate_wrenches(
-        contact_surface, rigid_body1, rigid_body2)
-    timer.stop_and_add_to_total("accumulate_wrenches")
-
-    if return_details:
-        timer.start("make_details")
-        if contact_surface.intersection:
-            details = contact_surface.make_details(
-                rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points)
-        else:
-            details = {}
-        timer.stop_and_add_to_total("make_details")
-        return contact_surface.intersection, wrench12_in_world, wrench21_in_world, details
-    else:
-        return contact_surface.intersection, wrench12_in_world, wrench21_in_world
-
-
-def find_contact_plane(rigid_body1, rigid_body2, timer=None):
-    if timer is None:
-        timer = Timer()
-
-    timer.start("transformation")
-    # We transform vertices of mesh1 to mesh2 frame to be able to reuse the
-    # AABB tree of mesh2.
-    rigid_body1.transform(mesh12mesh2(rigid_body1.mesh2origin, rigid_body2.mesh2origin))
-    tetrahedra_points1 = rigid_body1.tetrahedra_points
-    tetrahedra_points2 = rigid_body2.tetrahedra_points
-    timer.stop_and_add_to_total("transformation")
-
-    timer.start("broad_phase_tetrahedra")
-    broad_tetrahedra1, broad_tetrahedra2, broad_pairs = broad_phase_tetrahedra(
-        rigid_body1, rigid_body2)
-    timer.stop_and_add_to_total("broad_phase_tetrahedra")
-
-    timer.start("barycentric_transform")
-    unique_indices1 = np.unique(broad_tetrahedra1)
-    unique_indices2 = np.unique(broad_tetrahedra2)
-    X1 = barycentric_transforms(tetrahedra_points1[unique_indices1])
-    X2 = barycentric_transforms(tetrahedra_points2[unique_indices2])
-    X1 = {j: X1[i] for i, j in enumerate(unique_indices1)}
-    X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
-    timer.stop_and_add_to_total("barycentric_transform")
-
-    timer.start("intersect_pairs")
-    intersection_result = intersect_pairs(
-        broad_pairs, tetrahedra_points1, tetrahedra_points2,
-        X1, X2, rigid_body1.tetrahedra_potentials,
-        rigid_body2.tetrahedra_potentials)
-    contact_surface = ContactSurface(rigid_body2.mesh2origin, *intersection_result)
-    timer.stop_and_add_to_total("intersect_pairs")
-
-    return contact_surface
-
-
 class RigidBody:
     def __init__(self, mesh2origin, vertices_in_mesh, tetrahedra, potentials):
         self.mesh2origin = mesh2origin
@@ -99,39 +32,6 @@ class RigidBody:
     def transform(self, old2new):
         self.vertices_in_mesh = transform_points(old2new, self.vertices_in_mesh)
         self._tetrahedra_points = None
-
-
-def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):
-    com1_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body1.tetrahedra_points)
-    com2_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body2.tetrahedra_points)
-    tetrahedra_potentials1 = rigid_body1.tetrahedra_potentials
-    contact_coms = []
-    contact_forces = []
-    contact_areas = []
-    total_force_21 = np.zeros(3)
-    total_torque_12 = np.zeros(3)
-    total_torque_21 = np.zeros(3)
-    for intersection_idx in range(len(contact_surface.intersecting_tetrahedra1)):
-        i = contact_surface.intersecting_tetrahedra1[intersection_idx]
-        contact_plane_hnf = contact_surface.contact_planes[intersection_idx]
-        contact_polygon = contact_surface.contact_polygons[intersection_idx]
-        triangles = contact_surface.contact_polygon_triangles[intersection_idx]
-
-        intersection_com, force_vector, area = compute_contact_force(
-            rigid_body1.tetrahedra_points[i], tetrahedra_potentials1[i],
-            contact_plane_hnf, contact_polygon, triangles)
-
-        total_force_21 += force_vector
-        total_torque_21 += np.cross(intersection_com - com1_in_mesh2, force_vector)
-        total_torque_12 += np.cross(intersection_com - com2_in_mesh2, -force_vector)
-
-        contact_coms.append(intersection_com)
-        contact_forces.append(force_vector)
-        contact_areas.append(area)
-    wrench12_in_world, wrench21_in_world = postprocess_output(
-        contact_surface.frame2world, total_force_21, total_torque_12, total_torque_21)
-    contact_surface.add_polygon_info(contact_areas, contact_coms, contact_forces)
-    return wrench12_in_world, wrench21_in_world
 
 
 class ContactSurface:
@@ -202,6 +102,106 @@ class ContactSurface:
                 axis=0) / sum(self.contact_areas)
             details["contact_point"] = contact_point
         return details
+
+
+def contact_forces(
+        mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1,
+        mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2,
+        return_details=False, timer=None):
+    if timer is None:
+        timer = Timer()
+
+    rigid_body1 = RigidBody(mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1)
+    rigid_body2 = RigidBody(mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2)
+
+    contact_surface = find_contact_plane(rigid_body1, rigid_body2, timer)
+
+    timer.start("accumulate_wrenches")
+    wrench12_in_world, wrench21_in_world = accumulate_wrenches(
+        contact_surface, rigid_body1, rigid_body2)
+    timer.stop_and_add_to_total("accumulate_wrenches")
+
+    if return_details:
+        timer.start("make_details")
+        if contact_surface.intersection:
+            details = contact_surface.make_details(
+                rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points)
+        else:
+            details = {}
+        timer.stop_and_add_to_total("make_details")
+        return contact_surface.intersection, wrench12_in_world, wrench21_in_world, details
+    else:
+        return contact_surface.intersection, wrench12_in_world, wrench21_in_world
+
+
+def find_contact_plane(rigid_body1, rigid_body2, timer=None):
+    if timer is None:
+        timer = Timer()
+
+    timer.start("transformation")
+    # We transform vertices of mesh1 to mesh2 frame to be able to reuse the
+    # AABB tree of mesh2.
+    rigid_body1.transform(mesh12mesh2(rigid_body1.mesh2origin, rigid_body2.mesh2origin))
+    tetrahedra_points1 = rigid_body1.tetrahedra_points
+    tetrahedra_points2 = rigid_body2.tetrahedra_points
+    timer.stop_and_add_to_total("transformation")
+
+    timer.start("broad_phase_tetrahedra")
+    broad_tetrahedra1, broad_tetrahedra2, broad_pairs = broad_phase_tetrahedra(
+        rigid_body1, rigid_body2)
+    timer.stop_and_add_to_total("broad_phase_tetrahedra")
+
+    timer.start("barycentric_transform")
+    unique_indices1 = np.unique(broad_tetrahedra1)
+    unique_indices2 = np.unique(broad_tetrahedra2)
+    X1 = barycentric_transforms(tetrahedra_points1[unique_indices1])
+    X2 = barycentric_transforms(tetrahedra_points2[unique_indices2])
+    X1 = {j: X1[i] for i, j in enumerate(unique_indices1)}
+    X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
+    timer.stop_and_add_to_total("barycentric_transform")
+
+    timer.start("intersect_pairs")
+    intersection_result = intersect_pairs(
+        broad_pairs, tetrahedra_points1, tetrahedra_points2,
+        X1, X2, rigid_body1.tetrahedra_potentials,
+        rigid_body2.tetrahedra_potentials)
+    contact_surface = ContactSurface(rigid_body2.mesh2origin, *intersection_result)
+    timer.stop_and_add_to_total("intersect_pairs")
+
+    return contact_surface
+
+
+def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):
+    com1_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body1.tetrahedra_points)
+    com2_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body2.tetrahedra_points)
+    tetrahedra_potentials1 = rigid_body1.tetrahedra_potentials
+    contact_coms = []
+    contact_forces = []
+    contact_areas = []
+    total_force_21 = np.zeros(3)
+    total_torque_12 = np.zeros(3)
+    total_torque_21 = np.zeros(3)
+    for intersection_idx in range(len(contact_surface.intersecting_tetrahedra1)):
+        i = contact_surface.intersecting_tetrahedra1[intersection_idx]
+        contact_plane_hnf = contact_surface.contact_planes[intersection_idx]
+        contact_polygon = contact_surface.contact_polygons[intersection_idx]
+        triangles = contact_surface.contact_polygon_triangles[intersection_idx]
+
+        intersection_com, force_vector, area = compute_contact_force(
+            rigid_body1.tetrahedra_points[i], tetrahedra_potentials1[i],
+            contact_plane_hnf, contact_polygon, triangles)
+
+        total_force_21 += force_vector
+        total_torque_21 += np.cross(intersection_com - com1_in_mesh2, force_vector)
+        total_torque_12 += np.cross(intersection_com - com2_in_mesh2, -force_vector)
+
+        contact_coms.append(intersection_com)
+        contact_forces.append(force_vector)
+        contact_areas.append(area)
+    wrench12_in_world, wrench21_in_world = postprocess_output(
+        contact_surface.frame2world, total_force_21, total_torque_12, total_torque_21)
+    contact_surface.add_polygon_info(contact_areas, contact_coms, contact_forces)
+    return wrench12_in_world, wrench21_in_world
 
 
 def broad_phase_tetrahedra(rigid_body1, rigid_body2):
