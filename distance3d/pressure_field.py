@@ -111,10 +111,12 @@ class ContactSurface:
                 intersecting_tetrahedra2.reshape(
                     n_intersections * 4, 3).dot(self.frame2world[:3, :3].T)
                 + self.frame2world[:3, 3]).reshape(n_intersections, 4, 3)
+        pressures = np.linalg.norm(contact_forces, axis=1) / np.asarray(contact_areas)
         details = {
             "contact_polygons": contact_polygons,
             "contact_polygon_triangles": self.contact_polygon_triangles,
             "contact_coms": contact_coms,
+            "pressures": pressures,
             "contact_forces": contact_forces,
             "contact_areas": contact_areas,
             "contact_point": contact_point,
