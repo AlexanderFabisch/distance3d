@@ -4,113 +4,13 @@ import aabbtree
 import numba
 import numpy as np
 from ..utils import (
-    invert_transform, transform_points, transform_directions, norm_vector,
-    plane_basis_from_normal, adjoint_from_transform, EPSILON)
+    invert_transform, norm_vector, plane_basis_from_normal,
+    adjoint_from_transform, EPSILON)
 from ..benchmark import Timer
 from ._tetra_mesh_creation import make_tetrahedral_cube, make_tetrahedral_icosphere
-from ._mesh_processing import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
-
-
-class RigidBody:
-    def __init__(self, mesh2origin, vertices_in_mesh, tetrahedra, potentials):
-        self.mesh2origin = mesh2origin
-        self.vertices_in_mesh = vertices_in_mesh
-        self.tetrahedra = tetrahedra
-        self.potentials = potentials
-
-        self._tetrahedra_points = None
-        self._com = None
-
-    @property
-    def tetrahedra_points(self):
-        if self._tetrahedra_points is None:
-            self._tetrahedra_points = self.vertices_in_mesh[self.tetrahedra]
-        return self._tetrahedra_points
-
-    @property
-    def tetrahedra_potentials(self):
-        return self.potentials[self.tetrahedra]
-
-    @property
-    def com(self):
-        if self._com is None:
-            self._com = center_of_mass_tetrahedral_mesh(self.tetrahedra_points)
-        return self._com
-
-    def transform(self, old2new):
-        self.vertices_in_mesh = transform_points(old2new, self.vertices_in_mesh)
-        self._tetrahedra_points = None
-        self._com = None
-
-
-class ContactSurface:
-    def __init__(
-            self, frame2world, intersection, contact_planes, contact_polygons,
-            contact_polygon_triangles, intersecting_tetrahedra1,
-            intersecting_tetrahedra2):
-        self.frame2world = frame2world
-        self.intersection = intersection
-        self.contact_planes = contact_planes
-        self.contact_polygons = contact_polygons
-        self.contact_polygon_triangles = contact_polygon_triangles
-        self.contact_forces = contact_forces
-        self.intersecting_tetrahedra1 = intersecting_tetrahedra1
-        self.intersecting_tetrahedra2 = intersecting_tetrahedra2
-
-        self.contact_areas = None
-        self.contact_coms = None
-        self.contact_forces = None
-
-    def add_polygon_info(self, contact_areas, contact_coms, contact_forces):
-        self.contact_areas = contact_areas
-        self.contact_coms = contact_coms
-        self.contact_forces = contact_forces
-
-    def _transform_to_world(self, frame2world):
-        self.contact_polygons = [transform_points(frame2world, contact_polygon)
-                                 for contact_polygon in self.contact_polygons]
-        plane_points = self.contact_planes[:, :3] * self.contact_planes[:, 3, np.newaxis]
-        plane_points = transform_points(frame2world, plane_points)
-        plane_normals = transform_directions(
-            frame2world, self.contact_planes[:, :3])
-        plane_distances = np.sum(plane_points * plane_normals, axis=1)
-        self.contact_planes = np.hstack((plane_normals, plane_distances.reshape(-1, 1)))
-        self.contact_coms = transform_points(
-            frame2world, np.asarray(self.contact_coms))
-        self.contact_forces = transform_directions(
-            frame2world, np.asarray(self.contact_forces))
-
-    def make_details(self, tetrahedra_points1, tetrahedra_points2):
-        self._transform_to_world(self.frame2world)
-        n_intersections = len(self.intersecting_tetrahedra1)
-        intersecting_tetrahedra1 = tetrahedra_points1[np.asarray(self.intersecting_tetrahedra1, dtype=int)]
-        intersecting_tetrahedra1 = transform_points(
-            self.frame2world, intersecting_tetrahedra1.reshape(n_intersections * 4, 3)
-        ).reshape(n_intersections, 4, 3)
-        intersecting_tetrahedra2 = tetrahedra_points2[np.asarray(self.intersecting_tetrahedra2, dtype=int)]
-        intersecting_tetrahedra2 = transform_points(
-            self.frame2world, intersecting_tetrahedra2.reshape(n_intersections * 4, 3)
-        ).reshape(n_intersections, 4, 3)
-
-        self.contact_areas = np.asarray(self.contact_areas)
-        pressures = np.linalg.norm(self.contact_forces, axis=1) / self.contact_areas
-        contact_point = np.sum(
-            self.contact_coms * self.contact_areas[:, np.newaxis],
-            axis=0) / sum(self.contact_areas)
-
-        details = {
-            "contact_polygons": self.contact_polygons,
-            "contact_polygon_triangles": self.contact_polygon_triangles,
-            "contact_planes": self.contact_planes,
-            "intersecting_tetrahedra1": intersecting_tetrahedra1,
-            "intersecting_tetrahedra2": intersecting_tetrahedra2,
-            "contact_coms": self.contact_coms,
-            "contact_forces": self.contact_forces,
-            "contact_areas": self.contact_areas,
-            "pressures": pressures,
-            "contact_point": contact_point
-        }
-        return details
+from ._mesh_processing import tetrahedral_mesh_aabbs
+from ._rigid_body import RigidBody
+from ._contact_surface import ContactSurface
 
 
 def contact_forces(
@@ -185,8 +85,7 @@ def find_contact_plane(rigid_body1, rigid_body2, timer=None):
 
 def mesh12mesh2(mesh12origin, mesh22origin):
     origin2mesh2 = invert_transform(mesh22origin)
-    mesh12mesh2 = np.dot(origin2mesh2, mesh12origin)
-    return mesh12mesh2
+    return np.dot(origin2mesh2, mesh12origin)
 
 
 def broad_phase_tetrahedra(rigid_body1, rigid_body2):
