@@ -18,6 +18,7 @@ class RigidBody:
         self.potentials = potentials
 
         self._tetrahedra_points = None
+        self._com = None
 
     @property
     def tetrahedra_points(self):
@@ -29,9 +30,16 @@ class RigidBody:
     def tetrahedra_potentials(self):
         return self.potentials[self.tetrahedra]
 
+    @property
+    def com(self):
+        if self._com is None:
+            self._com = center_of_mass_tetrahedral_mesh(self.tetrahedra_points)
+        return self._com
+
     def transform(self, old2new):
         self.vertices_in_mesh = transform_points(old2new, self.vertices_in_mesh)
         self._tetrahedra_points = None
+        self._com = None
 
 
 class ContactSurface:
@@ -66,11 +74,10 @@ class ContactSurface:
             self.frame2world, self.contact_planes[:, :3])
         plane_distances = np.sum(plane_points * plane_normals, axis=1)
         self.contact_planes = np.hstack((plane_normals, plane_distances.reshape(-1, 1)))
-        if self.contact_coms is not None:
-            self.contact_coms = transform_points(
-                self.frame2world, np.asarray(self.contact_coms))
-            self.contact_forces = transform_directions(
-                self.frame2world, np.asarray(self.contact_forces))
+        self.contact_coms = transform_points(
+            self.frame2world, np.asarray(self.contact_coms))
+        self.contact_forces = transform_directions(
+            self.frame2world, np.asarray(self.contact_forces))
 
     def make_details(self, tetrahedra_points1, tetrahedra_points2):
         self._transform_to_world(self.frame2world)
@@ -83,24 +90,25 @@ class ContactSurface:
         intersecting_tetrahedra2 = transform_points(
             self.frame2world, intersecting_tetrahedra2.reshape(n_intersections * 4, 3)
         ).reshape(n_intersections, 4, 3)
+
+        self.contact_areas = np.asarray(self.contact_areas)
+        pressures = np.linalg.norm(self.contact_forces, axis=1) / self.contact_areas
+        contact_point = np.sum(
+            self.contact_coms * self.contact_areas[:, np.newaxis],
+            axis=0) / sum(self.contact_areas)
+
         details = {
             "contact_polygons": self.contact_polygons,
             "contact_polygon_triangles": self.contact_polygon_triangles,
             "contact_planes": self.contact_planes,
             "intersecting_tetrahedra1": intersecting_tetrahedra1,
             "intersecting_tetrahedra2": intersecting_tetrahedra2,
+            "contact_coms": self.contact_coms,
+            "contact_forces": self.contact_forces,
+            "contact_areas": self.contact_areas,
+            "pressures": pressures,
+            "contact_point": contact_point
         }
-        if self.contact_coms is not None:
-            details["contact_coms"] = self.contact_coms
-            details["contact_forces"] = self.contact_forces
-            self.contact_areas = np.asarray(self.contact_areas)
-            details["contact_areas"] = self.contact_areas
-            pressures = np.linalg.norm(self.contact_forces, axis=1) / self.contact_areas
-            details["pressures"] = pressures
-            contact_point = np.sum(
-                self.contact_coms * self.contact_areas[:, np.newaxis],
-                axis=0) / sum(self.contact_areas)
-            details["contact_point"] = contact_point
         return details
 
 
@@ -164,6 +172,13 @@ def find_contact_plane(rigid_body1, rigid_body2, timer=None):
     contact_surface = ContactSurface(rigid_body2.mesh2origin, *intersection_result)
     timer.stop_and_add_to_total("intersect_pairs")
 
+    timer.start("contact_surface_forces")
+    contact_areas, contact_coms, contact_forces = contact_surface_forces(
+        contact_surface, rigid_body1)
+    contact_surface.add_polygon_info(
+        contact_areas, contact_coms, contact_forces)
+    timer.stop_and_add_to_total("contact_surface_forces")
+
     return contact_surface
 
 
@@ -211,33 +226,13 @@ def barycentric_transforms(tetrahedra_points):
 
 
 def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):
-    tetrahedra_potentials1 = rigid_body1.tetrahedra_potentials
-    n_contacts = len(contact_surface.intersecting_tetrahedra1)
-    contact_coms = np.empty((n_contacts, 3), dtype=float)
-    contact_forces = np.empty((n_contacts, 3), dtype=float)
-    contact_areas = np.empty(n_contacts, dtype=float)
-    for intersection_idx in range(n_contacts):
-        i = contact_surface.intersecting_tetrahedra1[intersection_idx]
-        contact_plane_hnf = contact_surface.contact_planes[intersection_idx]
-        contact_polygon = contact_surface.contact_polygons[intersection_idx]
-        triangles = contact_surface.contact_polygon_triangles[intersection_idx]
-
-        com, force, area = compute_contact_force(
-            rigid_body1.tetrahedra_points[i], tetrahedra_potentials1[i],
-            contact_plane_hnf, contact_polygon, triangles)
-
-        contact_coms[intersection_idx] = com
-        contact_forces[intersection_idx] = force
-        contact_areas[intersection_idx] = area
-
-    total_force_21 = np.sum(contact_forces, axis=0)
-    com1_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body1.tetrahedra_points)
-    com2_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body2.tetrahedra_points)
-    total_torque_21 = np.sum(np.cross(contact_coms - com1_in_mesh2, contact_forces), axis=0)
-    total_torque_12 = np.sum(np.cross(contact_coms - com2_in_mesh2, -contact_forces), axis=0)
+    total_force_21 = np.sum(contact_surface.contact_forces, axis=0)
+    total_torque_21 = np.sum(np.cross(contact_surface.contact_coms - rigid_body1.com,
+                                      contact_surface.contact_forces), axis=0)
+    total_torque_12 = np.sum(np.cross(contact_surface.contact_coms - rigid_body2.com,
+                                      -contact_surface.contact_forces), axis=0)
     wrench12_in_world, wrench21_in_world = _transform_wrenches(
         contact_surface.frame2world, total_force_21, total_torque_12, total_torque_21)
-    contact_surface.add_polygon_info(contact_areas, contact_coms, contact_forces)
     return wrench12_in_world, wrench21_in_world
 
 
@@ -541,6 +536,28 @@ def cartesian_intersection_polygon(poly, cart2plane, contact_plane_hnf):
     plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
     poly3d = poly.dot(plane2cart.T) + plane_point
     return poly3d
+
+
+def contact_surface_forces(contact_surface, rigid_body1):
+    tetrahedra_potentials1 = rigid_body1.tetrahedra_potentials
+    n_contacts = len(contact_surface.intersecting_tetrahedra1)
+    contact_coms = np.empty((n_contacts, 3), dtype=float)
+    contact_forces = np.empty((n_contacts, 3), dtype=float)
+    contact_areas = np.empty(n_contacts, dtype=float)
+    for intersection_idx in range(n_contacts):
+        i = contact_surface.intersecting_tetrahedra1[intersection_idx]
+        contact_plane_hnf = contact_surface.contact_planes[intersection_idx]
+        contact_polygon = contact_surface.contact_polygons[intersection_idx]
+        triangles = contact_surface.contact_polygon_triangles[intersection_idx]
+
+        com, force, area = compute_contact_force(
+            rigid_body1.tetrahedra_points[i], tetrahedra_potentials1[i],
+            contact_plane_hnf, contact_polygon, triangles)
+
+        contact_coms[intersection_idx] = com
+        contact_forces[intersection_idx] = force
+        contact_areas[intersection_idx] = area
+    return contact_areas, contact_coms, contact_forces
 
 
 @numba.njit(cache=True)
