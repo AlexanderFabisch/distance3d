@@ -127,6 +127,14 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     return poly3d, triangles
 
 
+def plot_halfplane(ppq, ax, c, alpha):
+    line = ppq[:2] + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(ppq[2:])
+    ax.plot(line[:, 0], line[:, 1], lw=3, c=c, alpha=alpha)
+    normal2d = np.array([-ppq[3], ppq[2]])
+    normal = ppq[:2] + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(normal2d)
+    ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=alpha)
+
+
 @numba.njit(cache=True)
 def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
     plane_normal = plane_hnf[:3]
@@ -236,14 +244,6 @@ def intersect_two_halfplanes(p1, pq1, p2, pq2):
 @numba.njit(cache=True)
 def point_outside_of_halfplane(p, pq, point):
     return cross2d(pq, point - p) < -EPSILON
-
-
-def plot_halfplane(ppq, ax, c, alpha):
-    line = ppq[:2] + np.linspace(-3.0, 3.0, 101)[:, np.newaxis] * norm_vector(ppq[2:])
-    ax.plot(line[:, 0], line[:, 1], lw=3, c=c, alpha=alpha)
-    normal2d = np.array([-ppq[3], ppq[2]])
-    normal = ppq[:2] + np.linspace(0.0, 1.0, 101)[:, np.newaxis] * norm_vector(normal2d)
-    ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=alpha)
 
 
 @numba.njit(cache=True)
