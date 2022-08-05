@@ -67,11 +67,11 @@ def find_contact_plane(rigid_body1, rigid_body2, timer=None):
     X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
     timer.stop_and_add_to_total("barycentric_transform")
 
-    timer.start("intersect_pairs")
+    timer.start("intersect_tetrahedron_pairs")
     intersection_result = intersect_tetrahedron_pairs(
         broad_pairs, rigid_body1, rigid_body2, X1, X2)
     contact_surface = ContactSurface(rigid_body2.mesh2origin, *intersection_result)
-    timer.stop_and_add_to_total("intersect_pairs")
+    timer.stop_and_add_to_total("intersect_tetrahedron_pairs")
 
     timer.start("contact_surface_forces")
     contact_areas, contact_coms, contact_forces = contact_surface_forces(
