@@ -61,6 +61,36 @@ def contact_forces(
     timer.stop_and_add_to_total("contact surface")
 
     timer.start("forces")
+    contact_areas, contact_coms, contact_forces, wrench12_in_world, wrench21_in_world = accumulate_wrenches(
+        contact_planes, contact_polygons, contact_polygon_triangles,
+        com1_in_mesh2, com2_in_mesh2, mesh22origin, epsilon1,
+        intersecting_tetrahedra1, tetrahedra_points1)
+    timer.stop_and_add_to_total("forces")
+
+    if return_details:
+        timer.start("make_details")
+        if intersection:
+            details = make_details(
+                tetrahedra_points1, tetrahedra_points2,
+                contact_areas, contact_coms, contact_forces, contact_planes,
+                contact_polygons, contact_polygon_triangles,
+                intersecting_tetrahedra1, intersecting_tetrahedra2,
+                mesh22origin)
+        else:
+            details = {}
+        timer.stop_and_add_to_total("make_details")
+
+        import pprint
+        pprint.pprint(timer.total_time_)
+        return intersection, wrench12_in_world, wrench21_in_world, details
+    else:
+        return intersection, wrench12_in_world, wrench21_in_world
+
+
+def accumulate_wrenches(
+        contact_planes, contact_polygons, contact_polygon_triangles,
+        com1_in_mesh2, com2_in_mesh2, mesh22origin, epsilon1,
+        intersecting_tetrahedra1, tetrahedra_points1):
     total_force_21 = np.zeros(3)
     total_torque_12 = np.zeros(3)
     total_torque_21 = np.zeros(3)
@@ -84,29 +114,9 @@ def contact_forces(
         contact_coms.append(intersection_com)
         contact_forces.append(force_vector)
         contact_areas.append(area)
-
     wrench12_in_world, wrench21_in_world = postprocess_output(
         mesh22origin, total_force_21, total_torque_12, total_torque_21)
-    timer.stop_and_add_to_total("forces")
-
-    if return_details:
-        timer.start("make_details")
-        if intersection:
-            details = make_details(
-                tetrahedra_points1, tetrahedra_points2,
-                contact_areas, contact_coms, contact_forces, contact_planes,
-                contact_polygons, contact_polygon_triangles,
-                intersecting_tetrahedra1, intersecting_tetrahedra2,
-                mesh22origin)
-        else:
-            details = {}
-        timer.stop_and_add_to_total("make_details")
-
-        import pprint
-        pprint.pprint(timer.total_time_)
-        return intersection, wrench12_in_world, wrench21_in_world, details
-    else:
-        return intersection, wrench12_in_world, wrench21_in_world
+    return contact_areas, contact_coms, contact_forces, wrench12_in_world, wrench21_in_world
 
 
 def intersect_pairs(
