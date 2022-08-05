@@ -142,8 +142,6 @@ def find_contact_plane(rigid_body1, rigid_body2, timer=None):
     # We transform vertices of mesh1 to mesh2 frame to be able to reuse the
     # AABB tree of mesh2.
     rigid_body1.transform(mesh12mesh2(rigid_body1.mesh2origin, rigid_body2.mesh2origin))
-    tetrahedra_points1 = rigid_body1.tetrahedra_points
-    tetrahedra_points2 = rigid_body2.tetrahedra_points
     timer.stop_and_add_to_total("transformation")
 
     timer.start("broad_phase_tetrahedra")
@@ -154,17 +152,15 @@ def find_contact_plane(rigid_body1, rigid_body2, timer=None):
     timer.start("barycentric_transform")
     unique_indices1 = np.unique(broad_tetrahedra1)
     unique_indices2 = np.unique(broad_tetrahedra2)
-    X1 = barycentric_transforms(tetrahedra_points1[unique_indices1])
-    X2 = barycentric_transforms(tetrahedra_points2[unique_indices2])
+    X1 = barycentric_transforms(rigid_body1.tetrahedra_points[unique_indices1])
+    X2 = barycentric_transforms(rigid_body2.tetrahedra_points[unique_indices2])
     X1 = {j: X1[i] for i, j in enumerate(unique_indices1)}
     X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
     timer.stop_and_add_to_total("barycentric_transform")
 
     timer.start("intersect_pairs")
-    intersection_result = intersect_pairs(
-        broad_pairs, tetrahedra_points1, tetrahedra_points2,
-        X1, X2, rigid_body1.tetrahedra_potentials,
-        rigid_body2.tetrahedra_potentials)
+    intersection_result = intersect_tetrahedron_pairs(
+        broad_pairs, rigid_body1, rigid_body2, X1, X2)
     contact_surface = ContactSurface(rigid_body2.mesh2origin, *intersection_result)
     timer.stop_and_add_to_total("intersect_pairs")
 
@@ -255,19 +251,19 @@ def _transform_wrenches(mesh22origin, total_force_21, total_torque_12, total_tor
     return wrench12_in_world, wrench21_in_world
 
 
-def intersect_pairs(
-        broad_pairs, tetrahedra_points1, tetrahedra_points2, X1, X2,
-        epsilon1, epsilon2):
+def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
     intersection = False
     contact_planes = []
     contact_polygons = []
     contact_polygon_triangles = []
     intersecting_tetrahedra1 = []
     intersecting_tetrahedra2 = []
-    for i, j in broad_pairs:
-        intersecting, contact_details = intersect_two_tetrahedra(
-            tetrahedra_points1[i], epsilon1[i], X1[i],
-            tetrahedra_points2[j], epsilon2[j], X2[j])
+    epsilon1 = rigid_body1.tetrahedra_potentials
+    epsilon2 = rigid_body2.tetrahedra_potentials
+    for i, j in pairs:
+        intersecting, contact_details = intersect_tetrahedron_pair(
+            rigid_body1.tetrahedra_points[i], epsilon1[i], X1[i],
+            rigid_body2.tetrahedra_points[j], epsilon2[j], X2[j])
         if intersecting:
             intersection = True
         else:
@@ -287,7 +283,8 @@ def intersect_pairs(
 
 
 @numba.njit(cache=True)
-def intersect_two_tetrahedra(tetrahedron1, epsilon1, X1, tetrahedron2, epsilon2, X2):
+def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
+                               tetrahedron2, epsilon2, X2):
     contact_plane_hnf = contact_plane(X1, X2, epsilon1, epsilon2)
     if not check_tetrahedra_intersect_contact_plane(
             tetrahedron1, tetrahedron2, contact_plane_hnf):

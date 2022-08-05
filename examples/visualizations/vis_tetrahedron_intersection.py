@@ -20,12 +20,10 @@ epsilon2 = np.array([0.0, 0.0, 0.0, 1.0])
 
 X1 = pressure_field.barycentric_transforms(tetrahedron1[np.newaxis])[0]
 X2 = pressure_field.barycentric_transforms(tetrahedron2[np.newaxis])[0]
-contact_plane_hnf = pressure_field.contact_plane(X1, X2, epsilon1, epsilon2)
-assert pressure_field.check_tetrahedra_intersect_contact_plane(
-    tetrahedron1, tetrahedron2, contact_plane_hnf)
-contact_polygon, triangles = pressure_field.compute_contact_polygon(
-    tetrahedron1, tetrahedron2, contact_plane_hnf)
-assert contact_polygon is not None
+intersection, contact = pressure_field.intersect_tetrahedron_pair(
+    tetrahedron1, epsilon1, X1, tetrahedron2, epsilon2, X2)
+assert intersection
+contact_plane_hnf, contact_polygon, triangles = contact
 
 intersection_com, force_vector, _ = pressure_field.compute_contact_force(
     tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon, triangles)
