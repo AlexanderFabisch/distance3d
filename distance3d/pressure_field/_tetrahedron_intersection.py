@@ -93,19 +93,12 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     for i in range(len(poly)):
         points[i] = poly[i]
 
-    center = np.array([np.mean(points[:, 0]), np.mean(points[:, 1])])
-    poly_centered = points - center
-    angles = np.arctan2(poly_centered[:, 1], poly_centered[:, 0])
-    points = points[np.argsort(angles)]
+    points = order_points(points)
     # this approach sometimes results in duplicate points, remove them
-    unique_points = np.empty((len(points), 2))
-    n_unique_points = 0
-    for j in range(len(points)):
-        if j == len(points) - 1 or np.linalg.norm(points[j + 1] - points[j]) > 10.0 * EPSILON:
-            unique_points[n_unique_points] = points[j]
-            n_unique_points += 1
+    n_unique_points, unique_points = filter_unique_points(points)
     if n_unique_points < 3:
         return None, None
+    unique_points = unique_points[:n_unique_points]
 
     """
     import matplotlib.pyplot as plt
@@ -121,9 +114,8 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     plt.show()
     #"""
 
-    triangles = tesselate_ordered_polygon(unique_points[:n_unique_points])
-
-    poly3d = project_polygon_3d(unique_points[:n_unique_points], cart2plane, contact_plane_hnf)
+    triangles = tesselate_ordered_polygon(unique_points)
+    poly3d = project_polygon_3d(unique_points, cart2plane, contact_plane_hnf)
     return poly3d, triangles
 
 
@@ -253,6 +245,26 @@ def tesselate_ordered_polygon(poly):
     triangles[:, 1] = np.arange(1, len(poly) - 1)
     triangles[:, 2] = np.arange(2, len(poly))
     return triangles
+
+
+@numba.njit(cache=True)
+def order_points(points):
+    center = np.array([np.mean(points[:, 0]), np.mean(points[:, 1])])
+    poly_centered = points - center
+    angles = np.arctan2(poly_centered[:, 1], poly_centered[:, 0])
+    points = points[np.argsort(angles)]
+    return points
+
+
+@numba.njit(cache=True)
+def filter_unique_points(points):
+    unique_points = np.empty((len(points), 2))
+    n_unique_points = 0
+    for j in range(len(points)):
+        if j == len(points) - 1 or np.linalg.norm(points[j + 1] - points[j]) > 10.0 * EPSILON:
+            unique_points[n_unique_points] = points[j]
+            n_unique_points += 1
+    return n_unique_points, unique_points
 
 
 @numba.njit(cache=True)
