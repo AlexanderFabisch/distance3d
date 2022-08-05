@@ -7,12 +7,44 @@ import numpy as np
 from .utils import (
     invert_transform, transform_points, transform_directions, norm_vector,
     plane_basis_from_normal, adjoint_from_transform, EPSILON)
+from .benchmark import Timer
 
 
 def contact_forces(
         mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1,
         mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2,
         return_details=False, timer=None):
+    if timer is None:
+        timer = Timer()
+
+    contact_surface, tetrahedra_points1, tetrahedra_points2 = find_contact_plane(
+        mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1,
+        mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2, timer)
+
+    timer.start("accumulate_wrenches")
+    wrench12_in_world, wrench21_in_world = accumulate_wrenches(
+        contact_surface, mesh22origin, potentials1[tetrahedra1],
+        tetrahedra_points1, tetrahedra_points2)
+    timer.stop_and_add_to_total("accumulate_wrenches")
+
+    if return_details:
+        timer.start("make_details")
+        if contact_surface.intersection:
+            details = contact_surface.make_details(tetrahedra_points1, tetrahedra_points2)
+        else:
+            details = {}
+        timer.stop_and_add_to_total("make_details")
+        return contact_surface.intersection, wrench12_in_world, wrench21_in_world, details
+    else:
+        return contact_surface.intersection, wrench12_in_world, wrench21_in_world
+
+
+def find_contact_plane(
+        mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1,
+        mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2, timer=None):
+    if timer is None:
+        timer = Timer()
+
     timer.start("transformation")
     vertices1_in_mesh2 = transform_vertices_to_mesh2(
         mesh12origin, mesh22origin, vertices1_in_mesh1)
@@ -38,29 +70,23 @@ def contact_forces(
     epsilon1 = potentials1[tetrahedra1]
     epsilon2 = potentials2[tetrahedra2]
     intersection_result = intersect_pairs(
-            broad_pairs, tetrahedra_points1, tetrahedra_points2,
-            X1, X2, epsilon1, epsilon2)
+        broad_pairs, tetrahedra_points1, tetrahedra_points2,
+        X1, X2, epsilon1, epsilon2)
     contact_surface = ContactSurface(mesh22origin, *intersection_result)
     timer.stop_and_add_to_total("intersect_pairs")
 
-    timer.start("accumulate_wrenches")
-    contact_areas, contact_coms, contact_forces, wrench12_in_world, wrench21_in_world = accumulate_wrenches(
+    return contact_surface, tetrahedra_points1, tetrahedra_points2
+
+
+def accumulate_wrenches(
+        contact_surface, mesh22origin, epsilon1, tetrahedra_points1,
+        tetrahedra_points2):
+    contact_areas, contact_coms, contact_forces, wrench12_in_world, wrench21_in_world = _accumulate_wrenches(
         contact_surface.contact_planes, contact_surface.contact_polygons, contact_surface.contact_polygon_triangles,
-        mesh22origin, potentials1[tetrahedra1], contact_surface.intersecting_tetrahedra1, tetrahedra_points1,
+        mesh22origin, epsilon1, contact_surface.intersecting_tetrahedra1, tetrahedra_points1,
         tetrahedra_points2)
     contact_surface.add_polygon_info(contact_areas, contact_coms, contact_forces)
-    timer.stop_and_add_to_total("accumulate_wrenches")
-
-    if return_details:
-        timer.start("make_details")
-        if contact_surface.intersection:
-            details = contact_surface.make_details(tetrahedra_points1, tetrahedra_points2)
-        else:
-            details = {}
-        timer.stop_and_add_to_total("make_details")
-        return contact_surface.intersection, wrench12_in_world, wrench21_in_world, details
-    else:
-        return contact_surface.intersection, wrench12_in_world, wrench21_in_world
+    return wrench12_in_world, wrench21_in_world
 
 
 class ContactSurface:
@@ -193,7 +219,7 @@ def intersect_pairs(
             intersecting_tetrahedra2)
 
 
-def accumulate_wrenches(
+def _accumulate_wrenches(
         contact_planes, contact_polygons, contact_polygon_triangles,
         mesh22origin, epsilon1, intersecting_tetrahedra1, tetrahedra_points1,
         tetrahedra_points2):
