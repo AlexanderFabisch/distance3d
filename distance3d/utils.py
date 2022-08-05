@@ -141,6 +141,48 @@ def transform_point(A2B, point_in_A):
     return A2B[:3, 3] + np.dot(A2B[:3, :3], point_in_A)
 
 
+@numba.njit(numba.float64[:, :](numba.float64[:, ::1], numba.float64[:, ::1]),
+            cache=True)
+def transform_points(A2B, points_in_A):
+    """Transform points from frame A to frame B.
+
+    Parameters
+    ----------
+    A2B : array, shape (4, 4)
+        Transform from frame A to frame B as homogeneous matrix.
+
+    points_in_A : array, shape (n_points, 3)
+        Points in frame A.
+
+    Returns
+    -------
+    points_in_A : array, shape (n_points, 3)
+        Points in frame B.
+    """
+    return np.dot(points_in_A, A2B[:3, :3].T) + A2B[:3, 3]
+
+
+@numba.njit(numba.float64[:, :](numba.float64[:, ::1], numba.float64[:, :]),
+            cache=True)
+def transform_directions(A2B, directions_in_A):
+    """Transform directions from frame A to frame B.
+
+    Parameters
+    ----------
+    A2B : array, shape (4, 4)
+        Transform from frame A to frame B as homogeneous matrix.
+
+    directions_in_A : array, shape (n_points, 3)
+        Directions in frame A.
+
+    Returns
+    -------
+    points_in_A : array, shape (n_points, 3)
+        Points in frame B.
+    """
+    return np.dot(directions_in_A, A2B[:3, :3].T)
+
+
 @numba.njit(numba.float64[::1](numba.float64[:, ::1], numba.float64[::1]),
             cache=True)
 def inverse_transform_point(A2B, point_in_B):
