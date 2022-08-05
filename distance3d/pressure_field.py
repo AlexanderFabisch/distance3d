@@ -342,6 +342,8 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
         if j == len(points) - 1 or np.linalg.norm(points[j + 1] - points[j]) > 10.0 * EPSILON:
             unique_points[n_unique_points] = points[j]
             n_unique_points += 1
+    if n_unique_points < 3:
+        return None, None
 
     """
     import matplotlib.pyplot as plt
