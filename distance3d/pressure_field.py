@@ -47,9 +47,6 @@ def contact_forces(
     X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
     timer.stop_and_add_to_total("barycentric_transform")
 
-    com1_in_mesh2 = center_of_mass_tetrahedral_mesh(tetrahedra_points1)
-    com2_in_mesh2 = center_of_mass_tetrahedral_mesh(tetrahedra_points2)
-
     timer.start("contact surface")
     epsilon1 = potentials1[tetrahedra1]
     epsilon2 = potentials2[tetrahedra2]
@@ -63,8 +60,8 @@ def contact_forces(
     timer.start("forces")
     contact_areas, contact_coms, contact_forces, wrench12_in_world, wrench21_in_world = accumulate_wrenches(
         contact_planes, contact_polygons, contact_polygon_triangles,
-        com1_in_mesh2, com2_in_mesh2, mesh22origin, epsilon1,
-        intersecting_tetrahedra1, tetrahedra_points1)
+        mesh22origin, epsilon1, intersecting_tetrahedra1, tetrahedra_points1,
+        tetrahedra_points2)
     timer.stop_and_add_to_total("forces")
 
     if return_details:
@@ -89,14 +86,16 @@ def contact_forces(
 
 def accumulate_wrenches(
         contact_planes, contact_polygons, contact_polygon_triangles,
-        com1_in_mesh2, com2_in_mesh2, mesh22origin, epsilon1,
-        intersecting_tetrahedra1, tetrahedra_points1):
+        mesh22origin, epsilon1, intersecting_tetrahedra1, tetrahedra_points1,
+        tetrahedra_points2):
     total_force_21 = np.zeros(3)
     total_torque_12 = np.zeros(3)
     total_torque_21 = np.zeros(3)
     contact_coms = []
     contact_forces = []
     contact_areas = []
+    com1_in_mesh2 = center_of_mass_tetrahedral_mesh(tetrahedra_points1)
+    com2_in_mesh2 = center_of_mass_tetrahedral_mesh(tetrahedra_points2)
     for intersection_idx in range(len(intersecting_tetrahedra1)):
         i = intersecting_tetrahedra1[intersection_idx]
         contact_plane_hnf = contact_planes[intersection_idx]
