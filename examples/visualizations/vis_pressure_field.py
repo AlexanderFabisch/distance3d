@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import open3d as o3d
 import pytransform3d.rotations as pr
 import pytransform3d.visualizer as pv
-from distance3d import visualization, pressure_field, benchmark
+from distance3d import visualization, pressure_field, benchmark, utils
 
 
 highlight_isect_idx = None
@@ -23,7 +23,7 @@ show_broad_phase = False
 # into the object would experience at that point.
 # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 mesh12origin = np.eye(4)
-vertices1, tetrahedra1, potentials1 = pressure_field.make_tetrahedral_icosphere(0.13 * np.ones(3), 0.15, 3)
+vertices1, tetrahedra1, potentials1 = pressure_field.make_tetrahedral_icosphere(0.13 * np.ones(3), 0.15, 2)
 mesh22origin = np.eye(4)
 #mesh22origin[:3, :3] = pr.active_matrix_from_extrinsic_euler_zyx([0.1, 0.3, 0.5])
 #mesh22origin[:3, 3] = 0.25 * np.ones(3)
@@ -48,8 +48,8 @@ visualization.TetraMesh(mesh12origin, vertices1, tetrahedra1).add_artist(fig)
 visualization.TetraMesh(mesh22origin, vertices2, tetrahedra2).add_artist(fig)
 
 if show_broad_phase:
-    vertices1_in_mesh2 = pressure_field.transform_vertices_to_mesh2(
-        mesh12origin, mesh22origin, vertices1)
+    mesh12mesh2 = pressure_field.mesh12mesh2(mesh12origin, mesh22origin)
+    vertices1_in_mesh2 = utils.transform_points(mesh12mesh2, vertices1)
     tetrahedra_points1 = vertices1_in_mesh2[tetrahedra1]
     tetrahedra_points2 = vertices2[tetrahedra2]
     broad_overlapping_indices1, broad_overlapping_indices2 = pressure_field.check_aabbs_of_tetrahedra(
