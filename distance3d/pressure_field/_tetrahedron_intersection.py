@@ -152,7 +152,7 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
 
         isect_points[0] = intersection_points[0]
         isect_points[1] = intersection_points[1]
-        halfplanes[hp_idx, :2], halfplanes[hp_idx, 2:] = make_halfplane(
+        halfplanes[hp_idx] = make_halfplane(
             cart2plane, directions, isect_points, plane_point, triangle)
         hp_idx += 1
     return halfplanes[:hp_idx]
@@ -179,6 +179,15 @@ def _precompute_edge_intersections(d, plane_normal, tetrahedron_points):
 @numba.njit(cache=True)
 def make_halfplane(
         cart2plane, directions, intersection_points, plane_point, triangle):
+    """Construct halfplane.
+
+    Returns
+    -------
+    halfplane : array, shape (4,)
+        A halfplane defined by a point p (halfplane[:2]) and a direction
+        pq (halfplane[2:]) such that p + t * pq == q(t) generates another
+        point on the separating line.
+    """
     # normal pointing inwards
     normal = np.cross(directions[triangle[1], triangle[0]],
                       directions[triangle[2], triangle[0]])
@@ -190,7 +199,7 @@ def make_halfplane(
     if cross2d(pq, normal2d) < 0:
         p = q
         pq *= -1.0
-    return p, pq
+    return np.hstack((p, pq))
 
 
 # replaces from numba.np.extensions import cross2d, which seems to have a bug
@@ -205,15 +214,13 @@ def intersect_halfplanes(halfplanes):
     points = []
     for i in range(len(halfplanes)):
         for j in range(i + 1, len(halfplanes)):
-            p = intersect_two_halfplanes(
-                halfplanes[i, :2], halfplanes[i, 2:],
-                halfplanes[j, :2], halfplanes[j, 2:])
+            p = intersect_two_halfplanes(halfplanes[i], halfplanes[j])
             if p is None:  # parallel halfplanes
                 continue
             valid = True
             for k in range(len(halfplanes)):
                 if k != i and k != j and point_outside_of_halfplane(
-                        halfplanes[k, :2], halfplanes[k, 2:], p):
+                        halfplanes[k], p):
                     valid = False
                     break
             if valid:
@@ -224,17 +231,17 @@ def intersect_halfplanes(halfplanes):
 
 
 @numba.njit(cache=True)
-def intersect_two_halfplanes(p1, pq1, p2, pq2):
-    denom = cross2d(pq1, pq2)
+def intersect_two_halfplanes(halfplane1, halfplane2):
+    denom = cross2d(halfplane1[2:], halfplane2[2:])
     if np.abs(denom) < EPSILON:
         return None
-    t = cross2d((p2 - p1), pq2) / denom
-    return p1 + pq1 * t
+    t = cross2d((halfplane2[:2] - halfplane1[:2]), halfplane2[2:]) / denom
+    return halfplane1[:2] + halfplane1[2:] * t
 
 
 @numba.njit(cache=True)
-def point_outside_of_halfplane(p, pq, point):
-    return cross2d(pq, point - p) < -EPSILON
+def point_outside_of_halfplane(halfplane, point):
+    return cross2d(halfplane[2:], point - halfplane[:2]) < -EPSILON
 
 
 @numba.njit(cache=True)
