@@ -4,10 +4,10 @@ import numpy as np
 from ..utils import invert_transform
 from ..benchmark import Timer
 from ._tetra_mesh_creation import make_tetrahedral_cube, make_tetrahedral_icosphere
-from ._mesh_processing import tetrahedral_mesh_aabbs
+from ._mesh_processing import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from ._rigid_body import RigidBody
 from ._contact_surface import ContactSurface
-from ._tetrahedron_intersection import intersect_tetrahedron_pairs, intersect_tetrahedron_pair
+from ._tetrahedron_intersection import intersect_tetrahedron_pairs, intersect_tetrahedron_pair, intersect_halfplanes
 from ._forces import contact_surface_forces, accumulate_wrenches, compute_contact_force
 
 
