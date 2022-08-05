@@ -23,7 +23,7 @@ def contact_forces(
 
     timer.start("accumulate_wrenches")
     wrench12_in_world, wrench21_in_world = accumulate_wrenches(
-        contact_surface, mesh22origin, potentials1[tetrahedra1],
+        contact_surface, mesh22origin, potentials1, tetrahedra1,
         tetrahedra_points1, tetrahedra_points2)
     timer.stop_and_add_to_total("accumulate_wrenches")
 
@@ -79,11 +79,11 @@ def find_contact_plane(
 
 
 def accumulate_wrenches(
-        contact_surface, mesh22origin, epsilon1, tetrahedra_points1,
-        tetrahedra_points2):
+        contact_surface, mesh22origin, potentials1, tetrahedra1,
+        tetrahedra_points1, tetrahedra_points2):
     contact_areas, contact_coms, contact_forces, wrench12_in_world, wrench21_in_world = _accumulate_wrenches(
         contact_surface.contact_planes, contact_surface.contact_polygons, contact_surface.contact_polygon_triangles,
-        mesh22origin, epsilon1, contact_surface.intersecting_tetrahedra1, tetrahedra_points1,
+        mesh22origin, potentials1[tetrahedra1], contact_surface.intersecting_tetrahedra1, tetrahedra_points1,
         tetrahedra_points2)
     contact_surface.add_polygon_info(contact_areas, contact_coms, contact_forces)
     return wrench12_in_world, wrench21_in_world
