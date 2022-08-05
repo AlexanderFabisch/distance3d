@@ -171,37 +171,10 @@ def find_contact_plane(rigid_body1, rigid_body2, timer=None):
     return contact_surface
 
 
-def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):
-    com1_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body1.tetrahedra_points)
-    com2_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body2.tetrahedra_points)
-    tetrahedra_potentials1 = rigid_body1.tetrahedra_potentials
-    contact_coms = []
-    contact_forces = []
-    contact_areas = []
-    total_force_21 = np.zeros(3)
-    total_torque_12 = np.zeros(3)
-    total_torque_21 = np.zeros(3)
-    for intersection_idx in range(len(contact_surface.intersecting_tetrahedra1)):
-        i = contact_surface.intersecting_tetrahedra1[intersection_idx]
-        contact_plane_hnf = contact_surface.contact_planes[intersection_idx]
-        contact_polygon = contact_surface.contact_polygons[intersection_idx]
-        triangles = contact_surface.contact_polygon_triangles[intersection_idx]
-
-        intersection_com, force_vector, area = compute_contact_force(
-            rigid_body1.tetrahedra_points[i], tetrahedra_potentials1[i],
-            contact_plane_hnf, contact_polygon, triangles)
-
-        total_force_21 += force_vector
-        total_torque_21 += np.cross(intersection_com - com1_in_mesh2, force_vector)
-        total_torque_12 += np.cross(intersection_com - com2_in_mesh2, -force_vector)
-
-        contact_coms.append(intersection_com)
-        contact_forces.append(force_vector)
-        contact_areas.append(area)
-    wrench12_in_world, wrench21_in_world = _transform_wrenches(
-        contact_surface.frame2world, total_force_21, total_torque_12, total_torque_21)
-    contact_surface.add_polygon_info(contact_areas, contact_coms, contact_forces)
-    return wrench12_in_world, wrench21_in_world
+def mesh12mesh2(mesh12origin, mesh22origin):
+    origin2mesh2 = invert_transform(mesh22origin)
+    mesh12mesh2 = np.dot(origin2mesh2, mesh12origin)
+    return mesh12mesh2
 
 
 def broad_phase_tetrahedra(rigid_body1, rigid_body2):
@@ -233,10 +206,53 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2):
     return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
 
 
-def mesh12mesh2(mesh12origin, mesh22origin):
-    origin2mesh2 = invert_transform(mesh22origin)
-    mesh12mesh2 = np.dot(origin2mesh2, mesh12origin)
-    return mesh12mesh2
+def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):
+    tetrahedra_potentials1 = rigid_body1.tetrahedra_potentials
+    n_contacts = len(contact_surface.intersecting_tetrahedra1)
+    contact_coms = np.empty((n_contacts, 3), dtype=float)
+    contact_forces = np.empty((n_contacts, 3), dtype=float)
+    contact_areas = np.empty(n_contacts, dtype=float)
+    for intersection_idx in range(n_contacts):
+        i = contact_surface.intersecting_tetrahedra1[intersection_idx]
+        contact_plane_hnf = contact_surface.contact_planes[intersection_idx]
+        contact_polygon = contact_surface.contact_polygons[intersection_idx]
+        triangles = contact_surface.contact_polygon_triangles[intersection_idx]
+
+        com, force, area = compute_contact_force(
+            rigid_body1.tetrahedra_points[i], tetrahedra_potentials1[i],
+            contact_plane_hnf, contact_polygon, triangles)
+
+        contact_coms[intersection_idx] = com
+        contact_forces[intersection_idx] = force
+        contact_areas[intersection_idx] = area
+
+    com1_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body1.tetrahedra_points)
+    com2_in_mesh2 = center_of_mass_tetrahedral_mesh(rigid_body2.tetrahedra_points)
+    total_force_21 = np.sum(contact_forces, axis=0)
+    com_minus_com1 = contact_coms - com1_in_mesh2
+    com_minus_com2 = contact_coms - com2_in_mesh2
+    torques_21 = np.vstack([
+        np.cross(com_diff, force)
+        for com_diff, force in zip(com_minus_com1, contact_forces)])
+    total_torque_21 = np.sum(torques_21, axis=0)
+    torques_12 = np.vstack([
+        np.cross(com_diff, -force)
+        for com_diff, force in zip(com_minus_com2, contact_forces)])
+    total_torque_12 = np.sum(torques_12, axis=0)
+    wrench12_in_world, wrench21_in_world = _transform_wrenches(
+        contact_surface.frame2world, total_force_21, total_torque_12, total_torque_21)
+    contact_surface.add_polygon_info(contact_areas, contact_coms, contact_forces)
+    return wrench12_in_world, wrench21_in_world
+
+
+@numba.njit(cache=True)
+def _transform_wrenches(mesh22origin, total_force_21, total_torque_12, total_torque_21):
+    wrench21 = np.hstack((total_force_21, total_torque_21))
+    wrench12 = np.hstack((-total_force_21, total_torque_12))
+    mesh22origin_adjoint = adjoint_from_transform(mesh22origin)
+    wrench21_in_world = mesh22origin_adjoint.T.dot(wrench21)
+    wrench12_in_world = mesh22origin_adjoint.T.dot(wrench12)
+    return wrench12_in_world, wrench21_in_world
 
 
 def intersect_pairs(
@@ -271,16 +287,6 @@ def intersect_pairs(
 
 
 @numba.njit(cache=True)
-def _transform_wrenches(mesh22origin, total_force_21, total_torque_12, total_torque_21):
-    wrench21 = np.hstack((total_force_21, total_torque_21))
-    wrench12 = np.hstack((-total_force_21, total_torque_12))
-    mesh22origin_adjoint = adjoint_from_transform(mesh22origin)
-    wrench21_in_world = mesh22origin_adjoint.T.dot(wrench21)
-    wrench12_in_world = mesh22origin_adjoint.T.dot(wrench12)
-    return wrench12_in_world, wrench21_in_world
-
-
-@numba.njit(cache=True)
 def intersect_two_tetrahedra(tetrahedron1, epsilon1, X1, tetrahedron2, epsilon2, X2):
     contact_plane_hnf = contact_plane(X1, X2, epsilon1, epsilon2)
     if not check_tetrahedra_intersect_contact_plane(
@@ -293,40 +299,6 @@ def intersect_two_tetrahedra(tetrahedron1, epsilon1, X1, tetrahedron2, epsilon2,
         return False, None
 
     return True, (contact_plane_hnf, contact_polygon, triangles)
-
-
-@numba.njit(
-    numba.float64[:](numba.float64[:, ::1], numba.float64[:], numba.float64[:]),
-    cache=True)
-def points_to_plane_signed(points, plane_point, plane_normal):
-    return np.dot(points - np.ascontiguousarray(plane_point).reshape(1, -1), plane_normal)
-
-
-@numba.njit(cache=True)  # TODO can we use this?
-def _check_tetrahedra_intersect_contact_plane(
-        vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2,
-        contact_point, normal, broad_tetrahedra1,
-        broad_tetrahedra2):
-    """Check if the tetrahedra actually intersect the contact plane."""
-    candidates1 = tetrahedra1[broad_tetrahedra1]
-    candidates2 = tetrahedra2[broad_tetrahedra2]
-    keep1 = intersecting_tetrahedra(vertices1_in_mesh2, candidates1, contact_point, normal)
-    keep2 = intersecting_tetrahedra(vertices2_in_mesh2, candidates2, contact_point, normal)
-    keep = np.logical_and(keep1, keep2)
-    broad_tetrahedra1 = broad_tetrahedra1[keep]
-    broad_tetrahedra2 = broad_tetrahedra2[keep]
-    return broad_tetrahedra1, broad_tetrahedra2
-
-
-@numba.njit(
-    numba.boolean[:](numba.float64[:, :], numba.int64[:, :], numba.float64[:], numba.float64[:]),
-    cache=True)
-def intersecting_tetrahedra(vertices, tetrahedra, contact_point, normal):
-    candidates = np.empty(len(tetrahedra), dtype=np.dtype("bool"))
-    for i, tetrahedron in enumerate(tetrahedra):
-        d = points_to_plane_signed(vertices[tetrahedron], contact_point, normal)
-        candidates[i] = np.sign(min(d)) != np.sign(max(d))
-    return candidates
 
 
 def barycentric_transforms(tetrahedra_points):
