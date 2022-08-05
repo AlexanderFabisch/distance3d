@@ -205,12 +205,11 @@ def intersect_halfplanes(halfplanes):
     points = []
     for i in range(len(halfplanes)):
         for j in range(i + 1, len(halfplanes)):
-            try:
-                p = intersect_two_halfplanes(
-                    halfplanes[i, :2], halfplanes[i, 2:],
-                    halfplanes[j, :2], halfplanes[j, 2:])
-            except Exception:
-                continue  # parallel halfplanes
+            p = intersect_two_halfplanes(
+                halfplanes[i, :2], halfplanes[i, 2:],
+                halfplanes[j, :2], halfplanes[j, 2:])
+            if p is None:  # parallel halfplanes
+                continue
             valid = True
             for k in range(len(halfplanes)):
                 if k != i and k != j and point_outside_of_halfplane(
@@ -228,7 +227,7 @@ def intersect_halfplanes(halfplanes):
 def intersect_two_halfplanes(p1, pq1, p2, pq2):
     denom = cross2d(pq1, pq2)
     if np.abs(denom) < EPSILON:
-        raise ValueError("Parallel halfplanes")
+        return None
     alpha = cross2d((p2 - p1), pq2) / denom
     return p1 + pq1 * alpha
 
