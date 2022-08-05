@@ -51,30 +51,13 @@ def contact_forces(
     com2_in_mesh2 = center_of_mass_tetrahedral_mesh(tetrahedra_points2)
 
     timer.start("contact surface")
-    intersection = False
-    contact_planes = []
-    contact_polygons = []
-    contact_polygon_triangles = []
-    intersecting_tetrahedra1 = []
-    intersecting_tetrahedra2 = []
     epsilon1 = potentials1[tetrahedra1]
     epsilon2 = potentials2[tetrahedra2]
-    for i, j in broad_overlapping_pairs:
-        intersecting, contact_details = intersect_tetrahedra(
-            tetrahedra_points1[i], epsilon1[i], X1[i],
-            tetrahedra_points2[j], epsilon2[j], X2[j])
-        if intersecting:
-            intersection = True
-        else:
-            continue
-
-        contact_plane_hnf, contact_polygon, triangles = contact_details
-
-        intersecting_tetrahedra1.append(i)
-        intersecting_tetrahedra2.append(j)
-        contact_planes.append(contact_plane_hnf)
-        contact_polygons.append(contact_polygon)
-        contact_polygon_triangles.append(triangles)
+    contact_planes, contact_polygon_triangles, contact_polygons, \
+        intersecting_tetrahedra1, intersecting_tetrahedra2, \
+        intersection = intersect_pairs(
+            broad_overlapping_pairs, tetrahedra_points1, tetrahedra_points2,
+            X1, X2, epsilon1, epsilon2)
     timer.stop_and_add_to_total("contact surface")
 
     timer.start("forces")
@@ -124,6 +107,36 @@ def contact_forces(
         return intersection, wrench12_in_world, wrench21_in_world, details
     else:
         return intersection, wrench12_in_world, wrench21_in_world
+
+
+def intersect_pairs(
+        broad_overlapping_pairs, tetrahedra_points1, tetrahedra_points2,
+        X1, X2, epsilon1, epsilon2):
+    intersection = False
+    contact_planes = []
+    contact_polygons = []
+    contact_polygon_triangles = []
+    intersecting_tetrahedra1 = []
+    intersecting_tetrahedra2 = []
+    for i, j in broad_overlapping_pairs:
+        intersecting, contact_details = intersect_tetrahedra(
+            tetrahedra_points1[i], epsilon1[i], X1[i],
+            tetrahedra_points2[j], epsilon2[j], X2[j])
+        if intersecting:
+            intersection = True
+        else:
+            continue
+
+        contact_plane_hnf, contact_polygon, triangles = contact_details
+
+        intersecting_tetrahedra1.append(i)
+        intersecting_tetrahedra2.append(j)
+        contact_planes.append(contact_plane_hnf)
+        contact_polygons.append(contact_polygon)
+        contact_polygon_triangles.append(triangles)
+    return (
+        contact_planes, contact_polygon_triangles, contact_polygons,
+        intersecting_tetrahedra1, intersecting_tetrahedra2, intersection)
 
 
 def transform_vertices_to_mesh2(mesh12origin, mesh22origin, vertices1_in_mesh1):
