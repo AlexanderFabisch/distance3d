@@ -228,8 +228,8 @@ def intersect_two_halfplanes(p1, pq1, p2, pq2):
     denom = cross2d(pq1, pq2)
     if np.abs(denom) < EPSILON:
         return None
-    alpha = cross2d((p2 - p1), pq2) / denom
-    return p1 + pq1 * alpha
+    t = cross2d((p2 - p1), pq2) / denom
+    return p1 + pq1 * t
 
 
 @numba.njit(cache=True)
