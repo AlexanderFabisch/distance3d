@@ -61,8 +61,8 @@ if show_broad_phase:
         visualization.Tetrahedron(tetrahedron_points2, c=(1, 0, 0)).add_artist(fig)
 
 if highlight_isect_idx is not None:
-    fig.plot_plane(normal=details["plane_normals"][highlight_isect_idx],
-                   point_in_plane=details["contact_coms"][highlight_isect_idx], s=0.05)
+    fig.plot_plane(normal=details["contact_planes"][highlight_isect_idx, :3],
+                   d=details["contact_planes"][highlight_isect_idx, -1], s=0.15)
     fig.scatter(details["contact_polygons"][highlight_isect_idx], s=0.001, c=(1, 0, 1))
     fig.scatter(details["intersecting_tetrahedra1"][highlight_isect_idx], s=0.001, c=(1, 0, 0))
     fig.scatter(details["intersecting_tetrahedra2"][highlight_isect_idx], s=0.001, c=(0, 0, 1))
