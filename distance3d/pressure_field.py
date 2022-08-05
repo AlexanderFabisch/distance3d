@@ -7,15 +7,12 @@ import numpy as np
 from .utils import (
     invert_transform, norm_vector, plane_basis_from_normal,
     adjoint_from_transform, EPSILON)
-from .benchmark import Timer
 
 
 def contact_forces(
         mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1,
         mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2,
-        return_details=False):
-    timer = Timer()
-
+        return_details=False, timer=None):
     timer.start("transformation")
     vertices1_in_mesh2 = transform_vertices_to_mesh2(
         mesh12origin, mesh22origin, vertices1_in_mesh1)
@@ -66,9 +63,6 @@ def contact_forces(
         else:
             details = {}
         timer.stop_and_add_to_total("make_details")
-
-        import pprint
-        pprint.pprint(timer.total_time_)
         return intersection, wrench12_in_world, wrench21_in_world, details
     else:
         return intersection, wrench12_in_world, wrench21_in_world
@@ -128,6 +122,7 @@ def intersect_pairs(
         contact_planes.append(contact_plane_hnf)
         contact_polygons.append(contact_polygon)
         contact_polygon_triangles.append(triangles)
+    contact_planes = np.vstack(contact_planes)
     return (
         contact_planes, contact_polygon_triangles, contact_polygons,
         intersecting_tetrahedra1, intersecting_tetrahedra2, intersection)
@@ -208,7 +203,6 @@ def make_details(
     contact_point = np.sum(
         contact_coms * contact_areas[:, np.newaxis],
         axis=0) / sum(contact_areas)
-    contact_planes = np.asarray(contact_planes)
     plane_points = contact_planes[:, :3] * contact_planes[:, 3, np.newaxis]
     plane_points = plane_points.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
     plane_normals = contact_planes[:, :3].dot(mesh22origin[:3, :3].T)

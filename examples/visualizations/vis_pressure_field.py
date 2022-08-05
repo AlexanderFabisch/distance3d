@@ -5,6 +5,7 @@ Visualize Pressure Field of Two Colliding Objects
 """
 print(__doc__)
 
+import pprint
 import numpy as np
 import matplotlib.pyplot as plt
 import open3d as o3d
@@ -24,17 +25,18 @@ show_broad_phase = False
 mesh12origin = np.eye(4)
 vertices1, tetrahedra1, potentials1 = pressure_field.make_tetrahedral_icosphere(0.13 * np.ones(3), 0.15, 3)
 mesh22origin = np.eye(4)
-mesh22origin[:3, :3] = pr.active_matrix_from_extrinsic_euler_zyx([0.1, 0.3, 0.5])
-mesh22origin[:3, 3] = 0.25 * np.ones(3)
-vertices2, tetrahedra2, potentials2 = pressure_field.make_tetrahedral_cube(0.15)
-#vertices2, tetrahedra2, potentials2 = pressure_field.make_tetrahedral_icosphere(0.25 * np.ones(3), 0.15, 2)
+#mesh22origin[:3, :3] = pr.active_matrix_from_extrinsic_euler_zyx([0.1, 0.3, 0.5])
+#mesh22origin[:3, 3] = 0.25 * np.ones(3)
+#vertices2, tetrahedra2, potentials2 = pressure_field.make_tetrahedral_cube(0.15)
+vertices2, tetrahedra2, potentials2 = pressure_field.make_tetrahedral_icosphere(0.25 * np.ones(3), 0.15, 2)
 
 timer = benchmark.Timer()
 timer.start("contact_forces")
 intersection, wrench12, wrench21, details = pressure_field.contact_forces(
     mesh12origin, vertices1, tetrahedra1, potentials1,
     mesh22origin, vertices2, tetrahedra2, potentials2,
-    return_details=True)
+    return_details=True, timer=timer)
+pprint.pprint(timer.total_time_)
 print(f"time: {timer.stop('contact_forces')}")
 
 print(f"force 12: {np.round(wrench12, 8)}")
