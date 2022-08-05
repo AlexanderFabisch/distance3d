@@ -5,8 +5,8 @@ import aabbtree
 import numba
 import numpy as np
 from .utils import (
-    invert_transform, norm_vector, plane_basis_from_normal,
-    adjoint_from_transform, EPSILON)
+    invert_transform, transform_points, transform_directions, norm_vector,
+    plane_basis_from_normal, adjoint_from_transform, EPSILON)
 
 
 def contact_forces(
@@ -87,30 +87,29 @@ class ContactSurface:
         self.contact_forces = contact_forces
 
     def make_details(self, tetrahedra_points1, tetrahedra_points2):
-        contact_polygons = [contact_polygon.dot(self.frame2world[:3, :3].T) + self.frame2world[:3, 3]
+        contact_polygons = [transform_points(self.frame2world, contact_polygon)
                             for contact_polygon in self.contact_polygons]
         contact_coms = np.asarray(self.contact_coms)
-        contact_coms = contact_coms.dot(self.frame2world[:3, :3].T) + self.frame2world[:3, 3]
-        contact_forces = np.asarray(self.contact_forces)
-        contact_forces = contact_forces.dot(self.frame2world[:3, :3].T)
+        contact_coms = transform_points(self.frame2world, contact_coms)
+        contact_forces = transform_directions(
+            self.frame2world, np.asarray(self.contact_forces))
         contact_areas = np.asarray(self.contact_areas)
         contact_point = np.sum(
             contact_coms * contact_areas[:, np.newaxis],
             axis=0) / sum(contact_areas)
         plane_points = self.contact_planes[:, :3] * self.contact_planes[:, 3, np.newaxis]
-        plane_points = plane_points.dot(self.frame2world[:3, :3].T) + self.frame2world[:3, 3]
-        plane_normals = self.contact_planes[:, :3].dot(self.frame2world[:3, :3].T)
+        plane_points = transform_points(self.frame2world, plane_points)
+        plane_normals = transform_directions(
+            self.frame2world, self.contact_planes[:, :3])
+        n_intersections = len(self.intersecting_tetrahedra1)
         intersecting_tetrahedra1 = tetrahedra_points1[np.asarray(self.intersecting_tetrahedra1, dtype=int)]
-        n_intersections = len(intersecting_tetrahedra1)
-        intersecting_tetrahedra1 = (
-                intersecting_tetrahedra1.reshape(
-                    n_intersections * 4, 3).dot(self.frame2world[:3, :3].T)
-                + self.frame2world[:3, 3]).reshape(n_intersections, 4, 3)
+        intersecting_tetrahedra1 = transform_points(
+            self.frame2world, intersecting_tetrahedra1.reshape(n_intersections * 4, 3)
+        ).reshape(n_intersections, 4, 3)
         intersecting_tetrahedra2 = tetrahedra_points2[np.asarray(self.intersecting_tetrahedra2, dtype=int)]
-        intersecting_tetrahedra2 = (
-                intersecting_tetrahedra2.reshape(
-                    n_intersections * 4, 3).dot(self.frame2world[:3, :3].T)
-                + self.frame2world[:3, 3]).reshape(n_intersections, 4, 3)
+        intersecting_tetrahedra2 = transform_points(
+            self.frame2world, intersecting_tetrahedra2.reshape(n_intersections * 4, 3)
+        ).reshape(n_intersections, 4, 3)
         pressures = np.linalg.norm(contact_forces, axis=1) / np.asarray(contact_areas)
         details = {
             "contact_polygons": contact_polygons,
