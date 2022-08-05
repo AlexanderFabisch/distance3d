@@ -123,7 +123,7 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
 
     triangles = tesselate_ordered_polygon(unique_points[:n_unique_points])
 
-    poly3d = cartesian_intersection_polygon(unique_points[:n_unique_points], cart2plane, contact_plane_hnf)
+    poly3d = project_polygon_3d(unique_points[:n_unique_points], cart2plane, contact_plane_hnf)
     return poly3d, triangles
 
 
@@ -256,7 +256,7 @@ def tesselate_ordered_polygon(poly):
 
 
 @numba.njit(cache=True)
-def cartesian_intersection_polygon(poly, cart2plane, contact_plane_hnf):
+def project_polygon_3d(poly, cart2plane, contact_plane_hnf):
     plane2cart = cart2plane.T
     plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
     return poly.dot(plane2cart.T) + plane_point
