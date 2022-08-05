@@ -40,22 +40,21 @@ def contact_forces(
     intersection_result = intersect_pairs(
             broad_pairs, tetrahedra_points1, tetrahedra_points2,
             X1, X2, epsilon1, epsilon2)
-    contact_surface = ContactSurface(*intersection_result)
+    contact_surface = ContactSurface(mesh22origin, *intersection_result)
     timer.stop_and_add_to_total("intersect_pairs")
 
     timer.start("accumulate_wrenches")
     contact_areas, contact_coms, contact_forces, wrench12_in_world, wrench21_in_world = accumulate_wrenches(
         contact_surface.contact_planes, contact_surface.contact_polygons, contact_surface.contact_polygon_triangles,
-        mesh22origin, epsilon1, contact_surface.intersecting_tetrahedra1, tetrahedra_points1,
+        mesh22origin, potentials1[tetrahedra1], contact_surface.intersecting_tetrahedra1, tetrahedra_points1,
         tetrahedra_points2)
+    contact_surface.add_polygon_info(contact_areas, contact_coms, contact_forces)
     timer.stop_and_add_to_total("accumulate_wrenches")
 
     if return_details:
         timer.start("make_details")
         if contact_surface.intersection:
-            details = make_details(
-                tetrahedra_points1, tetrahedra_points2, contact_areas,
-                contact_coms, contact_forces, contact_surface, mesh22origin)
+            details = make_details(contact_surface, tetrahedra_points1, tetrahedra_points2)
         else:
             details = {}
         timer.stop_and_add_to_total("make_details")
@@ -66,9 +65,10 @@ def contact_forces(
 
 class ContactSurface:
     def __init__(
-            self, intersection, contact_planes, contact_polygons,
+            self, frame2world, intersection, contact_planes, contact_polygons,
             contact_polygon_triangles, intersecting_tetrahedra1,
             intersecting_tetrahedra2):
+        self.frame2world = frame2world
         self.intersection = intersection
         self.contact_planes = contact_planes
         self.contact_polygons = contact_polygons
@@ -76,6 +76,15 @@ class ContactSurface:
         self.contact_forces = contact_forces
         self.intersecting_tetrahedra1 = intersecting_tetrahedra1
         self.intersecting_tetrahedra2 = intersecting_tetrahedra2
+
+        self.contact_areas = None
+        self.contact_coms = None
+        self.contact_forces = None
+
+    def add_polygon_info(self, contact_areas, contact_coms, contact_forces):
+        self.contact_areas = contact_areas
+        self.contact_coms = contact_coms
+        self.contact_forces = contact_forces
 
 
 def broad_phase_tetrahedra(tetrahedra1, tetrahedra2):
@@ -198,34 +207,31 @@ def intersect_tetrahedra(tetrahedron1, epsilon1, X1,
     return True, (contact_plane_hnf, contact_polygon, triangles)
 
 
-def make_details(
-        tetrahedra_points1, tetrahedra_points2,
-        contact_areas, contact_coms, contact_forces, contact_surface,
-        mesh22origin):
-    contact_polygons = [contact_polygon.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
+def make_details(contact_surface, tetrahedra_points1, tetrahedra_points2):
+    contact_polygons = [contact_polygon.dot(contact_surface.frame2world[:3, :3].T) + contact_surface.frame2world[:3, 3]
                         for contact_polygon in contact_surface.contact_polygons]
-    contact_coms = np.asarray(contact_coms)
-    contact_coms = contact_coms.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
-    contact_forces = np.asarray(contact_forces)
-    contact_forces = contact_forces.dot(mesh22origin[:3, :3].T)
-    contact_areas = np.asarray(contact_areas)
+    contact_coms = np.asarray(contact_surface.contact_coms)
+    contact_coms = contact_coms.dot(contact_surface.frame2world[:3, :3].T) + contact_surface.frame2world[:3, 3]
+    contact_forces = np.asarray(contact_surface.contact_forces)
+    contact_forces = contact_forces.dot(contact_surface.frame2world[:3, :3].T)
+    contact_areas = np.asarray(contact_surface.contact_areas)
     contact_point = np.sum(
         contact_coms * contact_areas[:, np.newaxis],
         axis=0) / sum(contact_areas)
     plane_points = contact_surface.contact_planes[:, :3] * contact_surface.contact_planes[:, 3, np.newaxis]
-    plane_points = plane_points.dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
-    plane_normals = contact_surface.contact_planes[:, :3].dot(mesh22origin[:3, :3].T)
+    plane_points = plane_points.dot(contact_surface.frame2world[:3, :3].T) + contact_surface.frame2world[:3, 3]
+    plane_normals = contact_surface.contact_planes[:, :3].dot(contact_surface.frame2world[:3, :3].T)
     intersecting_tetrahedra1 = tetrahedra_points1[np.asarray(contact_surface.intersecting_tetrahedra1, dtype=int)]
     n_intersections = len(intersecting_tetrahedra1)
     intersecting_tetrahedra1 = (
             intersecting_tetrahedra1.reshape(
-                n_intersections * 4, 3).dot(mesh22origin[:3, :3].T)
-            + mesh22origin[:3, 3]).reshape(n_intersections, 4, 3)
+                n_intersections * 4, 3).dot(contact_surface.frame2world[:3, :3].T)
+            + contact_surface.frame2world[:3, 3]).reshape(n_intersections, 4, 3)
     intersecting_tetrahedra2 = tetrahedra_points2[np.asarray(contact_surface.intersecting_tetrahedra2, dtype=int)]
     intersecting_tetrahedra2 = (
             intersecting_tetrahedra2.reshape(
-                n_intersections * 4, 3).dot(mesh22origin[:3, :3].T)
-            + mesh22origin[:3, 3]).reshape(n_intersections, 4, 3)
+                n_intersections * 4, 3).dot(contact_surface.frame2world[:3, :3].T)
+            + contact_surface.frame2world[:3, 3]).reshape(n_intersections, 4, 3)
     details = {
         "contact_polygons": contact_polygons,
         "contact_polygon_triangles": contact_surface.contact_polygon_triangles,
