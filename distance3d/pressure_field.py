@@ -23,46 +23,36 @@ def contact_forces(
     tetrahedra_points2 = vertices2_in_mesh2[tetrahedra2]
     timer.stop_and_add_to_total("transformation")
 
-    """
-    # TODO fix broad phase for cube vs. sphere
-    timer.start("broad phase")  # TODO speed up broad phase
-    broad_overlapping_indices1, broad_overlapping_indices2 = check_aabbs_of_tetrahedra(
-        tetrahedra_points1, tetrahedra_points2, timer=timer)
-    broad_overlapping_pairs = zip(broad_overlapping_indices1, broad_overlapping_indices2)
-    timer.stop_and_add_to_total("broad phase")
-    """
-
-    # FIXME workaround for broad phase bug:
-    from itertools import product
-    broad_overlapping_indices1 = np.array(list(range(len(tetrahedra1))), dtype=int)
-    broad_overlapping_indices2 = np.array(list(range(len(tetrahedra2))), dtype=int)
-    broad_overlapping_pairs = list(product(broad_overlapping_indices1, broad_overlapping_indices2))
+    timer.start("broad_phase_tetrahedra")
+    broad_tetrahedra1, broad_tetrahedra2, broad_pairs = broad_phase_tetrahedra(
+        tetrahedra1, tetrahedra2)
+    timer.stop_and_add_to_total("broad_phase_tetrahedra")
 
     timer.start("barycentric_transform")
-    unique_indices1 = np.unique(broad_overlapping_indices1)
-    unique_indices2 = np.unique(broad_overlapping_indices2)
+    unique_indices1 = np.unique(broad_tetrahedra1)
+    unique_indices2 = np.unique(broad_tetrahedra2)
     X1 = barycentric_transforms(tetrahedra_points1[unique_indices1])
     X2 = barycentric_transforms(tetrahedra_points2[unique_indices2])
     X1 = {j: X1[i] for i, j in enumerate(unique_indices1)}
     X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
     timer.stop_and_add_to_total("barycentric_transform")
 
-    timer.start("contact surface")
+    timer.start("intersect_pairs")
     epsilon1 = potentials1[tetrahedra1]
     epsilon2 = potentials2[tetrahedra2]
     contact_planes, contact_polygon_triangles, contact_polygons, \
         intersecting_tetrahedra1, intersecting_tetrahedra2, \
         intersection = intersect_pairs(
-            broad_overlapping_pairs, tetrahedra_points1, tetrahedra_points2,
+            broad_pairs, tetrahedra_points1, tetrahedra_points2,
             X1, X2, epsilon1, epsilon2)
-    timer.stop_and_add_to_total("contact surface")
+    timer.stop_and_add_to_total("intersect_pairs")
 
-    timer.start("forces")
+    timer.start("accumulate_wrenches")
     contact_areas, contact_coms, contact_forces, wrench12_in_world, wrench21_in_world = accumulate_wrenches(
         contact_planes, contact_polygons, contact_polygon_triangles,
         mesh22origin, epsilon1, intersecting_tetrahedra1, tetrahedra_points1,
         tetrahedra_points2)
-    timer.stop_and_add_to_total("forces")
+    timer.stop_and_add_to_total("accumulate_wrenches")
 
     if return_details:
         timer.start("make_details")
@@ -82,6 +72,65 @@ def contact_forces(
         return intersection, wrench12_in_world, wrench21_in_world, details
     else:
         return intersection, wrench12_in_world, wrench21_in_world
+
+
+def broad_phase_tetrahedra(tetrahedra1, tetrahedra2):
+    """Broad phase collision detection of tetrahedra."""
+
+    """
+    # TODO fix broad phase for cube vs. sphere
+    # TODO speed up broad phase
+    broad_tetrahedra1, broad_tetrahedra2 = check_aabbs_of_tetrahedra(
+        tetrahedra_points1, tetrahedra_points2, timer=timer)
+    broad_pairs = zip(broad_tetrahedra1, broad_tetrahedra2)
+    """
+
+    # FIXME workaround for broad phase bug:
+    from itertools import product
+    broad_tetrahedra1 = np.array(list(range(len(tetrahedra1))), dtype=int)
+    broad_tetrahedra2 = np.array(list(range(len(tetrahedra2))), dtype=int)
+    broad_pairs = list(product(broad_tetrahedra1, broad_tetrahedra2))
+    return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
+
+
+def transform_vertices_to_mesh2(mesh12origin, mesh22origin, vertices1_in_mesh1):
+    # We transform vertices of mesh1 to mesh2 frame to be able to reuse the AABB
+    # tree of mesh2.
+    origin2mesh2 = invert_transform(mesh22origin)
+    mesh12mesh2 = np.dot(origin2mesh2, mesh12origin)
+    vertices1_in_mesh2 = np.dot(
+        vertices1_in_mesh1, mesh12mesh2[:3, :3].T) + mesh12mesh2[np.newaxis, :3, 3]
+    return vertices1_in_mesh2
+
+
+def intersect_pairs(
+        broad_pairs, tetrahedra_points1, tetrahedra_points2, X1, X2,
+        epsilon1, epsilon2):
+    intersection = False
+    contact_planes = []
+    contact_polygons = []
+    contact_polygon_triangles = []
+    intersecting_tetrahedra1 = []
+    intersecting_tetrahedra2 = []
+    for i, j in broad_pairs:
+        intersecting, contact_details = intersect_tetrahedra(
+            tetrahedra_points1[i], epsilon1[i], X1[i],
+            tetrahedra_points2[j], epsilon2[j], X2[j])
+        if intersecting:
+            intersection = True
+        else:
+            continue
+
+        contact_plane_hnf, contact_polygon, triangles = contact_details
+
+        intersecting_tetrahedra1.append(i)
+        intersecting_tetrahedra2.append(j)
+        contact_planes.append(contact_plane_hnf)
+        contact_polygons.append(contact_polygon)
+        contact_polygon_triangles.append(triangles)
+    return (
+        contact_planes, contact_polygon_triangles, contact_polygons,
+        intersecting_tetrahedra1, intersecting_tetrahedra2, intersection)
 
 
 def accumulate_wrenches(
@@ -116,46 +165,6 @@ def accumulate_wrenches(
     wrench12_in_world, wrench21_in_world = postprocess_output(
         mesh22origin, total_force_21, total_torque_12, total_torque_21)
     return contact_areas, contact_coms, contact_forces, wrench12_in_world, wrench21_in_world
-
-
-def intersect_pairs(
-        broad_overlapping_pairs, tetrahedra_points1, tetrahedra_points2,
-        X1, X2, epsilon1, epsilon2):
-    intersection = False
-    contact_planes = []
-    contact_polygons = []
-    contact_polygon_triangles = []
-    intersecting_tetrahedra1 = []
-    intersecting_tetrahedra2 = []
-    for i, j in broad_overlapping_pairs:
-        intersecting, contact_details = intersect_tetrahedra(
-            tetrahedra_points1[i], epsilon1[i], X1[i],
-            tetrahedra_points2[j], epsilon2[j], X2[j])
-        if intersecting:
-            intersection = True
-        else:
-            continue
-
-        contact_plane_hnf, contact_polygon, triangles = contact_details
-
-        intersecting_tetrahedra1.append(i)
-        intersecting_tetrahedra2.append(j)
-        contact_planes.append(contact_plane_hnf)
-        contact_polygons.append(contact_polygon)
-        contact_polygon_triangles.append(triangles)
-    return (
-        contact_planes, contact_polygon_triangles, contact_polygons,
-        intersecting_tetrahedra1, intersecting_tetrahedra2, intersection)
-
-
-def transform_vertices_to_mesh2(mesh12origin, mesh22origin, vertices1_in_mesh1):
-    # We transform vertices of mesh1 to mesh2 frame to be able to reuse the AABB
-    # tree of mesh2.
-    origin2mesh2 = invert_transform(mesh22origin)
-    mesh12mesh2 = np.dot(origin2mesh2, mesh12origin)
-    vertices1_in_mesh2 = np.dot(
-        vertices1_in_mesh1, mesh12mesh2[:3, :3].T) + mesh12mesh2[np.newaxis, :3, 3]
-    return vertices1_in_mesh2
 
 
 @numba.njit(cache=True)
@@ -244,15 +253,15 @@ def check_aabbs_of_tetrahedra(tetrahedra_points1, tetrahedra_points2, timer=None
     if timer is not None:
         timer.stop_and_add_to_total("broad phase - aabb tree construction")
         timer.start("broad phase - aabb tree querying")
-    broad_overlapping_indices1 = []
-    broad_overlapping_indices2 = []
+    broad_tetrahedra1 = []
+    broad_tetrahedra2 = []
     for i, aabb in enumerate(aabbs1):
         new_indices2 = tree2.overlap_values(aabbtree.AABB(aabb))
-        broad_overlapping_indices2.extend(new_indices2)
-        broad_overlapping_indices1.extend([i] * len(new_indices2))
+        broad_tetrahedra2.extend(new_indices2)
+        broad_tetrahedra1.extend([i] * len(new_indices2))
     if timer is not None:
         timer.stop_and_add_to_total("broad phase - aabb tree querying")
-    return broad_overlapping_indices1, broad_overlapping_indices2
+    return broad_tetrahedra1, broad_tetrahedra2
 
 
 @numba.njit(
@@ -265,17 +274,17 @@ def points_to_plane_signed(points, plane_point, plane_normal):
 @numba.njit(cache=True)  # TODO can we use this?
 def _check_tetrahedra_intersect_contact_plane(
         vertices1_in_mesh2, tetrahedra1, vertices2_in_mesh2, tetrahedra2,
-        contact_point, normal, broad_overlapping_indices1,
-        broad_overlapping_indices2):
+        contact_point, normal, broad_tetrahedra1,
+        broad_tetrahedra2):
     """Check if the tetrahedra actually intersect the contact plane."""
-    candidates1 = tetrahedra1[broad_overlapping_indices1]
-    candidates2 = tetrahedra2[broad_overlapping_indices2]
+    candidates1 = tetrahedra1[broad_tetrahedra1]
+    candidates2 = tetrahedra2[broad_tetrahedra2]
     keep1 = intersecting_tetrahedra(vertices1_in_mesh2, candidates1, contact_point, normal)
     keep2 = intersecting_tetrahedra(vertices2_in_mesh2, candidates2, contact_point, normal)
     keep = np.logical_and(keep1, keep2)
-    broad_overlapping_indices1 = broad_overlapping_indices1[keep]
-    broad_overlapping_indices2 = broad_overlapping_indices2[keep]
-    return broad_overlapping_indices1, broad_overlapping_indices2
+    broad_tetrahedra1 = broad_tetrahedra1[keep]
+    broad_tetrahedra2 = broad_tetrahedra2[keep]
+    return broad_tetrahedra1, broad_tetrahedra2
 
 
 @numba.njit(
