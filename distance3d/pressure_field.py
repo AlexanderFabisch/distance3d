@@ -198,7 +198,7 @@ def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):
         contact_coms.append(intersection_com)
         contact_forces.append(force_vector)
         contact_areas.append(area)
-    wrench12_in_world, wrench21_in_world = postprocess_output(
+    wrench12_in_world, wrench21_in_world = _transform_wrenches(
         contact_surface.frame2world, total_force_21, total_torque_12, total_torque_21)
     contact_surface.add_polygon_info(contact_areas, contact_coms, contact_forces)
     return wrench12_in_world, wrench21_in_world
@@ -249,7 +249,7 @@ def intersect_pairs(
     intersecting_tetrahedra1 = []
     intersecting_tetrahedra2 = []
     for i, j in broad_pairs:
-        intersecting, contact_details = intersect_tetrahedra(
+        intersecting, contact_details = intersect_two_tetrahedra(
             tetrahedra_points1[i], epsilon1[i], X1[i],
             tetrahedra_points2[j], epsilon2[j], X2[j])
         if intersecting:
@@ -271,7 +271,7 @@ def intersect_pairs(
 
 
 @numba.njit(cache=True)
-def postprocess_output(mesh22origin, total_force_21, total_torque_12, total_torque_21):
+def _transform_wrenches(mesh22origin, total_force_21, total_torque_12, total_torque_21):
     wrench21 = np.hstack((total_force_21, total_torque_21))
     wrench12 = np.hstack((-total_force_21, total_torque_12))
     mesh22origin_adjoint = adjoint_from_transform(mesh22origin)
@@ -281,8 +281,7 @@ def postprocess_output(mesh22origin, total_force_21, total_torque_12, total_torq
 
 
 @numba.njit(cache=True)
-def intersect_tetrahedra(tetrahedron1, epsilon1, X1,
-                         tetrahedron2, epsilon2, X2):
+def intersect_two_tetrahedra(tetrahedron1, epsilon1, X1, tetrahedron2, epsilon2, X2):
     contact_plane_hnf = contact_plane(X1, X2, epsilon1, epsilon2)
     if not check_tetrahedra_intersect_contact_plane(
             tetrahedron1, tetrahedron2, contact_plane_hnf):
