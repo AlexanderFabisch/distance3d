@@ -83,7 +83,7 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, plane_n
 
 @numba.njit(cache=True)
 def compute_contact_polygon(tetrahedron1, tetrahedron2, plane_normal, d):
-    cart2plane = np.row_stack(plane_basis_from_normal(plane_normal))
+    cart2plane = np.vstack(plane_basis_from_normal(plane_normal))
     halfplanes = np.vstack((
         make_halfplanes(tetrahedron1, plane_normal, d, cart2plane),
         make_halfplanes(tetrahedron2, plane_normal, d, cart2plane)))
