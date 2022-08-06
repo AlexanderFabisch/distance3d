@@ -152,8 +152,10 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
 
         isect_points[0] = intersection_points[0]
         isect_points[1] = intersection_points[1]
+        normal = np.cross(directions[triangle[1], triangle[0]],
+                          directions[triangle[2], triangle[0]])
         halfplanes[hp_idx] = make_halfplane(
-            cart2plane, directions, isect_points, plane_point, triangle)
+            cart2plane, isect_points, plane_point, normal)
         hp_idx += 1
     return halfplanes[:hp_idx]
 
@@ -177,8 +179,7 @@ def _precompute_edge_intersections(d, plane_normal, tetrahedron_points):
 
 
 @numba.njit(cache=True)
-def make_halfplane(
-        cart2plane, directions, intersection_points, plane_point, triangle):
+def make_halfplane(cart2plane, intersection_points, plane_point, normal):
     """Construct halfplane.
 
     Returns
@@ -189,8 +190,6 @@ def make_halfplane(
         point on the separating line.
     """
     # normal pointing inwards
-    normal = np.cross(directions[triangle[1], triangle[0]],
-                      directions[triangle[2], triangle[0]])
     normal2d = cart2plane.dot(normal)
     intersection_points -= plane_point
     intersection_points = intersection_points.dot(cart2plane.T)
