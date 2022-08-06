@@ -144,23 +144,22 @@ def make_halfplanes(tetrahedron_points, plane_normal, d, cart2plane):
 
     halfplanes = np.empty((4, 4))
     hp_idx = 0
-    isect_points = np.empty((2, 3))
+    intersection_points = np.empty((2, 3))
     for triangle_idx in range(len(TRIANGLES)):
-        intersection_points = []
+        n_intersections = 0
         for i, j in TRIANGLE_LINE_SEGMENTS[triangle_idx]:
             if d_signs[i] != d_signs[j]:
-                intersection_points.append(P[i, j])
+                intersection_points[n_intersections] = P[i, j]
+                n_intersections += 1
 
-        if len(intersection_points) != 2:  # TODO what if 3 points? (touching objects)
+        if n_intersections != 2:  # TODO what if 3 points? (touching objects)
             continue
 
-        isect_points[0] = intersection_points[0]
-        isect_points[1] = intersection_points[1]
         normal = np.cross(
             directions[TRIANGLES[triangle_idx, 1], TRIANGLES[triangle_idx, 0]],
             directions[TRIANGLES[triangle_idx, 2], TRIANGLES[triangle_idx, 0]])
         halfplanes[hp_idx] = make_halfplane(
-            isect_points, normal, cart2plane, plane_point)
+            intersection_points, normal, cart2plane, plane_point)
         hp_idx += 1
     return halfplanes[:hp_idx]
 
