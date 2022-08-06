@@ -287,7 +287,7 @@ def filter_unique_points(points):
     unique_points = np.empty((len(points), 2))
     n_unique_points = 0
     for j in range(len(points)):
-        if j == len(points) - 1 or np.linalg.norm(points[j + 1] - points[j]) > 10.0 * EPSILON:
+        if j == 0 or np.linalg.norm(points[j] - points[j - 1]) > 10.0 * EPSILON:
             unique_points[n_unique_points] = points[j]
             n_unique_points += 1
     return n_unique_points, unique_points
