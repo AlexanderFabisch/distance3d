@@ -72,8 +72,8 @@ def contact_plane(X1, X2, epsilon1, epsilon2):
 
 @numba.njit(cache=True)
 def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, plane_normal, d, epsilon=1e-6):
-    plane_distances1 = tetrahedron1.dot(plane_normal[:3]) - d
-    plane_distances2 = tetrahedron2.dot(plane_normal[:3]) - d
+    plane_distances1 = tetrahedron1.dot(plane_normal) - d
+    plane_distances2 = tetrahedron2.dot(plane_normal) - d
     return (
         min(plane_distances1) < -epsilon
         and max(plane_distances1) > epsilon
