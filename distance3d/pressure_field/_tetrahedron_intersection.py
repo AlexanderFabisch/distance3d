@@ -151,8 +151,10 @@ def make_halfplanes(tetrahedron_points, plane_normal, d, cart2plane):
             if d_signs[i] != d_signs[j]:
                 intersection_points[n_intersections] = P[i, j]
                 n_intersections += 1
+            if n_intersections == 2:  # TODO what if 3 points? (touching objects)
+                break
 
-        if n_intersections != 2:  # TODO what if 3 points? (touching objects)
+        if n_intersections < 2:
             continue
 
         normal = np.cross(
