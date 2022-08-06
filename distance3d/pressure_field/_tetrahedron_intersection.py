@@ -44,12 +44,14 @@ def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
 def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
                                tetrahedron2, epsilon2, X2):
     contact_plane_hnf = contact_plane(X1, X2, epsilon1, epsilon2)
+    plane_normal = contact_plane_hnf[:3]
+    d = contact_plane_hnf[3]
     if not check_tetrahedra_intersect_contact_plane(
-            tetrahedron1, tetrahedron2, contact_plane_hnf):
+            tetrahedron1, tetrahedron2, plane_normal, d):
         return False, None
 
     contact_polygon, triangles = compute_contact_polygon(
-        tetrahedron1, tetrahedron2, contact_plane_hnf)
+        tetrahedron1, tetrahedron2, plane_normal, d)
     if contact_polygon is None:
         return False, None
 
@@ -69,9 +71,9 @@ def contact_plane(X1, X2, epsilon1, epsilon2):
 
 
 @numba.njit(cache=True)
-def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact_plane_hnf, epsilon=1e-6):
-    plane_distances1 = tetrahedron1.dot(contact_plane_hnf[:3]) - contact_plane_hnf[3]
-    plane_distances2 = tetrahedron2.dot(contact_plane_hnf[:3]) - contact_plane_hnf[3]
+def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, plane_normal, d, epsilon=1e-6):
+    plane_distances1 = tetrahedron1.dot(plane_normal[:3]) - d
+    plane_distances2 = tetrahedron2.dot(plane_normal[:3]) - d
     return (
         min(plane_distances1) < -epsilon
         and max(plane_distances1) > epsilon
@@ -80,10 +82,8 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 
 
 @numba.njit(cache=True)
-def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
-    cart2plane = np.row_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
-    plane_normal = contact_plane_hnf[:3]
-    d = contact_plane_hnf[3]
+def compute_contact_polygon(tetrahedron1, tetrahedron2, plane_normal, d):
+    cart2plane = np.row_stack(plane_basis_from_normal(plane_normal))
     halfplanes = np.vstack((
         make_halfplanes(tetrahedron1, plane_normal, d, cart2plane),
         make_halfplanes(tetrahedron2, plane_normal, d, cart2plane)))
@@ -106,7 +106,7 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     #plot_halfplanes_and_intersections(halfplanes, unique_points)
 
     triangles = tesselate_ordered_polygon(unique_points)
-    poly3d = project_polygon_3d(unique_points, cart2plane, contact_plane_hnf)
+    poly3d = project_polygon_3d(unique_points, cart2plane, plane_normal, d)
     return poly3d, triangles
 
 
@@ -293,7 +293,7 @@ def filter_unique_points(points):
 
 
 @numba.njit(cache=True)
-def project_polygon_3d(poly, cart2plane, contact_plane_hnf):
+def project_polygon_3d(poly, cart2plane, plane_normal, d):
     plane2cart = cart2plane.T
-    plane_point = contact_plane_hnf[:3] * contact_plane_hnf[3]
+    plane_point = plane_normal * d
     return poly.dot(plane2cart.T) + plane_point
