@@ -5,7 +5,7 @@ from ..utils import plane_basis_from_normal, norm_vector, EPSILON
 
 TRIANGLES = np.array([[2, 1, 0], [2, 3, 1], [2, 0, 3], [1, 3, 0]], dtype=int)
 LINE_SEGMENTS = np.array([[0, 1], [1, 2], [2, 0]], dtype=int)
-TRIANGLE_LINE_SEGMENTS = np.array([triangle[LINE_SEGMENTS] for triangle in TRIANGLES], dtype=int)
+TRIANGLE_LINE_SEGMENTS = np.array([np.sort(triangle[LINE_SEGMENTS]) for triangle in TRIANGLES], dtype=int)
 
 
 def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
@@ -81,9 +81,11 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, contact
 @numba.njit(cache=True)
 def compute_contact_polygon(tetrahedron1, tetrahedron2, contact_plane_hnf):
     cart2plane = np.row_stack(plane_basis_from_normal(contact_plane_hnf[:3]))
+    plane_normal = contact_plane_hnf[:3]
+    d = contact_plane_hnf[3]
     halfplanes = np.vstack((
-        make_halfplanes(tetrahedron1, contact_plane_hnf, cart2plane),
-        make_halfplanes(tetrahedron2, contact_plane_hnf, cart2plane)))
+        make_halfplanes(tetrahedron1, plane_normal, d, cart2plane),
+        make_halfplanes(tetrahedron2, plane_normal, d, cart2plane)))
     poly = intersect_halfplanes(halfplanes)
 
     if poly is None:
@@ -133,9 +135,7 @@ def plot_halfplane(halfplane, ax, c, alpha, scale):
 
 
 @numba.njit(cache=True)
-def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
-    plane_normal = plane_hnf[:3]
-    d = plane_hnf[3]
+def make_halfplanes(tetrahedron_points, plane_normal, d, cart2plane):
     plane_point = plane_normal * d
 
     P, d_signs, directions = _precompute_edge_intersections(
@@ -146,9 +146,7 @@ def make_halfplanes(tetrahedron_points, plane_hnf, cart2plane):
     isect_points = np.empty((2, 3))
     for i, triangle in enumerate(TRIANGLES):
         intersection_points = []
-        for line_segment in TRIANGLE_LINE_SEGMENTS[i]:
-            i = min(line_segment)
-            j = max(line_segment)
+        for i, j in TRIANGLE_LINE_SEGMENTS[i]:
             if d_signs[i] != d_signs[j]:
                 intersection_points.append(P[i, j])
 
