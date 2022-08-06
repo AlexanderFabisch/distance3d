@@ -39,6 +39,8 @@ intersection, wrench12, wrench21, details = pressure_field.contact_forces(
 pprint.pprint(timer.total_time_)
 print(f"time: {timer.stop('contact_forces')}")
 
+assert intersection
+
 print(f"force 12: {np.round(wrench12, 8)}")
 print(f"force 21: {np.round(wrench21, 8)}")
 
