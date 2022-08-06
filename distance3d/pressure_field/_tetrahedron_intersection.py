@@ -33,7 +33,8 @@ def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
         contact_planes.append(contact_plane_hnf)
         contact_polygons.append(contact_polygon)
         contact_polygon_triangles.append(triangles)
-    contact_planes = np.vstack(contact_planes)
+    if len(contact_planes) > 0:
+        contact_planes = np.vstack(contact_planes)
     return (intersection, contact_planes, contact_polygons,
             contact_polygon_triangles, intersecting_tetrahedra1,
             intersecting_tetrahedra2)
