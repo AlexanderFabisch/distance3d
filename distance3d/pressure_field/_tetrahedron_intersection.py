@@ -168,8 +168,10 @@ def make_halfplanes(tetrahedron_points, plane_normal, d, cart2plane):
 def _precompute_edge_intersections(d, plane_normal, tetrahedron_points):
     directions = np.empty((4, 4, 3), np.dtype("float"))
     for i in range(4):
-        for j in range(4):
+        directions[i, i] = 0.0
+        for j in range(i + 1, 4):
             directions[i, j] = tetrahedron_points[j] - tetrahedron_points[i]
+            directions[j, i] = -directions[i, j]
     unnormalized_distances = d - np.dot(tetrahedron_points, plane_normal)
     d_signs = np.sign(unnormalized_distances)
     P = np.empty((4, 4, 3), np.dtype("float"))
