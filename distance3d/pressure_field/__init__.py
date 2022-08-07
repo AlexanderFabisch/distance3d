@@ -9,6 +9,7 @@ from ._rigid_body import RigidBody
 from ._contact_surface import ContactSurface
 from ._tetrahedron_intersection import intersect_tetrahedron_pairs, intersect_tetrahedron_pair, intersect_halfplanes
 from ._forces import contact_surface_forces, accumulate_wrenches, compute_contact_force
+from ._halfplanes import plot_halfplanes_and_intersections
 
 
 def contact_forces(
