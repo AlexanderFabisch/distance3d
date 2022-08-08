@@ -133,27 +133,3 @@ def make_halfplanes2(tetrahedron, cart2plane, plane2cart_offset):  # TODO can we
             p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
             halfplanes.append((p, normal2d))
     return halfplanes
-
-
-# TODO remove or reuse function
-def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with parallel lines?
-    from collections import deque
-    dq = deque()
-    for hp in halfplanes:
-        while len(dq) >= 2 and hp.outside_of(dq[-1].intersect(dq[-2])):
-            dq.pop()
-        while len(dq) >= 2 and hp.outside_of(dq[0].intersect(dq[1])):
-            dq.popleft()
-        dq.append(hp)
-
-    while len(dq) >= 3 and dq[0].outside_of(dq[-1].intersect(dq[-2])):
-        dq.pop()
-    while len(dq) >= 3 and dq[-1].outside_of(dq[0].intersect(dq[1])):
-        dq.popleft()
-
-    if len(dq) < 3:
-        return None, []
-    else:
-        polygon = np.row_stack([dq[i].intersect(dq[(i + 1) % len(dq)])
-                                for i in range(len(dq))])
-        return polygon, list(dq)
