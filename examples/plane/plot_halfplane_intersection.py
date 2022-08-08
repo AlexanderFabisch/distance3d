@@ -11,28 +11,39 @@ from distance3d import pressure_field, benchmark
 
 # TODO remove or reuse function
 from collections import deque
-from distance3d.pressure_field._halfplanes import intersect_two_halfplanes, point_outside_of_halfplane
+from distance3d.pressure_field._halfplanes import intersect_two_halfplanes, point_outside_of_halfplane, cross2d
+from distance3d.utils import EPSILON
 def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with parallel lines?
     angles = np.arctan2(halfplanes[:, 3], halfplanes[:, 2])
     halfplanes = halfplanes[np.argsort(angles)]
-    dq = deque()
+
+    result = deque()
     for hp in halfplanes:
-        while len(dq) >= 2 and point_outside_of_halfplane(hp, intersect_two_halfplanes(dq[-1], dq[-2])):
-            dq.pop()
-        while len(dq) >= 2 and point_outside_of_halfplane(hp, intersect_two_halfplanes(dq[0], dq[1])):
-            dq.popleft()
-        dq.append(hp)
+        try:
+            while len(result) >= 2 and point_outside_of_halfplane(hp, intersect_two_halfplanes(result[-1], result[-2])):
+                result.pop()
+            while len(result) >= 2 and point_outside_of_halfplane(hp, intersect_two_halfplanes(result[0], result[1])):
+                result.popleft()
+        except TypeError:
+            #if len(result) > 0 and abs(cross2d(hp[2:], result[-1][2:])) < 1e-6:
+            # Opposite parallel halfplanes that ended up checked against each other
+            if np.dot(hp[2:], result[-1][2:]) < -EPSILON:
+                return None
+            # Same direction halfplane: keep only the leftmost halfplane
+            if point_outside_of_halfplane(hp, result[-1][:2]):
+                result.pop()
+        result.append(hp)
 
-    while len(dq) >= 3 and point_outside_of_halfplane(dq[0], intersect_two_halfplanes(dq[-1], dq[-2])):
-        dq.pop()
-    while len(dq) >= 3 and point_outside_of_halfplane(dq[-1], intersect_two_halfplanes(dq[0], dq[1])):
-        dq.popleft()
+    while len(result) >= 3 and point_outside_of_halfplane(result[0], intersect_two_halfplanes(result[-1], result[-2])):
+        result.pop()
+    while len(result) >= 3 and point_outside_of_halfplane(result[-1], intersect_two_halfplanes(result[0], result[1])):
+        result.popleft()
 
-    if len(dq) < 3:
+    if len(result) < 3:
         return None
     else:
-        polygon = np.row_stack([intersect_two_halfplanes(dq[i], dq[(i + 1) % len(dq)])
-                                for i in range(len(dq))])
+        polygon = np.row_stack([intersect_two_halfplanes(result[i], result[(i + 1) % len(result)])
+                                for i in range(len(result))])
         return polygon
 
 
@@ -48,10 +59,10 @@ halfplanes = np.hstack((p, pq))
 
 timer = benchmark.Timer()
 timer.start("intersect_halfplanes")
-polygon = np.asarray(intersect_halfplanes2(halfplanes))
+polygon = np.asarray(pressure_field.intersect_halfplanes(halfplanes))
 print(f"{timer.stop('intersect_halfplanes')} s")
 timer.start("intersect_halfplanes2")
-polygon2 = np.asarray(pressure_field.intersect_halfplanes(halfplanes))
+polygon2 = np.asarray(intersect_halfplanes2(halfplanes))
 print(f"{timer.stop('intersect_halfplanes2')} s")
 print(polygon)
 print(polygon2)
