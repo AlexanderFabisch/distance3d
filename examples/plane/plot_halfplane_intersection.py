@@ -13,6 +13,8 @@ from distance3d import pressure_field, benchmark
 from collections import deque
 from distance3d.pressure_field._halfplanes import intersect_two_halfplanes, point_outside_of_halfplane
 def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with parallel lines?
+    angles = np.arctan2(halfplanes[:, 3], halfplanes[:, 2])
+    halfplanes = halfplanes[np.argsort(angles)]
     dq = deque()
     for hp in halfplanes:
         while len(dq) >= 2 and point_outside_of_halfplane(hp, intersect_two_halfplanes(dq[-1], dq[-2])):
@@ -35,7 +37,7 @@ def intersect_halfplanes2(halfplanes):  # TODO can we modify this to work with p
 
 
 random_state = np.random.RandomState(0)
-n_halfplanes = 100
+n_halfplanes = 10
 x = random_state.rand(n_halfplanes) * 2.0 * np.pi
 p = np.column_stack((np.cos(x), np.sin(x)))
 p += random_state.rand(*p.shape) * 0.1
