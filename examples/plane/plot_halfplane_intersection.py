@@ -10,8 +10,6 @@ from distance3d import pressure_field, benchmark
 
 
 from distance3d.pressure_field._halfplanes import intersect_two_halfplanes, point_outside_of_halfplane, cross2d
-import numba
-@numba.njit(cache=True)
 def intersect_halfplanes(halfplanes):
     # source: https://cp-algorithms.com/geometry/halfplane-intersection.html#direct-implementation
     angles = np.arctan2(halfplanes[:, 3], halfplanes[:, 2])
@@ -20,7 +18,7 @@ def intersect_halfplanes(halfplanes):
     result = []
     for hp in halfplanes:
         while len(result) >= 2:
-            p = intersect_two_halfplanes(result[-1], result[-2])
+            p = intersect_two_halfplanes(result[-2], result[-1])
             if p is not None and point_outside_of_halfplane(hp, p):
                 del result[-1]
             else:
@@ -32,7 +30,7 @@ def intersect_halfplanes(halfplanes):
             else:
                 break
 
-        parallel_halfplanes = len(result) > 0 and abs(cross2d(hp[2:], result[-1][2:])) < 1e-6
+        parallel_halfplanes = len(result) > 0 and abs(cross2d(result[-1][2:], hp[2:])) < 1e-6
         if parallel_halfplanes:
             opposite = np.dot(hp[2:], result[-1][2:]) < 0.0
             if opposite:
@@ -47,7 +45,7 @@ def intersect_halfplanes(halfplanes):
             result.append(hp)
 
     while len(result) >= 3:
-        p = intersect_two_halfplanes(result[-1], result[-2])
+        p = intersect_two_halfplanes(result[-2], result[-1])
         assert p is not None
         if point_outside_of_halfplane(result[0], p):
             del result[-1]
