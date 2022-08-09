@@ -5,6 +5,7 @@ from numpy.testing import assert_array_almost_equal
 
 def test_intersect_halfplanes():
     halfplanes = np.array([
+        [1.0, 0.0, 0.0, 1.0],
         [0.5, 0.0, 0.0, 1.0],
         [0.0, 0.5, -1.0, 0.0],
         [-0.5, 0.0, 0.0, -1.0],
