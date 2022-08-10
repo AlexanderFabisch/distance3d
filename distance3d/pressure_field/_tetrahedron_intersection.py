@@ -115,7 +115,7 @@ def make_halfplanes(X, plane_point, cart2plane):
     hp_idx = 0
     for i in range(4):
         norm = np.linalg.norm(normals2d[i])
-        if norm > 1e-9:
+        if norm > EPSILON:
             p = normals2d[i] * ds[i] / (norm * norm)
             halfplanes[i, :2] = p
             halfplanes[i, 2] = normals2d[i, 1]
