@@ -119,17 +119,3 @@ def barycentric_transforms(tetrahedra_points):
     # the inverse
     return np.linalg.pinv(np.hstack((tetrahedra_points.transpose((0, 2, 1)),
                                      np.ones((len(tetrahedra_points), 1, 4)))))
-
-
-# TODO remove or reuse function
-def make_halfplanes2(tetrahedron, cart2plane, plane2cart_offset):  # TODO can we fix this?
-    halfplanes = []
-    X = barycentric_transform(tetrahedron)
-    for i in range(4):
-        halfspace = X[i]
-        normal2d = cart2plane.dot(halfspace[:3])
-        norm = np.linalg.norm(normal2d)
-        if norm > 1e-9:
-            p = normal2d * (-halfspace[3] - halfspace[:3].dot(plane2cart_offset)) / np.dot(normal2d, normal2d)
-            halfplanes.append((p, normal2d))
-    return halfplanes
