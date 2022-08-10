@@ -45,19 +45,24 @@ def point_outside_of_halfplane(halfplane, point):
     return cross2d(halfplane[2:], point - halfplane[:2]) < -EPSILON
 
 
-def plot_halfplanes_and_intersections(halfplanes, points, xlim=None, ylim=None):
+def plot_halfplanes_and_intersections(halfplanes, points=None, xlim=None, ylim=None):
     import matplotlib.pyplot as plt
-    center = np.mean(points, axis=0)
-    max_distance = max(np.linalg.norm(points - center, axis=1))
+    if points is None:
+        scale = 1.0
+    else:
+        center = np.mean(points, axis=0)
+        max_distance = max(np.linalg.norm(points - center, axis=1))
+        scale = 10.0 * max_distance
     plt.figure()
     ax = plt.subplot(111, aspect="equal")
     for i, halfplane in enumerate(halfplanes):
         c = "r" if i < len(halfplanes) // 2 else "b"
-        plot_halfplane(halfplane, ax, c, 0.5, 10.0 * max_distance)
-    colors = ["r", "g", "b", "orange", "magenta", "brown", "k"][:len(points)]
-    if len(colors) < len(points):
-        colors.extend(["k"] * (len(points) - len(colors)))
-    plt.scatter(points[:, 0], points[:, 1], c=colors, s=100)
+        plot_halfplane(halfplane, ax, c, 0.5, scale)
+    if points is not None:
+        colors = ["r", "g", "b", "orange", "magenta", "brown", "k"][:len(points)]
+        if len(colors) < len(points):
+            colors.extend(["k"] * (len(points) - len(colors)))
+        plt.scatter(points[:, 0], points[:, 1], c=colors, s=100)
     if xlim is not None:
         plt.xlim(xlim)
     if ylim is not None:

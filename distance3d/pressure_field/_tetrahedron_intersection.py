@@ -4,11 +4,6 @@ from ..utils import plane_basis_from_normal, EPSILON
 from ._halfplanes import intersect_halfplanes, cross2d, plot_halfplanes_and_intersections
 
 
-TRIANGLES = np.array([[2, 1, 0], [2, 3, 1], [2, 0, 3], [1, 3, 0]], dtype=int)
-LINE_SEGMENTS = np.array([[0, 1], [1, 2], [2, 0]], dtype=int)
-TRIANGLE_LINE_SEGMENTS = np.array([np.sort(triangle[LINE_SEGMENTS]) for triangle in TRIANGLES], dtype=int)
-
-
 def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
     intersection = False
     contact_planes = []
@@ -52,7 +47,7 @@ def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
         return False, None
 
     contact_polygon, triangles = compute_contact_polygon(
-        tetrahedron1, tetrahedron2, plane_normal, d)
+        X1, X2, plane_normal, d)
     if contact_polygon is None:
         return False, None
 
@@ -83,11 +78,12 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, plane_n
 
 
 @numba.njit(cache=True)
-def compute_contact_polygon(tetrahedron1, tetrahedron2, plane_normal, d):
+def compute_contact_polygon(X1, X2, plane_normal, d):
+    plane_point = plane_normal * d
     cart2plane = np.vstack(plane_basis_from_normal(plane_normal))
-    halfplanes = np.vstack((
-        make_halfplanes(tetrahedron1, plane_normal, d, cart2plane),
-        make_halfplanes(tetrahedron2, plane_normal, d, cart2plane)))
+    halfplanes = np.vstack((make_halfplanes(X1, plane_point, cart2plane),
+                            make_halfplanes(X2, plane_point, cart2plane)))
+
     poly = intersect_halfplanes(halfplanes)
 
     if poly is None:
@@ -112,33 +108,19 @@ def compute_contact_polygon(tetrahedron1, tetrahedron2, plane_normal, d):
 
 
 @numba.njit(cache=True)
-def make_halfplanes(tetrahedron_points, plane_normal, d, cart2plane):
-    plane_point = plane_normal * d
-
-    P, d_signs, directions = _precompute_edge_intersections(
-        d, plane_normal, tetrahedron_points)
-
+def make_halfplanes(X, plane_point, cart2plane):
     halfplanes = np.empty((4, 4))
+    normals2d = X[:, :3].dot(cart2plane.T)
+    ds = -X[:, 3] - X[:, :3].dot(plane_point)
     hp_idx = 0
-    intersection_points = np.empty((2, 3))
-    for triangle_idx in range(len(TRIANGLES)):
-        n_intersections = 0
-        for i, j in TRIANGLE_LINE_SEGMENTS[triangle_idx]:
-            if d_signs[i] != d_signs[j]:
-                intersection_points[n_intersections] = P[i, j]
-                n_intersections += 1
-            if n_intersections == 2:  # TODO what if 3 points? (touching objects)
-                break
-
-        if n_intersections < 2:
-            continue
-
-        normal = np.cross(
-            directions[TRIANGLES[triangle_idx, 1], TRIANGLES[triangle_idx, 0]],
-            directions[TRIANGLES[triangle_idx, 2], TRIANGLES[triangle_idx, 0]])
-        halfplanes[hp_idx] = make_halfplane(
-            intersection_points, normal, cart2plane, plane_point)
-        hp_idx += 1
+    for i in range(4):
+        norm = np.linalg.norm(normals2d[i])
+        if norm > 1e-9:
+            p = normals2d[i] * ds[i] / (norm * norm)
+            halfplanes[i, :2] = p
+            halfplanes[i, 2] = normals2d[i, 1]
+            halfplanes[i, 3] = -normals2d[i, 0]
+            hp_idx += 1
     return halfplanes[:hp_idx]
 
 
@@ -160,42 +142,6 @@ def _precompute_edge_intersections(d, plane_normal, tetrahedron_points):
                 t = unnormalized_distances[i] / normal_direction
                 P[i, j] = tetrahedron_points[i] + t * directions[i, j]
     return P, d_signs, directions
-
-
-@numba.njit(cache=True)
-def make_halfplane(intersection_points, normal, cart2plane, plane_point):
-    """Construct halfplane.
-
-    Parameters
-    ----------
-    intersection_points : array, shape (2, 3)
-        Triangle-plane intersection points.
-
-    normal : array, shape (3,)
-        Normal pointing inwards, i.e., into the halfplane.
-
-    cart2plane : array, shape (2, 3)
-        Transform from space to plane.
-
-    plane_point : array, shape (3,)
-        Point on the plane.
-
-    Returns
-    -------
-    halfplane : array, shape (4,)
-        A halfplane defined by a point p (halfplane[:2]) and a direction
-        pq (halfplane[2:]) such that p + t * pq == q(t) generates another
-        point on the separating line.
-    """
-    normal2d = cart2plane.dot(normal)
-    intersection_points -= plane_point
-    intersection_points = intersection_points.dot(cart2plane.T)
-    p, q = intersection_points
-    pq = q - p
-    if cross2d(pq, normal2d) < 0:
-        p = q
-        pq *= -1.0
-    return np.hstack((p, pq))
 
 
 @numba.njit(cache=True)
