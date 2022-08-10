@@ -180,21 +180,21 @@ def test_point_to_triangle():
 
 
 def test_point_to_box():
-    point = np.array([0, 0, 0])
+    point = np.array([0, 0, 0], dtype=float)
 
     box2origin = np.eye(4)
-    size = np.array([1, 1, 1])
+    size = np.array([1, 1, 1], dtype=float)
 
     dist, closest_point_box = point_to_box(point, box2origin, size)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point_box, np.array([0, 0, 0]))
 
-    point = np.array([0.5, 0.5, 0.5])
+    point = np.array([0.5, 0.5, 0.5], dtype=float)
     dist, closest_point_box = point_to_box(point, box2origin, size)
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point_box, point)
 
-    point = np.array([1, 1, 1])
+    point = np.array([1, 1, 1], dtype=float)
     dist, closest_point_box = point_to_box(point, box2origin, size)
     assert approx(dist) == np.sqrt(0.75)
     assert_array_almost_equal(closest_point_box, np.array([0.5, 0.5, 0.5]))
@@ -289,8 +289,9 @@ def test_point_to_ellipsoid():
     ellipsoid2origin = pt.random_transform(random_state)
     radii = random_state.rand(3)
 
+    point = np.ascontiguousarray(ellipsoid2origin[:3, 3])
     dist, closest_point_ellipsoid = point_to_ellipsoid(
-        ellipsoid2origin[:3, 3], ellipsoid2origin, radii)
+        point, ellipsoid2origin, radii)
     assert approx(dist) == 0.0
     assert_array_almost_equal(closest_point_ellipsoid, ellipsoid2origin[:3, 3])
 
@@ -324,7 +325,7 @@ def test_point_to_ellipsoid_surface():
             closest_point_ellipsoid,
             ellipsoid2origin[:3, 3] + 0.5 * ellipsoid2origin[:3, 0])
 
-        point = ellipsoid2origin[:3, 3]
+        point = np.ascontiguousarray(ellipsoid2origin[:3, 3])
         dist, closest_point_ellipsoid = point_to_ellipsoid(
             point, ellipsoid2origin, radii, distance_to_surface=True)
         assert approx(dist) == 0.5
@@ -802,18 +803,18 @@ def test_line_segment_to_box():
         [0, 0, -1, 0],
         [0, 1, 0, 0],
         [0, 0, 0, 1]
-    ])
-    size = np.array([1, 1, 1])
+    ], dtype=float)
+    size = np.array([1, 1, 1], dtype=float)
 
     segment_start = np.array([2, 0, 0], dtype=float)
-    segment_end = np.array([0, 2, 0])
+    segment_end = np.array([0, 2, 0], dtype=float)
     dist, closest_point_segment, closest_point_box = line_segment_to_box(
         segment_start, segment_end, box2origin, size)
     assert approx(dist) == np.sqrt(0.5)
     assert_array_almost_equal(closest_point_segment, np.array([1, 1, 0]))
     assert_array_almost_equal(closest_point_box, np.array([0.5, 0.5, 0]))
 
-    segment_end = np.array([3, 0, 0])
+    segment_end = np.array([3, 0, 0], dtype=float)
     dist, closest_point_segment, closest_point_box = line_segment_to_box(
         segment_start, segment_end, box2origin, size)
     assert approx(dist) == 1.5
@@ -827,7 +828,7 @@ def test_line_segment_to_box():
     assert_array_almost_equal(closest_point_segment, np.array([0.5, 0, 0]))
     assert_array_almost_equal(closest_point_box, closest_point_segment)
 
-    segment_end = np.array([-1, 0, 0])
+    segment_end = np.array([-1, 0, 0], dtype=float)
     dist, closest_point_segment, closest_point_box = line_segment_to_box(
         segment_start, segment_end, box2origin, size)
     assert approx(dist) == 0.5

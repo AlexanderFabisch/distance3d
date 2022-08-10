@@ -30,15 +30,18 @@ def test_cone_support_function():
     random_state = np.random.RandomState(2323)
     cone2origin, radius, height = rand_cone(random_state)
 
-    p = support_function_cone(cone2origin[:3, 2], cone2origin, radius, height)
+    d = np.ascontiguousarray(cone2origin[:3, 2])
+    p = support_function_cone(d, cone2origin, radius, height)
     assert_array_almost_equal(
         p, cone2origin[:3, 3] + height * cone2origin[:3, 2])
 
-    p = support_function_cone(cone2origin[:3, 1], cone2origin, radius, height)
+    d = np.ascontiguousarray(cone2origin[:3, 1])
+    p = support_function_cone(d, cone2origin, radius, height)
     assert_array_almost_equal(
         p, cone2origin[:3, 3] + radius * cone2origin[:3, 1])
 
-    p = support_function_cone(cone2origin[:3, 0], cone2origin, radius, height)
+    d = np.ascontiguousarray(cone2origin[:3, 0])
+    p = support_function_cone(d, cone2origin, radius, height)
     assert_array_almost_equal(
         p, cone2origin[:3, 3] + radius * cone2origin[:3, 0])
 
