@@ -52,23 +52,23 @@ def test_contact_forces_and_details():
         mesh12origin, vertices1, tetrahedra1, potentials1,
         mesh22origin, vertices2, tetrahedra2, potentials2, return_details=True)
     assert "contact_polygons" in details
-    assert len(details["contact_polygons"]) == 7
+    n_intersections = len(details["contact_polygons"])
     assert "contact_polygon_triangles" in details
-    assert len(details["contact_polygon_triangles"]) == 7
+    assert len(details["contact_polygon_triangles"]) == n_intersections
     assert "contact_planes" in details
-    assert len(details["contact_planes"]) == 7
+    assert len(details["contact_planes"]) == n_intersections
     assert "intersecting_tetrahedra1" in details
-    assert len(details["intersecting_tetrahedra1"]) == 7
+    assert len(details["intersecting_tetrahedra1"]) == n_intersections
     assert "intersecting_tetrahedra2" in details
-    assert len(details["intersecting_tetrahedra2"]) == 7
+    assert len(details["intersecting_tetrahedra2"]) == n_intersections
     assert "contact_coms" in details
-    assert len(details["contact_coms"]) == 7
+    assert len(details["contact_coms"]) == n_intersections
     assert "contact_forces" in details
-    assert len(details["contact_forces"]) == 7
+    assert len(details["contact_forces"]) == n_intersections
     assert "contact_areas" in details
-    assert len(details["contact_areas"]) == 7
+    assert len(details["contact_areas"]) == n_intersections
     assert "pressures" in details
-    assert len(details["pressures"]) == 7
+    assert len(details["pressures"]) == n_intersections
     assert "contact_point" in details
 
 
