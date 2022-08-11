@@ -105,8 +105,8 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     """
     plane_point = plane_normal * d
     cart2plane = np.vstack(plane_basis_from_normal(plane_normal))
-    halfplanes = np.vstack((make_halfplanes(X1, plane_point, cart2plane),
-                            make_halfplanes(X2, plane_point, cart2plane)))
+    X = np.vstack((X1, X2))
+    halfplanes = make_halfplanes(X, plane_point, cart2plane)
 
     polygon = intersect_halfplanes(halfplanes)
 
@@ -136,8 +136,8 @@ def make_halfplanes(X, plane_point, cart2plane):
 
     Parameters
     ----------
-    X : array, shape (4, 4)
-        Each row is a halfspace that defines the original tetrahedron.
+    X : array, shape (8, 4)
+        Each row is a halfspace that defines one of the original tetrahedra.
 
     plane_point : array, shape (3,)
         Point on plane.
@@ -151,11 +151,11 @@ def make_halfplanes(X, plane_point, cart2plane):
         Halfplanes in contact plane. Each halfplane is defined by a point
         p and a direction pq.
     """
-    halfplanes = np.empty((4, 4))
+    halfplanes = np.empty((8, 4))
     normals2d = X[:, :3].dot(cart2plane.T)
     ds = -X[:, 3] - X[:, :3].dot(plane_point)
     hp_idx = 0
-    for i in range(4):
+    for i in range(8):
         norm = np.linalg.norm(normals2d[i])
         if norm > EPSILON:
             p = normals2d[i] * ds[i] / (norm * norm)
