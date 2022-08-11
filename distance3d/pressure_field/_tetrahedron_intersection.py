@@ -77,10 +77,10 @@ def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
             tetrahedron1, tetrahedron2, plane_normal, d):
         return False, None
 
-    contact_polygon, triangles = compute_contact_polygon(
-        X1, X2, plane_normal, d)
+    contact_polygon = compute_contact_polygon(X1, X2, plane_normal, d)
     if contact_polygon is None:
         return False, None
+    triangles = tesselate_ordered_polygon(len(contact_polygon))
 
     return True, (contact_plane_hnf, contact_polygon, triangles)
 
@@ -176,10 +176,8 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     Returns
     -------
     polygon3d : array, shape (n_vertices, 3)
-        Contact polygon between two tetrahedra.
-
-    triangles : array, shape (n_triangles, 3)
-        Vertex indices that form triangles of contact polygon.
+        Contact polygon between two tetrahedra. Points are ordered
+        counter-clockwise around their center.
     """
     plane_point = plane_normal * d
     cart2plane = np.vstack(plane_basis_from_normal(plane_normal))
@@ -189,7 +187,7 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     polygon = intersect_halfplanes(halfplanes)
 
     if polygon is None:
-        return None, None
+        return None
 
     vertices2d = np.empty((len(polygon), 2))
     for i in range(len(polygon)):
@@ -199,13 +197,12 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     vertices2d = order_points(vertices2d)
     unique_vertices2d = filter_unique_points(vertices2d)
     if len(unique_vertices2d) < 3:
-        return None, None
+        return None
 
     #plot_halfplanes_and_intersections(halfplanes, unique_vertices2d)
 
-    triangles = tesselate_ordered_polygon(len(unique_vertices2d))
     vertices3d = project_polygon_to_3d(unique_vertices2d, cart2plane, plane_point)
-    return vertices3d, triangles
+    return vertices3d
 
 
 @numba.njit(cache=True)
