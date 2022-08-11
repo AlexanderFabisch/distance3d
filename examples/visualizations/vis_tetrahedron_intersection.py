@@ -23,7 +23,8 @@ X2 = pressure_field.barycentric_transforms(tetrahedron2[np.newaxis])[0]
 intersection, contact = pressure_field.intersect_tetrahedron_pair(
     tetrahedron1, epsilon1, X1, tetrahedron2, epsilon2, X2)
 assert intersection
-contact_plane_hnf, contact_polygon, triangles = contact
+contact_plane_hnf, contact_polygon = contact
+triangles = pressure_field.tesselate_ordered_polygon(len(contact_polygon))
 
 intersection_com, force_vector, _ = pressure_field.compute_contact_force(
     tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon, triangles)
