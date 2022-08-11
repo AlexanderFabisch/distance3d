@@ -103,7 +103,7 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     #plot_halfplanes_and_intersections(halfplanes, unique_points)
 
     triangles = tesselate_ordered_polygon(len(unique_points))
-    poly3d = project_polygon_3d(unique_points, cart2plane, plane_normal, d)
+    poly3d = project_polygon_to_3d(unique_points, cart2plane, plane_point)
     return poly3d, triangles
 
 
@@ -144,17 +144,50 @@ def order_points(points):
 
 @numba.njit(cache=True)
 def filter_unique_points(points):
+    """Remove duplicate points.
+
+    Parameters
+    ----------
+    points :  array, shape (n_points, 2)
+        Points that should be filtered.
+
+    Returns
+    -------
+    n_unique_points : int
+        Number of unique points.
+
+    unique_points : array, shape (n_points, 2)
+        Unique points.
+    """
+    epsilon = 10.0 * EPSILON
     unique_points = np.empty((len(points), 2))
     n_unique_points = 0
     for j in range(len(points)):
-        if j == 0 or np.linalg.norm(points[j] - points[j - 1]) > 10.0 * EPSILON:
+        if j == 0 or np.linalg.norm(points[j] - points[j - 1]) > epsilon:
             unique_points[n_unique_points] = points[j]
             n_unique_points += 1
     return n_unique_points, unique_points
 
 
 @numba.njit(cache=True)
-def project_polygon_3d(poly, cart2plane, plane_normal, d):
+def project_polygon_to_3d(vertices, cart2plane, plane_point):
+    """Project polygon from contact plane to 3D space.
+
+    Parameters
+    ----------
+    vertices : array, shape (n_vertices, 2)
+        Vertices of contact polygon in contact plane.
+
+    cart2plane : array, shape (2, 3)
+        Projection from 3D space to contact plane.
+
+    plane_point : array, shape (3,)
+        Point on plane. Projection offset from contact plane to 3D space.
+
+    Returns
+    -------
+    vertices3d : array, shape (n_vertices, 3)
+        Vertices of contact polygon in 3D space.
+    """
     plane2cart = cart2plane.T
-    plane_point = plane_normal * d
-    return poly.dot(plane2cart.T) + plane_point
+    return vertices.dot(plane2cart.T) + plane_point
