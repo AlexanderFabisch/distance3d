@@ -117,17 +117,16 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     for i in range(len(polygon)):
         vertices2d[i] = polygon[i]
 
-    vertices2d = order_points(vertices2d)
     # this approach sometimes results in duplicate points, remove them
-    n_unique_points, unique_points = filter_unique_points(vertices2d)
-    if n_unique_points < 3:
+    vertices2d = order_points(vertices2d)
+    unique_vertices2d = filter_unique_points(vertices2d)
+    if len(unique_vertices2d) < 3:
         return None, None
-    unique_points = unique_points[:n_unique_points]
 
-    #plot_halfplanes_and_intersections(halfplanes, unique_points)
+    #plot_halfplanes_and_intersections(halfplanes, unique_vertices2d)
 
-    triangles = tesselate_ordered_polygon(len(unique_points))
-    vertices3d = project_polygon_to_3d(unique_points, cart2plane, plane_point)
+    triangles = tesselate_ordered_polygon(len(unique_vertices2d))
+    vertices3d = project_polygon_to_3d(unique_vertices2d, cart2plane, plane_point)
     return vertices3d, triangles
 
 
@@ -219,10 +218,7 @@ def filter_unique_points(points):
 
     Returns
     -------
-    n_unique_points : int
-        Number of unique points.
-
-    unique_points : array, shape (n_points, 2)
+    unique_points : array, shape (n_unique_points, 2)
         Unique points.
     """
     epsilon = 10.0 * EPSILON
@@ -232,7 +228,7 @@ def filter_unique_points(points):
         if j == 0 or np.linalg.norm(points[j] - points[j - 1]) > epsilon:
             unique_points[n_unique_points] = points[j]
             n_unique_points += 1
-    return n_unique_points, unique_points
+    return unique_points[:n_unique_points]
 
 
 @numba.njit(cache=True)
