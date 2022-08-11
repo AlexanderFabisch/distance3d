@@ -54,11 +54,40 @@ TRIANGLES = tesselate_ordered_polygon(9)
 @numba.njit(cache=True)
 def compute_contact_force(
         tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
-    normal = contact_plane_hnf[:3]
+    """Compute contact force from contact polygon.
 
+    Parameters
+    ----------
+    tetrahedron : array, shape (4, 3)
+        Vertices of tetrahedron
+
+    epsilon : array, shape (4,)
+        Potentials of vertices of tetrahedron.
+
+    contact_plane_hnf : array, shape (4,)
+        Contact plane in Hesse normal form.
+
+    contact_polygon : array, shape (n_vertices, 3)
+        Contact polygon between two tetrahedra. Points are ordered
+        counter-clockwise around their center.
+
+    Returns
+    -------
+    intersection_com : array, shape (3,)
+        Center of the contact polygon.
+
+    force_vector : array, shape (3,)
+        Force vector of this contact.
+
+    total_area : float
+        Area of contact polygon.
+
+    triangles : array, shape (n_triangles, 3)
+        Vertex indices of triangles.
+    """
     total_force = 0.0
-    intersection_com = np.zeros(3)
     total_area = 0.0
+    intersection_com = np.zeros(3)
 
     X = np.vstack((tetrahedron.T, np.ones((1, 4))))
     com = np.empty(4, dtype=np.dtype("float"))
@@ -76,7 +105,7 @@ def compute_contact_force(
         intersection_com += area * com[:3]
 
     intersection_com /= total_area
-    force_vector = total_force * normal
+    force_vector = total_force * contact_plane_hnf[:3]
     return intersection_com, force_vector, total_area, triangles
 
 
