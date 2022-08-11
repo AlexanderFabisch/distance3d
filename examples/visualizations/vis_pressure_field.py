@@ -50,15 +50,15 @@ visualization.TetraMesh(mesh12origin, vertices1, tetrahedra1).add_artist(fig)
 visualization.TetraMesh(mesh22origin, vertices2, tetrahedra2).add_artist(fig)
 
 if show_broad_phase:
-    mesh12mesh2 = pressure_field.mesh12mesh2(mesh12origin, mesh22origin)
-    vertices1_in_mesh2 = utils.transform_points(mesh12mesh2, vertices1)
-    tetrahedra_points1 = vertices1_in_mesh2[tetrahedra1]
-    tetrahedra_points2 = vertices2[tetrahedra2]
-    broad_overlapping_indices1, broad_overlapping_indices2 = pressure_field.check_aabbs_of_tetrahedra(
-        tetrahedra_points1, tetrahedra_points2, timer=timer)
-    for i, j in zip(broad_overlapping_indices1, broad_overlapping_indices2):
-        tetrahedron_points1 = vertices1[tetrahedra1[i]].dot(mesh12origin[:3, :3].T) + mesh12origin[:3, 3]
-        tetrahedron_points2 = vertices2[tetrahedra2[j]].dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
+    rigid_body1 = pressure_field.RigidBody(mesh12origin, vertices1, tetrahedra1, potentials1)
+    rigid_body2 = pressure_field.RigidBody(mesh22origin, vertices2, tetrahedra2, potentials2)
+    mesh12mesh2 = np.dot(utils.invert_transform(mesh22origin), mesh12origin)
+    rigid_body1.transform(mesh12mesh2)
+    broad_overlapping_indices1, broad_overlapping_indices2, broad_pairs = pressure_field.broad_phase_tetrahedra(
+        rigid_body1, rigid_body2)
+    for i, j in broad_pairs:
+        tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
+        tetrahedron_points2 = rigid_body2.tetrahedra_points[j].dot(mesh22origin[:3, :3].T) + mesh22origin[:3, 3]
         visualization.Tetrahedron(tetrahedron_points1, c=(1, 0, 0)).add_artist(fig)
         visualization.Tetrahedron(tetrahedron_points2, c=(1, 0, 0)).add_artist(fig)
 
