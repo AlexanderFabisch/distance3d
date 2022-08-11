@@ -79,23 +79,47 @@ def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, plane_n
 
 @numba.njit(cache=True)
 def compute_contact_polygon(X1, X2, plane_normal, d):
+    """Compute contact polygon.
+
+    Parameters
+    ----------
+    X1 : array, shape (4, 4)
+        Each row is a halfspace that defines the original tetrahedron.
+
+    X2 : array, shape (4, 4)
+        Each row is a halfspace that defines the original tetrahedron.
+
+    plane_normal : array, shape (3,)
+        Normal of the contact plane.
+
+    d : float
+        Distance to origin along normal.
+
+    Returns
+    -------
+    polygon3d : array, shape (n_vertices, 3)
+        Contact polygon between two tetrahedra.
+
+    triangles : array, shape (n_triangles, 3)
+        Vertex indices that form triangles of contact polygon.
+    """
     plane_point = plane_normal * d
     cart2plane = np.vstack(plane_basis_from_normal(plane_normal))
     halfplanes = np.vstack((make_halfplanes(X1, plane_point, cart2plane),
                             make_halfplanes(X2, plane_point, cart2plane)))
 
-    poly = intersect_halfplanes(halfplanes)
+    polygon = intersect_halfplanes(halfplanes)
 
-    if poly is None:
+    if polygon is None:
         return None, None
 
-    points = np.empty((len(poly), 2))
-    for i in range(len(poly)):
-        points[i] = poly[i]
+    vertices2d = np.empty((len(polygon), 2))
+    for i in range(len(polygon)):
+        vertices2d[i] = polygon[i]
 
-    points = order_points(points)
+    vertices2d = order_points(vertices2d)
     # this approach sometimes results in duplicate points, remove them
-    n_unique_points, unique_points = filter_unique_points(points)
+    n_unique_points, unique_points = filter_unique_points(vertices2d)
     if n_unique_points < 3:
         return None, None
     unique_points = unique_points[:n_unique_points]
@@ -103,12 +127,31 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     #plot_halfplanes_and_intersections(halfplanes, unique_points)
 
     triangles = tesselate_ordered_polygon(len(unique_points))
-    poly3d = project_polygon_to_3d(unique_points, cart2plane, plane_point)
-    return poly3d, triangles
+    vertices3d = project_polygon_to_3d(unique_points, cart2plane, plane_point)
+    return vertices3d, triangles
 
 
 @numba.njit(cache=True)
 def make_halfplanes(X, plane_point, cart2plane):
+    """Project triangles of a tetrahedron to contact plane.
+
+    Parameters
+    ----------
+    X : array, shape (4, 4)
+        Each row is a halfspace that defines the original tetrahedron.
+
+    plane_point : array, shape (3,)
+        Point on plane.
+
+    cart2plane : array, shape (2, 3)
+        Projection from 3D Cartesian space to contact plane.
+
+    Returns
+    -------
+    halfplanes : array, shape (n_halfplanes, 4)
+        Halfplanes in contact plane. Each halfplane is defined by a point
+        p and a direction pq.
+    """
     halfplanes = np.empty((4, 4))
     normals2d = X[:, :3].dot(cart2plane.T)
     ds = -X[:, 3] - X[:, :3].dot(plane_point)
@@ -126,6 +169,18 @@ def make_halfplanes(X, plane_point, cart2plane):
 
 @numba.njit(cache=True)
 def tesselate_ordered_polygon(n_vertices):
+    """Tesselate a ccw-ordered polygon.
+
+    Parameters
+    ----------
+    n_vertices : int
+        Number of vertices of the polygon.
+
+    Returns
+    -------
+    triangles : array, shape (n_vertices - 2, 3)
+        Triangles forming the polygon.
+    """
     triangles = np.empty((n_vertices - 2, 3), dtype=np.dtype("int"))
     triangles[:, 0] = 0
     triangles[:, 1] = np.arange(1, n_vertices - 1)
@@ -135,11 +190,22 @@ def tesselate_ordered_polygon(n_vertices):
 
 @numba.njit(cache=True)
 def order_points(points):
+    """Order points by angle around their center.
+
+    Parameters
+    ----------
+    points : array, shape (n_points, 2)
+        Points.
+
+    Returns
+    -------
+    ordered_points : shape (n_points, 2)
+        Ordered points.
+    """
     center = np.array([np.mean(points[:, 0]), np.mean(points[:, 1])])
     poly_centered = points - center
     angles = np.arctan2(poly_centered[:, 1], poly_centered[:, 0])
-    points = points[np.argsort(angles)]
-    return points
+    return points[np.argsort(angles)]
 
 
 @numba.njit(cache=True)
@@ -179,7 +245,7 @@ def project_polygon_to_3d(vertices, cart2plane, plane_point):
         Vertices of contact polygon in contact plane.
 
     cart2plane : array, shape (2, 3)
-        Projection from 3D space to contact plane.
+        Projection from 3D Cartesian space to contact plane.
 
     plane_point : array, shape (3,)
         Point on plane. Projection offset from contact plane to 3D space.
