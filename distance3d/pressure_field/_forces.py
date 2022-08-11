@@ -27,35 +27,6 @@ def contact_surface_forces(contact_surface, rigid_body1):
 
 
 @numba.njit(cache=True)
-def compute_contact_force(
-        tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
-    normal = contact_plane_hnf[:3]
-
-    total_force = 0.0
-    intersection_com = np.zeros(3)
-    total_area = 0.0
-
-    X = np.vstack((tetrahedron.T, np.ones((1, 4))))
-    com = np.empty(4, dtype=np.dtype("float"))
-    com[3] = 1.0
-    triangles = tesselate_ordered_polygon(len(contact_polygon))
-    for triangle in triangles:
-        vertices = contact_polygon[triangle]
-        com[:3] = (vertices[0] + vertices[1] + vertices[2]) / 3.0
-        res = np.linalg.solve(X, com)
-        pressure = np.sum(res * epsilon)
-        area = 0.5 * np.linalg.norm(np.cross(vertices[1] - vertices[0],
-                                             vertices[2] - vertices[0]))
-        total_force += pressure * area
-        total_area += area
-        intersection_com += area * com[:3]
-
-    intersection_com /= total_area
-    force_vector = total_force * normal
-    return intersection_com, force_vector, total_area, triangles
-
-
-@numba.njit(cache=True)
 def tesselate_ordered_polygon(n_vertices):
     """Tesselate a ccw-ordered polygon.
 
@@ -74,6 +45,39 @@ def tesselate_ordered_polygon(n_vertices):
     triangles[:, 1] = np.arange(1, n_vertices - 1)
     triangles[:, 2] = np.arange(2, n_vertices)
     return triangles
+
+
+# 8 halfplanes cannot define a polygon with more than 9 vertices
+TRIANGLES = tesselate_ordered_polygon(9)
+
+
+@numba.njit(cache=True)
+def compute_contact_force(
+        tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
+    normal = contact_plane_hnf[:3]
+
+    total_force = 0.0
+    intersection_com = np.zeros(3)
+    total_area = 0.0
+
+    X = np.vstack((tetrahedron.T, np.ones((1, 4))))
+    com = np.empty(4, dtype=np.dtype("float"))
+    com[3] = 1.0
+    triangles = TRIANGLES[:len(contact_polygon) - 2]
+    for triangle in triangles:
+        vertices = contact_polygon[triangle]
+        com[:3] = (vertices[0] + vertices[1] + vertices[2]) / 3.0
+        res = np.linalg.solve(X, com)
+        pressure = np.sum(res * epsilon)
+        area = 0.5 * np.linalg.norm(np.cross(vertices[1] - vertices[0],
+                                             vertices[2] - vertices[0]))
+        total_force += pressure * area
+        total_area += area
+        intersection_com += area * com[:3]
+
+    intersection_com /= total_area
+    force_vector = total_force * normal
+    return intersection_com, force_vector, total_area, triangles
 
 
 def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):
