@@ -22,7 +22,8 @@ def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
         else:
             continue
 
-        contact_plane_hnf, contact_polygon, triangles = contact_details
+        contact_plane_hnf, contact_polygon = contact_details
+        triangles = tesselate_ordered_polygon(len(contact_polygon))
 
         intersecting_tetrahedra1.append(i)
         intersecting_tetrahedra2.append(j)
@@ -80,9 +81,8 @@ def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
     contact_polygon = compute_contact_polygon(X1, X2, plane_normal, d)
     if contact_polygon is None:
         return False, None
-    triangles = tesselate_ordered_polygon(len(contact_polygon))
 
-    return True, (contact_plane_hnf, contact_polygon, triangles)
+    return True, (contact_plane_hnf, contact_polygon)
 
 
 @numba.njit(cache=True)
