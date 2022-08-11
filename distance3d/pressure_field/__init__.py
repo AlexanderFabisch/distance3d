@@ -12,10 +12,11 @@ from ._forces import contact_surface_forces, accumulate_wrenches, compute_contac
 from ._halfplanes import plot_halfplanes_and_intersections
 
 
-def contact_forces(
+def contact_forces(  # TODO think about interface
         mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1,
         mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2,
         return_details=False, timer=None):
+    """Contact forces between two objects."""
     if timer is None:
         timer = Timer()
 
@@ -43,6 +44,21 @@ def contact_forces(
 
 
 def find_contact_plane(rigid_body1, rigid_body2, timer=None):
+    """Find contact plane of two rigid bodies.
+
+    Parameters
+    ----------
+    rigid_body1 : RigidBody
+        First rigid body.
+
+    rigid_body2 : RigidBody
+        Second rigid body.
+
+    Returns
+    -------
+    contact_surface : ContactSurface
+        Contact information.
+    """
     if timer is None:
         timer = Timer()
 
