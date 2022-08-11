@@ -9,25 +9,26 @@ def contact_surface_forces(contact_surface, rigid_body1):
     contact_coms = np.empty((n_contacts, 3), dtype=float)
     contact_forces = np.empty((n_contacts, 3), dtype=float)
     contact_areas = np.empty(n_contacts, dtype=float)
+    contact_polygon_triangles = []
     for intersection_idx in range(n_contacts):
         i = contact_surface.intersecting_tetrahedra1[intersection_idx]
         contact_plane_hnf = contact_surface.contact_planes[intersection_idx]
         contact_polygon = contact_surface.contact_polygons[intersection_idx]
-        triangles = contact_surface.contact_polygon_triangles[intersection_idx]
 
-        com, force, area = compute_contact_force(
+        com, force, area, triangle = compute_contact_force(
             rigid_body1.tetrahedra_points[i], tetrahedra_potentials1[i],
-            contact_plane_hnf, contact_polygon, triangles)
+            contact_plane_hnf, contact_polygon)
 
         contact_coms[intersection_idx] = com
         contact_forces[intersection_idx] = force
         contact_areas[intersection_idx] = area
-    return contact_areas, contact_coms, contact_forces
+        contact_polygon_triangles.append(triangle)
+    return contact_areas, contact_coms, contact_forces, contact_polygon_triangles
 
 
 @numba.njit(cache=True)
 def compute_contact_force(
-        tetrahedron, epsilon, contact_plane_hnf, contact_polygon, triangles):
+        tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
     normal = contact_plane_hnf[:3]
 
     total_force = 0.0
@@ -37,6 +38,7 @@ def compute_contact_force(
     X = np.vstack((tetrahedron.T, np.ones((1, 4))))
     com = np.empty(4, dtype=np.dtype("float"))
     com[3] = 1.0
+    triangles = tesselate_ordered_polygon(len(contact_polygon))
     for triangle in triangles:
         vertices = contact_polygon[triangle]
         com[:3] = (vertices[0] + vertices[1] + vertices[2]) / 3.0
@@ -50,7 +52,28 @@ def compute_contact_force(
 
     intersection_com /= total_area
     force_vector = total_force * normal
-    return intersection_com, force_vector, total_area
+    return intersection_com, force_vector, total_area, triangles
+
+
+@numba.njit(cache=True)
+def tesselate_ordered_polygon(n_vertices):
+    """Tesselate a ccw-ordered polygon.
+
+    Parameters
+    ----------
+    n_vertices : int
+        Number of vertices of the polygon.
+
+    Returns
+    -------
+    triangles : array, shape (n_vertices - 2, 3)
+        Triangles forming the polygon.
+    """
+    triangles = np.empty((n_vertices - 2, 3), dtype=np.dtype("int"))
+    triangles[:, 0] = 0
+    triangles[:, 1] = np.arange(1, n_vertices - 1)
+    triangles[:, 2] = np.arange(2, n_vertices)
+    return triangles
 
 
 def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):

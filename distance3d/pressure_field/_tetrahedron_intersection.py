@@ -8,7 +8,6 @@ def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
     intersection = False
     contact_planes = []
     contact_polygons = []
-    contact_polygon_triangles = []
     intersecting_tetrahedra1 = []
     intersecting_tetrahedra2 = []
     epsilon1 = rigid_body1.tetrahedra_potentials
@@ -23,18 +22,15 @@ def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
             continue
 
         contact_plane_hnf, contact_polygon = contact_details
-        triangles = tesselate_ordered_polygon(len(contact_polygon))
 
         intersecting_tetrahedra1.append(i)
         intersecting_tetrahedra2.append(j)
         contact_planes.append(contact_plane_hnf)
         contact_polygons.append(contact_polygon)
-        contact_polygon_triangles.append(triangles)
     if len(contact_planes) > 0:
         contact_planes = np.vstack(contact_planes)
     return (intersection, contact_planes, contact_polygons,
-            contact_polygon_triangles, intersecting_tetrahedra1,
-            intersecting_tetrahedra2)
+            intersecting_tetrahedra1, intersecting_tetrahedra2)
 
 
 @numba.njit(cache=True)
@@ -239,27 +235,6 @@ def make_halfplanes(X, plane_point, cart2plane):
             halfplanes[i, 3] = -normals2d[i, 0]
             hp_idx += 1
     return halfplanes[:hp_idx]
-
-
-@numba.njit(cache=True)
-def tesselate_ordered_polygon(n_vertices):
-    """Tesselate a ccw-ordered polygon.
-
-    Parameters
-    ----------
-    n_vertices : int
-        Number of vertices of the polygon.
-
-    Returns
-    -------
-    triangles : array, shape (n_vertices - 2, 3)
-        Triangles forming the polygon.
-    """
-    triangles = np.empty((n_vertices - 2, 3), dtype=np.dtype("int"))
-    triangles[:, 0] = 0
-    triangles[:, 1] = np.arange(1, n_vertices - 1)
-    triangles[:, 2] = np.arange(2, n_vertices)
-    return triangles
 
 
 @numba.njit(cache=True)

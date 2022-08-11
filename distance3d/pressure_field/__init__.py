@@ -7,7 +7,7 @@ from ._tetra_mesh_creation import make_tetrahedral_cube, make_tetrahedral_icosph
 from ._mesh_processing import tetrahedral_mesh_aabbs, center_of_mass_tetrahedral_mesh
 from ._rigid_body import RigidBody
 from ._contact_surface import ContactSurface
-from ._tetrahedron_intersection import intersect_tetrahedron_pairs, intersect_tetrahedron_pair, intersect_halfplanes, tesselate_ordered_polygon
+from ._tetrahedron_intersection import intersect_tetrahedron_pairs, intersect_tetrahedron_pair, intersect_halfplanes
 from ._forces import contact_surface_forces, accumulate_wrenches, compute_contact_force
 from ._halfplanes import plot_halfplanes_and_intersections
 
@@ -75,10 +75,10 @@ def find_contact_plane(rigid_body1, rigid_body2, timer=None):
     timer.stop_and_add_to_total("intersect_tetrahedron_pairs")
 
     timer.start("contact_surface_forces")
-    contact_areas, contact_coms, contact_forces = contact_surface_forces(
+    contact_areas, contact_coms, contact_forces, contact_triangles = contact_surface_forces(
         contact_surface, rigid_body1)
     contact_surface.add_polygon_info(
-        contact_areas, contact_coms, contact_forces)
+        contact_areas, contact_coms, contact_forces, contact_triangles)
     timer.stop_and_add_to_total("contact_surface_forces")
 
     return contact_surface
