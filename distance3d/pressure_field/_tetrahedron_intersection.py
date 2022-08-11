@@ -39,6 +39,37 @@ def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
 @numba.njit(cache=True)
 def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
                                tetrahedron2, epsilon2, X2):
+    """Intersect a pair of tetrahedra.
+
+    Parameters
+    ----------
+    tetrahedron1 : array, shape (4, 3)
+        Vertices of tetrahedron 1.
+
+    epsilon1 : array, shape (4,)
+        Potentials of the vertices of tetrahedron 1.
+
+    X1 : array, shape (4, 4)
+        Each row is a halfspace that defines the original tetrahedron.
+
+    tetrahedron2 : array, shape (4, 3)
+        Vertices of tetrahedron 2.
+
+    epsilon2 : array, shape (4,)
+        Potentials of the vertices of tetrahedron 2.
+
+    X2 : array, shape (4, 4)
+        Each row is a halfspace that defines the original tetrahedron.
+
+    Returns
+    -------
+    intersection : bool
+        Do both tetrahedra intersect?
+
+    contact_info : tuple
+        Contact plane in Hesse normal form, contact polygon and triangles of
+        contact polygon.
+    """
     contact_plane_hnf = contact_plane(X1, X2, epsilon1, epsilon2)
     plane_normal = contact_plane_hnf[:3]
     d = contact_plane_hnf[3]
@@ -56,6 +87,28 @@ def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
 
 @numba.njit(cache=True)
 def contact_plane(X1, X2, epsilon1, epsilon2):
+    """Compute contact plane.
+
+    Parameters
+    ----------
+    X1 : array, shape (4, 4)
+        Each row is a halfspace that defines the original tetrahedron.
+
+    X2 : array, shape (4, 4)
+        Each row is a halfspace that defines the original tetrahedron.
+
+    epsilon1 : array, shape (4,)
+        Potentials of the vertices of tetrahedron 1.
+
+    epsilon2 : array, shape (4,)
+        Potentials of the vertices of tetrahedron 2.
+
+    Returns
+    -------
+    plane_hnf : array, shape (4,)
+        Contact plane in Hesse normal form: plane normal and distance to origin
+        along plane normal.
+    """
     plane_hnf = epsilon1.dot(X1) - epsilon2.dot(X2)  # TODO Young's modulus, see Eq. 16 of paper
     plane_hnf /= np.linalg.norm(plane_hnf[:3])
     # NOTE in order to obtain proper Hesse normal form of the contact plane
@@ -67,7 +120,32 @@ def contact_plane(X1, X2, epsilon1, epsilon2):
 
 
 @numba.njit(cache=True)
-def check_tetrahedra_intersect_contact_plane(tetrahedron1, tetrahedron2, plane_normal, d, epsilon=1e-6):
+def check_tetrahedra_intersect_contact_plane(
+        tetrahedron1, tetrahedron2, plane_normal, d, epsilon=1e-6):
+    """Check if tetrahedra intersect contact plane.
+
+    Parameters
+    ----------
+    tetrahedron1 : array, shape (4, 3)
+        Vertices of tetrahedron 1.
+
+    tetrahedron2 : array, shape (4, 3)
+        Vertices of tetrahedron 2.
+
+    plane_normal : array, shape (3,)
+        Normal of the contact plane.
+
+    d : float
+        Distance to origin along normal.
+
+    epsilon : float, optional (default: 1e-6)
+        Floating point tolerance.
+
+    Returns
+    -------
+    intersection : bool
+        Do both tetrahedra intersect the contact plane.
+    """
     plane_distances1 = tetrahedron1.dot(plane_normal) - d
     plane_distances2 = tetrahedron2.dot(plane_normal) - d
     return (
