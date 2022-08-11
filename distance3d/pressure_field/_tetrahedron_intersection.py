@@ -125,26 +125,6 @@ def make_halfplanes(X, plane_point, cart2plane):
 
 
 @numba.njit(cache=True)
-def _precompute_edge_intersections(d, plane_normal, tetrahedron_points):
-    directions = np.empty((4, 4, 3), np.dtype("float"))
-    for i in range(4):
-        directions[i, i] = 0.0
-        for j in range(i + 1, 4):
-            directions[i, j] = tetrahedron_points[j] - tetrahedron_points[i]
-            directions[j, i] = -directions[i, j]
-    unnormalized_distances = d - np.dot(tetrahedron_points, plane_normal)
-    d_signs = np.sign(unnormalized_distances)
-    P = np.empty((4, 4, 3), np.dtype("float"))
-    for i in range(4):
-        for j in range(i + 1, 4):  # only fill upper triangle
-            normal_direction = np.dot(directions[i, j], plane_normal)
-            if normal_direction != 0.0:
-                t = unnormalized_distances[i] / normal_direction
-                P[i, j] = tetrahedron_points[i] + t * directions[i, j]
-    return P, d_signs, directions
-
-
-@numba.njit(cache=True)
 def tesselate_ordered_polygon(poly):
     triangles = np.empty((len(poly) - 2, 3), dtype=np.dtype("int"))
     triangles[:, 0] = 0
