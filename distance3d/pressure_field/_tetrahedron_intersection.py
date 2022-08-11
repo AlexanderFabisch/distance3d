@@ -1,7 +1,7 @@
 import numba
 import numpy as np
 from ..utils import plane_basis_from_normal, EPSILON
-from ._halfplanes import intersect_halfplanes, cross2d, plot_halfplanes_and_intersections
+from ._halfplanes import intersect_halfplanes, plot_halfplanes_and_intersections
 
 
 def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
