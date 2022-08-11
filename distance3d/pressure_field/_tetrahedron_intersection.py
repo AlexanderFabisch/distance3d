@@ -102,7 +102,7 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
 
     #plot_halfplanes_and_intersections(halfplanes, unique_points)
 
-    triangles = tesselate_ordered_polygon(unique_points)
+    triangles = tesselate_ordered_polygon(len(unique_points))
     poly3d = project_polygon_3d(unique_points, cart2plane, plane_normal, d)
     return poly3d, triangles
 
@@ -125,11 +125,11 @@ def make_halfplanes(X, plane_point, cart2plane):
 
 
 @numba.njit(cache=True)
-def tesselate_ordered_polygon(poly):
-    triangles = np.empty((len(poly) - 2, 3), dtype=np.dtype("int"))
+def tesselate_ordered_polygon(n_vertices):
+    triangles = np.empty((n_vertices - 2, 3), dtype=np.dtype("int"))
     triangles[:, 0] = 0
-    triangles[:, 1] = np.arange(1, len(poly) - 1)
-    triangles[:, 2] = np.arange(2, len(poly))
+    triangles[:, 1] = np.arange(1, n_vertices - 1)
+    triangles[:, 2] = np.arange(2, n_vertices)
     return triangles
 
 
