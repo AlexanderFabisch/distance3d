@@ -3,7 +3,35 @@ import numpy as np
 from ..utils import norm_vector, EPSILON
 
 
-@numba.njit(cache=True)
+# replaces from numba.np.extensions import cross2d, which seems to have a bug
+# when called with NUMBA_DISABLE_JIT=1
+@numba.njit(
+    numba.float64(numba.float64[::1], numba.float64[::1]),
+    cache=True)
+def cross2d(a, b):
+    return a[0] * b[1] - a[1] * b[0]
+
+
+@numba.njit(
+    numba.float64[::1](numba.float64[::1], numba.float64[::1]),
+    cache=True)
+def intersect_two_halfplanes(halfplane1, halfplane2):
+    denom = cross2d(halfplane1[2:], halfplane2[2:])
+    if np.abs(denom) < EPSILON:
+        return np.empty(0, dtype=np.dtype("float"))
+    t = cross2d((halfplane2[:2] - halfplane1[:2]), halfplane2[2:]) / denom
+    return halfplane1[:2] + halfplane1[2:] * t
+
+
+@numba.njit(
+    numba.bool_(numba.float64[::1], numba.float64[::1]),
+    cache=True)
+def point_outside_of_halfplane(halfplane, point):
+    return cross2d(halfplane[2:], point - halfplane[:2]) < -EPSILON
+
+
+@numba.njit(
+    numba.float64[:, :](numba.float64[:, ::1]), cache=True)
 def intersect_halfplanes(halfplanes):
     """Find polygon points by halfplane intersection.
 
@@ -23,7 +51,7 @@ def intersect_halfplanes(halfplanes):
     for i in range(len(halfplanes)):
         for j in range(i + 1, len(halfplanes)):
             p = intersect_two_halfplanes(halfplanes[i], halfplanes[j])
-            if p is None:  # parallel halfplanes
+            if len(p) == 0:  # parallel halfplanes
                 continue
             valid = True
             for k in range(len(halfplanes)):
@@ -35,27 +63,6 @@ def intersect_halfplanes(halfplanes):
                 points[n_intersections] = p
                 n_intersections += 1
     return points[:n_intersections]
-
-
-@numba.njit(cache=True)
-def intersect_two_halfplanes(halfplane1, halfplane2):
-    denom = cross2d(halfplane1[2:], halfplane2[2:])
-    if np.abs(denom) < EPSILON:
-        return None
-    t = cross2d((halfplane2[:2] - halfplane1[:2]), halfplane2[2:]) / denom
-    return halfplane1[:2] + halfplane1[2:] * t
-
-
-# replaces from numba.np.extensions import cross2d, which seems to have a bug
-# when called with NUMBA_DISABLE_JIT=1
-@numba.njit(cache=True)
-def cross2d(a, b):
-    return a[0] * b[1] - a[1] * b[0]
-
-
-@numba.njit(cache=True)
-def point_outside_of_halfplane(halfplane, point):
-    return cross2d(halfplane[2:], point - halfplane[:2]) < -EPSILON
 
 
 def plot_halfplanes_and_intersections(halfplanes, points=None, xlim=None, ylim=None):  # pragma: no cover
