@@ -181,8 +181,7 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     halfplanes = make_halfplanes(X, plane_point, cart2plane)
 
     polygon = intersect_halfplanes(halfplanes)
-
-    if polygon is None:
+    if len(polygon) < 3:
         return None
 
     vertices2d = np.empty((len(polygon), 2))

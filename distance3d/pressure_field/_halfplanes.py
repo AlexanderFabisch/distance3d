@@ -5,6 +5,19 @@ from ..utils import norm_vector, EPSILON
 
 @numba.njit(cache=True)
 def intersect_halfplanes(halfplanes):
+    """Find polygon points by halfplane intersection.
+
+    Parameters
+    ----------
+    halfplanes : array, shape (n_halfplanes, 4)
+        Halfplanes in contact plane. Each halfplane is defined by a point
+        p and a direction pq.
+
+    Returns
+    -------
+    points : list
+        Points of the polygon.
+    """
     points = []
     for i in range(len(halfplanes)):
         for j in range(i + 1, len(halfplanes)):
@@ -19,8 +32,6 @@ def intersect_halfplanes(halfplanes):
                     break
             if valid:
                 points.append(p)
-    if len(points) < 3:
-        return None
     return points
 
 
