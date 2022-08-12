@@ -46,7 +46,7 @@ def intersect_halfplanes(halfplanes):
     points : list
         Points of the polygon.
     """
-    points = np.empty((9, 2))
+    points = np.empty((len(halfplanes) + 2, 2))
     n_intersections = 0
     for i in range(len(halfplanes)):
         for j in range(i + 1, len(halfplanes)):
