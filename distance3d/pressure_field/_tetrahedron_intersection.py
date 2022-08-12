@@ -107,7 +107,7 @@ def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
     plane_normal = contact_plane_hnf[:3]
     d = contact_plane_hnf[3]
     if not check_tetrahedra_intersect_contact_plane(
-            tetrahedron1, tetrahedron2, plane_normal, d):
+            tetrahedron1, tetrahedron2, plane_normal, d, tolerance=1e-6):
         return False, None
 
     contact_polygon = compute_contact_polygon(X1, X2, plane_normal, d)
@@ -153,9 +153,11 @@ def contact_plane(X1, X2, epsilon1, epsilon2):
     return plane_hnf
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.bool_(numba.float64[:, ::1], numba.float64[:, ::1], numba.float64[::1], numba.float64, numba.float64),
+    cache=True)
 def check_tetrahedra_intersect_contact_plane(
-        tetrahedron1, tetrahedron2, plane_normal, d, epsilon=1e-6):
+        tetrahedron1, tetrahedron2, plane_normal, d, tolerance):
     """Check if tetrahedra intersect contact plane.
 
     Parameters
@@ -172,7 +174,7 @@ def check_tetrahedra_intersect_contact_plane(
     d : float
         Distance to origin along normal.
 
-    epsilon : float, optional (default: 1e-6)
+    tolerance : float, optional (default: 1e-6)
         Floating point tolerance.
 
     Returns
@@ -183,10 +185,10 @@ def check_tetrahedra_intersect_contact_plane(
     plane_distances1 = tetrahedron1.dot(plane_normal) - d
     plane_distances2 = tetrahedron2.dot(plane_normal) - d
     return (
-        min(plane_distances1) < -epsilon
-        and max(plane_distances1) > epsilon
-        and min(plane_distances2) < -epsilon
-        and max(plane_distances2) > epsilon)
+        min(plane_distances1) < -tolerance
+        and max(plane_distances1) > tolerance
+        and min(plane_distances2) < -tolerance
+        and max(plane_distances2) > tolerance)
 
 
 @numba.njit(
