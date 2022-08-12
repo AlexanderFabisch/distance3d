@@ -45,7 +45,7 @@ def point_outside_of_halfplane(halfplane, point):
     return cross2d(halfplane[2:], point - halfplane[:2]) < -EPSILON
 
 
-def plot_halfplanes_and_intersections(halfplanes, points=None, xlim=None, ylim=None):
+def plot_halfplanes_and_intersections(halfplanes, points=None, xlim=None, ylim=None):  # pragma: no cover
     import matplotlib.pyplot as plt
     if points is None:
         scale = 1.0
@@ -70,7 +70,7 @@ def plot_halfplanes_and_intersections(halfplanes, points=None, xlim=None, ylim=N
     plt.show()
 
 
-def plot_halfplane(halfplane, ax, c, alpha, scale):
+def plot_halfplane(halfplane, ax, c, alpha, scale):  # pragma: no cover
     line = halfplane[:2] + np.linspace(-scale, scale, 101)[:, np.newaxis] * norm_vector(halfplane[2:])
     ax.plot(line[:, 0], line[:, 1], lw=3, c=c, alpha=alpha)
     normal2d = np.array([-halfplane[3], halfplane[2]])
