@@ -2,7 +2,7 @@ import numpy as np
 import pytransform3d.transformations as pt
 from distance3d.utils import (
     norm_vector, invert_transform, transform_point, inverse_transform_point,
-    scalar_triple_product)
+    scalar_triple_product, transform_points, transform_directions)
 from numpy.testing import assert_array_almost_equal
 from pytest import approx
 
@@ -43,3 +43,23 @@ def test_scalar_triple_product():
     assert approx(scalar_triple_product(a, b, -c)) == -1
 
     assert approx(scalar_triple_product(a, b, b)) == 0
+
+
+def test_transform_points():
+    random_state = np.random.RandomState(335)
+    A2B = pt.random_transform(random_state)
+    points_in_A = random_state.randn(10, 3)
+    points_in_B = transform_points(A2B, points_in_A)
+    for i in range(len(points_in_A)):
+        assert_array_almost_equal(
+            points_in_B[i], transform_point(A2B, points_in_A[i]))
+
+
+def test_transform_directions():
+    random_state = np.random.RandomState(336)
+    A2B = pt.random_transform(random_state)
+    directions_in_A = random_state.randn(10, 3)
+    directions_in_B = transform_directions(A2B, directions_in_A)
+    for i in range(len(directions_in_A)):
+        assert_array_almost_equal(
+            directions_in_B[i], A2B[:3, :3].dot(directions_in_A[i]))
