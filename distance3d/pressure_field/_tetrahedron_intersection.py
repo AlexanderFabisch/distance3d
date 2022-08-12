@@ -196,7 +196,9 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     return vertices3d
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.float64[:, ::1](numba.float64[:, ::1], numba.float64[::1], numba.float64[:, ::1]),
+    cache=True)
 def make_halfplanes(X, plane_point, cart2plane):
     """Project triangles of a tetrahedron to contact plane.
 
