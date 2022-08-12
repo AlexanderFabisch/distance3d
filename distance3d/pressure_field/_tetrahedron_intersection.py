@@ -234,7 +234,9 @@ def make_halfplanes(X, plane_point, cart2plane):
     return halfplanes[:hp_idx]
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.float64[:, :](numba.float64[:, :]),
+    cache=True)
 def order_points(points):
     """Order points by angle around their center.
 
@@ -254,7 +256,9 @@ def order_points(points):
     return points[np.argsort(angles)]
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.float64[:, :](numba.float64[:, :]),
+    cache=True)
 def filter_unique_points(points):
     """Remove duplicate points.
 
@@ -278,7 +282,9 @@ def filter_unique_points(points):
     return unique_points[:n_unique_points]
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.float64[:, :](numba.float64[:, :], numba.float64[:, ::1], numba.float64[:]),
+    cache=True)
 def project_polygon_to_3d(vertices, cart2plane, plane_point):
     """Project polygon from contact plane to 3D space.
 
