@@ -86,7 +86,9 @@ def find_contact_plane(rigid_body1, rigid_body2, timer=None):
 
     timer.start("intersect_tetrahedron_pairs")
     intersection_result = intersect_tetrahedron_pairs(
-        broad_pairs, rigid_body1, rigid_body2, X1, X2)
+        broad_pairs, rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points,
+        rigid_body1.tetrahedra_potentials, rigid_body2.tetrahedra_potentials,
+        X1, X2)
     contact_surface = ContactSurface(rigid_body2.mesh2origin, *intersection_result)
     timer.stop_and_add_to_total("intersect_tetrahedron_pairs")
 

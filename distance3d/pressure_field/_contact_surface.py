@@ -67,10 +67,10 @@ class ContactSurface:
 
         Parameters
         ----------
-        tetrahedra_points1 : array, shape (n_tetrahedra, 4, 3)
+        tetrahedra_points1 : array, shape (n_tetrahedra1, 4, 3)
             Points that form the first tetrahedra.
 
-        tetrahedra_points2 : array, shape (n_tetrahedra, 4, 3)
+        tetrahedra_points2 : array, shape (n_tetrahedra2, 4, 3)
             Points that form the second tetrahedra.
 
         Returns
