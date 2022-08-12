@@ -213,8 +213,9 @@ def make_halfplanes(X, plane_point, cart2plane):
         p and a direction pq.
     """
     halfplanes = np.empty((8, 4))
-    normals2d = X[:, :3].dot(cart2plane.T)
-    ds = -X[:, 3] - X[:, :3].dot(plane_point)
+    face_normals = np.ascontiguousarray(X[:, :3])
+    normals2d = face_normals.dot(cart2plane.T)
+    ds = -X[:, 3] - face_normals.dot(plane_point)
     hp_idx = 0
     for i in range(8):
         norm = np.linalg.norm(normals2d[i])
@@ -228,7 +229,7 @@ def make_halfplanes(X, plane_point, cart2plane):
 
 
 @numba.njit(
-    numba.float64[:, :](numba.float64[:, :]),
+    numba.float64[:, ::1](numba.float64[:, ::1]),
     cache=True)
 def order_points(points):
     """Order points by angle around their center.
@@ -250,7 +251,7 @@ def order_points(points):
 
 
 @numba.njit(
-    numba.float64[:, :](numba.float64[:, :]),
+    numba.float64[:, ::1](numba.float64[:, ::1]),
     cache=True)
 def filter_unique_points(points):
     """Remove duplicate points.
@@ -276,7 +277,7 @@ def filter_unique_points(points):
 
 
 @numba.njit(
-    numba.float64[:, :](numba.float64[:, :], numba.float64[:, ::1], numba.float64[:]),
+    numba.float64[:, ::1](numba.float64[:, ::1], numba.float64[:, ::1], numba.float64[::1]),
     cache=True)
 def project_polygon_to_3d(vertices, cart2plane, plane_point):
     """Project polygon from contact plane to 3D space.
@@ -340,7 +341,7 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
         return np.empty((0, 3), dtype=np.dtype("float"))
 
     # this approach sometimes results in duplicate points, remove them
-    vertices2d = order_points(vertices2d)
+    vertices2d = order_points(np.ascontiguousarray(vertices2d))
     unique_vertices2d = filter_unique_points(vertices2d)
     if len(unique_vertices2d) < 3:
         return np.empty((0, 3), dtype=np.dtype("float"))
