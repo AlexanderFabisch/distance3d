@@ -180,13 +180,9 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     X = np.vstack((X1, X2))
     halfplanes = make_halfplanes(X, plane_point, cart2plane)
 
-    polygon = intersect_halfplanes(halfplanes)
-    if len(polygon) < 3:
+    vertices2d = intersect_halfplanes(halfplanes)
+    if len(vertices2d) < 3:
         return None
-
-    vertices2d = np.empty((len(polygon), 2))
-    for i in range(len(polygon)):
-        vertices2d[i] = polygon[i]
 
     # this approach sometimes results in duplicate points, remove them
     vertices2d = order_points(vertices2d)

@@ -18,7 +18,8 @@ def intersect_halfplanes(halfplanes):
     points : list
         Points of the polygon.
     """
-    points = []
+    points = np.empty((9, 2))
+    n_intersections = 0
     for i in range(len(halfplanes)):
         for j in range(i + 1, len(halfplanes)):
             p = intersect_two_halfplanes(halfplanes[i], halfplanes[j])
@@ -31,8 +32,9 @@ def intersect_halfplanes(halfplanes):
                     valid = False
                     break
             if valid:
-                points.append(p)
-    return points
+                points[n_intersections] = p
+                n_intersections += 1
+    return points[:n_intersections]
 
 
 @numba.njit(cache=True)
