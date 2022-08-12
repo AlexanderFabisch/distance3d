@@ -1,7 +1,7 @@
 import numba
 import numpy as np
 from ..utils import plane_basis_from_normal, EPSILON
-from ._halfplanes import intersect_halfplanes, plot_halfplanes_and_intersections
+from ._halfplanes import intersect_halfplanes
 
 
 def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
@@ -307,6 +307,7 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     if len(unique_vertices2d) < 3:
         return np.empty((0, 3), dtype=np.dtype("float"))
 
+    #from ._halfplanes import plot_halfplanes_and_intersections
     #plot_halfplanes_and_intersections(halfplanes, unique_vertices2d)
 
     vertices3d = project_polygon_to_3d(unique_vertices2d, cart2plane, plane_point)
