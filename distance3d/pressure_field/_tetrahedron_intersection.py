@@ -297,8 +297,10 @@ def project_polygon_to_3d(vertices, cart2plane, plane_point):
     vertices3d : array, shape (n_vertices, 3)
         Vertices of contact polygon in 3D space.
     """
-    plane2cart = cart2plane.T
-    return vertices.dot(plane2cart.T) + plane_point
+    # Note that we actually apply the transform plane2cart to the vertices,
+    # however, it is the transpose of cart2plane and to apply it to a batch
+    # of vertices, we also have to transpose it, so both transposes cancel out.
+    return vertices.dot(cart2plane) + plane_point
 
 
 @numba.njit(
