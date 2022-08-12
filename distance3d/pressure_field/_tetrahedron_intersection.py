@@ -4,7 +4,9 @@ from ..utils import plane_basis_from_normal, EPSILON
 from ._halfplanes import intersect_halfplanes
 
 
-def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
+def intersect_tetrahedron_pairs(
+        pairs, tetrahedra_points1, tetrahedra_points2,
+        epsilon1, epsilon2, X1, X2):
     """Intersect pairs of tetrahedra.
 
     Parameters
@@ -12,11 +14,17 @@ def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
     pairs : list
         List of index pairs.
 
-    rigid_body1 : RigidBody
-        First tetrahedral mesh.
+    tetrahedra_points1 : array, shape (n_tetrahedra1, 4, 3)
+        Points that form the tetrahedra of object 1.
 
-    rigid_body2 : RigidBody
-        Second tetrahedral mesh.
+    tetrahedra_points2 : array, shape (n_tetrahedra2, 4, 3)
+        Points that form the tetrahedra of object 2.
+
+    epsilon1 : array, shape (n_tetrahedra1, 4)
+        Potentials of the vertices of the tetrahedra of object 1.
+
+    epsilon2 : array, shape (n_tetrahedra2, 4)
+        Potentials of the vertices of the tetrahedra of object 2.
 
     X1 : dict
         Maps tetrahedron indices of first rigid body to barycentric transform.
@@ -46,12 +54,10 @@ def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
     contact_polygons = []
     intersecting_tetrahedra1 = []
     intersecting_tetrahedra2 = []
-    epsilon1 = rigid_body1.tetrahedra_potentials
-    epsilon2 = rigid_body2.tetrahedra_potentials
     for i, j in pairs:
         intersecting, contact_details = intersect_tetrahedron_pair(
-            rigid_body1.tetrahedra_points[i], epsilon1[i], X1[i],
-            rigid_body2.tetrahedra_points[j], epsilon2[j], X2[j])
+            tetrahedra_points1[i], epsilon1[i], X1[i],
+            tetrahedra_points2[j], epsilon2[j], X2[j])
         if intersecting:
             intersection = True
         else:
