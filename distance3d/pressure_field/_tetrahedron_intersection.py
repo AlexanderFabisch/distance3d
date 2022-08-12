@@ -5,6 +5,42 @@ from ._halfplanes import intersect_halfplanes
 
 
 def intersect_tetrahedron_pairs(pairs, rigid_body1, rigid_body2, X1, X2):
+    """Intersect pairs of tetrahedra.
+
+    Parameters
+    ----------
+    pairs : list
+        List of index pairs.
+
+    rigid_body1 : RigidBody
+        First tetrahedral mesh.
+
+    rigid_body2 : RigidBody
+        Second tetrahedral mesh.
+
+    X1 : dict
+        Maps tetrahedron indices of first rigid body to barycentric transform.
+
+    X2 : dict
+        Maps tetrahedron indices of second rigid body to barycentric transform.
+
+    Returns
+    -------
+    intersection : bool
+        Do both rigid bodies overlap?
+
+    contact_planes : array, shape (n_intersections, 4)
+        Contact planes of intersection pairs in Hesse normal form.
+
+    contact_polygons : list
+        Vertices of contact polygons in counter-clockwise order.
+
+    intersecting_tetrahedra1 : list
+        Intersecting tetrahedron indices of first mesh.
+
+    intersecting_tetrahedra2 : list
+        Intersecting tetrahedron indices of second mesh.
+    """
     intersection = False
     contact_planes = []
     contact_polygons = []
