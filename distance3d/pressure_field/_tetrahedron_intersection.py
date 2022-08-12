@@ -75,13 +75,15 @@ def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
         return False, None
 
     contact_polygon = compute_contact_polygon(X1, X2, plane_normal, d)
-    if contact_polygon is None:
+    if len(contact_polygon) < 3:
         return False, None
 
     return True, (contact_plane_hnf, contact_polygon)
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.float64[::1](numba.float64[:, ::1], numba.float64[:, ::1], numba.float64[::1], numba.float64[::1]),
+    cache=True)
 def contact_plane(X1, X2, epsilon1, epsilon2):
     """Compute contact plane.
 
@@ -149,51 +151,6 @@ def check_tetrahedra_intersect_contact_plane(
         and max(plane_distances1) > epsilon
         and min(plane_distances2) < -epsilon
         and max(plane_distances2) > epsilon)
-
-
-@numba.njit(cache=True)
-def compute_contact_polygon(X1, X2, plane_normal, d):
-    """Compute contact polygon.
-
-    Parameters
-    ----------
-    X1 : array, shape (4, 4)
-        Each row is a halfspace that defines the original tetrahedron.
-
-    X2 : array, shape (4, 4)
-        Each row is a halfspace that defines the original tetrahedron.
-
-    plane_normal : array, shape (3,)
-        Normal of the contact plane.
-
-    d : float
-        Distance to origin along normal.
-
-    Returns
-    -------
-    polygon3d : array, shape (n_vertices, 3)
-        Contact polygon between two tetrahedra. Points are ordered
-        counter-clockwise around their center.
-    """
-    plane_point = plane_normal * d
-    cart2plane = np.vstack(plane_basis_from_normal(plane_normal))
-    X = np.vstack((X1, X2))
-    halfplanes = make_halfplanes(X, plane_point, cart2plane)
-
-    vertices2d = intersect_halfplanes(halfplanes)
-    if len(vertices2d) < 3:
-        return None
-
-    # this approach sometimes results in duplicate points, remove them
-    vertices2d = order_points(vertices2d)
-    unique_vertices2d = filter_unique_points(vertices2d)
-    if len(unique_vertices2d) < 3:
-        return None
-
-    #plot_halfplanes_and_intersections(halfplanes, unique_vertices2d)
-
-    vertices3d = project_polygon_to_3d(unique_vertices2d, cart2plane, plane_point)
-    return vertices3d
 
 
 @numba.njit(
@@ -306,3 +263,51 @@ def project_polygon_to_3d(vertices, cart2plane, plane_point):
     """
     plane2cart = cart2plane.T
     return vertices.dot(plane2cart.T) + plane_point
+
+
+@numba.njit(
+    numba.float64[:, :](numba.float64[:, ::1], numba.float64[:, ::1], numba.float64[::1], numba.float64),
+    cache=True)
+def compute_contact_polygon(X1, X2, plane_normal, d):
+    """Compute contact polygon.
+
+    Parameters
+    ----------
+    X1 : array, shape (4, 4)
+        Each row is a halfspace that defines the original tetrahedron.
+
+    X2 : array, shape (4, 4)
+        Each row is a halfspace that defines the original tetrahedron.
+
+    plane_normal : array, shape (3,)
+        Normal of the contact plane.
+
+    d : float
+        Distance to origin along normal.
+
+    Returns
+    -------
+    polygon3d : array, shape (n_vertices, 3)
+        Contact polygon between two tetrahedra. Points are ordered
+        counter-clockwise around their center. No intersection is indicated
+        by 0 vertices.
+    """
+    plane_point = plane_normal * d
+    cart2plane = np.vstack(plane_basis_from_normal(plane_normal))
+    X = np.vstack((X1, X2))
+    halfplanes = make_halfplanes(X, plane_point, cart2plane)
+
+    vertices2d = intersect_halfplanes(halfplanes)
+    if len(vertices2d) < 3:
+        return np.empty((0, 3), dtype=np.dtype("float"))
+
+    # this approach sometimes results in duplicate points, remove them
+    vertices2d = order_points(vertices2d)
+    unique_vertices2d = filter_unique_points(vertices2d)
+    if len(unique_vertices2d) < 3:
+        return np.empty((0, 3), dtype=np.dtype("float"))
+
+    #plot_halfplanes_and_intersections(halfplanes, unique_vertices2d)
+
+    vertices3d = project_polygon_to_3d(unique_vertices2d, cart2plane, plane_point)
+    return vertices3d
