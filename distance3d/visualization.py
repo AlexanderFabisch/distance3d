@@ -206,7 +206,17 @@ class ContactSurface(pv.Artist):
 
     Parameters
     ----------
-    TODO
+    mesh2origin : array, shape (4, 4)
+        Pose of the mesh.
+
+    contact_vertices : list
+        Each entry is an array of vertices of a contact polygon.
+
+    contact_triangles : list
+        Each entry is an array of trangles of a contact polygon.
+
+    pressures : array, shape (n_contact_polygons)
+        Pressure values for contact polygons.
     """
     def __init__(self, mesh2origin, contact_vertices, contact_triangles, pressures):
         self.cmap = plt.get_cmap("plasma")
