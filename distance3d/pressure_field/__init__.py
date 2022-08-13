@@ -9,6 +9,7 @@ from ._mesh_processing import center_of_mass_tetrahedral_mesh, tetrahedral_mesh_
 from ._barycentric_transform import barycentric_transforms
 from ._tetrahedron_intersection import intersect_tetrahedron_pair
 from ._forces import compute_contact_force
+from ._broad_phase import broad_phase_tetrahedra
 
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     "intersect_halfplanes", "plot_halfplanes_and_intersections",
     "make_tetrahedral_icosphere", "center_of_mass_tetrahedral_mesh",
     "tetrahedral_mesh_aabbs", "barycentric_transforms",
-    "intersect_tetrahedron_pair", "compute_contact_force"
+    "intersect_tetrahedron_pair", "compute_contact_force",
+    "broad_phase_tetrahedra"
 ]
