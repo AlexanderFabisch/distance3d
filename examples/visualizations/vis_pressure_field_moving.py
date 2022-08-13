@@ -15,6 +15,7 @@ class AnimationCallback:
         self.n_frames = n_frames
         self.rigid_body1 = rigid_body1
         self.rigid_body2 = rigid_body2
+        self.initial_body12origin = np.copy(self.rigid_body1.body2origin_)
         self.mesh1 = visualization.TetraMesh(
             self.rigid_body1.body2origin_, self.rigid_body1.vertices_,
             self.rigid_body1.tetrahedra_)
@@ -34,16 +35,24 @@ class AnimationCallback:
         self.mesh2.add_artist(fig)
         self.contact_surface.add_artist(fig)
 
-    def __call__(self, step):
-        if step == 0:
-            body1_old2body1_new = self.rigid_body1.body2origin_
-        else:
-            body1_old2body1_new = np.eye(4)
-            body1_old2body1_new[:3, 3] = np.array([-0.1 / self.n_frames, 0.0, 0.0])
+    def __call__(self, step, fig):
+        body12origin = np.copy(self.initial_body12origin)
+        if step > 0:
+            body12origin = np.copy(self.initial_body12origin)
+            t = 0.1 / self.n_frames
+            body12origin[:3, 3] = np.array([t, 0.0, 0.0])
+        self.rigid_body1.express_in(self.initial_body12origin)
+        self.rigid_body1.body2origin_ = body12origin
+        self.mesh1.set_data(body12origin)
 
-        self.rigid_body1.transform(body1_old2body1_new)
-        self.mesh1.set_data(self.rigid_body1.body2origin_)
-        return self.mesh1, self.mesh2
+        contact_surface = pressure_field.find_contact_surface(
+            self.rigid_body1, self.rigid_body2)
+        self.contact_surface.set_data(
+            contact_surface.frame2world,
+            contact_surface.contact_polygons,
+            contact_surface.contact_polygon_triangles,
+            contact_surface.pressures)
+        return self.mesh1, self.contact_surface
 
 
 cube12origin = np.eye(4)
@@ -61,7 +70,7 @@ animation_callback.add_artists(fig)
 fig.view_init()
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
-                fargs=())
+                fargs=(fig,))
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")

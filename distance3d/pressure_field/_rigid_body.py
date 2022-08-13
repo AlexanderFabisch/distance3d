@@ -44,8 +44,12 @@ class RigidBody:
             self._com = center_of_mass_tetrahedral_mesh(self.tetrahedra_points)
         return self._com
 
-    def transform(self, old2new):
-        self.body2origin_ = np.dot(self.body2origin_, invert_transform(old2new))
-        self.vertices_ = transform_points(old2new, self.vertices_)
+    def express_in(self, new_body2origin):
+        origin2new_body = invert_transform(new_body2origin)
+        body2new_body = np.dot(origin2new_body, self.body2origin_)
+        print(body2new_body)
+        self.vertices_ = transform_points(body2new_body, self.vertices_)
+        self.body2origin_ = new_body2origin
+
         self._tetrahedra_points = None
         self._com = None

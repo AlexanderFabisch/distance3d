@@ -202,26 +202,37 @@ class Ellipse(pv.Artist):
 
 
 class ContactSurface(pv.Artist):
-    """TODO"""
+    """A pressure field.
+
+    Parameters
+    ----------
+    TODO
+    """
     def __init__(self, mesh2origin, contact_vertices, contact_triangles, pressures):
         self.cmap = plt.get_cmap("plasma")
         self.mesh = o3d.geometry.TriangleMesh()
         self.set_data(mesh2origin, contact_vertices, contact_triangles, pressures)
 
     def set_data(self, mesh2origin, contact_vertices, contact_triangles, pressures):
-        vertices = transform_points(mesh2origin, np.vstack(contact_vertices))
-        triangles = []
-        n_vertices = 0
-        pressures_per_face = []
-        for i in range(len(contact_triangles)):
-            triangles.extend(contact_triangles[i] + n_vertices)
-            n_vertices += len(contact_vertices[i])
-            pressures_per_face.extend([pressures[i]] * len(contact_vertices[i]))
-        triangles = np.vstack(triangles)
-        triangles = np.vstack((triangles, triangles[:, ::-1]))
-        max_pressure = max(pressures)
-        colors = [self.cmap(pressure_per_face / max_pressure)[:3]
-                  for pressure_per_face in pressures_per_face]
+        if len(contact_vertices) > 0:
+            # TODO can we just transform the mesh?
+            vertices = transform_points(mesh2origin, np.vstack(contact_vertices))
+            triangles = []
+            n_vertices = 0
+            pressures_per_face = []
+            for i in range(len(contact_triangles)):
+                triangles.extend(contact_triangles[i] + n_vertices)
+                n_vertices += len(contact_vertices[i])
+                pressures_per_face.extend([pressures[i]] * len(contact_vertices[i]))
+            triangles = np.vstack(triangles)
+            triangles = np.vstack((triangles, triangles[:, ::-1]))
+            max_pressure = max(pressures)
+            colors = np.vstack([self.cmap(pressure_per_face / max_pressure)[:3]
+                                for pressure_per_face in pressures_per_face])
+        else:
+            vertices = np.empty((0, 3), dtype=float)
+            triangles = np.empty((0, 4), dtype=int)
+            colors = np.empty((0, 3), dtype=float)
         self.mesh.vertices = o3d.utility.Vector3dVector(vertices)
         self.mesh.triangles = o3d.utility.Vector3iVector(triangles)
         self.mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
