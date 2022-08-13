@@ -15,7 +15,7 @@ class AnimationCallback:
         self.n_frames = n_frames
         self.rigid_body1 = rigid_body1
         self.rigid_body2 = rigid_body2
-        self.initial_body12origin = np.copy(self.rigid_body1.body2origin_)
+        self.rigid_body1.express_in(self.rigid_body2.body2origin_)
         self.mesh1 = visualization.TetraMesh(
             self.rigid_body1.body2origin_, self.rigid_body1.vertices_,
             self.rigid_body1.tetrahedra_)
@@ -36,14 +36,8 @@ class AnimationCallback:
         self.contact_surface.add_artist(fig)
 
     def __call__(self, step, fig):
-        body12origin = np.copy(self.initial_body12origin)
-        if step > 0:
-            body12origin = np.copy(self.initial_body12origin)
-            t = 0.1 / self.n_frames
-            body12origin[:3, 3] = np.array([t, 0.0, 0.0])
-        self.rigid_body1.express_in(self.initial_body12origin)
-        self.rigid_body1.body2origin_ = body12origin
-        self.mesh1.set_data(body12origin)
+        self.rigid_body1.move(np.array([0.1 / self.n_frames, 0.0, 0.0]), np.eye(4))
+        self.mesh1.set_data(np.copy(self.rigid_body1.body2origin_))
 
         contact_surface = pressure_field.find_contact_surface(
             self.rigid_body1, self.rigid_body2)

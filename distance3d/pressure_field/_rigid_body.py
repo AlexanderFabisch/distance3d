@@ -47,9 +47,12 @@ class RigidBody:
     def express_in(self, new_body2origin):
         origin2new_body = invert_transform(new_body2origin)
         body2new_body = np.dot(origin2new_body, self.body2origin_)
-        print(body2new_body)
         self.vertices_ = transform_points(body2new_body, self.vertices_)
         self.body2origin_ = new_body2origin
 
         self._tetrahedra_points = None
         self._com = None
+
+    def move(self, position_offset_in_A, A2origin):
+        position_offset_in_origin = A2origin[:3, :3].dot(position_offset_in_A)
+        self.body2origin_[:3, 3] += position_offset_in_origin
