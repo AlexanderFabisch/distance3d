@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.visualizer as pv
 import open3d as o3d
+from .utils import transform_points
 
 
 class Mesh(pv.Artist):
@@ -202,10 +203,13 @@ class Ellipse(pv.Artist):
 
 class ContactSurface(pv.Artist):
     """TODO"""
-    def __init__(self, contact_vertices, contact_triangles, pressures):
+    def __init__(self, mesh2origin, contact_vertices, contact_triangles, pressures):
         self.cmap = plt.get_cmap("plasma")
         self.mesh = o3d.geometry.TriangleMesh()
-        vertices = np.vstack(contact_vertices)
+        self.set_data(mesh2origin, contact_vertices, contact_triangles, pressures)
+
+    def set_data(self, mesh2origin, contact_vertices, contact_triangles, pressures):
+        vertices = transform_points(mesh2origin, np.vstack(contact_vertices))
         triangles = []
         n_vertices = 0
         pressures_per_face = []
@@ -221,9 +225,6 @@ class ContactSurface(pv.Artist):
         self.mesh.vertices = o3d.utility.Vector3dVector(vertices)
         self.mesh.triangles = o3d.utility.Vector3iVector(triangles)
         self.mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
-
-    def set_data(self, *args, **kwargs):
-        print("TODO implement update function")
 
     @property
     def geometries(self):

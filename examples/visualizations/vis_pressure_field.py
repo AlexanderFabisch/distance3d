@@ -72,8 +72,8 @@ fig.plot_vector(details["contact_point"], 100 * wrench21[:3], (1, 0, 0))
 fig.plot_vector(details["contact_point"], 100 * wrench12[:3], (0, 1, 0))
 
 contact_surface = visualization.ContactSurface(
-    details["contact_polygons"], details["contact_polygon_triangles"],
-    details["pressures"])
+    np.eye(4), details["contact_polygons"],
+    details["contact_polygon_triangles"], details["pressures"])
 contact_surface.add_artist(fig)
 
 fig.view_init()
