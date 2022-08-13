@@ -78,6 +78,9 @@ class ContactSurface:
         details : dict
             Detailed description of contact surface and pressure field.
         """
+        if not self.intersection:
+            return {}
+
         intersecting_tetrahedra1, intersecting_tetrahedra2 = self._transform_to_world(
             self.frame2world, tetrahedra_points1, tetrahedra_points2)
 
