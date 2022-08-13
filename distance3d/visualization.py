@@ -1,5 +1,6 @@
 """Visualization tools."""
 import numpy as np
+import matplotlib.pyplot as plt
 import pytransform3d.visualizer as pv
 import open3d as o3d
 
@@ -186,6 +187,43 @@ class Ellipse(pv.Artist):
 
         self.mesh.transform(np.linalg.inv(previous_ellipse2origin))
         self.mesh.transform(self.ellipse2origin)
+
+    @property
+    def geometries(self):
+        """Expose geometries.
+
+        Returns
+        -------
+        geometries : list
+            List of geometries that can be added to the visualizer.
+        """
+        return [self.mesh]
+
+
+class ContactSurface(pv.Artist):
+    """TODO"""
+    def __init__(self, contact_vertices, contact_triangles, pressures):
+        self.cmap = plt.get_cmap("plasma")
+        self.mesh = o3d.geometry.TriangleMesh()
+        vertices = np.vstack(contact_vertices)
+        triangles = []
+        n_vertices = 0
+        pressures_per_face = []
+        for i in range(len(contact_triangles)):
+            triangles.extend(contact_triangles[i] + n_vertices)
+            n_vertices += len(contact_vertices[i])
+            pressures_per_face.extend([pressures[i]] * len(contact_vertices[i]))
+        triangles = np.vstack(triangles)
+        triangles = np.vstack((triangles, triangles[:, ::-1]))
+        max_pressure = max(pressures)
+        colors = [self.cmap(pressure_per_face / max_pressure)[:3]
+                  for pressure_per_face in pressures_per_face]
+        self.mesh.vertices = o3d.utility.Vector3dVector(vertices)
+        self.mesh.triangles = o3d.utility.Vector3iVector(triangles)
+        self.mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
+
+    def set_data(self, *args, **kwargs):
+        print("TODO implement update function")
 
     @property
     def geometries(self):

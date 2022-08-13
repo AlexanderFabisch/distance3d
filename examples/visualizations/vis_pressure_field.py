@@ -71,17 +71,10 @@ if highlight_isect_idx is not None:
 fig.plot_vector(details["contact_point"], 100 * wrench21[:3], (1, 0, 0))
 fig.plot_vector(details["contact_point"], 100 * wrench12[:3], (0, 1, 0))
 
-max_pressure = max(details["pressures"])
-cmap = plt.get_cmap("plasma")
-colors = [cmap(pressure / max_pressure)[:3] for pressure in details["pressures"]]
-contact_polygons = zip(colors, details["contact_polygons"], details["contact_polygon_triangles"])
-for color, points, triangles in contact_polygons:
-    triangles = np.vstack((triangles, triangles[:, ::-1]))
-    contact_surface_mesh = o3d.geometry.TriangleMesh(
-        o3d.utility.Vector3dVector(points),
-        o3d.utility.Vector3iVector(triangles))
-    contact_surface_mesh.paint_uniform_color(color)
-    fig.add_geometry(contact_surface_mesh)
+contact_surface = visualization.ContactSurface(
+    details["contact_polygons"], details["contact_polygon_triangles"],
+    details["pressures"])
+contact_surface.add_artist(fig)
 
 fig.view_init()
 
