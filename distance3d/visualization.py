@@ -225,8 +225,7 @@ class ContactSurface(pv.Artist):
 
     def set_data(self, mesh2origin, contact_vertices, contact_triangles, pressures):
         if len(contact_vertices) > 0:
-            # TODO can we just transform the mesh?
-            vertices = transform_points(mesh2origin, np.vstack(contact_vertices))
+            vertices = np.vstack(contact_vertices)
             triangles = []
             n_vertices = 0
             pressures_per_face = []
@@ -246,6 +245,8 @@ class ContactSurface(pv.Artist):
         self.mesh.vertices = o3d.utility.Vector3dVector(vertices)
         self.mesh.triangles = o3d.utility.Vector3iVector(triangles)
         self.mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
+        # TODO can we just transform the mesh?
+        self.mesh.transform(mesh2origin)
 
     @property
     def geometries(self):
