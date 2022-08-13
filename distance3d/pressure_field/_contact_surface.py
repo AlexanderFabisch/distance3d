@@ -62,6 +62,10 @@ class ContactSurface:
         self.contact_forces = contact_forces
         self.contact_polygon_triangles = contact_polygon_triangles
 
+    @property
+    def pressures(self):
+        return np.linalg.norm(self.contact_forces, axis=1) / self.contact_areas
+
     def make_details(self, tetrahedra_points1, tetrahedra_points2):
         """Summarize details of contact points in world frame.
 
@@ -84,7 +88,6 @@ class ContactSurface:
         intersecting_tetrahedra1, intersecting_tetrahedra2 = self._transform_to_world(
             self.frame2world, tetrahedra_points1, tetrahedra_points2)
 
-        pressures = np.linalg.norm(self.contact_forces, axis=1) / self.contact_areas
         contact_point = np.sum(
             self.contact_coms * self.contact_areas[:, np.newaxis],
             axis=0) / sum(self.contact_areas)
@@ -98,7 +101,7 @@ class ContactSurface:
             "contact_coms": self.contact_coms,
             "contact_forces": self.contact_forces,
             "contact_areas": self.contact_areas,
-            "pressures": pressures,
+            "pressures": self.pressures,
             "contact_point": contact_point
         }
         return details
