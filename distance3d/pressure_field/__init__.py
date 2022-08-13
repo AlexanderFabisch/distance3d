@@ -89,11 +89,11 @@ def find_contact_surface(rigid_body1, rigid_body2, timer=None):
         timer = Timer()
 
     timer.start("transformation")
-    # We transform vertices of mesh1 to mesh2 frame to be able to reuse the
-    # AABB tree of mesh2.
-    mesh12mesh2 = np.dot(invert_transform(rigid_body2.mesh2origin),
-                         rigid_body1.mesh2origin)
-    rigid_body1.transform(mesh12mesh2)
+    # We transform vertices of rigid_body1 to rigid_body2 frame to be able to
+    # reuse the AABB tree of rigid_body2.
+    body12body2 = np.dot(invert_transform(rigid_body2.body2origin_),
+                         rigid_body1.body2origin_)
+    rigid_body1.transform(body12body2)
     timer.stop_and_add_to_total("transformation")
 
     timer.start("broad_phase_tetrahedra")
@@ -115,7 +115,7 @@ def find_contact_surface(rigid_body1, rigid_body2, timer=None):
         broad_pairs, rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points,
         rigid_body1.tetrahedra_potentials, rigid_body2.tetrahedra_potentials,
         X1, X2)
-    contact_surface = ContactSurface(rigid_body2.mesh2origin, *intersection_result)
+    contact_surface = ContactSurface(rigid_body2.body2origin_, *intersection_result)
     timer.stop_and_add_to_total("intersect_tetrahedron_pairs")
 
     timer.start("contact_surface_forces")
@@ -160,8 +160,8 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2):
 
     # FIXME workaround for broad phase bug:
     from itertools import product
-    broad_tetrahedra1 = np.array(list(range(len(rigid_body1.tetrahedra))), dtype=int)
-    broad_tetrahedra2 = np.array(list(range(len(rigid_body2.tetrahedra))), dtype=int)
+    broad_tetrahedra1 = np.array(list(range(len(rigid_body1.tetrahedra_))), dtype=int)
+    broad_tetrahedra2 = np.array(list(range(len(rigid_body2.tetrahedra_))), dtype=int)
     broad_pairs = list(product(broad_tetrahedra1, broad_tetrahedra2))
     return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
 
