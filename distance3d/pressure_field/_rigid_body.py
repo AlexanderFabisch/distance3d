@@ -4,11 +4,11 @@ from ._mesh_processing import center_of_mass_tetrahedral_mesh
 
 
 class RigidBody:
-    def __init__(self, mesh2origin, vertices_in_mesh, tetrahedra, potentials):
-        self.mesh2origin = mesh2origin
-        self.vertices_in_mesh = vertices_in_mesh
-        self.tetrahedra = tetrahedra
-        self.potentials = potentials
+    def __init__(self, mesh2origin, vertices, tetrahedra, potentials):
+        self.body2origin_ = mesh2origin
+        self.vertices_ = vertices
+        self.tetrahedra_ = tetrahedra
+        self.potentials_ = potentials
 
         self._tetrahedra_points = None
         self._com = None
@@ -16,12 +16,12 @@ class RigidBody:
     @property
     def tetrahedra_points(self):
         if self._tetrahedra_points is None:
-            self._tetrahedra_points = self.vertices_in_mesh[self.tetrahedra]
+            self._tetrahedra_points = self.vertices_[self.tetrahedra_]
         return self._tetrahedra_points
 
     @property
     def tetrahedra_potentials(self):
-        return self.potentials[self.tetrahedra]
+        return self.potentials_[self.tetrahedra_]
 
     @property
     def com(self):
@@ -30,7 +30,7 @@ class RigidBody:
         return self._com
 
     def transform(self, old2new):
-        self.mesh2origin = np.dot(self.mesh2origin, invert_transform(old2new))
-        self.vertices_in_mesh = transform_points(old2new, self.vertices_in_mesh)
+        self.body2origin_ = np.dot(self.body2origin_, invert_transform(old2new))
+        self.vertices_ = transform_points(old2new, self.vertices_)
         self._tetrahedra_points = None
         self._com = None
