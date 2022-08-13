@@ -23,7 +23,7 @@ def contact_forces(  # TODO think about interface
     rigid_body1 = RigidBody(mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1)
     rigid_body2 = RigidBody(mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2)
 
-    contact_surface = find_contact_plane(rigid_body1, rigid_body2, timer)
+    contact_surface = find_contact_surface(rigid_body1, rigid_body2, timer)
 
     timer.start("accumulate_wrenches")
     wrench12_in_world, wrench21_in_world = accumulate_wrenches(
@@ -43,7 +43,7 @@ def contact_forces(  # TODO think about interface
         return contact_surface.intersection, wrench12_in_world, wrench21_in_world
 
 
-def find_contact_plane(rigid_body1, rigid_body2, timer=None):
+def find_contact_surface(rigid_body1, rigid_body2, timer=None):
     """Find contact plane of two rigid bodies.
 
     Parameters
