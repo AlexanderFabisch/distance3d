@@ -32,10 +32,12 @@ vertices2, tetrahedra2, potentials2 = pressure_field.make_tetrahedral_icosphere(
 
 timer = benchmark.Timer()
 timer.start("contact_forces")
+rigid_body1 = pressure_field.RigidBody(
+    mesh12origin, vertices1, tetrahedra1, potentials1)
+rigid_body2 = pressure_field.RigidBody(
+    mesh22origin, vertices2, tetrahedra2, potentials2)
 intersection, wrench12, wrench21, details = pressure_field.contact_forces(
-    mesh12origin, vertices1, tetrahedra1, potentials1,
-    mesh22origin, vertices2, tetrahedra2, potentials2,
-    return_details=True, timer=timer)
+    rigid_body1, rigid_body2, return_details=True, timer=timer)
 pprint.pprint(timer.total_time_)
 print(f"time: {timer.stop('contact_forces')}")
 

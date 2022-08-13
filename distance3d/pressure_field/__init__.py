@@ -12,16 +12,39 @@ from ._forces import contact_surface_forces, accumulate_wrenches, compute_contac
 from ._halfplanes import plot_halfplanes_and_intersections
 
 
-def contact_forces(  # TODO think about interface
-        mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1,
-        mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2,
-        return_details=False, timer=None):
-    """Contact forces between two objects."""
+def contact_forces(rigid_body1, rigid_body2, return_details=False, timer=None):
+    """Contact forces between two objects.
+
+    Parameters
+    ----------
+    rigid_body1 : RigidBody
+        First rigid body.
+
+    rigid_body2 : RigidBody
+        Second rigid body.
+
+    return_details : bool
+        Return additional contact details.
+
+    timer : Timer, optional (default: None)
+        Measures time to execute certain parts of this function.
+
+    Returns
+    -------
+    intersection : bool
+        Do both bodies intersect?
+
+    wrench12_in_world : array, shape (6,)
+        Forces and torques caused by body 1 acting on body 2 in world frame.
+
+    wrench21_in_world : array, shape (6,)
+        Forces and torques caused by body 2 acting on body 1 in world frame.
+
+    details : dict, optional
+        Additional contact details.
+    """
     if timer is None:
         timer = Timer()
-
-    rigid_body1 = RigidBody(mesh12origin, vertices1_in_mesh1, tetrahedra1, potentials1)
-    rigid_body2 = RigidBody(mesh22origin, vertices2_in_mesh2, tetrahedra2, potentials2)
 
     contact_surface = find_contact_surface(rigid_body1, rigid_body2, timer)
 
@@ -53,6 +76,9 @@ def find_contact_surface(rigid_body1, rigid_body2, timer=None):
 
     rigid_body2 : RigidBody
         Second rigid body.
+
+    timer : Timer, optional (default: None)
+        Measures time to execute certain parts of this function.
 
     Returns
     -------
