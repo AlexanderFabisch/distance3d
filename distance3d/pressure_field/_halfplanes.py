@@ -17,7 +17,7 @@ def cross2d(a, b):
     cache=True)
 def intersect_two_halfplanes(halfplane1, halfplane2):
     denom = cross2d(halfplane1[2:], halfplane2[2:])
-    if np.abs(denom) < EPSILON:
+    if abs(denom) < EPSILON:
         return np.empty(0, dtype=np.dtype("float"))
     t = cross2d((halfplane2[:2] - halfplane1[:2]), halfplane2[2:]) / denom
     return halfplane1[:2] + halfplane1[2:] * t
