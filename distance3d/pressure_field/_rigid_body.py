@@ -1,4 +1,5 @@
-from ..utils import transform_points
+import numpy as np
+from ..utils import transform_points, invert_transform
 from ._mesh_processing import center_of_mass_tetrahedral_mesh
 
 
@@ -29,6 +30,7 @@ class RigidBody:
         return self._com
 
     def transform(self, old2new):
+        self.mesh2origin = np.dot(self.mesh2origin, invert_transform(old2new))
         self.vertices_in_mesh = transform_points(old2new, self.vertices_in_mesh)
         self._tetrahedra_points = None
         self._com = None

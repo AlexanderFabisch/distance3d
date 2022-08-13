@@ -66,6 +66,9 @@ def contact_forces(rigid_body1, rigid_body2, return_details=False, timer=None):
 def find_contact_surface(rigid_body1, rigid_body2, timer=None):
     """Find contact plane of two rigid bodies.
 
+    Note that this function will transform rigid_body1 into the frame of
+    rigid_body2.
+
     Parameters
     ----------
     rigid_body1 : RigidBody
