@@ -84,12 +84,10 @@ def find_contact_surface(rigid_body1, rigid_body2, timer=None):
     if timer is None:
         timer = Timer()
 
-    timer.start("transformation")
     # We transform vertices of rigid_body1 to rigid_body2 frame to be able to
     # reuse the AABB tree of rigid_body2.
-    body12body2 = np.dot(invert_transform(rigid_body2.body2origin_),
-                         rigid_body1.body2origin_)
-    rigid_body1.transform(body12body2)
+    timer.start("transformation")
+    rigid_body1.express_in(rigid_body2.body2origin_)
     timer.stop_and_add_to_total("transformation")
 
     timer.start("broad_phase_tetrahedra")

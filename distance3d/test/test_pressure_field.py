@@ -63,6 +63,27 @@ def test_contact_forces_and_details():
     assert "contact_point" in details
 
 
+def test_rigid_body_transforms():
+    cube12origin = np.eye(4)
+    cube22origin = np.eye(4)
+    cube1_22origin = np.copy(cube12origin)
+    cube1_22origin[:3, 3] += 1.0
+
+    rigid_body1 = pressure_field.RigidBody.make_cube(cube12origin, 0.1)
+    cube22origin[:3, 3] = np.array([0.0, 0.0, 0.08])
+    rigid_body2 = pressure_field.RigidBody.make_cube(cube22origin, 0.1)
+
+    rigid_body1.express_in(rigid_body2.body2origin_)
+    tetras1_in_2 = rigid_body1.tetrahedra_points  # measure in cube2 frame
+
+    rigid_body1.express_in(cube12origin)
+    rigid_body1.body2origin_ = cube1_22origin  # move forward in origin frame
+
+    rigid_body1.express_in(rigid_body2.body2origin_)
+    tetras1_in_2_2 = rigid_body1.tetrahedra_points  # measure in cube frame
+
+    assert_array_almost_equal(tetras1_in_2 + 1, tetras1_in_2_2)
+
 
 def test_intersect_halfplanes():
     halfplanes = np.array([
