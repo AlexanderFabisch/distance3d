@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import open3d as o3d
 import pytransform3d.rotations as pr
 import pytransform3d.visualizer as pv
-from distance3d import visualization, pressure_field, benchmark, utils
+from distance3d import visualization, pressure_field, benchmark
 
 
 highlight_isect_idx = None
