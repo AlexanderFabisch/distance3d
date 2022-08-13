@@ -48,7 +48,7 @@ class RigidBody:
         origin2new_body = invert_transform(new_body2origin)
         body2new_body = np.dot(origin2new_body, self.body2origin_)
         self.vertices_ = transform_points(body2new_body, self.vertices_)
-        self.body2origin_ = new_body2origin
+        self.body2origin_ = np.copy(new_body2origin)
 
         self._tetrahedra_points = None
         self._com = None
