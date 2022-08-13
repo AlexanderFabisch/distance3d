@@ -47,8 +47,8 @@ def tesselate_ordered_polygon(n_vertices):
     return triangles
 
 
-# 8 halfplanes cannot define a polygon with more than 10 vertices
-TRIANGLES = tesselate_ordered_polygon(10)
+# 8 halfplanes cannot define a polygon with more than 8 vertices
+TRIANGLES = tesselate_ordered_polygon(8)
 
 
 @numba.njit(cache=True)
