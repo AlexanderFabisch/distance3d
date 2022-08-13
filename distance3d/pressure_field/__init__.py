@@ -55,11 +55,8 @@ def contact_forces(rigid_body1, rigid_body2, return_details=False, timer=None):
 
     if return_details:
         timer.start("make_details")
-        if contact_surface.intersection:
-            details = contact_surface.make_details(
-                rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points)
-        else:
-            details = {}
+        details = contact_surface.make_details(
+            rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points)
         timer.stop_and_add_to_total("make_details")
         return contact_surface.intersection, wrench12_in_world, wrench21_in_world, details
     else:
