@@ -21,6 +21,9 @@ class AnimationCallback:
         self.mesh2 = visualization.TetraMesh(
             self.rigid_body2.body2origin_, self.rigid_body2.vertices_,
             self.rigid_body2.tetrahedra_)
+        self.contact_surface = pressure_field.find_contact_surface(
+            self.rigid_body1, self.rigid_body2)
+        # TODO contact surface artist
 
     def add_artists(self, fig):
         self.mesh1.add_artist(fig)
