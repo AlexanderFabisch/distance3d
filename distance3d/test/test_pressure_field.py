@@ -4,28 +4,18 @@ from numpy.testing import assert_array_almost_equal
 
 
 def test_contact_forces():
-    mesh12origin = np.eye(4)
-    mesh22origin = np.eye(4)
-
-    vertices1, tetrahedra1, potentials1 = pressure_field.make_tetrahedral_icosphere(
+    rigid_body1 = pressure_field.RigidBody.make_sphere(
         np.array([0.0, 0.0, 0.01]), 0.15, 1)
-    rigid_body1 = pressure_field.RigidBody(
-        mesh12origin, vertices1, tetrahedra1, potentials1)
 
-    vertices2, tetrahedra2, potentials2 = pressure_field.make_tetrahedral_icosphere(
+    rigid_body2 = pressure_field.RigidBody.make_sphere(
         np.array([0.0, 0.0, 0.4]), 0.15, 1)
-    rigid_body2 = pressure_field.RigidBody(
-        mesh22origin, vertices2, tetrahedra2, potentials2)
     intersection, wrench12, wrench21 = pressure_field.contact_forces(
         rigid_body1, rigid_body2)
     assert not intersection
     assert_array_almost_equal(wrench12, np.zeros(6))
     assert_array_almost_equal(wrench21, np.zeros(6))
 
-    vertices2, tetrahedra2, potentials2 = pressure_field.make_tetrahedral_icosphere(
-        np.array([0.0, 0.0, 0.3]), 0.15, 1)
-    rigid_body2 = pressure_field.RigidBody(
-        mesh22origin, vertices2, tetrahedra2, potentials2)
+    rigid_body2 = pressure_field.RigidBody.make_sphere(np.array([0.0, 0.0, 0.3]), 0.15, 1)
     intersection, wrench12, wrench21 = pressure_field.contact_forces(
         rigid_body1, rigid_body2)
     assert intersection
@@ -34,10 +24,8 @@ def test_contact_forces():
     assert_array_almost_equal(
         wrench21, np.array([0.0, 0.0, -1.120994e-06, 0.0, 0.0, 0.0]))
 
-    vertices2, tetrahedra2, potentials2 = pressure_field.make_tetrahedral_icosphere(
+    rigid_body2 = pressure_field.RigidBody.make_sphere(
         np.array([0.0, 0.0, 0.15]), 0.15, 1)
-    rigid_body2 = pressure_field.RigidBody(
-        mesh22origin, vertices2, tetrahedra2, potentials2)
     intersection, wrench12, wrench21 = pressure_field.contact_forces(
         rigid_body1, rigid_body2)
     assert intersection
@@ -48,16 +36,10 @@ def test_contact_forces():
 
 
 def test_contact_forces_and_details():
-    mesh12origin = np.eye(4)
-    vertices1, tetrahedra1, potentials1 = pressure_field.make_tetrahedral_icosphere(
+    rigid_body1 = pressure_field.RigidBody.make_sphere(
         np.array([0.0, 0.0, 0.01]), 0.15, 1)
-    rigid_body1 = pressure_field.RigidBody(
-        mesh12origin, vertices1, tetrahedra1, potentials1)
-    mesh22origin = np.eye(4)
-    vertices2, tetrahedra2, potentials2 = pressure_field.make_tetrahedral_icosphere(
+    rigid_body2 = pressure_field.RigidBody.make_sphere(
         np.array([0.0, 0.0, 0.3]), 0.15, 1)
-    rigid_body2 = pressure_field.RigidBody(
-        mesh22origin, vertices2, tetrahedra2, potentials2)
     intersection, wrench12, wrench21, details = pressure_field.contact_forces(
         rigid_body1, rigid_body2, return_details=True)
     assert "contact_polygons" in details
