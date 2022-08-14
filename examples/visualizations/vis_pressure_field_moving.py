@@ -30,7 +30,7 @@ class AnimationCallback:
             contact_surface.contact_polygons,
             contact_surface.contact_polygon_triangles,
             contact_surface.pressures)
-        self.rigid_body1.move(self.position_offset, np.eye(4))
+        self.rigid_body1.body2origin_[:3, 3] += self.position_offset
 
     def add_artists(self, fig):
         self.mesh1.add_artist(fig)
@@ -40,9 +40,9 @@ class AnimationCallback:
     def __call__(self, step):
         # TODO clean up move interface, introduce RigidBodyArtist?
         if step == 0:
-            self.rigid_body1.move(-self.position_offset, np.eye(4))
+            self.rigid_body1.body2origin_[:3, 3] += -self.position_offset
             self.mesh1.set_data(self.rigid_body2.body2origin_)
-        self.rigid_body1.move(self.position_offset / self.n_frames, np.eye(4))
+        self.rigid_body1.body2origin_[:3, 3] += self.position_offset / self.n_frames
         mesh12origin = np.copy(self.mesh1.mesh2origin)
         mesh12origin[:3, 3] += self.position_offset / self.n_frames
         self.mesh1.set_data(mesh12origin)
