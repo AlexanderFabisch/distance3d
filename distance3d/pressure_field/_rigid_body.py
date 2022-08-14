@@ -52,7 +52,3 @@ class RigidBody:
 
         self._tetrahedra_points = None
         self._com = None
-
-    def move(self, position_offset_in_A, A2origin):
-        position_offset_in_origin = A2origin[:3, :3].dot(position_offset_in_A)
-        self.body2origin_[:3, 3] += position_offset_in_origin
