@@ -245,7 +245,6 @@ class ContactSurface(pv.Artist):
         self.mesh.vertices = o3d.utility.Vector3dVector(vertices)
         self.mesh.triangles = o3d.utility.Vector3iVector(triangles)
         self.mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
-        # TODO can we just transform the mesh?
         self.mesh.transform(mesh2origin)
 
     @property
