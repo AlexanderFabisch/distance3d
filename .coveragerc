@@ -4,6 +4,7 @@ source = distance3d
 omit =
     */setup.py
     distance3d/plotting.py
+    distance3d/test/*
 
 [report]
 omit =
