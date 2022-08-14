@@ -115,7 +115,7 @@ class TetraMesh(pv.Artist):
         return [self.mesh]
 
 
-class Tetrahedron(Mesh):
+class Tetrahedron(Mesh):  # pragma: no cover
     """Tetrahedron.
 
     Parameters
@@ -132,7 +132,7 @@ class Tetrahedron(Mesh):
         super(Tetrahedron, self).__init__(mesh2origin, tetrahedron_points, triangles, c)
 
 
-class Ellipse(pv.Artist):
+class Ellipse(pv.Artist):  # pragma: no cover
     """An ellipse.
 
     Parameters
@@ -201,7 +201,7 @@ class Ellipse(pv.Artist):
         return [self.mesh]
 
 
-class ContactSurface(pv.Artist):
+class ContactSurface(pv.Artist):  # pragma: no cover
     """A pressure field.
 
     Parameters
@@ -231,8 +231,9 @@ class ContactSurface(pv.Artist):
             pressures_per_face = []
             for i in range(len(contact_triangles)):
                 triangles.extend(contact_triangles[i] + n_vertices)
-                n_vertices += len(contact_vertices[i])
-                pressures_per_face.extend([pressures[i]] * len(contact_vertices[i]))
+                n_vertices_i = len(contact_vertices[i])
+                n_vertices += n_vertices_i
+                pressures_per_face.extend([pressures[i]] * n_vertices_i)
             triangles = np.vstack(triangles)
             triangles = np.vstack((triangles, triangles[:, ::-1]))
             max_pressure = max(pressures)
