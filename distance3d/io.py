@@ -37,7 +37,7 @@ def load_mesh(filename, scale=1.0):
     except ImportError:
         try_trimesh = True
 
-    if try_trimesh:
+    if try_trimesh:  # pragma: no cover
         import trimesh
         mesh = trimesh.load(filename)
         vertices = np.asarray(mesh.vertices)
