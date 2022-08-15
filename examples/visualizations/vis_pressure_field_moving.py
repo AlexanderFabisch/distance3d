@@ -37,10 +37,17 @@ class AnimationCallback:
         self.contact_surface.add_artist(fig)
 
     def __call__(self, step):
-        # TODO clean up move interface, introduce RigidBodyArtist?
-        if step == 0:
-            self.rigid_body1.body2origin_[:3, 3] += -self.position_offset
-        self.rigid_body1.body2origin_[:3, 3] += self.position_offset / self.n_frames
+        # Transform back to original frame
+        cube12origin = np.eye(4)
+        t1 = np.sin(2 * np.pi * step / self.n_frames) / 2.0 + 1.0
+        cube12origin[:3, 3] = t1 * self.position_offset
+        self.rigid_body1.express_in(cube12origin)
+
+        # Move to new pose
+        t2 = np.sin(2 * np.pi * (step + 1) / self.n_frames) / 2.0 + 1.0
+        cube12origin[:3, 3] = t2 * self.position_offset
+        self.rigid_body1.body2origin_ = cube12origin
+
         self.mesh1.set_data(self.rigid_body1.body2origin_, self.rigid_body1.vertices_, self.rigid_body1.tetrahedra_)
 
         contact_surface = pressure_field.find_contact_surface(
@@ -56,15 +63,15 @@ class AnimationCallback:
 cube12origin = np.eye(4)
 rigid_body1 = pressure_field.RigidBody.make_cube(cube12origin, 0.1)
 cube22origin = np.eye(4)
-cube22origin[:3, 3] = np.array([0.0, 0.05, 0.08])
+cube22origin[:3, 3] = np.array([0.0, 0.03, 0.05])
 rigid_body2 = pressure_field.RigidBody.make_cube(cube22origin, 0.1)
 
 fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
 
-n_frames = 100
+n_frames = 500
 animation_callback = AnimationCallback(
-    n_frames, rigid_body1, rigid_body2, np.array([0.1, 0.0, 0.0]))
+    n_frames, rigid_body1, rigid_body2, np.array([0.1, 0.0, 0.05]))
 animation_callback.add_artists(fig)
 fig.view_init()
 if "__file__" in globals():
