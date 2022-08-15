@@ -17,10 +17,10 @@ class AnimationCallback:
         self.rigid_body2 = rigid_body2
         self.position_offset = position_offset
         self.rigid_body1.express_in(self.rigid_body2.body2origin_)
-        self.mesh1 = visualization.TetraMesh(
+        self.mesh1 = visualization.RigidBodyTetrahedralMesh(
             self.rigid_body1.body2origin_, self.rigid_body1.vertices_,
             self.rigid_body1.tetrahedra_)
-        self.mesh2 = visualization.TetraMesh(
+        self.mesh2 = visualization.RigidBodyTetrahedralMesh(
             self.rigid_body2.body2origin_, self.rigid_body2.vertices_,
             self.rigid_body2.tetrahedra_)
         contact_surface = pressure_field.find_contact_surface(
@@ -30,7 +30,6 @@ class AnimationCallback:
             contact_surface.contact_polygons,
             contact_surface.contact_polygon_triangles,
             contact_surface.pressures)
-        self.rigid_body1.body2origin_[:3, 3] += self.position_offset
 
     def add_artists(self, fig):
         self.mesh1.add_artist(fig)
@@ -41,11 +40,8 @@ class AnimationCallback:
         # TODO clean up move interface, introduce RigidBodyArtist?
         if step == 0:
             self.rigid_body1.body2origin_[:3, 3] += -self.position_offset
-            self.mesh1.set_data(self.rigid_body2.body2origin_)
         self.rigid_body1.body2origin_[:3, 3] += self.position_offset / self.n_frames
-        mesh12origin = np.copy(self.mesh1.mesh2origin)
-        mesh12origin[:3, 3] += self.position_offset / self.n_frames
-        self.mesh1.set_data(mesh12origin)
+        self.mesh1.set_data(self.rigid_body1.body2origin_, self.rigid_body1.vertices_, self.rigid_body1.tetrahedra_)
 
         contact_surface = pressure_field.find_contact_surface(
             self.rigid_body1, self.rigid_body2)

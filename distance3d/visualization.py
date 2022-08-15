@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pytransform3d.visualizer as pv
 import open3d as o3d
-from .utils import transform_points
 
 
 class Mesh(pv.Artist):
@@ -247,6 +246,28 @@ class ContactSurface(pv.Artist):  # pragma: no cover
         self.mesh.triangles = o3d.utility.Vector3iVector(triangles)
         self.mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
         self.mesh.transform(mesh2origin)
+
+    @property
+    def geometries(self):
+        """Expose geometries.
+
+        Returns
+        -------
+        geometries : list
+            List of geometries that can be added to the visualizer.
+        """
+        return [self.mesh]
+
+
+class RigidBodyTetrahedralMesh(pv.Artist):  # pragma: no cover
+    def __init__(self, body2origin, vertices, tetrahedra):
+        self.mesh = o3d.geometry.TetraMesh()
+        self.set_data(body2origin, vertices, tetrahedra)
+
+    def set_data(self, body2origin, vertices, tetrahedra):
+        self.mesh.vertices = o3d.utility.Vector3dVector(vertices)
+        self.mesh.tetras = o3d.utility.Vector4iVector(tetrahedra)
+        self.mesh.transform(body2origin)
 
     @property
     def geometries(self):
