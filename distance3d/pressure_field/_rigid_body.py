@@ -6,8 +6,8 @@ from ._mesh_processing import center_of_mass_tetrahedral_mesh
 
 
 class RigidBody:
-    def __init__(self, mesh2origin, vertices, tetrahedra, potentials):
-        self.body2origin_ = mesh2origin
+    def __init__(self, body2origin, vertices, tetrahedra, potentials):
+        self.body2origin_ = body2origin
         self.vertices_ = vertices
         self.tetrahedra_ = tetrahedra
         self.potentials_ = potentials

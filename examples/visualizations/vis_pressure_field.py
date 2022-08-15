@@ -41,8 +41,10 @@ print(f"force 21: {np.round(wrench21, 8)}")
 
 fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
-visualization.TetraMesh(rigid_body1.body2origin_, rigid_body1.vertices_, rigid_body1.tetrahedra_).add_artist(fig)
-visualization.TetraMesh(rigid_body2.body2origin_, rigid_body2.vertices_, rigid_body2.tetrahedra_).add_artist(fig)
+visualization.RigidBodyTetrahedralMesh(
+    rigid_body1.body2origin_, rigid_body1.vertices_, rigid_body1.tetrahedra_).add_artist(fig)
+visualization.RigidBodyTetrahedralMesh(
+    rigid_body2.body2origin_, rigid_body2.vertices_, rigid_body2.tetrahedra_).add_artist(fig)
 
 if show_broad_phase:
     broad_overlapping_indices1, broad_overlapping_indices2, broad_pairs = pressure_field.broad_phase_tetrahedra(
