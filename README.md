@@ -20,8 +20,8 @@ Distance computation and collision detection in 3D.
     <td><a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_capsules_benchmark.py">vis_capsules_benchmark.py</a></td>
 </tr>
 <tr>
-    <td>Closest Points</td>
-    <td>Hydroelastic Contact</td>
+    <td>Closest points</td>
+    <td>Hydroelastic contact</td>
 </tr>
 <tr>
     <td><img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/closest_points.png" width=100% /></td>
