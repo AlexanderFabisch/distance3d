@@ -1,4 +1,7 @@
-"""Pressure field model for contact wrenches."""
+"""Hydroelastic contact model for contact wrenches of rigid bodies.
+
+The original name for this model is pressure field model.
+"""
 from ._interface import contact_forces, find_contact_surface
 from ._rigid_body import RigidBody
 from ._contact_surface import ContactSurface
