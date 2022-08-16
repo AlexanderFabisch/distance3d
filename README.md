@@ -21,15 +21,15 @@ Distance computation and collision detection in 3D.
 </tr>
 <tr>
     <td>Closest Points</td>
-    <td></td>
+    <td>Hydroelastic Contact</td>
 </tr>
 <tr>
     <td><img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/closest_points.png" width=100% /></td>
-    <td></td>
+    <td><img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/hydroelastic_contact_surface.png" width=100% /></td>
 </tr>
 <tr>
     <td><a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_closest_points.py">vis_closest_points.py</a></td>
-    <td></td>
+    <td><a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_pressure_field.py">vis_pressure_field.py</a></td>
 </tr>
 </table>
 
