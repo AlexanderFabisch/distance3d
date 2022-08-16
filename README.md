@@ -12,16 +12,16 @@ Distance computation and collision detection in 3D.
     <td><img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/capsule_collisions.png" width=100% /></td>
 </tr>
 <tr>
-    <td>Robot collision detection - <a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_robot_collision_objects.py">vis_robot_collision_objects.py</a></td>
-    <td>Capsule collision detection - <a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_capsules_benchmark.py">vis_capsules_benchmark.py</a></td>
+    <td><a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_robot_collision_objects.py">Robot collision detection</a></td>
+    <td><a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_capsules_benchmark.py">Capsule collision detection</a></td>
 </tr>
 <tr>
     <td><img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/closest_points.png" width=100% /></td>
     <td><img src="https://raw.githubusercontent.com/AlexanderFabisch/distance3d/master/doc/source/_static/hydroelastic_contact_surface.png" width=100% /></td>
 </tr>
 <tr>
-    <td>Closest points - <a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_closest_points.py">vis_closest_points.py</a></td>
-    <td>Hydroelastic contact - <a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_pressure_field.py">vis_pressure_field.py</a></td>
+    <td><a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_closest_points.py">Closest points</a></td>
+    <td><a href="https://github.com/AlexanderFabisch/distance3d/blob/master/examples/visualizations/vis_pressure_field.py">Hydroelastic contact</a></td>
 </tr>
 </table>
 
