@@ -1,22 +1,22 @@
 import numpy as np
-from distance3d import pressure_field, containment
+from distance3d import hydroelastic_contact, containment
 from numpy.testing import assert_array_almost_equal
 
 
 def test_contact_forces():
-    rigid_body1 = pressure_field.RigidBody.make_sphere(
+    rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(
         np.array([0.0, 0.0, 0.01]), 0.15, 1)
 
-    rigid_body2 = pressure_field.RigidBody.make_sphere(
+    rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(
         np.array([0.0, 0.0, 0.4]), 0.15, 1)
-    intersection, wrench12, wrench21 = pressure_field.contact_forces(
+    intersection, wrench12, wrench21 = hydroelastic_contact.contact_forces(
         rigid_body1, rigid_body2)
     assert not intersection
     assert_array_almost_equal(wrench12, np.zeros(6))
     assert_array_almost_equal(wrench21, np.zeros(6))
 
-    rigid_body2 = pressure_field.RigidBody.make_sphere(np.array([0.0, 0.0, 0.3]), 0.15, 1)
-    intersection, wrench12, wrench21 = pressure_field.contact_forces(
+    rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.0, 0.0, 0.3]), 0.15, 1)
+    intersection, wrench12, wrench21 = hydroelastic_contact.contact_forces(
         rigid_body1, rigid_body2)
     assert intersection
     assert_array_almost_equal(
@@ -24,9 +24,9 @@ def test_contact_forces():
     assert_array_almost_equal(
         wrench21, np.array([0.0, 0.0, -1.120994e-06, 0.0, 0.0, 0.0]))
 
-    rigid_body2 = pressure_field.RigidBody.make_sphere(
+    rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(
         np.array([0.0, 0.0, 0.15]), 0.15, 1)
-    intersection, wrench12, wrench21 = pressure_field.contact_forces(
+    intersection, wrench12, wrench21 = hydroelastic_contact.contact_forces(
         rigid_body1, rigid_body2)
     assert intersection
     assert_array_almost_equal(
@@ -36,11 +36,11 @@ def test_contact_forces():
 
 
 def test_contact_forces_and_details():
-    rigid_body1 = pressure_field.RigidBody.make_sphere(
+    rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(
         np.array([0.0, 0.0, 0.01]), 0.15, 1)
-    rigid_body2 = pressure_field.RigidBody.make_sphere(
+    rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(
         np.array([0.0, 0.0, 0.3]), 0.15, 1)
-    intersection, wrench12, wrench21, details = pressure_field.contact_forces(
+    intersection, wrench12, wrench21, details = hydroelastic_contact.contact_forces(
         rigid_body1, rigid_body2, return_details=True)
     assert "contact_polygons" in details
     n_intersections = len(details["contact_polygons"])
@@ -69,9 +69,9 @@ def test_rigid_body_transforms():
     cube1_22origin = np.copy(cube12origin)
     cube1_22origin[:3, 3] += 1.0
 
-    rigid_body1 = pressure_field.RigidBody.make_cube(cube12origin, 0.1)
+    rigid_body1 = hydroelastic_contact.RigidBody.make_cube(cube12origin, 0.1)
     cube22origin[:3, 3] = np.array([0.0, 0.0, 0.08])
-    rigid_body2 = pressure_field.RigidBody.make_cube(cube22origin, 0.1)
+    rigid_body2 = hydroelastic_contact.RigidBody.make_cube(cube22origin, 0.1)
 
     rigid_body1.express_in(rigid_body2.body2origin_)
     tetras1_in_2 = rigid_body1.tetrahedra_points  # measure in cube2 frame
@@ -93,7 +93,7 @@ def test_intersect_halfplanes():
         [-0.5, 0.0, 0.0, -1.0],
         [0.0, -0.5, 1.0, 0.0]
     ])
-    polygon = pressure_field.intersect_halfplanes(halfplanes)
+    polygon = hydroelastic_contact.intersect_halfplanes(halfplanes)
     polygon = [p.tolist() for p in polygon]
     expected_polygon = [
         [0.5, 0.5],
@@ -107,19 +107,19 @@ def test_intersect_halfplanes():
 
 def test_center_of_mass_tetrahedral_mesh():
     center = np.array([0.0, 0.2, -0.3])
-    vertices, tetrahedra, _ = pressure_field.make_tetrahedral_icosphere(
+    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_icosphere(
         center, 0.2)
     tetrahedra_points = vertices[tetrahedra]
-    com = pressure_field.center_of_mass_tetrahedral_mesh(tetrahedra_points)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(tetrahedra_points)
     assert_array_almost_equal(com, center)
 
 
 def test_tetrahedral_mesh_aabbs():
     center = np.array([0.0, 0.2, -0.3])
-    vertices, tetrahedra, _ = pressure_field.make_tetrahedral_icosphere(
+    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_icosphere(
         center, 0.2, 2)
     tetrahedra_points = vertices[tetrahedra]
-    aabbs = pressure_field.tetrahedral_mesh_aabbs(tetrahedra_points)
+    aabbs = hydroelastic_contact.tetrahedral_mesh_aabbs(tetrahedra_points)
     for i in range(len(tetrahedra_points)):
         mins, maxs = containment.axis_aligned_bounding_box(tetrahedra_points[i])
         assert_array_almost_equal(mins, aabbs[i, :, 0])

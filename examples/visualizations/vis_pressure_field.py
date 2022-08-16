@@ -9,7 +9,7 @@ import pprint
 import numpy as np
 import pytransform3d.rotations as pr
 import pytransform3d.visualizer as pv
-from distance3d import visualization, pressure_field, benchmark
+from distance3d import visualization, hydroelastic_contact, benchmark
 
 
 highlight_isect_idx = None
@@ -20,16 +20,16 @@ show_broad_phase = False
 # is an intuitive notion of how much resistance a foreign body protruding
 # into the object would experience at that point.
 # Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
-rigid_body1 = pressure_field.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
-rigid_body2 = pressure_field.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
+rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
+rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
 #cube2origin = np.eye(4)
 #cube2origin[:3, :3] = pr.active_matrix_from_extrinsic_euler_zyx([0.1, 0.3, 0.5])
 #cube2origin[:3, 3] = 0.25 * np.ones(3)
-#rigid_body2 = pressure_field.RigidBody.make_cube(cube2origin, 0.15)
+#rigid_body2 = hydroelastic_contact.RigidBody.make_cube(cube2origin, 0.15)
 
 timer = benchmark.Timer()
 timer.start("contact_forces")
-intersection, wrench12, wrench21, details = pressure_field.contact_forces(
+intersection, wrench12, wrench21, details = hydroelastic_contact.contact_forces(
     rigid_body1, rigid_body2, return_details=True, timer=timer)
 pprint.pprint(timer.total_time_)
 print(f"time: {timer.stop('contact_forces')}")
@@ -47,7 +47,7 @@ visualization.RigidBodyTetrahedralMesh(
     rigid_body2.body2origin_, rigid_body2.vertices_, rigid_body2.tetrahedra_).add_artist(fig)
 
 if show_broad_phase:
-    broad_overlapping_indices1, broad_overlapping_indices2, broad_pairs = pressure_field.broad_phase_tetrahedra(
+    broad_overlapping_indices1, broad_overlapping_indices2, broad_pairs = hydroelastic_contact.broad_phase_tetrahedra(
         rigid_body1, rigid_body2)
     for i in np.unique(broad_overlapping_indices1):
         tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(

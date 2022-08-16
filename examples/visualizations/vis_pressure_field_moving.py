@@ -7,7 +7,7 @@ print(__doc__)
 
 import numpy as np
 import pytransform3d.visualizer as pv
-from distance3d import visualization, pressure_field
+from distance3d import visualization, hydroelastic_contact
 
 
 class AnimationCallback:
@@ -23,7 +23,7 @@ class AnimationCallback:
         self.mesh2 = visualization.RigidBodyTetrahedralMesh(
             self.rigid_body2.body2origin_, self.rigid_body2.vertices_,
             self.rigid_body2.tetrahedra_)
-        contact_surface = pressure_field.find_contact_surface(
+        contact_surface = hydroelastic_contact.find_contact_surface(
             self.rigid_body1, self.rigid_body2)
         self.contact_surface = visualization.ContactSurface(
             contact_surface.frame2world,
@@ -50,7 +50,7 @@ class AnimationCallback:
 
         self.mesh1.set_data(self.rigid_body1.body2origin_, self.rigid_body1.vertices_, self.rigid_body1.tetrahedra_)
 
-        contact_surface = pressure_field.find_contact_surface(
+        contact_surface = hydroelastic_contact.find_contact_surface(
             self.rigid_body1, self.rigid_body2)
         self.contact_surface.set_data(
             contact_surface.frame2world,
@@ -61,10 +61,10 @@ class AnimationCallback:
 
 
 cube12origin = np.eye(4)
-rigid_body1 = pressure_field.RigidBody.make_cube(cube12origin, 0.1)
+rigid_body1 = hydroelastic_contact.RigidBody.make_cube(cube12origin, 0.1)
 cube22origin = np.eye(4)
 cube22origin[:3, 3] = np.array([0.0, 0.03, 0.05])
-rigid_body2 = pressure_field.RigidBody.make_cube(cube22origin, 0.1)
+rigid_body2 = hydroelastic_contact.RigidBody.make_cube(cube22origin, 0.1)
 
 fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
