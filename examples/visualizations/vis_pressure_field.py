@@ -5,7 +5,6 @@ Visualize Pressure Field of Two Colliding Objects
 """
 print(__doc__)
 
-import pprint
 import numpy as np
 import pytransform3d.rotations as pr
 import pytransform3d.visualizer as pv
