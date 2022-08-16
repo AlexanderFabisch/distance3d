@@ -249,6 +249,25 @@ API Reference
    ~distance3d.containment_test.points_in_convex_mesh
 
 
+:mod:`distance3d.pressure_field`
+--------------------------------
+
+.. automodule:: distance3d.pressure_field
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.pressure_field
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.pressure_field.contact_forces
+   ~distance3d.pressure_field.find_contact_surface
+   ~distance3d.pressure_field.RigidBody
+   ~distance3d.pressure_field.ContactSurface
+
+
 :mod:`distance3d.plotting`
 --------------------------
 

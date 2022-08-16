@@ -79,37 +79,19 @@ class RigidBody:
 
     @property
     def tetrahedra_points(self):
-        """All points of all tetrahedra in body frame.
-
-        Returns
-        -------
-        tetrahedra_points : array, shape (n_tetrahedra, 4, 3)
-            Vertices of tetrahedra.
-        """
+        """All points of all tetrahedra in body frame."""
         if self._tetrahedra_points is None:
             self._tetrahedra_points = self.vertices_[self.tetrahedra_]
         return self._tetrahedra_points
 
     @property
     def tetrahedra_potentials(self):
-        """Potentials of tetrahedra.
-
-        Returns
-        -------
-        potentials : array, shape (n_tetrahedra, 4)
-            Potentials of vertices of each tetrahedron.
-        """
+        """Potentials of tetrahedra."""
         return self.potentials_[self.tetrahedra_]
 
     @property
     def com(self):
-        """Center of mass.
-
-        Returns
-        -------
-        com : array, shape (3,)
-            Center of mass.
-        """
+        """Center of mass."""
         if self._com is None:
             self._com = center_of_mass_tetrahedral_mesh(self.tetrahedra_points)
         return self._com
