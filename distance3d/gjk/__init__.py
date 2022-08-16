@@ -6,6 +6,13 @@ decomposed into convex shapes first.
 This module contains several flavours of the GJK algorithm. Some of them
 only detect collisions (intersections) and some of them calculate distances
 between separated objects as well.
+
+The original publication describing the algorithm is:
+
+E.G. Gilbert, D.W. Johnson, S.S. Keerthi: A fast procedure for computing
+the distance between complex objects in three-dimensional space, IEEE
+Journal on Robotics and Automation (1988),
+https://graphics.stanford.edu/courses/cs448b-00-winter/papers/gilbert.pdf
 """
 from ._gjk_original import gjk_distance_original
 from ._gjk_libccd import gjk_intersection_libccd

@@ -1,6 +1,17 @@
 """Hydroelastic contact model for contact wrenches of rigid bodies.
 
-The original name for this model is pressure field model.
+The original name for this model is pressure field model. It has been
+presented in:
+
+R. Elandt, E. Drumwright, M. Sherman and A. Ruina: A pressure field model for
+fast, robust approximation of net contact force and moment between nominally
+rigid objects, IEEE/RSJ International Conference on Intelligent Robots and
+Systems (IROS), 2019, pp. 8238-8245, doi: 10.1109/IROS40897.2019.8968548.
+
+The implementation is different, but is inspired by:
+
+V. Huang, F. Wang, E. Zhang: An Efficient Implementation of Pressure Field
+Models, https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf.
 """
 from ._interface import contact_forces, find_contact_surface
 from ._rigid_body import RigidBody

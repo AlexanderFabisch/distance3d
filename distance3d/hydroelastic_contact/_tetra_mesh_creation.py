@@ -81,8 +81,6 @@ def make_triangular_icosphere(center, radius, order=4):
 def make_tetrahedral_icosphere(center, radius, order=4):
     """Creates a tetrahedral icosphere mesh.
 
-    Source: https://github.com/ekzhang/hydroelastics
-
     Parameters
     ----------
     center : array, shape (3,)
@@ -159,5 +157,7 @@ def make_tetrahedral_cube(size):
         [6, 4, 0, 8],
         [6, 5, 4, 8],
     ], dtype=int)
-    potentials = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, size / 2.0], dtype=float)
+    potentials = np.array(
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, size / 2.0],
+        dtype=float)
     return vertices, tetrahedra, potentials
