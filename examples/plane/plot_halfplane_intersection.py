@@ -6,10 +6,10 @@ Halfplane Intersection
 print(__doc__)
 
 import numpy as np
-from distance3d import pressure_field, benchmark
+from distance3d import hydroelastic_contact, benchmark
 
 
-from distance3d.pressure_field._halfplanes import intersect_two_halfplanes, point_outside_of_halfplane, cross2d
+from distance3d.hydroelastic_contact._halfplanes import intersect_two_halfplanes, point_outside_of_halfplane, cross2d
 def intersect_halfplanes(halfplanes):
     # source: https://cp-algorithms.com/geometry/halfplane-intersection.html#direct-implementation
     angles = np.arctan2(halfplanes[:, 3], halfplanes[:, 2])
@@ -80,15 +80,15 @@ pq = p[np.arange(n_halfplanes)] - p[np.arange(n_halfplanes) - 1]
 halfplanes = np.hstack((p, pq))
 
 timer = benchmark.Timer()
-timer.start("pressure_field.intersect_halfplanes")
-polygon = np.asarray(pressure_field.intersect_halfplanes(halfplanes))
-print(f"{timer.stop('pressure_field.intersect_halfplanes')} s")
+timer.start("hydroelastic_contact.intersect_halfplanes")
+polygon = np.asarray(hydroelastic_contact.intersect_halfplanes(halfplanes))
+print(f"{timer.stop('hydroelastic_contact.intersect_halfplanes')} s")
 print(polygon)
 timer.start("intersect_halfplanes")
 polygon2 = np.asarray(intersect_halfplanes(halfplanes))
 print(f"{timer.stop('intersect_halfplanes')} s")
 print(polygon2)
-pressure_field.plot_halfplanes_and_intersections(
+hydroelastic_contact.plot_halfplanes_and_intersections(
     halfplanes, polygon, xlim=(-2, 2), ylim=(-2, 2))
-pressure_field.plot_halfplanes_and_intersections(
+hydroelastic_contact.plot_halfplanes_and_intersections(
     halfplanes, polygon2, xlim=(-2, 2), ylim=(-2, 2))

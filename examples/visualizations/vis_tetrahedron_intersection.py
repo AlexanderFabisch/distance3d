@@ -6,11 +6,11 @@ Visualize Intersection of Tetrahedra
 print(__doc__)
 import numpy as np
 import pytransform3d.visualizer as pv
-from distance3d import pressure_field, visualization
+from distance3d import hydroelastic_contact, visualization
 
 
-vertices1, tetrahedra1, _ = pressure_field.make_tetrahedral_icosphere(np.array([0.1, 0.2, 0.1]), 1.0, order=2)
-vertices2, tetrahedra2, _ = pressure_field.make_tetrahedral_icosphere(np.array([0.05, 0.15, 1.6]), 1.0, order=2)
+vertices1, tetrahedra1, _ = hydroelastic_contact.make_tetrahedral_icosphere(np.array([0.1, 0.2, 0.1]), 1.0, order=2)
+vertices2, tetrahedra2, _ = hydroelastic_contact.make_tetrahedral_icosphere(np.array([0.05, 0.15, 1.6]), 1.0, order=2)
 
 tetrahedron1 = vertices1[tetrahedra1[257]]
 tetrahedron2 = vertices2[tetrahedra2[310]]
@@ -18,14 +18,14 @@ tetrahedron2 = vertices2[tetrahedra2[310]]
 epsilon1 = np.array([0.0, 0.0, 0.0, 1.0])
 epsilon2 = np.array([0.0, 0.0, 0.0, 1.0])
 
-X1 = pressure_field.barycentric_transforms(tetrahedron1[np.newaxis])[0]
-X2 = pressure_field.barycentric_transforms(tetrahedron2[np.newaxis])[0]
-intersection, contact = pressure_field.intersect_tetrahedron_pair(
+X1 = hydroelastic_contact.barycentric_transforms(tetrahedron1[np.newaxis])[0]
+X2 = hydroelastic_contact.barycentric_transforms(tetrahedron2[np.newaxis])[0]
+intersection, contact = hydroelastic_contact.intersect_tetrahedron_pair(
     tetrahedron1, epsilon1, X1, tetrahedron2, epsilon2, X2)
 assert intersection
 contact_plane_hnf, contact_polygon = contact
 
-intersection_com, force_vector, _, _ = pressure_field.compute_contact_force(
+intersection_com, force_vector, _, _ = hydroelastic_contact.compute_contact_force(
     tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon)
 
 fig = pv.figure()
