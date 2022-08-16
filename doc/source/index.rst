@@ -14,6 +14,8 @@ Features
   ...
 * Broad phase collision detection with bounding volume hierarchy (AABB tree).
 * Self-collision detection for robots.
+* Contact wrench computation with hydroelastic contact model (pressure field
+  model).
 
 Content
 -------
