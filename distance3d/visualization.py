@@ -223,6 +223,22 @@ class ContactSurface(pv.Artist):  # pragma: no cover
         self.set_data(mesh2origin, contact_vertices, contact_triangles, pressures)
 
     def set_data(self, mesh2origin, contact_vertices, contact_triangles, pressures):
+        """Update contact surface.
+
+        Parameters
+        ----------
+        mesh2origin : array, shape (4, 4)
+            Pose of the mesh.
+
+        contact_vertices : list
+            Each entry is an array of vertices of a contact polygon.
+
+        contact_triangles : list
+            Each entry is an array of trangles of a contact polygon.
+
+        pressures : array, shape (n_contact_polygons)
+            Pressure values for contact polygons.
+        """
         if len(contact_vertices) > 0:
             vertices = np.vstack(contact_vertices)
             triangles = []
@@ -260,11 +276,37 @@ class ContactSurface(pv.Artist):  # pragma: no cover
 
 
 class RigidBodyTetrahedralMesh(pv.Artist):  # pragma: no cover
+    """Rigid body represented by a tetrahedral mesh.
+
+    Parameters
+    ----------
+    body2origin : array, shape (4, 4)
+        Pose of the mesh.
+
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    tetrahedra : array, shape (n_tetrahedra, 4)
+        Indices of vertices that form tetrahedra of the mesh.
+    """
     def __init__(self, body2origin, vertices, tetrahedra):
         self.mesh = o3d.geometry.TetraMesh()
         self.set_data(body2origin, vertices, tetrahedra)
 
     def set_data(self, body2origin, vertices, tetrahedra):
+        """Update rigid body.
+
+        Parameters
+        ----------
+        body2origin : array, shape (4, 4)
+            Pose of the mesh.
+
+        vertices : array, shape (n_vertices, 3)
+            Vertices of the mesh.
+
+        tetrahedra : array, shape (n_tetrahedra, 4)
+            Indices of vertices that form tetrahedra of the mesh.
+        """
         self.mesh.vertices = o3d.utility.Vector3dVector(vertices)
         self.mesh.tetras = o3d.utility.Vector4iVector(tetrahedra)
         self.mesh.transform(body2origin)
