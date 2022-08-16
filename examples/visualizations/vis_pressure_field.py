@@ -30,8 +30,7 @@ rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15
 timer = benchmark.Timer()
 timer.start("contact_forces")
 intersection, wrench12, wrench21, details = hydroelastic_contact.contact_forces(
-    rigid_body1, rigid_body2, return_details=True, timer=timer)
-pprint.pprint(timer.total_time_)
+    rigid_body1, rigid_body2, return_details=True)
 print(f"time: {timer.stop('contact_forces')}")
 
 assert intersection
