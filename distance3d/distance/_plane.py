@@ -96,7 +96,7 @@ def line_to_plane(
     numba.types.Tuple((numba.boolean, numba.float64))
     (numba.float64[::1], numba.float64[::1], numba.float64[::1],
      numba.float64[::1], numba.float64),
-    cache=False)
+    cache=True)
 def _line_to_plane(line_point, line_direction, plane_point, plane_normal,
                    epsilon):
     length_of_dir_projected_on_normal = np.dot(line_direction, plane_normal)
