@@ -1,4 +1,5 @@
 import numpy as np
+import pytransform3d.rotations as pr
 import pytransform3d.transformations as pt
 from distance3d.distance import (
     point_to_line, point_to_line_segment, point_to_plane, point_to_triangle,
@@ -7,8 +8,9 @@ from distance3d.distance import (
     line_to_box, line_segment_to_line_segment, line_segment_to_plane,
     line_segment_to_triangle, line_segment_to_circle, line_segment_to_box,
     plane_to_plane, plane_to_triangle, plane_to_rectangle, plane_to_box,
-    plane_to_ellipsoid, triangle_to_triangle, triangle_to_rectangle,
-    rectangle_to_rectangle, rectangle_to_box, disk_to_disk)
+    plane_to_ellipsoid, plane_to_cylinder, triangle_to_triangle,
+    triangle_to_rectangle, rectangle_to_rectangle, rectangle_to_box,
+    disk_to_disk)
 from distance3d.geometry import convert_box_to_face
 from distance3d.utils import norm_vector
 from distance3d import random
@@ -959,6 +961,40 @@ def test_plane_to_ellipsoid():
     assert approx(dist) == 0
     assert_array_almost_equal(closest_point_plane, np.array([0, 0, 0]))
     assert_array_almost_equal(closest_point_ellipsoid, np.array([0, 0, 0]))
+
+
+def test_plane_to_cylinder():
+    plane_point = np.array([0, 0, 0], dtype=float)
+    plane_normal = np.array([0, 0, 1], dtype=float)
+
+    cylinder2origin = np.eye(4)
+    cylinder2origin[:3, 3] = np.array([0, 0, 5.5])
+    radius = 0.5
+    length = 10.0
+    dist, closest_point_plane, closest_point_ellipsoid = plane_to_cylinder(
+        plane_point, plane_normal, cylinder2origin, radius, length)
+    assert approx(dist) == 0.5
+    assert approx(closest_point_plane[2]) == 0.0
+    assert np.linalg.norm(closest_point_plane[:2]) <= 0.5
+    assert_array_almost_equal(
+        closest_point_ellipsoid, np.r_[closest_point_plane[:2], 0.5])
+
+    cylinder2origin = np.eye(4)
+    cylinder2origin[:3, 3] = np.array([0, 0, -5.5])
+    dist, closest_point_plane, closest_point_ellipsoid = plane_to_cylinder(
+        plane_point, plane_normal, cylinder2origin, radius, length)
+    assert approx(dist) == 0.5
+    assert approx(closest_point_plane[2]) == 0.0
+    assert np.linalg.norm(closest_point_plane[:2]) <= 0.5
+    assert_array_almost_equal(
+        closest_point_ellipsoid, np.r_[closest_point_plane[:2], -0.5])
+
+    cylinder2origin = np.eye(4)
+    cylinder2origin[:3, :3] = pr.matrix_from_angle(1, 0.5)
+    dist, closest_point_plane, closest_point_ellipsoid = plane_to_cylinder(
+        plane_point, plane_normal, cylinder2origin, radius, length)
+    assert approx(dist) == 0
+    assert_array_almost_equal(closest_point_plane, closest_point_ellipsoid)
 
 
 def test_triangel_to_triangle():

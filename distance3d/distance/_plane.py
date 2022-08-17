@@ -1,11 +1,9 @@
-import math
-
 import numpy as np
 import numba
 from ..geometry import (
     hesse_normal_form, convert_segment_to_line, line_from_pluecker,
     convert_rectangle_to_vertices, convert_box_to_vertices,
-    support_function_ellipsoid)
+    support_function_ellipsoid, support_function_cylinder)
 
 
 def point_to_plane(point, plane_point, plane_normal, signed=False):
@@ -375,5 +373,46 @@ def plane_to_ellipsoid(plane_point, plane_normal, ellipsoid2origin, radii):
     """
     point1 = support_function_ellipsoid(-plane_normal, ellipsoid2origin, radii)
     point2 = support_function_ellipsoid(plane_normal, ellipsoid2origin, radii)
+    return _plane_to_convex_hull_points(
+        plane_point, plane_normal, np.vstack((point1, point2)))
+
+
+@numba.njit(cache=True)
+def plane_to_cylinder(
+        plane_point, plane_normal, cylinder2origin, radius, length):
+    """Compute the shortest distance between a plane and a cylinder.
+
+    Parameters
+    ----------
+    plane_point : array, shape (3,)
+        Point on the plane.
+
+    plane_normal : array, shape (3,)
+        Normal of the plane. We assume unit length.
+
+    cylinder2origin : array, shape (4, 4)
+        Pose of the cylinder.
+
+    radius : float
+        Radius of the cylinder.
+
+    length : float
+        Length of the cylinder.
+
+    Returns
+    -------
+    dist : float
+        The shortest distance between rectangle and plane.
+
+    closest_point_plane : array, shape (3,)
+        Closest point on plane.
+
+    closest_point_cylinder : array, shape (3,)
+        Closest point on cylinder.
+    """
+    point1 = support_function_cylinder(
+        -plane_normal, cylinder2origin, radius, length)
+    point2 = support_function_cylinder(
+        plane_normal, cylinder2origin, radius, length)
     return _plane_to_convex_hull_points(
         plane_point, plane_normal, np.vstack((point1, point2)))
