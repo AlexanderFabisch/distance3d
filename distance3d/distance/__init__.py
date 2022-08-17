@@ -81,7 +81,7 @@ by GJK.
         <td>-</td>
         <td>X</td>
         <td>X</td>
-        <td>-</td>
+        <td>X</td>
       </tr>
       <tr>
         <td>triangle</td>
@@ -172,7 +172,7 @@ by GJK.
         <td>X</td>
         <td>-</td>
         <td>G</td>
-        <td>-</td>
+        <td>X</td>
         <td>G</td>
         <td>G</td>
         <td>-</td>
@@ -188,7 +188,8 @@ from ._line import (
     line_segment_to_line_segment)
 from ._plane import (
     point_to_plane, line_to_plane, line_segment_to_plane, plane_to_plane,
-    plane_to_triangle, plane_to_rectangle, plane_to_box, plane_to_ellipsoid)
+    plane_to_triangle, plane_to_rectangle, plane_to_box, plane_to_ellipsoid,
+    plane_to_cylinder)
 from ._triangle import (
     point_to_triangle, line_to_triangle, line_segment_to_triangle,
     triangle_to_triangle, triangle_to_rectangle)
@@ -232,6 +233,7 @@ __all__ = [
     "plane_to_rectangle",
     "plane_to_box",
     "plane_to_ellipsoid",
+    "plane_to_cylinder",
     "triangle_to_triangle",
     "triangle_to_rectangle",
     "rectangle_to_rectangle",
