@@ -6,7 +6,6 @@ Visualize Pressure Field of Two Colliding Objects
 print(__doc__)
 
 import numpy as np
-import pytransform3d.rotations as pr
 import pytransform3d.visualizer as pv
 from distance3d import visualization, hydroelastic_contact, benchmark
 
@@ -14,11 +13,6 @@ from distance3d import visualization, hydroelastic_contact, benchmark
 highlight_isect_idx = None
 show_broad_phase = False
 
-# The pressure function assigns to each point in the interior of the object
-# a nonnegative real number representing the pressure at that point, which
-# is an intuitive notion of how much resistance a foreign body protruding
-# into the object would experience at that point.
-# Source: https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf
 rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
 rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
 
