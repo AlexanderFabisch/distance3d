@@ -4,11 +4,11 @@ import pytransform3d.transformations as pt
 from distance3d.distance import (
     point_to_line, point_to_line_segment, point_to_plane, point_to_triangle,
     point_to_box, point_to_circle, point_to_disk, point_to_cylinder,
-    point_to_ellipsoid, line_to_line, line_to_plane, line_to_circle,
-    line_to_box, line_segment_to_line_segment, line_segment_to_plane,
-    line_segment_to_triangle, line_segment_to_circle, line_segment_to_box,
-    plane_to_plane, plane_to_triangle, plane_to_rectangle, plane_to_box,
-    plane_to_ellipsoid, plane_to_cylinder, triangle_to_triangle,
+    point_to_ellipsoid, line_to_line, line_to_line_segment, line_to_plane,
+    line_to_circle, line_to_box, line_segment_to_line_segment,
+    line_segment_to_plane, line_segment_to_triangle, line_segment_to_circle,
+    line_segment_to_box, plane_to_plane, plane_to_triangle, plane_to_rectangle,
+    plane_to_box, plane_to_ellipsoid, plane_to_cylinder, triangle_to_triangle,
     triangle_to_rectangle, rectangle_to_rectangle, rectangle_to_box,
     disk_to_disk)
 from distance3d.geometry import convert_box_to_face
@@ -389,6 +389,32 @@ def test_line_to_line():
         closest_point1, [0.47748201, -0.67206913, 1.53982529])
     assert_array_almost_equal(
         closest_point2, [-0.34791215, 0.15634897, 1.23029068])
+
+
+def test_line_to_line_segment():
+    line_point = np.array([1.0, 0.0, 1.0], dtype=float)
+    line_direction = np.array([0.0, 0.0, 1.0], dtype=float)
+
+    segment_start = np.array([0.0, 0.0, 1.0], dtype=float)
+    segment_end = np.array([0.0, 0.0, 1.0], dtype=float)
+
+    dist, p1, p2 = line_to_line_segment(
+        line_point, line_direction, segment_start, segment_end)
+    assert approx(dist) == 1.0
+
+    line_point = np.array([1.0, 0.0, 1.0], dtype=float)
+    line_direction = np.array([0.0, 0.0, 0.0], dtype=float)
+
+    dist, p1, p2 = line_to_line_segment(
+        line_point, line_direction, segment_start, segment_end)
+    assert approx(dist) == 1.0
+
+    segment_start = np.array([0.0, 0.0, 1.0], dtype=float)
+    segment_end = np.array([0.0, 0.0, 2.0], dtype=float)
+
+    dist, p1, p2 = line_to_line_segment(
+        line_point, line_direction, segment_start, segment_end)
+    assert approx(dist) == 1.0
 
 
 def test_line_to_plane():
