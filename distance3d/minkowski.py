@@ -3,6 +3,7 @@ import numpy as np
 
 
 class Simplex:
+    """Stores simplex of Minkowski differences and two colliders."""
     def __init__(self):
         self.v = np.empty((4, 3))  # Vertices of the Minkowski difference
         self.v1 = np.empty((4, 3))  # Vertices of collider 1
@@ -20,6 +21,30 @@ class Simplex:
 
 
 def support_function(collider1, collider2, search_direction):
+    """Call support function of both colliders to query a support point.
+
+    Parameters
+    ----------
+    collider1 : ConvexCollider
+        First collider.
+
+    collider2 : ConvexCollider
+        Second collider.
+
+    search_direction : array, shape (3,)
+        Search direction.
+
+    Returns
+    -------
+    v : array, shape (3,)
+        Support point in Minkowski difference.
+
+    v1 : array, shape (3,)
+        Support point on first collider.
+
+    v2 : array, shape (3,)
+        Support point on second collider.
+    """
     v1 = collider1.support_function(search_direction)
     v2 = collider2.support_function(-search_direction)
     return make_support_point(v1, v2)
