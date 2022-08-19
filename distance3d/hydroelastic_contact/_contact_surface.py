@@ -40,7 +40,8 @@ class ContactSurface:
         self.contact_forces = None
         self.contact_polygon_triangles = None
 
-    def add_polygon_info(self, contact_areas, contact_coms, contact_forces, contact_polygon_triangles):
+    def add_polygon_info(self, contact_areas, contact_coms, contact_forces,
+                         contact_polygon_triangles):
         """Add more info on contact polygons.
 
         Parameters
@@ -106,26 +107,33 @@ class ContactSurface:
         }
         return details
 
-    def _transform_to_world(self, frame2world, tetrahedra_points1, tetrahedra_points2):
+    def _transform_to_world(
+            self, frame2world, tetrahedra_points1, tetrahedra_points2):
         self.contact_polygons = [transform_points(frame2world, contact_polygon)
                                  for contact_polygon in self.contact_polygons]
-        plane_points = self.contact_planes[:, :3] * self.contact_planes[:, 3, np.newaxis]
+        plane_points = (self.contact_planes[:, :3]
+                        * self.contact_planes[:, 3, np.newaxis])
         plane_points = transform_points(frame2world, plane_points)
         plane_normals = transform_directions(
             frame2world, self.contact_planes[:, :3])
         plane_distances = np.sum(plane_points * plane_normals, axis=1)
-        self.contact_planes = np.hstack((plane_normals, plane_distances.reshape(-1, 1)))
+        self.contact_planes = np.hstack((plane_normals,
+                                         plane_distances.reshape(-1, 1)))
         self.contact_coms = transform_points(
             frame2world, self.contact_coms)
         self.contact_forces = transform_directions(
             frame2world, self.contact_forces)
         n_intersections = len(self.intersecting_tetrahedra1)
-        intersecting_tetrahedra1 = tetrahedra_points1[np.asarray(self.intersecting_tetrahedra1, dtype=int)]
+        intersecting_tetrahedra1 = tetrahedra_points1[np.asarray(
+            self.intersecting_tetrahedra1, dtype=int)]
         intersecting_tetrahedra1 = transform_points(
-            self.frame2world, intersecting_tetrahedra1.reshape(n_intersections * 4, 3)
+            self.frame2world, intersecting_tetrahedra1.reshape(
+                n_intersections * 4, 3)
         ).reshape(n_intersections, 4, 3)
-        intersecting_tetrahedra2 = tetrahedra_points2[np.asarray(self.intersecting_tetrahedra2, dtype=int)]
+        intersecting_tetrahedra2 = tetrahedra_points2[
+            np.asarray(self.intersecting_tetrahedra2, dtype=int)]
         intersecting_tetrahedra2 = transform_points(
-            self.frame2world, intersecting_tetrahedra2.reshape(n_intersections * 4, 3)
+            self.frame2world,
+            intersecting_tetrahedra2.reshape(n_intersections * 4, 3)
         ).reshape(n_intersections, 4, 3)
         return intersecting_tetrahedra1, intersecting_tetrahedra2

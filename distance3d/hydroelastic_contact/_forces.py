@@ -23,7 +23,8 @@ def contact_surface_forces(contact_surface, rigid_body1):
         contact_forces[intersection_idx] = force
         contact_areas[intersection_idx] = area
         contact_polygon_triangles.append(triangle)
-    return contact_areas, contact_coms, contact_forces, contact_polygon_triangles
+    return (contact_areas, contact_coms, contact_forces,
+            contact_polygon_triangles)
 
 
 @numba.njit(cache=True)
@@ -111,17 +112,21 @@ def compute_contact_force(
 
 def accumulate_wrenches(contact_surface, rigid_body1, rigid_body2):
     total_force_21 = np.sum(contact_surface.contact_forces, axis=0)
-    total_torque_21 = np.sum(np.cross(contact_surface.contact_coms - rigid_body1.com,
-                                      contact_surface.contact_forces), axis=0)
-    total_torque_12 = np.sum(np.cross(contact_surface.contact_coms - rigid_body2.com,
-                                      -contact_surface.contact_forces), axis=0)
+    total_torque_21 = np.sum(
+        np.cross(contact_surface.contact_coms - rigid_body1.com,
+                 contact_surface.contact_forces), axis=0)
+    total_torque_12 = np.sum(
+        np.cross(contact_surface.contact_coms - rigid_body2.com,
+                 -contact_surface.contact_forces), axis=0)
     wrench12_in_world, wrench21_in_world = _transform_wrenches(
-        contact_surface.frame2world, total_force_21, total_torque_12, total_torque_21)
+        contact_surface.frame2world, total_force_21, total_torque_12,
+        total_torque_21)
     return wrench12_in_world, wrench21_in_world
 
 
 @numba.njit(cache=True)
-def _transform_wrenches(mesh22origin, total_force_21, total_torque_12, total_torque_21):
+def _transform_wrenches(
+        mesh22origin, total_force_21, total_torque_12, total_torque_21):
     wrench21 = np.hstack((total_force_21, total_torque_21))
     wrench12 = np.hstack((-total_force_21, total_torque_12))
     mesh22origin_adjoint = adjoint_from_transform(mesh22origin)

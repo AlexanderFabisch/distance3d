@@ -40,7 +40,8 @@ def make_triangular_icosphere(center, radius, order=4):
         [6, 2, 10], [8, 6, 7]
     ], dtype=int)
     v = 12
-    mid_cache = dict()  # midpoint vertices cache to avoid duplicating shared vertices
+    # midpoint vertices cache to avoid duplicating shared vertices
+    mid_cache = dict()
 
     def add_mid_point(a, b, mid_cache, v):
         # Cantor's pairing function

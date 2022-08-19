@@ -4,7 +4,29 @@ from ._mesh_processing import tetrahedral_mesh_aabbs
 
 
 def broad_phase_tetrahedra(rigid_body1, rigid_body2):
-    """Broad phase collision detection of tetrahedra."""
+    """Broad phase collision detection of tetrahedra.
+
+    Parameters
+    ----------
+    rigid_body1 : RigidBody
+        First rigid body.
+
+    rigid_body2 : RigidBody
+        Second rigid body.
+
+    Returns
+    -------
+    broad_tetrahedra1 : array, shape (n_overlaps,)
+        Indices of tetrahedra in first rigid body that overlap with
+        second rigid body.
+
+    broad_tetrahedra2 : array, shape (n_overlaps,)
+        Indices of tetrahedra in second rigid body that overlap with
+        first rigid body.
+
+    broad_pairs : list
+        List of intersecting tetrahedron pairs.
+    """
 
     # TODO fix broad phase for cube vs. sphere
     # TODO speed up broad phase
@@ -35,7 +57,9 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2):
 
     # FIXME workaround for broad phase bug:
     from itertools import product
-    broad_tetrahedra1 = np.array(list(range(len(rigid_body1.tetrahedra_))), dtype=int)
-    broad_tetrahedra2 = np.array(list(range(len(rigid_body2.tetrahedra_))), dtype=int)
+    broad_tetrahedra1 = np.array(
+        list(range(len(rigid_body1.tetrahedra_))), dtype=int)
+    broad_tetrahedra2 = np.array(
+        list(range(len(rigid_body2.tetrahedra_))), dtype=int)
     broad_pairs = list(product(broad_tetrahedra1, broad_tetrahedra2))
     return broad_tetrahedra1, broad_tetrahedra2, broad_pairs

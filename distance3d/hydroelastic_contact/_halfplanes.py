@@ -93,9 +93,11 @@ def plot_halfplanes_and_intersections(halfplanes, points=None, xlim=None, ylim=N
 
 
 def plot_halfplane(halfplane, ax, c, alpha, scale):  # pragma: no cover
-    line = halfplane[:2] + np.linspace(-scale, scale, 101)[:, np.newaxis] * norm_vector(halfplane[2:])
+    line = (halfplane[:2] + np.linspace(-scale, scale, 101)[:, np.newaxis]
+            * norm_vector(halfplane[2:]))
     ax.plot(line[:, 0], line[:, 1], lw=3, c=c, alpha=alpha)
     normal2d = np.array([-halfplane[3], halfplane[2]])
     for p in line[::10]:
-        normal = p + np.linspace(0.0, 0.1 * scale, 101)[:, np.newaxis] * norm_vector(normal2d)
+        normal = (p + np.linspace(0.0, 0.1 * scale, 101)[:, np.newaxis]
+                  * norm_vector(normal2d))
         ax.plot(normal[:, 0], normal[:, 1], c=c, alpha=0.5 * alpha)

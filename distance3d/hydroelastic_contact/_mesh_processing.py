@@ -53,7 +53,8 @@ def _tetrahedral_mesh_volumes(tetrahedra_points):
     volumes : array, shape (n_tetrahedra,)
         Volumes of tetrahedra.
     """
-    tetrahedra_edges = tetrahedra_points[:, 1:] - tetrahedra_points[:, np.newaxis, 0]
+    tetrahedra_edges = (tetrahedra_points[:, 1:]
+                        - tetrahedra_points[:, np.newaxis, 0])
     return np.abs(np.sum(
         np.cross(tetrahedra_edges[:, 0], tetrahedra_edges[:, 1])
         * tetrahedra_edges[:, 2], axis=1)) / 6.0

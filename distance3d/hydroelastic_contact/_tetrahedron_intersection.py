@@ -124,7 +124,8 @@ def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
 
 
 @numba.njit(
-    numba.float64[::1](numba.float64[:, ::1], numba.float64[:, ::1], numba.float64[::1], numba.float64[::1]),
+    numba.float64[::1](numba.float64[:, ::1], numba.float64[:, ::1],
+                       numba.float64[::1], numba.float64[::1]),
     cache=True)
 def contact_plane(X1, X2, epsilon1, epsilon2):
     """Compute contact plane.
@@ -149,7 +150,8 @@ def contact_plane(X1, X2, epsilon1, epsilon2):
         Contact plane in Hesse normal form: plane normal and distance to origin
         along plane normal.
     """
-    plane_hnf = epsilon1.dot(X1) - epsilon2.dot(X2)  # TODO Young's modulus, see Eq. 16 of paper
+    # TODO Young's modulus, see Eq. 16 of paper
+    plane_hnf = epsilon1.dot(X1) - epsilon2.dot(X2)
     plane_hnf /= np.linalg.norm(plane_hnf[:3])
     # NOTE in order to obtain proper Hesse normal form of the contact plane
     # we have to multiply the scalar by -1, since it appears as -d in the
@@ -160,7 +162,8 @@ def contact_plane(X1, X2, epsilon1, epsilon2):
 
 
 @numba.njit(
-    numba.bool_(numba.float64[:, ::1], numba.float64[:, ::1], numba.float64[::1], numba.float64, numba.float64),
+    numba.bool_(numba.float64[:, ::1], numba.float64[:, ::1],
+                numba.float64[::1], numba.float64, numba.float64),
     cache=True)
 def check_tetrahedra_intersect_contact_plane(
         tetrahedron1, tetrahedron2, plane_normal, d, tolerance):
@@ -198,7 +201,8 @@ def check_tetrahedra_intersect_contact_plane(
 
 
 @numba.njit(
-    numba.float64[:, ::1](numba.float64[:, ::1], numba.float64[::1], numba.float64[:, ::1]),
+    numba.float64[:, ::1](numba.float64[:, ::1], numba.float64[::1],
+                          numba.float64[:, ::1]),
     cache=True)
 def make_halfplanes(X, plane_point, cart2plane):
     """Project triangles of a tetrahedron to contact plane.
@@ -285,7 +289,8 @@ def filter_unique_points(points):
 
 
 @numba.njit(
-    numba.float64[:, ::1](numba.float64[:, ::1], numba.float64[:, ::1], numba.float64[::1]),
+    numba.float64[:, ::1](numba.float64[:, ::1], numba.float64[:, ::1],
+                          numba.float64[::1]),
     cache=True)
 def project_polygon_to_3d(vertices, cart2plane, plane_point):
     """Project polygon from contact plane to 3D space.
@@ -313,7 +318,8 @@ def project_polygon_to_3d(vertices, cart2plane, plane_point):
 
 
 @numba.njit(
-    numba.float64[:, :](numba.float64[:, ::1], numba.float64[:, ::1], numba.float64[::1], numba.float64),
+    numba.float64[:, :](numba.float64[:, ::1], numba.float64[:, ::1],
+                        numba.float64[::1], numba.float64),
     cache=True)
 def compute_contact_polygon(X1, X2, plane_normal, d):
     """Compute contact polygon.
@@ -354,8 +360,9 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     if len(unique_vertices2d) < 3:
         return np.empty((0, 3), dtype=np.dtype("float"))
 
-    #from ._halfplanes import plot_halfplanes_and_intersections
-    #plot_halfplanes_and_intersections(halfplanes, unique_vertices2d)
+    # from ._halfplanes import plot_halfplanes_and_intersections
+    # plot_halfplanes_and_intersections(halfplanes, unique_vertices2d)
 
-    vertices3d = project_polygon_to_3d(unique_vertices2d, cart2plane, plane_point)
+    vertices3d = project_polygon_to_3d(unique_vertices2d, cart2plane,
+                                       plane_point)
     return vertices3d

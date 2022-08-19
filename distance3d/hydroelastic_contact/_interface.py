@@ -44,9 +44,12 @@ def contact_forces(rigid_body1, rigid_body2, return_details=False):
     if return_details:
         details = contact_surface.make_details(
             rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points)
-        return contact_surface.intersection, wrench12_in_world, wrench21_in_world, details
+        return (
+            contact_surface.intersection, wrench12_in_world, wrench21_in_world,
+            details)
     else:
-        return contact_surface.intersection, wrench12_in_world, wrench21_in_world
+        return (
+            contact_surface.intersection, wrench12_in_world, wrench21_in_world)
 
 
 def find_contact_surface(rigid_body1, rigid_body2):
@@ -83,14 +86,15 @@ def find_contact_surface(rigid_body1, rigid_body2):
     X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
 
     intersection_result = intersect_tetrahedron_pairs(
-        broad_pairs, rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points,
+        broad_pairs,
+        rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points,
         rigid_body1.tetrahedra_potentials, rigid_body2.tetrahedra_potentials,
         X1, X2)
-    contact_surface = ContactSurface(rigid_body2.body2origin_, *intersection_result)
+    contact_surface = ContactSurface(
+        rigid_body2.body2origin_, *intersection_result)
 
-    contact_areas, contact_coms, contact_forces, contact_triangles = contact_surface_forces(
+    areas, coms, forces, triangles = contact_surface_forces(
         contact_surface, rigid_body1)
-    contact_surface.add_polygon_info(
-        contact_areas, contact_coms, contact_forces, contact_triangles)
+    contact_surface.add_polygon_info(areas, coms, forces, triangles)
 
     return contact_surface
