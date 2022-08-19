@@ -6,10 +6,10 @@ from ..utils import adjoint_from_transform
 def contact_surface_forces(contact_surface, rigid_body1):
     tetrahedra_potentials1 = rigid_body1.tetrahedra_potentials
     n_contacts = len(contact_surface.intersecting_tetrahedra1)
-    contact_coms = np.empty((n_contacts, 3), dtype=float)
-    contact_forces = np.empty((n_contacts, 3), dtype=float)
-    contact_areas = np.empty(n_contacts, dtype=float)
-    contact_polygon_triangles = []
+    coms = np.empty((n_contacts, 3), dtype=float)
+    forces = np.empty((n_contacts, 3), dtype=float)
+    areas = np.empty(n_contacts, dtype=float)
+    triangles = []
     for intersection_idx in range(n_contacts):
         i = contact_surface.intersecting_tetrahedra1[intersection_idx]
         contact_plane_hnf = contact_surface.contact_planes[intersection_idx]
@@ -19,12 +19,11 @@ def contact_surface_forces(contact_surface, rigid_body1):
             rigid_body1.tetrahedra_points[i], tetrahedra_potentials1[i],
             contact_plane_hnf, contact_polygon)
 
-        contact_coms[intersection_idx] = com
-        contact_forces[intersection_idx] = force
-        contact_areas[intersection_idx] = area
-        contact_polygon_triangles.append(triangle)
-    return (contact_areas, contact_coms, contact_forces,
-            contact_polygon_triangles)
+        coms[intersection_idx] = com
+        forces[intersection_idx] = force
+        areas[intersection_idx] = area
+        triangles.append(triangle)
+    return areas, coms, forces, triangles
 
 
 @numba.njit(cache=True)

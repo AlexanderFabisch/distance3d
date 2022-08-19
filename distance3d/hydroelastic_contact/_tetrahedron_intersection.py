@@ -347,8 +347,7 @@ def compute_contact_polygon(X1, X2, plane_normal, d):
     """
     plane_point = plane_normal * d
     cart2plane = np.vstack(plane_basis_from_normal(plane_normal))
-    X = np.vstack((X1, X2))
-    halfplanes = make_halfplanes(X, plane_point, cart2plane)
+    halfplanes = make_halfplanes(np.vstack((X1, X2)), plane_point, cart2plane)
 
     vertices2d = intersect_halfplanes(halfplanes)
     if len(vertices2d) < 3:
