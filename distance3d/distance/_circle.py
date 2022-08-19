@@ -226,7 +226,7 @@ def _bisect_line_circle(
     #   f(s) = s + m2b2 - radius * m0_squared * s / sqrt(
     #       m0_squared * s * s + b1sqr)
     # on the specified interval [s_min, s_max].
-    for i in range(2, 10):
+    for _ in range(2, 10):
         s = 0.5 * (s_min + s_max)
         if s + m2b2 - rm0_squared * s / math.sqrt(
                 m0_squared * s * s + b1_squared) > 0.0:

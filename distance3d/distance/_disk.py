@@ -135,7 +135,7 @@ def disk_to_disk(center1, radius1, normal1, center2, radius2, normal2, epsilon=1
     # better solution: https://www.sciencedirect.com/science/article/pii/S0307904X0200080X
     _, closest_point_disk2 = point_to_disk(center1, center2, radius2, normal2)
     prev_dist = np.linalg.norm(center2 - center1)
-    for i in range(20):
+    for _ in range(20):
         _, closest_point_disk1 = point_to_disk(
             closest_point_disk2, center1, radius1, normal1)
         _, closest_point_disk2 = point_to_disk(
