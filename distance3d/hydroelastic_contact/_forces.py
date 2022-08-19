@@ -5,23 +5,20 @@ from ..utils import adjoint_from_transform
 
 def contact_surface_forces(contact_surface, rigid_body1):
     tetrahedra_potentials1 = rigid_body1.tetrahedra_potentials
-    n_contacts = len(contact_surface.intersecting_tetrahedra1)
-    coms = np.empty((n_contacts, 3), dtype=float)
-    forces = np.empty((n_contacts, 3), dtype=float)
-    areas = np.empty(n_contacts, dtype=float)
+    n_intersections = len(contact_surface.intersecting_tetrahedra1)
+    coms = np.empty((n_intersections, 3), dtype=float)
+    forces = np.empty((n_intersections, 3), dtype=float)
+    areas = np.empty(n_intersections, dtype=float)
     triangles = []
-    for intersection_idx in range(n_contacts):
-        i = contact_surface.intersecting_tetrahedra1[intersection_idx]
-        contact_plane_hnf = contact_surface.contact_planes[intersection_idx]
-        contact_polygon = contact_surface.contact_polygons[intersection_idx]
+    for intersection_idx, tetrahedron_idx in enumerate(
+            contact_surface.intersecting_tetrahedra1):
+        coms[intersection_idx], forces[intersection_idx], \
+        areas[intersection_idx], triangle = compute_contact_force(
+            rigid_body1.tetrahedra_points[tetrahedron_idx],
+            tetrahedra_potentials1[tetrahedron_idx],
+            contact_surface.contact_planes[intersection_idx],
+            contact_surface.contact_polygons[intersection_idx])
 
-        com, force, area, triangle = compute_contact_force(
-            rigid_body1.tetrahedra_points[i], tetrahedra_potentials1[i],
-            contact_plane_hnf, contact_polygon)
-
-        coms[intersection_idx] = com
-        forces[intersection_idx] = force
-        areas[intersection_idx] = area
         triangles.append(triangle)
     return areas, coms, forces, triangles
 
