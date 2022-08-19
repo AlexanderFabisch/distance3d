@@ -1,0 +1,33 @@
+﻿distance3d.hydroelastic\_contact.RigidBody
+==========================================
+
+.. currentmodule:: distance3d.hydroelastic_contact
+
+.. autoclass:: RigidBody
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~RigidBody.__init__
+      ~RigidBody.express_in
+      ~RigidBody.make_cube
+      ~RigidBody.make_sphere
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~RigidBody.com
+      ~RigidBody.tetrahedra_points
+      ~RigidBody.tetrahedra_potentials
+   
+   

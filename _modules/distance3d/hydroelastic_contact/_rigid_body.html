@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.hydroelastic_contact._rigid_body &#8212; distance3d 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distance3d.hydroelastic_contact._rigid_body</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">transform_points</span><span class="p">,</span> <span class="n">invert_transform</span>
+<span class="kn">from</span> <span class="nn">._tetra_mesh_creation</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">make_tetrahedral_icosphere</span><span class="p">,</span> <span class="n">make_tetrahedral_cube</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">._mesh_processing</span> <span class="kn">import</span> <span class="n">center_of_mass_tetrahedral_mesh</span>
+
+
+<div class="viewcode-block" id="RigidBody"><a class="viewcode-back" href="../../../_autosummary/distance3d.hydroelastic_contact.RigidBody.html#distance3d.hydroelastic_contact.RigidBody">[docs]</a><span class="k">class</span> <span class="nc">RigidBody</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Rigid body represented by tetrahedral mesh.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    body2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the mesh.</span>
+
+<span class="sd">    vertices : array, shape (n_vertices, 3)</span>
+<span class="sd">        Vertices of the mesh.</span>
+
+<span class="sd">    tetrahedra : array, shape (n_tetrahedra, 4)</span>
+<span class="sd">        Indices of vertices that form tetrahedra of the mesh.</span>
+
+<span class="sd">    potentials : array, shape (n_vertices,)</span>
+<span class="sd">        Potential of each vertex. Shortest distance to surface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RigidBody.__init__"><a class="viewcode-back" href="../../../_autosummary/distance3d.hydroelastic_contact.RigidBody.html#distance3d.hydroelastic_contact.RigidBody.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body2origin</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">tetrahedra</span><span class="p">,</span> <span class="n">potentials</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body2origin_</span> <span class="o">=</span> <span class="n">body2origin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="n">vertices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tetrahedra_</span> <span class="o">=</span> <span class="n">tetrahedra</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">potentials_</span> <span class="o">=</span> <span class="n">potentials</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tetrahedra_points</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_com</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_sphere</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create sphere.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        center : array, shape (3,)</span>
+<span class="sd">            Center of the sphere.</span>
+
+<span class="sd">        radius : float</span>
+<span class="sd">            Radius of the sphere.</span>
+
+<span class="sd">        order : int, optional (default: 4)</span>
+<span class="sd">            Number of subdivisions of initial 20 triangles.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rigid_body : RigidBody</span>
+<span class="sd">            Sphere.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mesh2origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">mesh2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="n">vertices</span><span class="p">,</span> <span class="n">tetrahedra</span><span class="p">,</span> <span class="n">potentials</span> <span class="o">=</span> <span class="n">make_tetrahedral_icosphere</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">radius</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RigidBody</span><span class="p">(</span><span class="n">mesh2origin</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">tetrahedra</span><span class="p">,</span> <span class="n">potentials</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_cube</span><span class="p">(</span><span class="n">cube2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create cube.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cube2origin : array, shape (4, 4)</span>
+<span class="sd">            Pose of the cube.</span>
+
+<span class="sd">        size : float</span>
+<span class="sd">            Length of the edges in each dimension.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rigid_body : RigidBody</span>
+<span class="sd">            Cube.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vertices</span><span class="p">,</span> <span class="n">tetrahedra</span><span class="p">,</span> <span class="n">potentials</span> <span class="o">=</span> <span class="n">make_tetrahedral_cube</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RigidBody</span><span class="p">(</span><span class="n">cube2origin</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">tetrahedra</span><span class="p">,</span> <span class="n">potentials</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tetrahedra_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;All points of all tetrahedra in body frame.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tetrahedra_points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tetrahedra_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tetrahedra_</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tetrahedra_points</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tetrahedra_potentials</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Potentials of tetrahedra.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">potentials_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tetrahedra_</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">com</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Center of mass.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_com</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_com</span> <span class="o">=</span> <span class="n">center_of_mass_tetrahedral_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tetrahedra_points</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_com</span>
+
+    <span class="k">def</span> <span class="nf">express_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_body2origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Express tetrahedral meshes in another frame.</span>
+
+<span class="sd">        Vertices will be transformed so that they are expressed in the new</span>
+<span class="sd">        frame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_body2origin : array, shape (4, 4)</span>
+<span class="sd">            New frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">origin2new_body</span> <span class="o">=</span> <span class="n">invert_transform</span><span class="p">(</span><span class="n">new_body2origin</span><span class="p">)</span>
+        <span class="n">body2new_body</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">origin2new_body</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">body2origin_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="n">transform_points</span><span class="p">(</span><span class="n">body2new_body</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body2origin_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">new_body2origin</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tetrahedra_points</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_com</span> <span class="o">=</span> <span class="kc">None</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

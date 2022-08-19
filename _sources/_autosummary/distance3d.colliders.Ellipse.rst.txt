@@ -1,0 +1,28 @@
+﻿distance3d.colliders.Ellipse
+============================
+
+.. currentmodule:: distance3d.colliders
+
+.. autoclass:: Ellipse
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Ellipse.__init__
+      ~Ellipse.aabb
+      ~Ellipse.center
+      ~Ellipse.first_vertex
+      ~Ellipse.make_artist
+      ~Ellipse.support_function
+      ~Ellipse.update_pose
+   
+   
+
+   
+   
+   

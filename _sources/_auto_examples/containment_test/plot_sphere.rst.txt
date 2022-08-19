@@ -39,7 +39,7 @@ Sphere Containment
  .. code-block:: none
 
 
-    0.00470423698425293 s
+    0.003716707229614258 s
 
 
 

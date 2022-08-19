@@ -1,0 +1,6 @@
+﻿distance3d.gjk.gjk\_intersection\_libccd
+========================================
+
+.. currentmodule:: distance3d.gjk
+
+.. autofunction:: gjk_intersection_libccd

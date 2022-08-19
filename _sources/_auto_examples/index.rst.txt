@@ -850,6 +850,27 @@ Distance
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to cylinder">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_cylinder_thumb.png
+     :alt: Distance from plane to cylinder
+
+     :ref:`sphx_glr__auto_examples_distance_plot_plane_to_cylinder.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/distance/plot_plane_to_cylinder
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Distance between two rectangles">
 
 .. only:: html
@@ -963,6 +984,27 @@ GJK
    :hidden:
 
    /_auto_examples/gjk/plot_spheres
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between ellipses with GJK">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_ellipse_thumb.png
+     :alt: Distance between ellipses with GJK
+
+     :ref:`sphx_glr__auto_examples_gjk_plot_ellipse.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/gjk/plot_ellipse
 
 .. raw:: html
 
@@ -1104,14 +1146,14 @@ Visualizations
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Title">
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Tetrahedral Mesh">
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_hand_contacts_thumb.png
-     :alt: Title
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedral_mesh_thumb.png
+     :alt: Visualize Tetrahedral Mesh
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_hand_contacts.py`
+     :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedral_mesh.py`
 
 .. raw:: html
 
@@ -1121,7 +1163,28 @@ Visualizations
 .. toctree::
    :hidden:
 
-   /_auto_examples/visualizations/vis_hand_contacts
+   /_auto_examples/visualizations/vis_tetrahedral_mesh
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Intersection of Tetrahedra">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedron_intersection_thumb.png
+     :alt: Visualize Intersection of Tetrahedra
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedron_intersection.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_tetrahedron_intersection
 
 .. raw:: html
 
@@ -1185,6 +1248,27 @@ Visualizations
    :hidden:
 
    /_auto_examples/visualizations/vis_disk_benchmark
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for ellipses">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_ellipse_benchmark_thumb.png
+     :alt: Benchmark collision detection for ellipses
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_ellipse_benchmark.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_ellipse_benchmark
 
 .. raw:: html
 
@@ -1314,6 +1398,69 @@ Visualizations
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Field of Two Moving Objects">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_moving_thumb.png
+     :alt: Visualize Pressure Field of Two Moving Objects
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field_moving.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_pressure_field_moving
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Field of Two Colliding Objects">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_thumb.png
+     :alt: Visualize Pressure Field of Two Colliding Objects
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_pressure_field
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Closest Points with GJK">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_closest_points_thumb.png
+     :alt: Closest Points with GJK
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_closest_points.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_closest_points
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Collisions between robot and environment">
 
 .. only:: html
@@ -1332,6 +1479,38 @@ Visualizations
    :hidden:
 
    /_auto_examples/visualizations/vis_robot_collision_objects
+.. raw:: html
+
+    <div class="sphx-glr-clear"></div>
+
+
+
+.. _sphx_glr__auto_examples_plane:
+
+Planar Algorithms
+-----------------
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Halfplane Intersection">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/plane/images/thumb/sphx_glr_plot_halfplane_intersection_thumb.png
+     :alt: Halfplane Intersection
+
+     :ref:`sphx_glr__auto_examples_plane_plot_halfplane_intersection.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/plane/plot_halfplane_intersection
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API Reference &#8212; distance3d 0.5.0 documentation</title>
+    <title>API Reference &#8212; distance3d 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -123,7 +123,7 @@ by GJK.</p>
     <td>-</td>
     <td>X</td>
     <td>X</td>
-    <td>-</td>
+    <td>X</td>
   </tr>
   <tr>
     <td>triangle</td>
@@ -214,7 +214,7 @@ by GJK.</p>
     <td>X</td>
     <td>-</td>
     <td>G</td>
-    <td>-</td>
+    <td>X</td>
     <td>G</td>
     <td>G</td>
     <td>-</td>
@@ -313,19 +313,22 @@ by GJK.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.plane_to_ellipsoid.html#distance3d.distance.plane_to_ellipsoid" title="distance3d.distance.plane_to_ellipsoid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plane_to_ellipsoid</span></code></a></p></td>
 <td><p>Compute the shortest distance between a plane and an ellipsoid.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.triangle_to_triangle.html#distance3d.distance.triangle_to_triangle" title="distance3d.distance.triangle_to_triangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triangle_to_triangle</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.plane_to_cylinder.html#distance3d.distance.plane_to_cylinder" title="distance3d.distance.plane_to_cylinder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plane_to_cylinder</span></code></a></p></td>
+<td><p>Compute the shortest distance between a plane and a cylinder.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.triangle_to_triangle.html#distance3d.distance.triangle_to_triangle" title="distance3d.distance.triangle_to_triangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triangle_to_triangle</span></code></a></p></td>
 <td><p>Compute the shortest distance between two triangles.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.triangle_to_rectangle.html#distance3d.distance.triangle_to_rectangle" title="distance3d.distance.triangle_to_rectangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triangle_to_rectangle</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.triangle_to_rectangle.html#distance3d.distance.triangle_to_rectangle" title="distance3d.distance.triangle_to_rectangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triangle_to_rectangle</span></code></a></p></td>
 <td><p>Compute the shortest distance between triangle and rectangle.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.rectangle_to_rectangle.html#distance3d.distance.rectangle_to_rectangle" title="distance3d.distance.rectangle_to_rectangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rectangle_to_rectangle</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.rectangle_to_rectangle.html#distance3d.distance.rectangle_to_rectangle" title="distance3d.distance.rectangle_to_rectangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rectangle_to_rectangle</span></code></a></p></td>
 <td><p>Compute the shortest distance between two rectangles.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rectangle_to_box</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rectangle_to_box</span></code></a></p></td>
 <td><p>Compute the shortest distance from rectangle to box.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.disk_to_disk.html#distance3d.distance.disk_to_disk" title="distance3d.distance.disk_to_disk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disk_to_disk</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.distance.disk_to_disk.html#distance3d.distance.disk_to_disk" title="distance3d.distance.disk_to_disk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disk_to_disk</span></code></a></p></td>
 <td><p>Compute the shortest distance between two disks.</p></td>
 </tr>
 </tbody>
@@ -367,10 +370,13 @@ by GJK.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Disk.html#distance3d.colliders.Disk" title="distance3d.colliders.Disk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Disk</span></code></a></p></td>
 <td><p>Disk collider.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Cone.html#distance3d.colliders.Cone" title="distance3d.colliders.Cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cone</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Ellipse.html#distance3d.colliders.Ellipse" title="distance3d.colliders.Ellipse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ellipse</span></code></a></p></td>
+<td><p>Ellipse collider.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Cone.html#distance3d.colliders.Cone" title="distance3d.colliders.Cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cone</span></code></a></p></td>
 <td><p>Cone collider.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Margin.html#distance3d.colliders.Margin" title="distance3d.colliders.Margin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Margin</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.colliders.Margin.html#distance3d.colliders.Margin" title="distance3d.colliders.Margin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Margin</span></code></a></p></td>
 <td><p>Margin around collider.</p></td>
 </tr>
 </tbody>
@@ -421,7 +427,10 @@ by GJK.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.containment.disk_aabb.html#distance3d.containment.disk_aabb" title="distance3d.containment.disk_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disk_aabb</span></code></a></p></td>
 <td><p>Compute axis-aligned bounding box of a disk.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.containment.cone_aabb.html#distance3d.containment.cone_aabb" title="distance3d.containment.cone_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cone_aabb</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.containment.ellipse_aabb.html#distance3d.containment.ellipse_aabb" title="distance3d.containment.ellipse_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ellipse_aabb</span></code></a></p></td>
+<td><p>Compute axis-aligned bounding box of an ellipse.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.containment.cone_aabb.html#distance3d.containment.cone_aabb" title="distance3d.containment.cone_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cone_aabb</span></code></a></p></td>
 <td><p>Compute axis-aligned bounding box of a cone.</p></td>
 </tr>
 </tbody>
@@ -430,6 +439,16 @@ by GJK.</p>
 <div class="section" id="module-distance3d.gjk">
 <span id="distance3d-gjk"></span><h3><a class="reference internal" href="#module-distance3d.gjk" title="distance3d.gjk"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.gjk</span></code></a><a class="headerlink" href="#module-distance3d.gjk" title="Permalink to this heading">¶</a></h3>
 <p>Gilbert-Johnson-Keerthi (GJK) for distance calculation of convex shapes.</p>
+<p>The GJK algorithm only works for convex shapes. Concave objects have to be
+decomposed into convex shapes first.</p>
+<p>This module contains several flavours of the GJK algorithm. Some of them
+only detect collisions (intersections) and some of them calculate distances
+between separated objects as well.</p>
+<p>The original publication describing the algorithm is:</p>
+<p>E.G. Gilbert, D.W. Johnson, S.S. Keerthi: A fast procedure for computing
+the distance between complex objects in three-dimensional space, IEEE
+Journal on Robotics and Automation (1988),
+<a class="reference external" href="https://graphics.stanford.edu/courses/cs448b-00-winter/papers/gilbert.pdf">https://graphics.stanford.edu/courses/cs448b-00-winter/papers/gilbert.pdf</a></p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -439,7 +458,22 @@ by GJK.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk.html#distance3d.gjk.gjk" title="distance3d.gjk.gjk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk</span></code></a></p></td>
 <td><p>Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk_intersection.html#distance3d.gjk.gjk_intersection" title="distance3d.gjk.gjk_intersection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk_intersection</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk_distance.html#distance3d.gjk.gjk_distance" title="distance3d.gjk.gjk_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk_distance</span></code></a></p></td>
+<td><p>Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk_intersection.html#distance3d.gjk.gjk_intersection" title="distance3d.gjk.gjk_intersection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk_intersection</span></code></a></p></td>
+<td><p>Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk_distance_jolt.html#distance3d.gjk.gjk_distance_jolt" title="distance3d.gjk.gjk_distance_jolt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk_distance_jolt</span></code></a></p></td>
+<td><p>Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk_intersection_jolt.html#distance3d.gjk.gjk_intersection_jolt" title="distance3d.gjk.gjk_intersection_jolt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk_intersection_jolt</span></code></a></p></td>
+<td><p>Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk_distance_original.html#distance3d.gjk.gjk_distance_original" title="distance3d.gjk.gjk_distance_original"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk_distance_original</span></code></a></p></td>
+<td><p>Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.gjk.gjk_intersection_libccd.html#distance3d.gjk.gjk_intersection_libccd" title="distance3d.gjk.gjk_intersection_libccd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gjk_intersection_libccd</span></code></a></p></td>
 <td><p>Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.</p></td>
 </tr>
 </tbody>
@@ -527,13 +561,16 @@ license.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_disk.html#distance3d.geometry.support_function_disk" title="distance3d.geometry.support_function_disk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_disk</span></code></a></p></td>
 <td><p>Compute extreme point of disk along a direction.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_cone.html#distance3d.geometry.support_function_cone" title="distance3d.geometry.support_function_cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_cone</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_ellipse.html#distance3d.geometry.support_function_ellipse" title="distance3d.geometry.support_function_ellipse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_ellipse</span></code></a></p></td>
+<td><p>Compute extreme point of ellipse along a direction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.support_function_cone.html#distance3d.geometry.support_function_cone" title="distance3d.geometry.support_function_cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">support_function_cone</span></code></a></p></td>
 <td><p>Compute extreme point of cone along a direction.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.hesse_normal_form.html#distance3d.geometry.hesse_normal_form" title="distance3d.geometry.hesse_normal_form"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hesse_normal_form</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.hesse_normal_form.html#distance3d.geometry.hesse_normal_form" title="distance3d.geometry.hesse_normal_form"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hesse_normal_form</span></code></a></p></td>
 <td><p>Computes Hesse normal form of a plane.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.line_from_pluecker.html#distance3d.geometry.line_from_pluecker" title="distance3d.geometry.line_from_pluecker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_from_pluecker</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.geometry.line_from_pluecker.html#distance3d.geometry.line_from_pluecker" title="distance3d.geometry.line_from_pluecker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_from_pluecker</span></code></a></p></td>
 <td><p>Computes line from Plücker coordinates.</p></td>
 </tr>
 </tbody>
@@ -592,6 +629,39 @@ license.</p>
 </tbody>
 </table>
 </div>
+<div class="section" id="module-distance3d.hydroelastic_contact">
+<span id="distance3d-hydroelastic-contact"></span><h3><a class="reference internal" href="#module-distance3d.hydroelastic_contact" title="distance3d.hydroelastic_contact"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.hydroelastic_contact</span></code></a><a class="headerlink" href="#module-distance3d.hydroelastic_contact" title="Permalink to this heading">¶</a></h3>
+<p>Hydroelastic contact model for contact wrenches of rigid bodies.</p>
+<p>The original name for this model is pressure field model. It has been
+presented in:</p>
+<p>R. Elandt, E. Drumwright, M. Sherman and A. Ruina: A pressure field model for
+fast, robust approximation of net contact force and moment between nominally
+rigid objects, IEEE/RSJ International Conference on Intelligent Robots and
+Systems (IROS), 2019, pp. 8238-8245, doi: 10.1109/IROS40897.2019.8968548.</p>
+<p>The implementation is different, but is inspired by:</p>
+<p>V. Huang, F. Wang, E. Zhang: An Efficient Implementation of Pressure Field
+Models, <a class="reference external" href="https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf">https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf</a>.</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.hydroelastic_contact.contact_forces.html#distance3d.hydroelastic_contact.contact_forces" title="distance3d.hydroelastic_contact.contact_forces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contact_forces</span></code></a></p></td>
+<td><p>Contact forces between two objects.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.hydroelastic_contact.find_contact_surface.html#distance3d.hydroelastic_contact.find_contact_surface" title="distance3d.hydroelastic_contact.find_contact_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_contact_surface</span></code></a></p></td>
+<td><p>Find contact plane of two rigid bodies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.hydroelastic_contact.RigidBody.html#distance3d.hydroelastic_contact.RigidBody" title="distance3d.hydroelastic_contact.RigidBody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RigidBody</span></code></a></p></td>
+<td><p>Rigid body represented by tetrahedral mesh.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.hydroelastic_contact.ContactSurface.html#distance3d.hydroelastic_contact.ContactSurface" title="distance3d.hydroelastic_contact.ContactSurface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContactSurface</span></code></a></p></td>
+<td><p>Contact surface of tetrahedral meshes.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="section" id="module-distance3d.plotting">
 <span id="distance3d-plotting"></span><h3><a class="reference internal" href="#module-distance3d.plotting" title="distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a><a class="headerlink" href="#module-distance3d.plotting" title="Permalink to this heading">¶</a></h3>
 <p>Plotting functions for geometric shapes.</p>
@@ -619,16 +689,19 @@ license.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.plotting.plot_circle.html#distance3d.plotting.plot_circle" title="distance3d.plotting.plot_circle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_circle</span></code></a></p></td>
 <td><p>Plot circle.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.plotting.plot_aabb.html#distance3d.plotting.plot_aabb" title="distance3d.plotting.plot_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_aabb</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.plotting.plot_ellipse.html#distance3d.plotting.plot_ellipse" title="distance3d.plotting.plot_ellipse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_ellipse</span></code></a></p></td>
+<td><p>Plot ellipse.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.plotting.plot_aabb.html#distance3d.plotting.plot_aabb" title="distance3d.plotting.plot_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_aabb</span></code></a></p></td>
 <td><p>Plot axis-aligned bounding box.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.plotting.plot_convex.html#distance3d.plotting.plot_convex" title="distance3d.plotting.plot_convex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_convex</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.plotting.plot_convex.html#distance3d.plotting.plot_convex" title="distance3d.plotting.plot_convex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_convex</span></code></a></p></td>
 <td><p>Plot convex mesh.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.plotting.plot_tetrahedron.html#distance3d.plotting.plot_tetrahedron" title="distance3d.plotting.plot_tetrahedron"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_tetrahedron</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.plotting.plot_tetrahedron.html#distance3d.plotting.plot_tetrahedron" title="distance3d.plotting.plot_tetrahedron"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_tetrahedron</span></code></a></p></td>
 <td><p>Plot tetrahedron.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.plotting.plot_aabb_tree.html#distance3d.plotting.plot_aabb_tree" title="distance3d.plotting.plot_aabb_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_aabb_tree</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.plotting.plot_aabb_tree.html#distance3d.plotting.plot_aabb_tree" title="distance3d.plotting.plot_aabb_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_aabb_tree</span></code></a></p></td>
 <td><p>Plot tree of axis-aligned bounding boxes.</p></td>
 </tr>
 </tbody>
@@ -679,10 +752,13 @@ license.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_sphere.html#distance3d.random.rand_sphere" title="distance3d.random.rand_sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_sphere</span></code></a></p></td>
 <td><p>Sample sphere.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_cone.html#distance3d.random.rand_cone" title="distance3d.random.rand_cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_cone</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_ellipse.html#distance3d.random.rand_ellipse" title="distance3d.random.rand_ellipse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_ellipse</span></code></a></p></td>
+<td><p>Sample ellipse.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.random.rand_cone.html#distance3d.random.rand_cone" title="distance3d.random.rand_cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rand_cone</span></code></a></p></td>
 <td><p>Sample cone.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/distance3d.random.randn_convex.html#distance3d.random.randn_convex" title="distance3d.random.randn_convex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randn_convex</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/distance3d.random.randn_convex.html#distance3d.random.randn_convex" title="distance3d.random.randn_convex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">randn_convex</span></code></a></p></td>
 <td><p>Sample convex mesh.</p></td>
 </tr>
 </tbody>
@@ -722,6 +798,7 @@ license.</p>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.geometry"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.geometry</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.self_collision"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.self_collision</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.containment_test"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.containment_test</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-distance3d.hydroelastic_contact"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.hydroelastic_contact</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-distance3d.random"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.random</span></code></a></li>
 </ul>

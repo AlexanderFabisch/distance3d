@@ -1,0 +1,6 @@
+﻿distance3d.hydroelastic\_contact.contact\_forces
+================================================
+
+.. currentmodule:: distance3d.hydroelastic_contact
+
+.. autofunction:: contact_forces

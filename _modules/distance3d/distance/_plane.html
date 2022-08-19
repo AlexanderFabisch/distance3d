@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.distance._plane &#8212; distance3d 0.4.0 documentation</title>
+    <title>distance3d.distance._plane &#8212; distance3d 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
@@ -37,13 +37,12 @@
           <div class="body" role="main">
             
   <h1>Source code for distance3d.distance._plane</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">math</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numba</span>
 <span class="kn">from</span> <span class="nn">..geometry</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">hesse_normal_form</span><span class="p">,</span> <span class="n">convert_segment_to_line</span><span class="p">,</span> <span class="n">line_from_pluecker</span><span class="p">,</span>
-    <span class="n">convert_rectangle_to_vertices</span><span class="p">,</span> <span class="n">convert_box_to_vertices</span><span class="p">)</span>
+    <span class="n">convert_rectangle_to_vertices</span><span class="p">,</span> <span class="n">convert_box_to_vertices</span><span class="p">,</span>
+    <span class="n">support_function_ellipsoid</span><span class="p">,</span> <span class="n">support_function_cylinder</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="point_to_plane"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.point_to_plane.html#distance3d.distance.point_to_plane">[docs]</a><span class="k">def</span> <span class="nf">point_to_plane</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -135,7 +134,7 @@
     <span class="n">numba</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Tuple</span><span class="p">((</span><span class="n">numba</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
     <span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span>
      <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-    <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_line_to_plane</span><span class="p">(</span><span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span>
                    <span class="n">epsilon</span><span class="p">):</span>
     <span class="n">length_of_dir_projected_on_normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">)</span>
@@ -408,36 +407,54 @@
 <span class="sd">    closest_point_plane : array, shape (3,)</span>
 <span class="sd">        Closest point on plane.</span>
 
-<span class="sd">    closest_point_box : array, shape (3,)</span>
-<span class="sd">        Closest point on box.</span>
+<span class="sd">    closest_point_ellipsoid : array, shape (3,)</span>
+<span class="sd">        Closest point on ellipsoid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># https://gamedev.net/forums/topic/457831-distance-between-ellipsoid-plane/4028358/</span>
-    <span class="c1"># Let the ellipsoid be represented in standard form,</span>
-    <span class="c1"># (X-C)^T*M*(X-C) = 1, where C is the center point, M is a positive</span>
-    <span class="c1"># definite matrix, and X is any point on the ellipsoid. The superscript T</span>
-    <span class="c1"># denotes the transpose operator. Let N be a normal vector to the plane.</span>
-    <span class="c1"># When the ellipsoid is not intersected by the plane, the closest and</span>
-    <span class="c1"># farthest points are</span>
-    <span class="c1"># X = C +/- M^{-1}*N/sqrt(N^T*M^{-1}*N)</span>
-    <span class="c1"># where M^{-1} is the inverse of M.</span>
-    <span class="n">C</span> <span class="o">=</span> <span class="n">ellipsoid2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
-    <span class="n">M</span> <span class="o">=</span> <span class="n">_ellipsoid_quadric_matrix</span><span class="p">(</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">)</span>
-
-    <span class="n">M_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
-    <span class="n">M_inv_normal</span> <span class="o">=</span> <span class="n">M_inv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">plane_normal</span><span class="p">)</span>
-    <span class="n">extent_along_plane_normal</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">M_inv_normal</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">plane_normal</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">M_inv_normal</span><span class="p">)))</span>
-    <span class="n">point1</span> <span class="o">=</span> <span class="n">C</span> <span class="o">-</span> <span class="n">extent_along_plane_normal</span>
-    <span class="n">point2</span> <span class="o">=</span> <span class="n">C</span> <span class="o">+</span> <span class="n">extent_along_plane_normal</span>
-    <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_plane</span><span class="p">,</span> <span class="n">closest_point_ellipsoid</span> <span class="o">=</span> <span class="n">_plane_to_convex_hull_points</span><span class="p">(</span>
-        <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">)))</span>
-    <span class="k">return</span> <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_plane</span><span class="p">,</span> <span class="n">closest_point_ellipsoid</span></div>
+    <span class="n">point1</span> <span class="o">=</span> <span class="n">support_function_ellipsoid</span><span class="p">(</span><span class="o">-</span><span class="n">plane_normal</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">)</span>
+    <span class="n">point2</span> <span class="o">=</span> <span class="n">support_function_ellipsoid</span><span class="p">(</span><span class="n">plane_normal</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_plane_to_convex_hull_points</span><span class="p">(</span>
+        <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">)))</span></div>
 
 
-<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_ellipsoid_quadric_matrix</span><span class="p">(</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
-    <span class="n">R_scaled</span> <span class="o">=</span> <span class="n">ellipsoid2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">radii</span>
-    <span class="k">return</span> <span class="n">R_scaled</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R_scaled</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<div class="viewcode-block" id="plane_to_cylinder"><a class="viewcode-back" href="../../../_autosummary/distance3d.distance.plane_to_cylinder.html#distance3d.distance.plane_to_cylinder">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">plane_to_cylinder</span><span class="p">(</span>
+        <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">cylinder2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the shortest distance between a plane and a cylinder.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plane_point : array, shape (3,)</span>
+<span class="sd">        Point on the plane.</span>
+
+<span class="sd">    plane_normal : array, shape (3,)</span>
+<span class="sd">        Normal of the plane. We assume unit length.</span>
+
+<span class="sd">    cylinder2origin : array, shape (4, 4)</span>
+<span class="sd">        Pose of the cylinder.</span>
+
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of the cylinder.</span>
+
+<span class="sd">    length : float</span>
+<span class="sd">        Length of the cylinder.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dist : float</span>
+<span class="sd">        The shortest distance between rectangle and plane.</span>
+
+<span class="sd">    closest_point_plane : array, shape (3,)</span>
+<span class="sd">        Closest point on plane.</span>
+
+<span class="sd">    closest_point_cylinder : array, shape (3,)</span>
+<span class="sd">        Closest point on cylinder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">point1</span> <span class="o">=</span> <span class="n">support_function_cylinder</span><span class="p">(</span>
+        <span class="o">-</span><span class="n">plane_normal</span><span class="p">,</span> <span class="n">cylinder2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+    <span class="n">point2</span> <span class="o">=</span> <span class="n">support_function_cylinder</span><span class="p">(</span>
+        <span class="n">plane_normal</span><span class="p">,</span> <span class="n">cylinder2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_plane_to_convex_hull_points</span><span class="p">(</span>
+        <span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">)))</span></div>
 </pre></div>
 
           </div>

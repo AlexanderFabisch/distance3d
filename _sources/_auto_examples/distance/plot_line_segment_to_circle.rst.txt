@@ -3539,7 +3539,7 @@ Distance from line segment to circle
     0.7296732706169388
     0.3659935769417604
     0.9633628278022892
-    accumulated_time=0.7839837074279785
+    accumulated_time=0.7837624549865723
 
 
 
@@ -3587,7 +3587,7 @@ Distance from line segment to circle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.105 seconds)
+   **Total running time of the script:** ( 0 minutes  1.087 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_segment_to_circle.py:

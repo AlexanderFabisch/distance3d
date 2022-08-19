@@ -39,7 +39,7 @@ Collision resolution with EPA after GJK
  .. code-block:: none
 
 
-    [-0.14611314 -0.16815313  0.21658019]
+    [ 0.11561795 -0.30145285  0.12618015]
     [ 0.16265775  0.56084527 -0.70360588]
 
 
@@ -99,7 +99,7 @@ Collision resolution with EPA after GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.283 seconds)
+   **Total running time of the script:** ( 0 minutes  0.287 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_collision_resolution_epa.py:

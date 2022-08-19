@@ -1,0 +1,6 @@
+﻿distance3d.hydroelastic\_contact.find\_contact\_surface
+=======================================================
+
+.. currentmodule:: distance3d.hydroelastic_contact
+
+.. autofunction:: find_contact_surface

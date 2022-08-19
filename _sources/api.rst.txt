@@ -50,6 +50,7 @@ API Reference
    ~distance3d.distance.plane_to_rectangle
    ~distance3d.distance.plane_to_box
    ~distance3d.distance.plane_to_ellipsoid
+   ~distance3d.distance.plane_to_cylinder
    ~distance3d.distance.triangle_to_triangle
    ~distance3d.distance.triangle_to_rectangle
    ~distance3d.distance.rectangle_to_rectangle
@@ -79,6 +80,7 @@ API Reference
    ~distance3d.colliders.Ellipsoid
    ~distance3d.colliders.Cylinder
    ~distance3d.colliders.Disk
+   ~distance3d.colliders.Ellipse
    ~distance3d.colliders.Cone
    ~distance3d.colliders.Margin
 
@@ -119,6 +121,7 @@ API Reference
    ~distance3d.containment.capsule_aabb
    ~distance3d.containment.ellipsoid_aabb
    ~distance3d.containment.disk_aabb
+   ~distance3d.containment.ellipse_aabb
    ~distance3d.containment.cone_aabb
 
 
@@ -136,7 +139,12 @@ API Reference
    :toctree: _autosummary/
 
    ~distance3d.gjk.gjk
+   ~distance3d.gjk.gjk_distance
    ~distance3d.gjk.gjk_intersection
+   ~distance3d.gjk.gjk_distance_jolt
+   ~distance3d.gjk.gjk_intersection_jolt
+   ~distance3d.gjk.gjk_distance_original
+   ~distance3d.gjk.gjk_intersection_libccd
 
 
 :mod:`distance3d.epa`
@@ -196,6 +204,7 @@ API Reference
    ~distance3d.geometry.support_function_box
    ~distance3d.geometry.support_function_sphere
    ~distance3d.geometry.support_function_disk
+   ~distance3d.geometry.support_function_ellipse
    ~distance3d.geometry.support_function_cone
    ~distance3d.geometry.hesse_normal_form
    ~distance3d.geometry.line_from_pluecker
@@ -241,6 +250,25 @@ API Reference
    ~distance3d.containment_test.points_in_convex_mesh
 
 
+:mod:`distance3d.hydroelastic_contact`
+--------------------------------------
+
+.. automodule:: distance3d.hydroelastic_contact
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.hydroelastic_contact
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.hydroelastic_contact.contact_forces
+   ~distance3d.hydroelastic_contact.find_contact_surface
+   ~distance3d.hydroelastic_contact.RigidBody
+   ~distance3d.hydroelastic_contact.ContactSurface
+
+
 :mod:`distance3d.plotting`
 --------------------------
 
@@ -260,6 +288,7 @@ API Reference
    ~distance3d.plotting.plot_triangle
    ~distance3d.plotting.plot_rectangle
    ~distance3d.plotting.plot_circle
+   ~distance3d.plotting.plot_ellipse
    ~distance3d.plotting.plot_aabb
    ~distance3d.plotting.plot_convex
    ~distance3d.plotting.plot_tetrahedron
@@ -291,5 +320,6 @@ API Reference
    ~distance3d.random.rand_ellipsoid
    ~distance3d.random.rand_cylinder
    ~distance3d.random.rand_sphere
+   ~distance3d.random.rand_ellipse
    ~distance3d.random.rand_cone
    ~distance3d.random.randn_convex

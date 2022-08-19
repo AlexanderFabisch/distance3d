@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.hydroelastic_contact._contact_surface &#8212; distance3d 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distance3d.hydroelastic_contact._contact_surface</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">transform_points</span><span class="p">,</span> <span class="n">transform_directions</span>
+
+
+<div class="viewcode-block" id="ContactSurface"><a class="viewcode-back" href="../../../_autosummary/distance3d.hydroelastic_contact.ContactSurface.html#distance3d.hydroelastic_contact.ContactSurface">[docs]</a><span class="k">class</span> <span class="nc">ContactSurface</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Contact surface of tetrahedral meshes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    frame2world : array, shape (4, 4)</span>
+<span class="sd">        Transforms vertices, points, and directions to world frame.</span>
+
+<span class="sd">    intersection : bool</span>
+<span class="sd">        Do both tetrahedral meshes intersect?</span>
+
+<span class="sd">    contact_planes : array, shape (n_intersections, 4)</span>
+<span class="sd">        Contact planes of intersection pairs in Hesse normal form.</span>
+
+<span class="sd">    contact_polygons : list</span>
+<span class="sd">        Contact polygons of intersection pairs.</span>
+
+<span class="sd">    intersecting_tetrahedra1 : list</span>
+<span class="sd">        Intersecting tetrahedron indices of first mesh.</span>
+
+<span class="sd">    intersecting_tetrahedra2 : list</span>
+<span class="sd">        Intersecting tetrahedron indices of second mesh.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ContactSurface.__init__"><a class="viewcode-back" href="../../../_autosummary/distance3d.hydroelastic_contact.ContactSurface.html#distance3d.hydroelastic_contact.ContactSurface.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">frame2world</span><span class="p">,</span> <span class="n">intersection</span><span class="p">,</span> <span class="n">contact_planes</span><span class="p">,</span> <span class="n">contact_polygons</span><span class="p">,</span>
+            <span class="n">intersecting_tetrahedra1</span><span class="p">,</span> <span class="n">intersecting_tetrahedra2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame2world</span> <span class="o">=</span> <span class="n">frame2world</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intersection</span> <span class="o">=</span> <span class="n">intersection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_planes</span> <span class="o">=</span> <span class="n">contact_planes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_polygons</span> <span class="o">=</span> <span class="n">contact_polygons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intersecting_tetrahedra1</span> <span class="o">=</span> <span class="n">intersecting_tetrahedra1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intersecting_tetrahedra2</span> <span class="o">=</span> <span class="n">intersecting_tetrahedra2</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_areas</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_coms</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_forces</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_polygon_triangles</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">add_polygon_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contact_areas</span><span class="p">,</span> <span class="n">contact_coms</span><span class="p">,</span> <span class="n">contact_forces</span><span class="p">,</span>
+                         <span class="n">contact_polygon_triangles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add more info on contact polygons.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        contact_areas : array, shape (n_intersections,)</span>
+<span class="sd">            Areas of contact polygons.</span>
+
+<span class="sd">        contact_coms : array, shape (n_intersections, 3)</span>
+<span class="sd">            Center of mass of contact polygons.</span>
+
+<span class="sd">        contact_forces : array, shape (n_intersections, 3)</span>
+<span class="sd">            Contact forces of contact polygons.</span>
+
+<span class="sd">        contact_polygon_triangles : list</span>
+<span class="sd">            Vertex indices of triangles of contact polygons.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_areas</span> <span class="o">=</span> <span class="n">contact_areas</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_coms</span> <span class="o">=</span> <span class="n">contact_coms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_forces</span> <span class="o">=</span> <span class="n">contact_forces</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_polygon_triangles</span> <span class="o">=</span> <span class="n">contact_polygon_triangles</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pressures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contact_forces</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_areas</span>
+
+    <span class="k">def</span> <span class="nf">make_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tetrahedra_points1</span><span class="p">,</span> <span class="n">tetrahedra_points2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Summarize details of contact points in world frame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tetrahedra_points1 : array, shape (n_tetrahedra1, 4, 3)</span>
+<span class="sd">            Points that form the first tetrahedra.</span>
+
+<span class="sd">        tetrahedra_points2 : array, shape (n_tetrahedra2, 4, 3)</span>
+<span class="sd">            Points that form the second tetrahedra.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        details : dict</span>
+<span class="sd">            Detailed description of contact surface and pressure field.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersection</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">intersecting_tetrahedra1</span><span class="p">,</span> <span class="n">intersecting_tetrahedra2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_to_world</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frame2world</span><span class="p">,</span> <span class="n">tetrahedra_points1</span><span class="p">,</span> <span class="n">tetrahedra_points2</span><span class="p">)</span>
+
+        <span class="n">contact_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contact_coms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_areas</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contact_areas</span><span class="p">)</span>
+
+        <span class="n">details</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;contact_polygons&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_polygons</span><span class="p">,</span>
+            <span class="s2">&quot;contact_polygon_triangles&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_polygon_triangles</span><span class="p">,</span>
+            <span class="s2">&quot;contact_planes&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_planes</span><span class="p">,</span>
+            <span class="s2">&quot;intersecting_tetrahedra1&quot;</span><span class="p">:</span> <span class="n">intersecting_tetrahedra1</span><span class="p">,</span>
+            <span class="s2">&quot;intersecting_tetrahedra2&quot;</span><span class="p">:</span> <span class="n">intersecting_tetrahedra2</span><span class="p">,</span>
+            <span class="s2">&quot;contact_coms&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_coms</span><span class="p">,</span>
+            <span class="s2">&quot;contact_forces&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_forces</span><span class="p">,</span>
+            <span class="s2">&quot;contact_areas&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_areas</span><span class="p">,</span>
+            <span class="s2">&quot;pressures&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pressures</span><span class="p">,</span>
+            <span class="s2">&quot;contact_point&quot;</span><span class="p">:</span> <span class="n">contact_point</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">details</span>
+
+    <span class="k">def</span> <span class="nf">_transform_to_world</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">frame2world</span><span class="p">,</span> <span class="n">tetrahedra_points1</span><span class="p">,</span> <span class="n">tetrahedra_points2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_polygons</span> <span class="o">=</span> <span class="p">[</span><span class="n">transform_points</span><span class="p">(</span><span class="n">frame2world</span><span class="p">,</span> <span class="n">contact_polygon</span><span class="p">)</span>
+                                 <span class="k">for</span> <span class="n">contact_polygon</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_polygons</span><span class="p">]</span>
+        <span class="n">plane_points</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contact_planes</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+                        <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_planes</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span>
+        <span class="n">plane_points</span> <span class="o">=</span> <span class="n">transform_points</span><span class="p">(</span><span class="n">frame2world</span><span class="p">,</span> <span class="n">plane_points</span><span class="p">)</span>
+        <span class="n">plane_normals</span> <span class="o">=</span> <span class="n">transform_directions</span><span class="p">(</span>
+            <span class="n">frame2world</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_planes</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">plane_distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">plane_points</span> <span class="o">*</span> <span class="n">plane_normals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_planes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">plane_normals</span><span class="p">,</span>
+                                         <span class="n">plane_distances</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_coms</span> <span class="o">=</span> <span class="n">transform_points</span><span class="p">(</span>
+            <span class="n">frame2world</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_coms</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_forces</span> <span class="o">=</span> <span class="n">transform_directions</span><span class="p">(</span>
+            <span class="n">frame2world</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_forces</span><span class="p">)</span>
+        <span class="n">n_intersections</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intersecting_tetrahedra1</span><span class="p">)</span>
+        <span class="n">intersecting_tetrahedra1</span> <span class="o">=</span> <span class="n">tetrahedra_points1</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">intersecting_tetrahedra1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)]</span>
+        <span class="n">intersecting_tetrahedra1</span> <span class="o">=</span> <span class="n">transform_points</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frame2world</span><span class="p">,</span> <span class="n">intersecting_tetrahedra1</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                <span class="n">n_intersections</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_intersections</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">intersecting_tetrahedra2</span> <span class="o">=</span> <span class="n">tetrahedra_points2</span><span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intersecting_tetrahedra2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)]</span>
+        <span class="n">intersecting_tetrahedra2</span> <span class="o">=</span> <span class="n">transform_points</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frame2world</span><span class="p">,</span>
+            <span class="n">intersecting_tetrahedra2</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_intersections</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_intersections</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">intersecting_tetrahedra1</span><span class="p">,</span> <span class="n">intersecting_tetrahedra2</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

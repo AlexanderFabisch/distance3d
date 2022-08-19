@@ -1,0 +1,30 @@
+﻿distance3d.hydroelastic\_contact.ContactSurface
+===============================================
+
+.. currentmodule:: distance3d.hydroelastic_contact
+
+.. autoclass:: ContactSurface
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ContactSurface.__init__
+      ~ContactSurface.add_polygon_info
+      ~ContactSurface.make_details
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ContactSurface.pressures
+   
+   

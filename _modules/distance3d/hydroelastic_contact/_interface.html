@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.hydroelastic_contact._interface &#8212; distance3d 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distance3d.hydroelastic_contact._interface</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">._forces</span> <span class="kn">import</span> <span class="n">contact_surface_forces</span><span class="p">,</span> <span class="n">accumulate_wrenches</span>
+<span class="kn">from</span> <span class="nn">._broad_phase</span> <span class="kn">import</span> <span class="n">broad_phase_tetrahedra</span>
+<span class="kn">from</span> <span class="nn">._barycentric_transform</span> <span class="kn">import</span> <span class="n">barycentric_transforms</span>
+<span class="kn">from</span> <span class="nn">._tetrahedron_intersection</span> <span class="kn">import</span> <span class="n">intersect_tetrahedron_pairs</span>
+<span class="kn">from</span> <span class="nn">._contact_surface</span> <span class="kn">import</span> <span class="n">ContactSurface</span>
+
+
+<div class="viewcode-block" id="contact_forces"><a class="viewcode-back" href="../../../_autosummary/distance3d.hydroelastic_contact.contact_forces.html#distance3d.hydroelastic_contact.contact_forces">[docs]</a><span class="k">def</span> <span class="nf">contact_forces</span><span class="p">(</span><span class="n">rigid_body1</span><span class="p">,</span> <span class="n">rigid_body2</span><span class="p">,</span> <span class="n">return_details</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Contact forces between two objects.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rigid_body1 : RigidBody</span>
+<span class="sd">        First rigid body.</span>
+
+<span class="sd">    rigid_body2 : RigidBody</span>
+<span class="sd">        Second rigid body.</span>
+
+<span class="sd">    return_details : bool</span>
+<span class="sd">        Return additional contact details.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    intersection : bool</span>
+<span class="sd">        Do both bodies intersect?</span>
+
+<span class="sd">    wrench12_in_world : array, shape (6,)</span>
+<span class="sd">        Forces and torques caused by body 1 acting on body 2 in world frame.</span>
+
+<span class="sd">    wrench21_in_world : array, shape (6,)</span>
+<span class="sd">        Forces and torques caused by body 2 acting on body 1 in world frame.</span>
+
+<span class="sd">    details : dict, optional</span>
+<span class="sd">        Additional contact details.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">contact_surface</span> <span class="o">=</span> <span class="n">find_contact_surface</span><span class="p">(</span><span class="n">rigid_body1</span><span class="p">,</span> <span class="n">rigid_body2</span><span class="p">)</span>
+
+    <span class="n">wrench12_in_world</span><span class="p">,</span> <span class="n">wrench21_in_world</span> <span class="o">=</span> <span class="n">accumulate_wrenches</span><span class="p">(</span>
+        <span class="n">contact_surface</span><span class="p">,</span> <span class="n">rigid_body1</span><span class="p">,</span> <span class="n">rigid_body2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_details</span><span class="p">:</span>
+        <span class="n">details</span> <span class="o">=</span> <span class="n">contact_surface</span><span class="o">.</span><span class="n">make_details</span><span class="p">(</span>
+            <span class="n">rigid_body1</span><span class="o">.</span><span class="n">tetrahedra_points</span><span class="p">,</span> <span class="n">rigid_body2</span><span class="o">.</span><span class="n">tetrahedra_points</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">contact_surface</span><span class="o">.</span><span class="n">intersection</span><span class="p">,</span> <span class="n">wrench12_in_world</span><span class="p">,</span> <span class="n">wrench21_in_world</span><span class="p">,</span>
+            <span class="n">details</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">contact_surface</span><span class="o">.</span><span class="n">intersection</span><span class="p">,</span> <span class="n">wrench12_in_world</span><span class="p">,</span> <span class="n">wrench21_in_world</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="find_contact_surface"><a class="viewcode-back" href="../../../_autosummary/distance3d.hydroelastic_contact.find_contact_surface.html#distance3d.hydroelastic_contact.find_contact_surface">[docs]</a><span class="k">def</span> <span class="nf">find_contact_surface</span><span class="p">(</span><span class="n">rigid_body1</span><span class="p">,</span> <span class="n">rigid_body2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find contact plane of two rigid bodies.</span>
+
+<span class="sd">    Note that this function will transform rigid_body1 into the frame of</span>
+<span class="sd">    rigid_body2.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rigid_body1 : RigidBody</span>
+<span class="sd">        First rigid body.</span>
+
+<span class="sd">    rigid_body2 : RigidBody</span>
+<span class="sd">        Second rigid body.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    contact_surface : ContactSurface</span>
+<span class="sd">        Contact information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># We transform vertices of rigid_body1 to rigid_body2 frame to be able to</span>
+    <span class="c1"># reuse the AABB tree of rigid_body2.</span>
+    <span class="n">rigid_body1</span><span class="o">.</span><span class="n">express_in</span><span class="p">(</span><span class="n">rigid_body2</span><span class="o">.</span><span class="n">body2origin_</span><span class="p">)</span>
+
+    <span class="n">broad_tetrahedra1</span><span class="p">,</span> <span class="n">broad_tetrahedra2</span><span class="p">,</span> <span class="n">broad_pairs</span> <span class="o">=</span> <span class="n">broad_phase_tetrahedra</span><span class="p">(</span>
+        <span class="n">rigid_body1</span><span class="p">,</span> <span class="n">rigid_body2</span><span class="p">)</span>
+
+    <span class="n">unique_indices1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">broad_tetrahedra1</span><span class="p">)</span>
+    <span class="n">unique_indices2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">broad_tetrahedra2</span><span class="p">)</span>
+    <span class="n">X1</span> <span class="o">=</span> <span class="n">barycentric_transforms</span><span class="p">(</span><span class="n">rigid_body1</span><span class="o">.</span><span class="n">tetrahedra_points</span><span class="p">[</span><span class="n">unique_indices1</span><span class="p">])</span>
+    <span class="n">X2</span> <span class="o">=</span> <span class="n">barycentric_transforms</span><span class="p">(</span><span class="n">rigid_body2</span><span class="o">.</span><span class="n">tetrahedra_points</span><span class="p">[</span><span class="n">unique_indices2</span><span class="p">])</span>
+    <span class="n">X1</span> <span class="o">=</span> <span class="p">{</span><span class="n">j</span><span class="p">:</span> <span class="n">X1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_indices1</span><span class="p">)}</span>
+    <span class="n">X2</span> <span class="o">=</span> <span class="p">{</span><span class="n">j</span><span class="p">:</span> <span class="n">X2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_indices2</span><span class="p">)}</span>
+
+    <span class="n">intersection_result</span> <span class="o">=</span> <span class="n">intersect_tetrahedron_pairs</span><span class="p">(</span>
+        <span class="n">broad_pairs</span><span class="p">,</span>
+        <span class="n">rigid_body1</span><span class="o">.</span><span class="n">tetrahedra_points</span><span class="p">,</span> <span class="n">rigid_body2</span><span class="o">.</span><span class="n">tetrahedra_points</span><span class="p">,</span>
+        <span class="n">rigid_body1</span><span class="o">.</span><span class="n">tetrahedra_potentials</span><span class="p">,</span> <span class="n">rigid_body2</span><span class="o">.</span><span class="n">tetrahedra_potentials</span><span class="p">,</span>
+        <span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="p">)</span>
+    <span class="n">contact_surface</span> <span class="o">=</span> <span class="n">ContactSurface</span><span class="p">(</span>
+        <span class="n">rigid_body2</span><span class="o">.</span><span class="n">body2origin_</span><span class="p">,</span> <span class="o">*</span><span class="n">intersection_result</span><span class="p">)</span>
+
+    <span class="n">areas</span><span class="p">,</span> <span class="n">coms</span><span class="p">,</span> <span class="n">forces</span><span class="p">,</span> <span class="n">triangles</span> <span class="o">=</span> <span class="n">contact_surface_forces</span><span class="p">(</span>
+        <span class="n">contact_surface</span><span class="p">,</span> <span class="n">rigid_body1</span><span class="p">)</span>
+    <span class="n">contact_surface</span><span class="o">.</span><span class="n">add_polygon_info</span><span class="p">(</span><span class="n">areas</span><span class="p">,</span> <span class="n">coms</span><span class="p">,</span> <span class="n">forces</span><span class="p">,</span> <span class="n">triangles</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">contact_surface</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

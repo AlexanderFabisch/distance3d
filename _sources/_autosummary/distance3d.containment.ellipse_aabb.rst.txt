@@ -1,0 +1,6 @@
+﻿distance3d.containment.ellipse\_aabb
+====================================
+
+.. currentmodule:: distance3d.containment
+
+.. autofunction:: ellipse_aabb

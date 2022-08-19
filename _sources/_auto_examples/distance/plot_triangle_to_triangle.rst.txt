@@ -1339,7 +1339,7 @@ Distance between two triangles
     0.9655903306410496
     1.097188159926347
     0.09953868649662805
-    accumulated_time=0.0693812370300293
+    accumulated_time=0.07264137268066406
 
 
 
@@ -1386,7 +1386,7 @@ Distance between two triangles
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.251 seconds)
+   **Total running time of the script:** ( 0 minutes  0.261 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_triangle_to_triangle.py:

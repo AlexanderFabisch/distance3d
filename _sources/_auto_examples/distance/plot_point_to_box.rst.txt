@@ -21039,7 +21039,7 @@ Distance from point to box
     1.1453650347428084
     0.1158014629402304
     0.41038773699315606
-    accumulated_time=0.6412708759307861
+    accumulated_time=0.6471052169799805
 
 
 
@@ -21085,7 +21085,7 @@ Distance from point to box
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.526 seconds)
+   **Total running time of the script:** ( 0 minutes  1.539 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_box.py:

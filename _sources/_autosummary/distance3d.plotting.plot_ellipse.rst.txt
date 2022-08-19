@@ -1,0 +1,6 @@
+﻿distance3d.plotting.plot\_ellipse
+=================================
+
+.. currentmodule:: distance3d.plotting
+
+.. autofunction:: plot_ellipse

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.geometry &#8212; distance3d 0.4.0 documentation</title>
+    <title>distance3d.geometry &#8212; distance3d 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -42,7 +42,9 @@
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
 <span class="kn">import</span> <span class="nn">numba</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">norm_vector</span><span class="p">,</span> <span class="n">transform_point</span><span class="p">,</span> <span class="n">plane_basis_from_normal</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">norm_vector</span><span class="p">,</span> <span class="n">transform_point</span><span class="p">,</span> <span class="n">plane_basis_from_normal</span><span class="p">,</span>
+    <span class="n">scalar_triple_product</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="convert_rectangle_to_segment"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.convert_rectangle_to_segment.html#distance3d.geometry.convert_rectangle_to_segment">[docs]</a><span class="k">def</span> <span class="nf">convert_rectangle_to_segment</span><span class="p">(</span><span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_extents</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">):</span>
@@ -420,6 +422,37 @@
     <span class="k">return</span> <span class="n">center</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="support_function_ellipse"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.support_function_ellipse.html#distance3d.geometry.support_function_ellipse">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
+    <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span>
+                     <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">support_function_ellipse</span><span class="p">(</span><span class="n">search_direction</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute extreme point of ellipse along a direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    search_direction : array, shape (3,)</span>
+<span class="sd">        Search direction.</span>
+
+<span class="sd">    center : array, shape (3,)</span>
+<span class="sd">        Center of ellipse.</span>
+
+<span class="sd">    axes : array, shape (2, 3)</span>
+<span class="sd">        Axes of ellipse.</span>
+
+<span class="sd">    radii : array, shape (2,)</span>
+<span class="sd">        Radii of ellipse.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    extreme_point : array, shape (3,)</span>
+<span class="sd">        Extreme point along search direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local_dir</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">search_direction</span><span class="p">)</span>
+    <span class="n">local_vertex</span> <span class="o">=</span> <span class="n">norm_vector</span><span class="p">(</span><span class="n">radii</span> <span class="o">*</span> <span class="n">local_dir</span><span class="p">)</span> <span class="o">*</span> <span class="n">radii</span>
+    <span class="k">return</span> <span class="n">center</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">local_vertex</span><span class="p">,</span> <span class="n">axes</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="support_function_cone"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.support_function_cone.html#distance3d.geometry.support_function_cone">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span>
     <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
                      <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
@@ -513,6 +546,40 @@
         <span class="n">line_point</span> <span class="o">/=</span> <span class="n">line_dir_norm_squared</span>
         <span class="n">line_direction</span> <span class="o">/=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">line_dir_norm_squared</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">line_point</span><span class="p">,</span> <span class="n">line_direction</span></div>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">barycentric_coordinates_tetrahedron</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">tetrahedron_points</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Barycentric coordinates of a point for tetrahedron.</span>
+
+<span class="sd">    Source: https://stackoverflow.com/a/38546111/915743</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p : array, shape (3,)</span>
+<span class="sd">        Point of which we want to determine barycentric coordinates.</span>
+
+<span class="sd">    tetrahedron_points : array, shape (4, 3)</span>
+<span class="sd">        Each row represents a point of the tetrahedron.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array, shape (4,)</span>
+<span class="sd">        Barycentric coordinates of p in the tetrahedron.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">))</span>
+
+    <span class="n">b_to_cd</span> <span class="o">=</span> <span class="n">tetrahedron_points</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="n">tetrahedron_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">bp</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="n">tetrahedron_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">scalar_triple_product</span><span class="p">(</span><span class="n">bp</span><span class="p">,</span> <span class="n">b_to_cd</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">b_to_cd</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">a_to_bcd</span> <span class="o">=</span> <span class="n">tetrahedron_points</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">tetrahedron_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="n">tetrahedron_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">scalar_triple_product</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span> <span class="n">a_to_bcd</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">a_to_bcd</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">scalar_triple_product</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span> <span class="n">a_to_bcd</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">a_to_bcd</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">result</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">scalar_triple_product</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span> <span class="n">a_to_bcd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a_to_bcd</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">result</span> <span class="o">/</span> <span class="n">scalar_triple_product</span><span class="p">(</span><span class="n">a_to_bcd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a_to_bcd</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">a_to_bcd</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 </pre></div>
 
           </div>

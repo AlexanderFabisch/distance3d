@@ -50039,7 +50039,7 @@ Distance from point to line segment
     0.2694807658680886
     2.0579077791795792
     0.9589908595461216
-    accumulated_time=0.17131757736206055
+    accumulated_time=0.17818188667297363
 
 
 
@@ -50083,7 +50083,7 @@ Distance from point to line segment
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.737 seconds)
+   **Total running time of the script:** ( 0 minutes  1.775 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_line_segment.py:
