@@ -1,6 +1,4 @@
 import numpy as np
-from ..utils import invert_transform
-from ..benchmark import Timer
 from ._forces import contact_surface_forces, accumulate_wrenches
 from ._broad_phase import broad_phase_tetrahedra
 from ._barycentric_transform import barycentric_transforms
