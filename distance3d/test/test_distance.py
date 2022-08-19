@@ -531,7 +531,7 @@ def test_line_to_circle():
         line_point, line_direction, center, radius, normal)
     assert approx(dist) == 1.4929044958307771
     assert_array_almost_equal(
-        closest_point_line, np.array([1.569036,  1.569036, -0.861929]))
+        closest_point_line, np.array([1.569036, 1.569036, -0.861929]))
     assert_array_almost_equal(
         closest_point_circle, np.array([0.707107, 0.707107, 0]))
 

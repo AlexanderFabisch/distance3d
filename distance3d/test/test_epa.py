@@ -24,12 +24,14 @@ def test_epa():
         [-0.37343875, 0.4638171, -0.01383896],
         [-0.04278462, -0.59883687, -0.44309735]])
     dist, p1, p2, simplex = gjk.gjk(
-        colliders.ConvexHullVertices(vertices), colliders.ConvexHullVertices(vertices2))
+        colliders.ConvexHullVertices(vertices),
+        colliders.ConvexHullVertices(vertices2))
     assert_array_almost_equal(p1, p2)
     mtv, _, success = epa.epa(
-        simplex, colliders.ConvexHullVertices(vertices), colliders.ConvexHullVertices(vertices2))
+        simplex, colliders.ConvexHullVertices(vertices),
+        colliders.ConvexHullVertices(vertices2))
     assert success
-    assert_array_almost_equal(mtv, np.array([-0.387287,  0.179576, -0.176204]))
+    assert_array_almost_equal(mtv, np.array([-0.387287, 0.179576, -0.176204]))
 
 
 def test_epa_separation():

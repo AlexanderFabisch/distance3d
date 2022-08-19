@@ -58,9 +58,9 @@ def self_collision_whitelists(tm):
         collision_objects_link = link_info.collision_frames_attached_to_link(link_frame)
         collision_objects_parent = link_info.collision_frames_attached_to_link(parent_frame)
         collision_objects_child = link_info.collision_frames_attached_to_link(child_frame)
-        whitelist[obj.frame] = (
-                collision_objects_link + collision_objects_parent
-                + collision_objects_child)
+        whitelist[obj.frame] = (collision_objects_link
+                                + collision_objects_parent
+                                + collision_objects_child)
     return whitelist
 
 

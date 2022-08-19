@@ -311,9 +311,10 @@ class SimplexInfo:
         self.indices_polytope1[self.n_simplex_points] = self.indices_polytope1[0]
         self.indices_polytope2[self.n_simplex_points] = self.indices_polytope2[0]
         self.points[self.n_simplex_points] = self.points[0]
-        self.dot_product_table[self.n_simplex_points, :self.n_simplex_points] = self.dot_product_table[
-                                                                                :self.n_simplex_points, 0]
-        self.dot_product_table[self.n_simplex_points, self.n_simplex_points] = self.dot_product_table[0, 0]
+        self.dot_product_table[self.n_simplex_points, :self.n_simplex_points] = \
+            self.dot_product_table[:self.n_simplex_points, 0]
+        self.dot_product_table[self.n_simplex_points, self.n_simplex_points] = \
+            self.dot_product_table[0, 0]
 
     def _move_vertex(self, old_index, new_index):
         if old_index == new_index:
@@ -409,7 +410,7 @@ def distance_subalgorithm_with_backup_procedure(simplex, solution, backup=False)
     Parameters
     ----------
     simplex : array, shape (n_simplex_points, 3)
-      Current simplex.
+        Current simplex.
 
     solution : Solution
         Represents current best solution and search direction.

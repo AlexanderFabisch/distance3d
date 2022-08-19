@@ -310,9 +310,9 @@ def _find_penetration_info(collider1, collider2, portal, mpr_tolerance, max_iter
         next_support_point, next_support_point1, next_support_point2 = support_function(
             collider1, collider2, search_direction)
         tolerance_reached = (
-                _portal_reach_tolerance(
-                    portal.v, next_support_point, search_direction, mpr_tolerance)
-                or iterations > max_iterations)
+            _portal_reach_tolerance(
+                portal.v, next_support_point, search_direction, mpr_tolerance)
+            or iterations > max_iterations)
         if tolerance_reached:
             depth, pdir, pos = _penetration_info(portal.v, portal.v1, portal.v2)
             return depth, norm_vector(pdir), pos
