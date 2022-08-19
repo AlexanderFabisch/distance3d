@@ -58,12 +58,12 @@ def make_triangular_icosphere(center, radius, order=4):
 
     # repeatedly subdivide each triangle into 4 triangles
     triangles_prev = triangles
-    for i in range(order):
+    for _ in range(order):
         triangles = np.empty(
             (4 * triangles.shape[0], triangles.shape[1]),
             dtype=int)
-        for k in range(len(triangles_prev)):
-            v1, v2, v3 = triangles_prev[k]
+        for k, triangle in enumerate(triangles_prev):
+            v1, v2, v3 = triangle
             a, v = add_mid_point(v1, v2, mid_cache, v)
             b, v = add_mid_point(v2, v3, mid_cache, v)
             c, v = add_mid_point(v3, v1, mid_cache, v)
