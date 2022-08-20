@@ -162,3 +162,37 @@ def make_tetrahedral_cube(size):
         [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, size / 2.0],
         dtype=float)
     return vertices, tetrahedra, potentials
+
+
+def make_tetrahedral_box(size):
+    """TODO"""
+    mesh_vertices = []
+    v = np.empty((2, 2, 2), dtype=float)
+    half_size = 0.5 * size
+    for i in range(2):
+        x = -half_size[0] if i == 0 else half_size[0]
+        for j in range(2):
+            y = -half_size[1] if j == 0 else half_size[1]
+            for k in range(2):
+                z = -half_size[2] if k == 0 else half_size[2]
+                v[i, j, k] = len(mesh_vertices)
+                mesh_vertices.append([x, y, z])
+    mesh_vertices = np.array(mesh_vertices)
+    print(mesh_vertices)
+    m = np.empty((2, 2, 2), dtype=float)
+    min_half_size = min(half_size)
+    """
+    vertices = size[np.newaxis] * np.array([
+        [-0.5, -0.5, -0.5],
+        [0.5, -0.5, -0.5],
+        [0.5, 0.5, -0.5],
+        [-0.5, 0.5, -0.5],
+        [-0.5, -0.5, 0.5],
+        [0.5, -0.5, 0.5],
+        [0.5, 0.5, 0.5],
+        [-0.5, 0.5, 0.5],
+    ])
+    """
+    print(vertices)
+
+make_tetrahedral_box(np.array([0.5, 1.0, 2.0]))
