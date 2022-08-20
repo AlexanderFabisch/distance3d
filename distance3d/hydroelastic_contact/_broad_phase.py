@@ -1,4 +1,5 @@
 import aabbtree
+import numpy as np
 import numba
 from ._mesh_processing import tetrahedral_mesh_aabbs
 
@@ -60,15 +61,17 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2):
 
 @numba.njit(cache=True)
 def _all_aabbs_overlap(aabbs1, aabbs2):
-    broad_tetrahedra1 = []
-    broad_tetrahedra2 = []
+    indices1 = []
+    indices2 = []
     broad_pairs = []
     for i in range(len(aabbs1)):
         for j in range(len(aabbs2)):
             if _aabbs_overlap(aabbs1[i], aabbs2[j]):
-                broad_tetrahedra1.append(i)
-                broad_tetrahedra2.append(j)
+                indices1.append(i)
+                indices2.append(j)
                 broad_pairs.append((i, j))
+    broad_tetrahedra1 = np.array(indices1, dtype=np.dtype("int"))
+    broad_tetrahedra2 = np.array(indices2, dtype=np.dtype("int"))
     return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
 
 
