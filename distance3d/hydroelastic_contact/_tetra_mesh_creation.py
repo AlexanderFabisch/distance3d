@@ -165,7 +165,11 @@ def make_tetrahedral_cube(size):
 
 
 def make_tetrahedral_box(size):
-    """TODO"""
+    """TODO
+
+    Source: Drake (https://github.com/RobotLocomotion/drake/blob/6b4664c2b4c4a7f52d24d16898d0bc2cc7f2b893/geometry/proximity/make_box_mesh.cc#L245),
+    BSD 3-clause
+    """
     mesh_vertices = []
     v = np.empty((2, 2, 2), dtype=float)
     half_size = 0.5 * size
