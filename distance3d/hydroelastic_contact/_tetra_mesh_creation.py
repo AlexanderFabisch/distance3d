@@ -242,6 +242,3 @@ def _split_to_tetrahedra(v0, v1, v2, v3, v4, v5, v6, v7):
             elements.append([previous, next, v0, v6])
         previous = next
     return elements
-
-
-make_tetrahedral_box(np.array([0.5, 1.0, 2.0]))
