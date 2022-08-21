@@ -1,7 +1,7 @@
 import numpy as np
 from ..utils import transform_points, invert_transform
 from ._tetra_mesh_creation import (
-    make_tetrahedral_icosphere, make_tetrahedral_cube)
+    make_tetrahedral_icosphere, make_tetrahedral_cube, make_tetrahedral_box)
 from ._mesh_processing import center_of_mass_tetrahedral_mesh
 
 
@@ -76,6 +76,12 @@ class RigidBody:
         """
         vertices, tetrahedra, potentials = make_tetrahedral_cube(size)
         return RigidBody(cube2origin, vertices, tetrahedra, potentials)
+
+    @staticmethod
+    def make_box(box2origin, size):
+        """TODO"""
+        vertices, tetrahedra, potentials = make_tetrahedral_box(size)
+        return RigidBody(box2origin, vertices, tetrahedra, potentials)
 
     @property
     def tetrahedra_points(self):
