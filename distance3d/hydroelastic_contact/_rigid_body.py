@@ -79,7 +79,21 @@ class RigidBody:
 
     @staticmethod
     def make_box(box2origin, size):
-        """TODO"""
+        """Create box.
+
+        Parameters
+        ----------
+        box2origin : array, shape (4, 4)
+            Pose of the cube.
+
+        size : float
+            Lengths of the edges in each dimension.
+
+        Returns
+        -------
+        rigid_body : RigidBody
+            Box.
+        """
         vertices, tetrahedra, potentials = make_tetrahedral_box(size)
         return RigidBody(box2origin, vertices, tetrahedra, potentials)
 
