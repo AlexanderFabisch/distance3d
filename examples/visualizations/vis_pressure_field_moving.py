@@ -60,18 +60,17 @@ class AnimationCallback:
         return self.mesh1, self.contact_surface
 
 
-cube12origin = np.eye(4)
-rigid_body1 = hydroelastic_contact.RigidBody.make_cube(cube12origin, 0.1)
-cube22origin = np.eye(4)
-cube22origin[:3, 3] = np.array([0.0, 0.03, 0.05])
-rigid_body2 = hydroelastic_contact.RigidBody.make_cube(cube22origin, 0.1)
+box2origin = np.eye(4)
+rigid_body1 = hydroelastic_contact.RigidBody.make_box(box2origin, np.array([0.2, 0.1, 0.1]))
+center = np.array([0.0, 0.03, 0.1])
+rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(center, 0.1, 2)
 
 fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
 
-n_frames = 500
+n_frames = 100
 animation_callback = AnimationCallback(
-    n_frames, rigid_body1, rigid_body2, np.array([0.1, 0.0, 0.05]))
+    n_frames, rigid_body1, rigid_body2, np.array([0.4, 0.0, 0.0]))
 animation_callback.add_artists(fig)
 fig.view_init()
 if "__file__" in globals():
