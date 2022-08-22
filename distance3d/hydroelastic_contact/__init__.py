@@ -19,8 +19,6 @@ from ._contact_surface import ContactSurface
 
 from ._halfplanes import (
     intersect_halfplanes, plot_halfplanes_and_intersections)
-from ._tetra_mesh_creation import (
-    make_tetrahedral_icosphere, make_tetrahedral_cube, make_tetrahedral_box)
 from ._mesh_processing import (
     center_of_mass_tetrahedral_mesh, tetrahedral_mesh_aabbs,
     tetrahedral_mesh_volumes)
@@ -34,9 +32,8 @@ __all__ = [
     "contact_forces", "find_contact_surface", "RigidBody", "ContactSurface",
     # exported for unit tests and specific examples:
     "intersect_halfplanes", "plot_halfplanes_and_intersections",
-    "make_tetrahedral_icosphere", "make_tetrahedral_cube",
-    "make_tetrahedral_box", "center_of_mass_tetrahedral_mesh",
-    "tetrahedral_mesh_aabbs", "tetrahedral_mesh_volumes",
-    "barycentric_transforms", "intersect_tetrahedron_pair",
-    "compute_contact_force", "broad_phase_tetrahedra"
+    "center_of_mass_tetrahedral_mesh", "tetrahedral_mesh_aabbs",
+    "tetrahedral_mesh_volumes", "barycentric_transforms",
+    "intersect_tetrahedron_pair", "compute_contact_force",
+    "broad_phase_tetrahedra"
 ]
