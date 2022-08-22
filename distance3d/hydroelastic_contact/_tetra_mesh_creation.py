@@ -200,18 +200,26 @@ def make_tetrahedral_box(size):
     m = np.empty((2, 2, 2), dtype=float)
     min_half_size = min(half_size)
     relative_tolerance = 1e-14 * max(1.0, min_half_size)
-    half_central_Ma = half_size - min_half_size
-    half_central_Ma[half_central_Ma <= relative_tolerance] = 0.0
+    half_central = half_size - min_half_size
+    half_central[half_central <= relative_tolerance] = 0.0
     for i in range(2):
-        x = -half_central_Ma[0] if i == 0 else half_central_Ma[0]
+        x = -half_central[0] if i == 0 else half_central[0]
         for j in range(2):
-            y = -half_central_Ma[1] if j == 0 else half_central_Ma[1]
+            y = -half_central[1] if j == 0 else half_central[1]
             for k in range(2):
-                z = -half_central_Ma[2] if k == 0 else half_central_Ma[2]
-                duplicate_in_i = i == 1 and half_central_Ma[0] == 0.0
-                duplicate_in_j = j == 1 and half_central_Ma[1] == 0.0
-                duplicate_in_k = k == 1 and half_central_Ma[2] == 0.0
-                m[i, j, k] = m[0, j, k] if duplicate_in_i else (m[i, 0, k] if duplicate_in_j else (m[i, j, 0] if duplicate_in_k else len(mesh_vertices)))
+                z = -half_central[2] if k == 0 else half_central[2]
+                duplicate_in_i = i == 1 and half_central[0] == 0.0
+                duplicate_in_j = j == 1 and half_central[1] == 0.0
+                duplicate_in_k = k == 1 and half_central[2] == 0.0
+                if duplicate_in_i:
+                    m[i, j, k] = m[0, j, k]
+                elif duplicate_in_j:
+                    m[i, j, k] = m[i, 0, k]
+                elif duplicate_in_k:
+                    m[i, j, k] = m[i, j, 0]
+                else:
+                    m[i, j, k] = len(mesh_vertices)
+
                 if not duplicate_in_i and not duplicate_in_j and not duplicate_in_k:
                     mesh_vertices.append([x, y, z])
     mesh_vertices = np.array(mesh_vertices)
@@ -219,28 +227,28 @@ def make_tetrahedral_box(size):
 
     mesh_elements = []
     mesh_elements.extend(_split_to_tetrahedra(
-        m[1][0][0], m[1][1][0], m[1][1][1], m[1][0][1],
-        v[1][0][0], v[1][1][0], v[1][1][1], v[1][0][1]
+        m[1, 0, 0], m[1, 1, 0], m[1, 1, 1], m[1, 0, 1],
+        v[1, 0, 0], v[1, 1, 0], v[1, 1, 1], v[1, 0, 1]
     ))
     mesh_elements.extend(_split_to_tetrahedra(
-        m[0][0][0], m[0][0][1], m[0][1][1], m[0][1][0],
-        v[0][0][0], v[0][0][1], v[0][1][1], v[0][1][0]
+        m[0, 0, 0], m[0, 0, 1], m[0, 1, 1], m[0, 1, 0],
+        v[0, 0, 0], v[0, 0, 1], v[0, 1, 1], v[0, 1, 0]
     ))
     mesh_elements.extend(_split_to_tetrahedra(
-        m[0][1][0], m[0][1][1], m[1][1][1], m[1][1][0],
-        v[0][1][0], v[0][1][1], v[1][1][1], v[1][1][0]
+        m[0, 1, 0], m[0, 1, 1], m[1, 1, 1], m[1, 1, 0],
+        v[0, 1, 0], v[0, 1, 1], v[1, 1, 1], v[1, 1, 0]
     ))
     mesh_elements.extend(_split_to_tetrahedra(
-        m[0][0][0], m[1][0][0], m[1][0][1], m[0][0][1],
-        v[0][0][0], v[1][0][0], v[1][0][1], v[0][0][1]
+        m[0, 0, 0], m[1, 0, 0], m[1, 0, 1], m[0, 0, 1],
+        v[0, 0, 0], v[1, 0, 0], v[1, 0, 1], v[0, 0, 1]
     ))
     mesh_elements.extend(_split_to_tetrahedra(
-        m[0][0][1], m[1][0][1], m[1][1][1], m[0][1][1],
-        v[0][0][1], v[1][0][1], v[1][1][1], v[0][1][1]
+        m[0, 0, 1], m[1, 0, 1], m[1, 1, 1], m[0, 1, 1],
+        v[0, 0, 1], v[1, 0, 1], v[1, 1, 1], v[0, 1, 1]
     ))
     mesh_elements.extend(_split_to_tetrahedra(
-        m[0][0][0], m[0][1][0], m[1][1][0], m[1][0][0],
-        v[0][0][0], v[0][1][0], v[1][1][0], v[1][0][0]
+        m[0, 0, 0], m[0, 1, 0], m[1, 1, 0], m[1, 0, 0],
+        v[0, 0, 0], v[0, 1, 0], v[1, 1, 0], v[1, 0, 0]
     ))
     mesh_elements = np.array(mesh_elements, dtype=int)
 
