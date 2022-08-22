@@ -86,7 +86,7 @@ class RigidBody:
         box2origin : array, shape (4, 4)
             Pose of the cube.
 
-        size : float
+        size : array, shape (3,)
             Lengths of the edges in each dimension.
 
         Returns

@@ -108,30 +108,29 @@ def test_intersect_halfplanes():
 
 def test_center_of_mass_tetrahedral_mesh():
     center = np.array([0.0, 0.2, -0.3])
-    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_icosphere(
-        center, 0.2)
-    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(vertices[tetrahedra])
+    sphere = hydroelastic_contact.RigidBody.make_sphere(center, 0.2)
+    sphere.express_in(np.eye(4))
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(sphere.tetrahedra_points)
     assert_array_almost_equal(com, center)
 
     size = 1.0
-    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_cube(size)
-    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(vertices[tetrahedra])
+    cube = hydroelastic_contact.RigidBody.make_cube(np.eye(4), size)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(cube.tetrahedra_points)
     assert_array_almost_equal(com, np.zeros(3))
 
     size = np.array([1.0, 2.0, 3.0])
-    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_box(size)
-    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(vertices[tetrahedra])
+    box = hydroelastic_contact.RigidBody.make_box(np.eye(4), size)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(box.tetrahedra_points)
     assert_array_almost_equal(com, np.zeros(3))
 
 
 def test_tetrahedral_mesh_aabbs():
     center = np.array([0.0, 0.2, -0.3])
-    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_icosphere(
-        center, 0.2, 2)
-    tetrahedra_points = vertices[tetrahedra]
-    aabbs = hydroelastic_contact.tetrahedral_mesh_aabbs(tetrahedra_points)
-    for i in range(len(tetrahedra_points)):
-        mins, maxs = containment.axis_aligned_bounding_box(tetrahedra_points[i])
+    rb = hydroelastic_contact.RigidBody.make_sphere(center, 0.2, 2)
+    rb.express_in(np.eye(4))
+    aabbs = hydroelastic_contact.tetrahedral_mesh_aabbs(rb.tetrahedra_points)
+    for i in range(len(rb.tetrahedra_points)):
+        mins, maxs = containment.axis_aligned_bounding_box(rb.tetrahedra_points[i])
         assert_array_almost_equal(mins, aabbs[i, :, 0])
         assert_array_almost_equal(maxs, aabbs[i, :, 1])
 
@@ -139,20 +138,20 @@ def test_tetrahedral_mesh_aabbs():
 def test_tetrahedral_mesh_volumes():
     center = np.array([1.0, 2.0, 3.0])
     radius = 1.0
-    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_icosphere(
-        center, radius, 5)
-    V = hydroelastic_contact.tetrahedral_mesh_volumes(vertices[tetrahedra])
+    sphere = hydroelastic_contact.RigidBody.make_sphere(center, radius)
+    sphere.express_in(np.eye(4))
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(sphere.tetrahedra_points)
     sphere_volume = 4.0 / 3.0 * np.pi * radius ** 3
     assert approx(np.sum(V), abs=1e-2) == sphere_volume
 
     size = 1.0
-    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_cube(size)
-    V = hydroelastic_contact.tetrahedral_mesh_volumes(vertices[tetrahedra])
+    cube = hydroelastic_contact.RigidBody.make_cube(np.eye(4), size)
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(cube.tetrahedra_points)
     cube_volume = size ** 3
     assert approx(np.sum(V)) == cube_volume
 
     size = np.array([1.0, 2.0, 3.0])
-    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_box(size)
-    V = hydroelastic_contact.tetrahedral_mesh_volumes(vertices[tetrahedra])
+    box = hydroelastic_contact.RigidBody.make_box(np.eye(4), size)
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(box.tetrahedra_points)
     box_volume = np.product(size)
     assert approx(np.sum(V)) == box_volume

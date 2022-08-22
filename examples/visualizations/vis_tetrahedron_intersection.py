@@ -9,11 +9,13 @@ import pytransform3d.visualizer as pv
 from distance3d import hydroelastic_contact, visualization
 
 
-vertices1, tetrahedra1, _ = hydroelastic_contact.make_tetrahedral_icosphere(np.array([0.1, 0.2, 0.1]), 1.0, order=2)
-vertices2, tetrahedra2, _ = hydroelastic_contact.make_tetrahedral_icosphere(np.array([0.05, 0.15, 1.6]), 1.0, order=2)
+sphere1 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.1, 0.2, 0.1]), 1.0, order=2)
+sphere1.express_in(np.eye(4))
+sphere2 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.05, 0.15, 1.6]), 1.0, order=2)
+sphere2.express_in(np.eye(4))
 
-tetrahedron1 = vertices1[tetrahedra1[257]]
-tetrahedron2 = vertices2[tetrahedra2[310]]
+tetrahedron1 = sphere1.tetrahedra_points[257]
+tetrahedron2 = sphere2.tetrahedra_points[310]
 
 epsilon1 = np.array([0.0, 0.0, 0.0, 1.0])
 epsilon2 = np.array([0.0, 0.0, 0.0, 1.0])
