@@ -165,10 +165,26 @@ def make_tetrahedral_cube(size):
 
 
 def make_tetrahedral_box(size):
-    """TODO
+    """Creates a tetrahedral box mesh.
 
     Source: Drake (https://github.com/RobotLocomotion/drake/blob/6b4664c2b4c4a7f52d24d16898d0bc2cc7f2b893/geometry/proximity/make_box_mesh.cc#L245),
     BSD 3-clause
+
+    Parameters
+    ----------
+    size : array, shape (3,)
+        Lengths of the edges in each dimension.
+
+    Returns
+    -------
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    tetrahedra : array, shape (n_tetrahedra, 4)
+        Indices of vertices that form tetrahedra of the mesh.
+
+    potentials : array, shape (n_vertices, 3)
+        Potential of each vertex.
     """
     mesh_vertices = []
     v = np.empty((2, 2, 2), dtype=float)
