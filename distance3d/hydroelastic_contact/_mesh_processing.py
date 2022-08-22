@@ -35,12 +35,12 @@ def center_of_mass_tetrahedral_mesh(tetrahedra_points):
     com : array, shape (3,)
         Center of mass.
     """
-    volumes = _tetrahedral_mesh_volumes(tetrahedra_points)
+    volumes = tetrahedral_mesh_volumes(tetrahedra_points)
     centers = tetrahedra_points.mean(axis=1)
     return np.dot(volumes, centers) / np.sum(volumes)
 
 
-def _tetrahedral_mesh_volumes(tetrahedra_points):
+def tetrahedral_mesh_volumes(tetrahedra_points):
     """Compute volumes of tetrahedra.
 
     Parameters

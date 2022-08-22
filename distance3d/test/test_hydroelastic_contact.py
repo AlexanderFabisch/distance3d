@@ -1,6 +1,7 @@
 import numpy as np
 from distance3d import hydroelastic_contact, containment
 from numpy.testing import assert_array_almost_equal
+from pytest import approx
 
 
 def test_contact_forces():
@@ -109,9 +110,18 @@ def test_center_of_mass_tetrahedral_mesh():
     center = np.array([0.0, 0.2, -0.3])
     vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_icosphere(
         center, 0.2)
-    tetrahedra_points = vertices[tetrahedra]
-    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(tetrahedra_points)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(vertices[tetrahedra])
     assert_array_almost_equal(com, center)
+
+    size = 1.0
+    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_cube(size)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(vertices[tetrahedra])
+    assert_array_almost_equal(com, np.zeros(3))
+
+    size = np.array([1.0, 2.0, 3.0])
+    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_box(size)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(vertices[tetrahedra])
+    assert_array_almost_equal(com, np.zeros(3))
 
 
 def test_tetrahedral_mesh_aabbs():
@@ -124,3 +134,25 @@ def test_tetrahedral_mesh_aabbs():
         mins, maxs = containment.axis_aligned_bounding_box(tetrahedra_points[i])
         assert_array_almost_equal(mins, aabbs[i, :, 0])
         assert_array_almost_equal(maxs, aabbs[i, :, 1])
+
+
+def test_tetrahedral_mesh_volumes():
+    center = np.array([1.0, 2.0, 3.0])
+    radius = 1.0
+    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_icosphere(
+        center, radius, 5)
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(vertices[tetrahedra])
+    sphere_volume = 4.0 / 3.0 * np.pi * radius ** 3
+    assert approx(np.sum(V), abs=1e-2) == sphere_volume
+
+    size = 1.0
+    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_cube(size)
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(vertices[tetrahedra])
+    cube_volume = size ** 3
+    assert approx(np.sum(V)) == cube_volume
+
+    size = np.array([1.0, 2.0, 3.0])
+    vertices, tetrahedra, _ = hydroelastic_contact.make_tetrahedral_box(size)
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(vertices[tetrahedra])
+    box_volume = np.product(size)
+    assert approx(np.sum(V)) == box_volume
