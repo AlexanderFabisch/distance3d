@@ -113,6 +113,11 @@ def test_center_of_mass_tetrahedral_mesh():
     com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(sphere.tetrahedra_points)
     assert_array_almost_equal(com, center)
 
+    radii = np.array([1.0, 2.0, 3.0])
+    ellipsoid = hydroelastic_contact.RigidBody.make_ellipsoid(np.eye(4), radii)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(ellipsoid.tetrahedra_points)
+    assert_array_almost_equal(com, np.zeros(3))
+
     size = 1.0
     cube = hydroelastic_contact.RigidBody.make_cube(np.eye(4), size)
     com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(cube.tetrahedra_points)
@@ -143,6 +148,12 @@ def test_tetrahedral_mesh_volumes():
     V = hydroelastic_contact.tetrahedral_mesh_volumes(sphere.tetrahedra_points)
     sphere_volume = 4.0 / 3.0 * np.pi * radius ** 3
     assert approx(np.sum(V), abs=1e-2) == sphere_volume
+
+    radii = np.array([1.0, 2.0, 3.0])
+    ellipsoid = hydroelastic_contact.RigidBody.make_ellipsoid(np.eye(4), radii, 5)
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(ellipsoid.tetrahedra_points)
+    ellipsoid_volume = 4.0 / 3.0 * np.pi * np.product(radii)
+    assert approx(np.sum(V), abs=1e-1) == ellipsoid_volume
 
     size = 1.0
     cube = hydroelastic_contact.RigidBody.make_cube(np.eye(4), size)
