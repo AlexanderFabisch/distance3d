@@ -79,14 +79,11 @@ def make_triangular_icosphere(center, radius, order=4):
     return vertices, triangles
 
 
-def make_tetrahedral_icosphere(center, radius, order=4):
+def make_tetrahedral_sphere(radius, order=4):
     """Creates a tetrahedral icosphere mesh.
 
     Parameters
     ----------
-    center : array, shape (3,)
-        Center of the sphere.
-
     radius : float
         Radius of the sphere.
 
@@ -104,9 +101,9 @@ def make_tetrahedral_icosphere(center, radius, order=4):
     potentials : array, shape (n_vertices, 3)
         Potential of each vertex.
     """
-    vertices, triangles = make_triangular_icosphere(center, radius, order)
+    vertices, triangles = make_triangular_icosphere(np.zeros(3), radius, order)
     center_idx = len(vertices)
-    vertices = np.vstack((vertices, center[np.newaxis]))
+    vertices = np.vstack((vertices, np.zeros((1, 3))))
     tetrahedra = np.hstack(
         (triangles, center_idx * np.ones((len(triangles), 1), dtype=int)))
     potentials = np.zeros(len(vertices))
