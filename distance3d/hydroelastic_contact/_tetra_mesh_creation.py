@@ -114,6 +114,39 @@ def make_tetrahedral_icosphere(center, radius, order=4):
     return vertices, tetrahedra, potentials
 
 
+def make_tetrahedral_ellipsoid(radii, order=4):
+    """Creates a tetrahedral ellipsoid mesh.
+
+    Parameters
+    ----------
+    radii : array, shape (3,)
+        Radii of the ellipsoid.
+
+    order : int, optional (default: 4)
+        Number of subdivisions of initial 20 triangles.
+
+    Returns
+    -------
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    tetrahedra : array, shape (n_tetrahedra, 4)
+        Indices of vertices that form tetrahedra of the mesh.
+
+    potentials : array, shape (n_vertices, 3)
+        Potential of each vertex.
+    """
+    vertices, triangles = make_triangular_icosphere(np.zeros(3), 1.0, order)
+    vertices *= radii[np.newaxis]
+    center_idx = len(vertices)
+    vertices = np.vstack((vertices, np.zeros((1, 3))))
+    tetrahedra = np.hstack(
+        (triangles, center_idx * np.ones((len(triangles), 1), dtype=int)))
+    potentials = np.zeros(len(vertices))
+    potentials[-1] = min(radii)
+    return vertices, tetrahedra, potentials
+
+
 def make_tetrahedral_cube(size):
     """Creates a tetrahedral cube mesh.
 

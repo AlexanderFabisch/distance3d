@@ -1,7 +1,8 @@
 import numpy as np
 from ..utils import transform_points, invert_transform
 from ._tetra_mesh_creation import (
-    make_tetrahedral_icosphere, make_tetrahedral_cube, make_tetrahedral_box)
+    make_tetrahedral_icosphere, make_tetrahedral_ellipsoid,
+    make_tetrahedral_cube, make_tetrahedral_box)
 from ._mesh_processing import center_of_mass_tetrahedral_mesh
 
 
@@ -56,6 +57,30 @@ class RigidBody:
         vertices, tetrahedra, potentials = make_tetrahedral_icosphere(
             np.zeros(3), radius, order)
         return RigidBody(mesh2origin, vertices, tetrahedra, potentials)
+
+    @staticmethod
+    def make_ellipsoid(ellipsoid2origin, radii, order=4):
+        """Create ellipsoid.
+
+        Parameters
+        ----------
+        ellipsoid2origin : array, shape (4, 4)
+            Pose of the ellipsoid.
+
+        radii : array, shape (3,)
+            Radii of the ellipsoid.
+
+        order : int, optional (default: 4)
+            Number of subdivisions of initial 20 triangles.
+
+        Returns
+        -------
+        rigid_body : RigidBody
+            Ellipsoid.
+        """
+        vertices, tetrahedra, potentials = make_tetrahedral_ellipsoid(
+            radii, order)
+        return RigidBody(ellipsoid2origin, vertices, tetrahedra, potentials)
 
     @staticmethod
     def make_cube(cube2origin, size):
