@@ -1,7 +1,7 @@
 import numpy as np
 from ..utils import transform_points, invert_transform
 from ._tetra_mesh_creation import (
-    make_tetrahedral_icosphere, make_tetrahedral_ellipsoid,
+    make_tetrahedral_sphere, make_tetrahedral_ellipsoid,
     make_tetrahedral_cube, make_tetrahedral_box)
 from ._mesh_processing import center_of_mass_tetrahedral_mesh
 
@@ -54,8 +54,8 @@ class RigidBody:
         """
         mesh2origin = np.eye(4)
         mesh2origin[:3, 3] = center
-        vertices, tetrahedra, potentials = make_tetrahedral_icosphere(
-            np.zeros(3), radius, order)
+        vertices, tetrahedra, potentials = make_tetrahedral_sphere(
+            radius, order)
         return RigidBody(mesh2origin, vertices, tetrahedra, potentials)
 
     @staticmethod
