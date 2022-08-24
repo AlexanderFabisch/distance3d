@@ -2,7 +2,7 @@ import numpy as np
 from ..utils import transform_points, invert_transform
 from ._tetra_mesh_creation import (
     make_tetrahedral_sphere, make_tetrahedral_ellipsoid,
-    make_tetrahedral_cube, make_tetrahedral_box)
+    make_tetrahedral_cube, make_tetrahedral_box, make_tetrahedral_cylinder)
 from ._mesh_processing import center_of_mass_tetrahedral_mesh
 
 
@@ -109,7 +109,7 @@ class RigidBody:
         Parameters
         ----------
         box2origin : array, shape (4, 4)
-            Pose of the cube.
+            Pose of the box.
 
         size : array, shape (3,)
             Lengths of the edges in each dimension.
@@ -121,6 +121,36 @@ class RigidBody:
         """
         vertices, tetrahedra, potentials = make_tetrahedral_box(size)
         return RigidBody(box2origin, vertices, tetrahedra, potentials)
+
+    @staticmethod
+    def make_cylinder(cylinder2origin, radius, length, resolution_hint=0.1):
+        """Create box.
+
+        Parameters
+        ----------
+        cylinder2origin : array, shape (4, 4)
+            Pose of the cylinder.
+
+        radius : float
+            Radius of the cylinder.
+
+        length : float
+            Length of the cylinder.
+
+        resolution_hint : float, optional (default: 0.1)
+            Controls the fineness of the tetrahedral mesh. The coarsest mesh
+            that produces desirable results will allow simulation to run as
+            efficiently as possible. The circles of the cylinder will have
+            2 * pi * radius / resolution_hint edges.
+
+        Returns
+        -------
+        rigid_body : RigidBody
+            Box.
+        """
+        vertices, tetrahedra, potentials = make_tetrahedral_cylinder(
+            radius, length, resolution_hint)
+        return RigidBody(cylinder2origin, vertices, tetrahedra, potentials)
 
     @property
     def tetrahedra_points(self):

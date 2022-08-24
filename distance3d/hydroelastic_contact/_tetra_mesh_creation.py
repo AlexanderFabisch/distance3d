@@ -1,3 +1,4 @@
+import enum
 import math
 import numpy as np
 
@@ -294,5 +295,167 @@ def _split_to_tetrahedra(v0, v1, v2, v3, v4, v5, v6, v7):
     for next in [v2, v3, v7, v4, v5, v1]:
         if len({previous, next, v0, v6}) == 4:
             elements.append([previous, next, v0, v6])
+        previous = next
+    return elements
+
+
+def make_tetrahedral_cylinder(radius, length, resolution_hint):
+    """TODO
+
+    Source: Drake (https://github.com/RobotLocomotion/drake/blob/665f178d7c61edef1a4961cc44bb320062224944/geometry/proximity/make_cylinder_mesh.cc#L345),
+    BSD 3-clause
+
+    TODO
+    """
+    top_z = 0.5 * length
+    bottom_z = -top_z
+    tolerance = 1e-14 * max(1.0, min(top_z, radius))
+    cylinder_class = CylinderClass.Medium
+    if top_z - radius > tolerance:
+        cylinder_class = CylinderClass.Long
+    elif radius - top_z > tolerance:
+        cylinder_class = CylinderClass.Short
+
+    n_vertices_per_circle = max(3, math.ceil(2.0 * np.pi * radius / resolution_hint))
+    assert isinstance(n_vertices_per_circle, int)  # TODO remove
+
+    mesh_vertices = []
+
+    bottom_center = len(mesh_vertices)
+    mesh_vertices.append(np.array([0.0, 0.0, bottom_z]))
+    top_center = len(mesh_vertices)
+    mesh_vertices.append(np.array([0.0, 0.0, top_z]))
+
+    bottom = []
+    top = []
+    angle_step = 2.0 * np.pi / n_vertices_per_circle
+    for i in range(n_vertices_per_circle):
+        x = radius * np.cos(angle_step * i)
+        y = radius * np.sin(angle_step * i)
+        bottom.append(len(mesh_vertices))
+        mesh_vertices.append(np.array([x, y, bottom_z]))
+        top.append(len(mesh_vertices))
+        mesh_vertices.append(np.array([x, y, top_z]))
+
+    n_outer_vertices = len(mesh_vertices)
+
+    potentials = [0.0] * n_outer_vertices
+
+    if cylinder_class == CylinderClass.Long:
+        mesh_elements = _calc_long_cylinder_volume_mesh_with_ma(
+            radius, length, n_vertices_per_circle, bottom_center, bottom,
+            top_center, top, mesh_vertices, potentials)
+    elif cylinder_class == CylinderClass.Medium:
+        mesh_elements = _calc_medium_cylinder_volume_mesh_with_ma(
+            radius, n_vertices_per_circle, bottom_center, bottom, top_center,
+            top, mesh_vertices, potentials)
+    else:
+        assert cylinder_class == CylinderClass.Short
+        mesh_elements = _calc_short_cylinder_volume_mesh_with_ma(
+            radius, length, n_vertices_per_circle, bottom_center, bottom,
+            top_center, top, mesh_vertices, potentials)
+
+    return (np.array(mesh_vertices), np.array(mesh_elements, dtype=int),
+            np.array(potentials))
+
+
+class CylinderClass(enum.Enum):
+    Long = 0
+    Medium = 1
+    Short = 2
+
+
+def _calc_long_cylinder_volume_mesh_with_ma(
+        radius, length, n_vertices_per_circle, bottom_center, bottom,
+        top_center, top, mesh_vertices, potentials):
+    medial = []
+    offset_distance = radius
+    top_z = 0.5 * length
+    offset_top_z = top_z - offset_distance
+    offset_bottom_z = -offset_top_z
+    medial.append(len(mesh_vertices))
+    mesh_vertices.append(np.array([0.0, 0.0, offset_bottom_z]))
+    potentials.append(radius)
+    medial.append(len(mesh_vertices))
+    mesh_vertices.append(np.array([0.0, 0.0, offset_top_z]))
+    potentials.append(radius)
+
+    mesh_elements = []
+    i = n_vertices_per_circle - 1
+    for j in range(n_vertices_per_circle):
+        mesh_elements.append([bottom_center, bottom[i], bottom[j], medial[0]])
+        mesh_elements.append([top_center, top[j], top[i], medial[1]])
+        mesh_elements.extend(_split_triangular_prism_to_tetrahedra(
+            medial[0], bottom[i], bottom[j], medial[1], top[i], top[j]))
+        i = j
+
+    return mesh_elements
+
+
+def _calc_medium_cylinder_volume_mesh_with_ma(
+        radius, n_vertices_per_circle, bottom_center, bottom, top_center, top,
+        mesh_vertices, potentials):
+    medial = len(mesh_vertices)
+    mesh_vertices.append(np.array([0.0, 0.0, 0.0]))
+    potentials.append(radius)
+
+    mesh_elements = []
+    i = n_vertices_per_circle - 1
+    for j in range(n_vertices_per_circle):
+        mesh_elements.append([bottom_center, bottom[i], bottom[j], medial])
+        mesh_elements.append([top_center, top[j], top[i], medial])
+        mesh_elements.extend(_split_pyramid_to_tetrahedra(
+            top[i], top[j], bottom[j], bottom[i], medial))
+        i = j
+
+    return mesh_elements
+
+
+def _calc_short_cylinder_volume_mesh_with_ma(
+        radius, length, n_vertices_per_circle, bottom_center, bottom,
+        top_center, top, mesh_vertices, potentials):
+    center = len(mesh_vertices)
+    mesh_vertices.append(np.array([0.0, 0.0, 0.0]))
+    half_length = 0.5 * length
+    potentials.append(half_length)
+
+    medial = []
+    medial_radius = radius - half_length
+    scale_cylinder_radius_to_medial_circle = medial_radius / radius
+    for i in range(n_vertices_per_circle):
+        x = mesh_vertices[bottom[i]][0] * scale_cylinder_radius_to_medial_circle
+        y = mesh_vertices[bottom[i]][1] * scale_cylinder_radius_to_medial_circle
+        medial.append(len(mesh_vertices))
+        mesh_vertices.append(np.array([x, y, 0.0]))
+        potentials.append(half_length)
+
+    mesh_elements = []
+    i = n_vertices_per_circle - 1
+    for j in range(n_vertices_per_circle):
+        mesh_elements.extend(_split_triangular_prism_to_tetrahedra(
+            bottom_center, bottom[i], bottom[j], center, medial[i], medial[j]))
+        mesh_elements.extend(_split_triangular_prism_to_tetrahedra(
+            center, medial[i], medial[j], top_center, top[i], top[j]))
+        mesh_elements.extend(_split_triangular_prism_to_tetrahedra(
+            bottom[i], medial[i], top[i], bottom[j], medial[j], top[j]))
+        i = j
+
+    return mesh_elements
+
+
+def _split_triangular_prism_to_tetrahedra(v0, v1, v2, v3, v4, v5):
+    elements = []
+    previous = v3
+    for next in [v4, v1, v2]:
+        elements.append([previous, next, v0, v5])
+        previous = next
+    return elements
+
+
+def _split_pyramid_to_tetrahedra(v0, v1, v2, v3, v4):
+    elements = []
+    previous = v3
+    for next in [v4, v1]:
+        elements.append([previous, next, v0, v2])
         previous = next
     return elements
