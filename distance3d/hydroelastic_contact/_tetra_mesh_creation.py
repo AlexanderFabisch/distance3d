@@ -300,12 +300,35 @@ def _split_to_tetrahedra(v0, v1, v2, v3, v4, v5, v6, v7):
 
 
 def make_tetrahedral_cylinder(radius, length, resolution_hint):
-    """TODO
+    """Creates a tetrahedral cylinder mesh.
 
     Source: Drake (https://github.com/RobotLocomotion/drake/blob/665f178d7c61edef1a4961cc44bb320062224944/geometry/proximity/make_cylinder_mesh.cc#L345),
     BSD 3-clause
 
-    TODO
+    Parameters
+    ----------
+    radius : float
+        Radius of the cylinder.
+
+    length : float
+        Length of the cylinder.
+
+    resolution_hint : float, optional (default: 0.1)
+        Controls the fineness of the tetrahedral mesh. The coarsest mesh
+        that produces desirable results will allow simulation to run as
+        efficiently as possible. The circles of the cylinder will have
+        2 * pi * radius / resolution_hint edges.
+
+    Returns
+    -------
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    tetrahedra : array, shape (n_tetrahedra, 4)
+        Indices of vertices that form tetrahedra of the mesh.
+
+    potentials : array, shape (n_vertices, 3)
+        Potential of each vertex.
     """
     top_z = 0.5 * length
     bottom_z = -top_z
@@ -317,7 +340,6 @@ def make_tetrahedral_cylinder(radius, length, resolution_hint):
         cylinder_class = CylinderClass.Short
 
     n_vertices_per_circle = max(3, math.ceil(2.0 * np.pi * radius / resolution_hint))
-    assert isinstance(n_vertices_per_circle, int)  # TODO remove
 
     mesh_vertices = []
 
