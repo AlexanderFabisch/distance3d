@@ -128,6 +128,24 @@ def test_center_of_mass_tetrahedral_mesh():
     com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(box.tetrahedra_points)
     assert_array_almost_equal(com, np.zeros(3))
 
+    long_cylinder = hydroelastic_contact.RigidBody.make_cylinder(
+        np.eye(4), 0.1, 1.0, resolution_hint=0.1)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(
+        long_cylinder.tetrahedra_points)
+    assert_array_almost_equal(com, np.zeros(3))
+
+    medium_cylinder = hydroelastic_contact.RigidBody.make_cylinder(
+        np.eye(4), 0.1, 0.2, resolution_hint=0.1)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(
+        medium_cylinder.tetrahedra_points)
+    assert_array_almost_equal(com, np.zeros(3))
+
+    short_cylinder = hydroelastic_contact.RigidBody.make_cylinder(
+        np.eye(4), 0.1, 0.1, resolution_hint=0.1)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(
+        short_cylinder.tetrahedra_points)
+    assert_array_almost_equal(com, np.zeros(3))
+
 
 def test_tetrahedral_mesh_aabbs():
     center = np.array([0.0, 0.2, -0.3])
@@ -166,3 +184,27 @@ def test_tetrahedral_mesh_volumes():
     V = hydroelastic_contact.tetrahedral_mesh_volumes(box.tetrahedra_points)
     box_volume = np.product(size)
     assert approx(np.sum(V)) == box_volume
+
+    radius = 0.1
+    length = 1.0
+    long_cylinder = hydroelastic_contact.RigidBody.make_cylinder(
+        np.eye(4), radius, length, resolution_hint=0.01)
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(long_cylinder.tetrahedra_points)
+    long_cylinder_volume = np.pi * radius ** 2 * length
+    assert approx(np.sum(V), abs=1e-2) == long_cylinder_volume
+
+    radius = 0.1
+    length = 0.2
+    medium_cylinder = hydroelastic_contact.RigidBody.make_cylinder(
+        np.eye(4), radius, length, resolution_hint=0.01)
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(medium_cylinder.tetrahedra_points)
+    medium_cylinder_volume = np.pi * radius ** 2 * length
+    assert approx(np.sum(V), abs=1e-2) == medium_cylinder_volume
+
+    radius = 0.1
+    length = 0.1
+    short_cylinder = hydroelastic_contact.RigidBody.make_cylinder(
+        np.eye(4), radius, length, resolution_hint=0.01)
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(short_cylinder.tetrahedra_points)
+    short_cylinder_volume = np.pi * radius ** 2 * length
+    assert approx(np.sum(V), abs=1e-2) == short_cylinder_volume
