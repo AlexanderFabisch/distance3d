@@ -2,7 +2,8 @@ import numpy as np
 from ..utils import transform_points, invert_transform
 from ._tetra_mesh_creation import (
     make_tetrahedral_sphere, make_tetrahedral_ellipsoid,
-    make_tetrahedral_cube, make_tetrahedral_box, make_tetrahedral_cylinder)
+    make_tetrahedral_cube, make_tetrahedral_box, make_tetrahedral_cylinder,
+    make_tetrahedral_capsule)
 from ._mesh_processing import center_of_mass_tetrahedral_mesh
 
 
@@ -124,7 +125,7 @@ class RigidBody:
 
     @staticmethod
     def make_cylinder(cylinder2origin, radius, length, resolution_hint=0.1):
-        """Create box.
+        """Create cylinder.
 
         Parameters
         ----------
@@ -146,11 +147,42 @@ class RigidBody:
         Returns
         -------
         rigid_body : RigidBody
-            Box.
+            Cylinder.
         """
         vertices, tetrahedra, potentials = make_tetrahedral_cylinder(
             radius, length, resolution_hint)
         return RigidBody(cylinder2origin, vertices, tetrahedra, potentials)
+
+    @staticmethod
+    def make_capsule(capsule2origin, radius, height, resolution_hint=0.1):
+        """Create capsule.
+
+        Parameters
+        ----------
+        capsule2origin : array, shape (4, 4)
+            Pose of the capsule.
+
+        radius : float
+            Radius of the capsule.
+
+        height : float
+            Height of the capsule.
+
+        resolution_hint : float, optional (default: 0.1)
+            Controls the fineness of the tetrahedral mesh. The coarsest mesh
+            that produces desirable results will allow simulation to run as
+            efficiently as possible. The circles of the cylinder and great
+            circles of each hemisphere will have 2 * pi * radius /
+            resolution_hint edges.
+
+        Returns
+        -------
+        rigid_body : RigidBody
+            Capsule.
+        """
+        vertices, tetrahedra, potentials = make_tetrahedral_capsule(
+            radius, height, resolution_hint)
+        return RigidBody(capsule2origin, vertices, tetrahedra, potentials)
 
     @property
     def tetrahedra_points(self):
