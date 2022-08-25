@@ -4,7 +4,7 @@ import numpy as np
 
 
 def make_triangular_icosphere(center, radius, order=4):
-    """Creates a triangular icosphere mesh.
+    """Create a triangular icosphere mesh.
 
     Source: https://observablehq.com/@mourner/fast-icosphere-mesh
 
@@ -81,7 +81,7 @@ def make_triangular_icosphere(center, radius, order=4):
 
 
 def make_tetrahedral_sphere(radius, order=4):
-    """Creates a tetrahedral icosphere mesh.
+    """Create a tetrahedral icosphere mesh.
 
     Parameters
     ----------
@@ -113,7 +113,7 @@ def make_tetrahedral_sphere(radius, order=4):
 
 
 def make_tetrahedral_ellipsoid(radii, order=4):
-    """Creates a tetrahedral ellipsoid mesh.
+    """Create a tetrahedral ellipsoid mesh.
 
     Parameters
     ----------
@@ -146,7 +146,7 @@ def make_tetrahedral_ellipsoid(radii, order=4):
 
 
 def make_tetrahedral_cube(size):
-    """Creates a tetrahedral cube mesh.
+    """Create a tetrahedral cube mesh.
 
     Parameters
     ----------
@@ -196,7 +196,7 @@ def make_tetrahedral_cube(size):
 
 
 def make_tetrahedral_box(size):
-    """Creates a tetrahedral box mesh.
+    """Create a tetrahedral box mesh.
 
     Source: Drake (https://github.com/RobotLocomotion/drake/blob/6b4664c2b4c4a7f52d24d16898d0bc2cc7f2b893/geometry/proximity/make_box_mesh.cc#L245),
     BSD 3-clause
@@ -300,7 +300,7 @@ def _split_to_tetrahedra(v0, v1, v2, v3, v4, v5, v6, v7):
 
 
 def make_tetrahedral_cylinder(radius, length, resolution_hint):
-    """Creates a tetrahedral cylinder mesh.
+    """Create a tetrahedral cylinder mesh.
 
     Source: Drake (https://github.com/RobotLocomotion/drake/blob/665f178d7c61edef1a4961cc44bb320062224944/geometry/proximity/make_cylinder_mesh.cc#L345),
     BSD 3-clause
@@ -313,7 +313,7 @@ def make_tetrahedral_cylinder(radius, length, resolution_hint):
     length : float
         Length of the cylinder.
 
-    resolution_hint : float, optional (default: 0.1)
+    resolution_hint : float
         Controls the fineness of the tetrahedral mesh. The coarsest mesh
         that produces desirable results will allow simulation to run as
         efficiently as possible. The circles of the cylinder will have
@@ -481,3 +481,113 @@ def _split_pyramid_to_tetrahedra(v0, v1, v2, v3, v4):
         elements.append([previous, next, v0, v2])
         previous = next
     return elements
+
+
+def make_tetrahedral_capsule(radius, height, resolution_hint):
+    """Create a tetrahedral capsule mesh.
+
+    Source: Drake (https://github.com/RobotLocomotion/drake/blob/903019faf53b771e8e2fe81222ffd74eae2dc85c/geometry/proximity/make_capsule_mesh.cc#L14),
+    BSD 3-clause
+
+    Parameters
+    ----------
+    radius : float
+        Radius of the capsule.
+
+    height : float
+        Height of the capsule.
+
+    resolution_hint : float
+        Controls the fineness of the tetrahedral mesh. The coarsest mesh
+        that produces desirable results will allow simulation to run as
+        efficiently as possible. The circles of the cylinder and great circles
+        of each hemisphere will have 2 * pi * radius / resolution_hint edges.
+
+    Returns
+    -------
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    tetrahedra : array, shape (n_tetrahedra, 4)
+        Indices of vertices that form tetrahedra of the mesh.
+
+    potentials : array, shape (n_vertices, 3)
+        Potential of each vertex.
+    """
+    medial_top_z = 0.5 * height
+    medial_bottom_z = -medial_top_z
+    top_z = medial_top_z + radius
+    bottom_z = -top_z
+
+    n_vertices_per_circle = int(np.clip(2.0 * np.pi * radius / resolution_hint,
+                                        3.0, 706.0))
+    n_circles_per_cap = n_vertices_per_circle // 2
+
+    mesh_vertices = []
+
+    medial_top = len(mesh_vertices)
+    mesh_vertices.append(np.array([0.0, 0.0, medial_top_z]))
+    medial_bottom = len(mesh_vertices)
+    mesh_vertices.append(np.array([0.0, 0.0, medial_bottom_z]))
+    top = len(mesh_vertices)
+    mesh_vertices.append(np.array([0.0, 0.0, top_z]))
+    bottom = len(mesh_vertices)
+    mesh_vertices.append(np.array([0.0, 0.0, bottom_z]))
+
+    top_cap = []
+    bottom_cap = []
+
+    theta_step = 0.5 * np.pi / n_circles_per_cap
+    phi_step = 2.0 * np.pi / n_vertices_per_circle
+
+    for i in range(n_circles_per_cap):
+        theta = 0.5 * np.pi - i * theta_step
+        s = np.sin(theta)
+        top_circle_z = radius * np.cos(theta) + medial_top_z
+        bottom_circle_z = -top_circle_z
+        for j in range(n_vertices_per_circle):
+            phi = j * phi_step
+            x = radius * s * np.cos(phi)
+            y = radius * s * np.sin(phi)
+
+            top_cap.append(len(mesh_vertices))
+            mesh_vertices.append(np.array([x, y, top_circle_z]))
+            bottom_cap.append(len(mesh_vertices))
+            mesh_vertices.append(np.array([x, y, bottom_circle_z]))
+
+    mesh_elements = []
+    for i in range(n_circles_per_cap - 1):
+        for j in range(n_vertices_per_circle):
+            j1 = (j + 1) % n_vertices_per_circle
+            mesh_elements.extend(_split_pyramid_to_tetrahedra(
+                top_cap[(i + 1) * n_vertices_per_circle + j],
+                top_cap[(i + 1) * n_vertices_per_circle + j1],
+                top_cap[i * n_vertices_per_circle + j1],
+                top_cap[i * n_vertices_per_circle + j],
+                medial_top
+            ))
+            mesh_elements.extend(_split_pyramid_to_tetrahedra(
+                bottom_cap[i * n_vertices_per_circle + j],
+                bottom_cap[i * n_vertices_per_circle + j1],
+                bottom_cap[(i + 1) * n_vertices_per_circle + j1],
+                bottom_cap[(i + 1) * n_vertices_per_circle + j],
+                medial_bottom
+            ))
+
+    last_circle_offset = (n_circles_per_cap - 1) * n_vertices_per_circle
+    for j in range(n_vertices_per_circle):
+        j1 = (j + 1) % n_vertices_per_circle
+        mesh_elements.append([top, top_cap[last_circle_offset + j1],
+                              top_cap[last_circle_offset + j], medial_top])
+        mesh_elements.append([bottom, bottom_cap[last_circle_offset + j],
+                              bottom_cap[last_circle_offset + j1],
+                              medial_bottom])
+        mesh_elements.extend(_split_triangular_prism_to_tetrahedra(
+            medial_bottom, bottom_cap[j], bottom_cap[j1], medial_top,
+            top_cap[j], top_cap[j1]))
+
+    potentials = np.zeros(len(mesh_vertices))
+    potentials[:2] = radius
+
+    return (np.array(mesh_vertices), np.array(mesh_elements, dtype=int),
+            potentials)

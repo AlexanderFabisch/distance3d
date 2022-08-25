@@ -146,6 +146,11 @@ def test_center_of_mass_tetrahedral_mesh():
         short_cylinder.tetrahedra_points)
     assert_array_almost_equal(com, np.zeros(3))
 
+    capsule = hydroelastic_contact.RigidBody.make_capsule(
+        np.eye(4), 0.1, 1.0, resolution_hint=0.1)
+    com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(capsule.tetrahedra_points)
+    assert_array_almost_equal(com, np.zeros(3))
+
 
 def test_tetrahedral_mesh_aabbs():
     center = np.array([0.0, 0.2, -0.3])
@@ -208,3 +213,11 @@ def test_tetrahedral_mesh_volumes():
     V = hydroelastic_contact.tetrahedral_mesh_volumes(short_cylinder.tetrahedra_points)
     short_cylinder_volume = np.pi * radius ** 2 * length
     assert approx(np.sum(V), abs=1e-2) == short_cylinder_volume
+
+    radius = 0.1
+    height = 0.0
+    capsule = hydroelastic_contact.RigidBody.make_capsule(
+        np.eye(4), radius, height, resolution_hint=0.01)
+    V = hydroelastic_contact.tetrahedral_mesh_volumes(capsule.tetrahedra_points)
+    capsule_volume = np.pi * radius ** 2 * length + 4.0 / 3.0 * np.pi * radius ** 3
+    assert approx(np.sum(V), abs=1e-2) == capsule_volume
