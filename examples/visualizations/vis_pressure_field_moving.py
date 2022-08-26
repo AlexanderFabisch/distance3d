@@ -127,7 +127,7 @@ rigid_body2 = hydroelastic_contact.RigidBody.make_capsule(capsule2origin, 0.1, 0
 
 cylinder2origin = np.eye(4)
 cylinder2origin[:3, 3] = np.array([-0.3, 0.0, 0.0])
-rigid_body3 = hydroelastic_contact.RigidBody.make_cylinder(cylinder2origin, 0.1, 0.2, 0.05)
+rigid_body3 = hydroelastic_contact.RigidBody.make_cylinder(cylinder2origin, 0.1, 0.4, 0.05)
 
 ellipsoid2origin = np.eye(4)
 ellipsoid2origin[:3, 3] = np.array([0.3, 0.0, 0.0])
