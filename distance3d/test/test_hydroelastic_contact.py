@@ -86,6 +86,18 @@ def test_rigid_body_transforms():
     assert_array_almost_equal(tetras1_in_2 + 1, tetras1_in_2_2)
 
 
+def test_compute_contact_plane_overlap():
+    sphere = hydroelastic_contact.RigidBody.make_cylinder(
+        np.eye(4), 0.1, 1.0, resolution_hint=0.1)
+    tetrahedron = sphere.tetrahedra_points[0]
+    epsilon = np.array([0.0, 0.0, 0.0, 1.0])
+    X = hydroelastic_contact.barycentric_transforms(
+        tetrahedron.reshape(1, 4, 3))[0]
+    intersection, contact_info = hydroelastic_contact.intersect_tetrahedron_pair(
+        tetrahedron, epsilon, X, tetrahedron, epsilon, X)
+    assert intersection
+
+
 def test_compute_contact_force_overlap():
     sphere = hydroelastic_contact.RigidBody.make_sphere(
         np.array([0.1, 0.2, 0.1]), 1.0, order=2)
