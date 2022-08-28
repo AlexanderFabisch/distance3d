@@ -103,6 +103,9 @@ def compute_contact_force(
 
     if total_area > 0.0:
         intersection_com /= total_area
+    else:
+        intersection_com = contact_polygon[0]
+
     force_vector = total_force * contact_plane_hnf[:3]
     return intersection_com, force_vector, total_area, triangles
 
