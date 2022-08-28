@@ -65,7 +65,9 @@ class ContactSurface:
 
     @property
     def pressures(self):
-        return np.linalg.norm(self.contact_forces, axis=1) / self.contact_areas
+        contact_areas = np.copy(self.contact_areas)
+        contact_areas[contact_areas == 0.0] = 1.0
+        return np.linalg.norm(self.contact_forces, axis=1) / contact_areas
 
     def make_details(self, tetrahedra_points1, tetrahedra_points2):
         """Summarize details of contact points in world frame.

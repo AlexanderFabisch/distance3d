@@ -252,6 +252,8 @@ class ContactSurface(pv.Artist):  # pragma: no cover
             triangles = np.vstack(triangles)
             triangles = np.vstack((triangles, triangles[:, ::-1]))
             max_pressure = max(pressures)
+            if max_pressure <= 0.0:
+                max_pressure = 1.0
             colors = np.vstack([self.cmap(pressure_per_face / max_pressure)[:3]
                                 for pressure_per_face in pressures_per_face])
         else:
