@@ -175,7 +175,7 @@ def contact_plane(X1, X2, epsilon1, epsilon2):
         along plane normal.
 
     same : bool
-        Are both tetrahedrons actually the same tetrahedron?
+        Are both tetrahedrons actually the same tetrahedron (maybe scaled)?
     """
     # TODO Young's modulus, see Eq. 16 of paper
     plane_hnf = epsilon1.dot(X1) - epsilon2.dot(X2)
