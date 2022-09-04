@@ -23,18 +23,24 @@ def parse_args():
 def main():
     args = parse_args()
 
-    triangular_vertices, triangles = io.load_mesh(args.triangle_mesh)
-    tetrahedral_vertices, tetrahedra = io.load_tetrahedral_mesh(args.tetrahedral_mesh)
+    surface_vertices, surface_triangles = io.load_mesh(args.triangle_mesh)
+    volume_vertices, _ = io.load_tetrahedral_mesh(args.tetrahedral_mesh)
 
-    potentials = []
-    for v in tetrahedral_vertices:
-        distances = [distance.point_to_triangle(v, triangular_vertices[t])[0]
-                     for t in triangles]
-        min_distance = min(distances)
-        potentials.append(min_distance)
+    potentials = compute_potentials(
+        surface_triangles, surface_vertices, volume_vertices)
 
     with open(args.output, "w") as f:
         json.dump(potentials, f)
+
+
+def compute_potentials(surface_triangles, surface_vertices, volume_vertices):
+    potentials = []
+    for v in volume_vertices:
+        distance_to_surface = min([
+            distance.point_to_triangle(v, surface_vertices[t])[0]
+            for t in surface_triangles])
+        potentials.append(distance_to_surface)
+    return potentials
 
 
 if __name__ == "__main__":
