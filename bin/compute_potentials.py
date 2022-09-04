@@ -4,10 +4,19 @@ from distance3d import io, distance
 
 
 def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("triangle_mesh", type=str, help="Triangle mesh file")
-    parser.add_argument("tetrahedral_mesh", type=str, help="Tetrahedral mesh file")
-    parser.add_argument("output", type=str, help="Output file")
+    parser = argparse.ArgumentParser(
+        description="Compute potentials of tetrahedral mesh and store them in "
+                    "JSON format.")
+    parser.add_argument("triangle_mesh", type=str,
+                        help="Triangle mesh file (e.g., .stl) that defines "
+                             "the surface.")
+    parser.add_argument("tetrahedral_mesh", type=str,
+                        help="Tetrahedral mesh file (.vtk) that defines the "
+                             "volume.")
+    parser.add_argument("output", type=str,
+                        help="Output file (.json) that will contain a list of "
+                             "potentials of the vertices of the tetrahedral "
+                             "mesh.")
     return parser.parse_args()
 
 
