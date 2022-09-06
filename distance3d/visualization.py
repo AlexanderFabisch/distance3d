@@ -323,3 +323,31 @@ class RigidBodyTetrahedralMesh(pv.Artist):  # pragma: no cover
             List of geometries that can be added to the visualizer.
         """
         return [self.mesh]
+
+
+class ColoredVertices(pv.Artist):  # pragma: no cover
+    """Vertices of a mesh without connections with color information.
+
+    Parameters
+    ----------
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    colors : array-like, shape (n_vertices, 3)
+        Colors
+    """
+    def __init__(self, vertices, colors):
+        self.vertices = o3d.geometry.PointCloud(
+            o3d.utility.Vector3dVector(vertices))
+        self.vertices.colors = o3d.utility.Vector3dVector(colors)
+
+    @property
+    def geometries(self):
+        """Expose geometries.
+
+        Returns
+        -------
+        geometries : list
+            List of geometries that can be added to the visualizer.
+        """
+        return [self.vertices]
