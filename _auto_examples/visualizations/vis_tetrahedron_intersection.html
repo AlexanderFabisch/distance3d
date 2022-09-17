@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Visualize Intersection of Tetrahedra &#8212; distance3d 0.6.0 documentation</title>
+    <title>Visualize Intersection of Tetrahedra &#8212; distance3d 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -51,11 +51,13 @@ to download the full example code</p>
 <span class="kn">from</span> <span class="nn">distance3d</span> <span class="kn">import</span> <span class="n">hydroelastic_contact</span><span class="p">,</span> <span class="n">visualization</span>
 
 
-<span class="n">vertices1</span><span class="p">,</span> <span class="n">tetrahedra1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">hydroelastic_contact</span><span class="o">.</span><span class="n">make_tetrahedral_icosphere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]),</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">vertices2</span><span class="p">,</span> <span class="n">tetrahedra2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">hydroelastic_contact</span><span class="o">.</span><span class="n">make_tetrahedral_icosphere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">]),</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">sphere1</span> <span class="o">=</span> <span class="n">hydroelastic_contact</span><span class="o">.</span><span class="n">RigidBody</span><span class="o">.</span><span class="n">make_sphere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]),</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">sphere1</span><span class="o">.</span><span class="n">express_in</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">sphere2</span> <span class="o">=</span> <span class="n">hydroelastic_contact</span><span class="o">.</span><span class="n">RigidBody</span><span class="o">.</span><span class="n">make_sphere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">]),</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">sphere2</span><span class="o">.</span><span class="n">express_in</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
 
-<span class="n">tetrahedron1</span> <span class="o">=</span> <span class="n">vertices1</span><span class="p">[</span><span class="n">tetrahedra1</span><span class="p">[</span><span class="mi">257</span><span class="p">]]</span>
-<span class="n">tetrahedron2</span> <span class="o">=</span> <span class="n">vertices2</span><span class="p">[</span><span class="n">tetrahedra2</span><span class="p">[</span><span class="mi">310</span><span class="p">]]</span>
+<span class="n">tetrahedron1</span> <span class="o">=</span> <span class="n">sphere1</span><span class="o">.</span><span class="n">tetrahedra_points</span><span class="p">[</span><span class="mi">257</span><span class="p">]</span>
+<span class="n">tetrahedron2</span> <span class="o">=</span> <span class="n">sphere2</span><span class="o">.</span><span class="n">tetrahedra_points</span><span class="p">[</span><span class="mi">310</span><span class="p">]</span>
 
 <span class="n">epsilon1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
 <span class="n">epsilon2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
@@ -137,10 +139,10 @@ to download the full example code</p>
 <li class="toctree-l3"><a class="reference internal" href="vis_cylinders_benchmark.html">Benchmark collision detection for cylinders</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vis_mesh_benchmark.html">Benchmark collision detection for meshes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vis_self_collisions.html">Self-collisions of a robot</a></li>
-<li class="toctree-l3"><a class="reference internal" href="vis_pressure_field_moving.html">Visualize Pressure Field of Two Moving Objects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vis_pressure_field.html">Visualize Pressure Field of Two Colliding Objects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vis_closest_points.html">Closest Points with GJK</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vis_robot_collision_objects.html">Collisions between robot and environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vis_pressure_field_moving.html">Visualize Pressure Fields of Moving Object</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#planar-algorithms">Planar Algorithms</a></li>

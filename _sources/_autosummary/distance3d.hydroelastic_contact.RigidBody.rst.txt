@@ -15,7 +15,11 @@
    
       ~RigidBody.__init__
       ~RigidBody.express_in
+      ~RigidBody.make_box
+      ~RigidBody.make_capsule
       ~RigidBody.make_cube
+      ~RigidBody.make_cylinder
+      ~RigidBody.make_ellipsoid
       ~RigidBody.make_sphere
    
    

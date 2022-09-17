@@ -3039,7 +3039,7 @@ Distance between boxes with GJK
     3.211636167089427
     3.24381478501287
     4.20806408278937
-    accumulated_time=0.21292734146118164
+    accumulated_time=0.21499180793762207
 
 
 
@@ -3090,7 +3090,7 @@ Distance between boxes with GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.625 seconds)
+   **Total running time of the script:** ( 0 minutes  0.628 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_box.py:

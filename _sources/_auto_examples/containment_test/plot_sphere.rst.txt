@@ -39,7 +39,7 @@ Sphere Containment
  .. code-block:: none
 
 
-    0.003716707229614258 s
+    0.003360271453857422 s
 
 
 
@@ -80,7 +80,7 @@ Sphere Containment
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.250 seconds)
+   **Total running time of the script:** ( 0 minutes  0.241 seconds)
 
 
 .. _sphx_glr_download__auto_examples_containment_test_plot_sphere.py:

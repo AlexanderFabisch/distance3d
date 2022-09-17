@@ -45039,7 +45039,7 @@ Distance from point to rectangle
     0.7274888444744186
     2.093113642520501
     0.35333695922488273
-    accumulated_time=1.1150338649749756
+    accumulated_time=1.0300145149230957
 
 
 
@@ -45085,7 +45085,7 @@ Distance from point to rectangle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.719 seconds)
+   **Total running time of the script:** ( 0 minutes  2.521 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_rectangle.py:

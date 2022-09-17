@@ -1398,27 +1398,6 @@ Visualizations
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Field of Two Moving Objects">
-
-.. only:: html
-
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_moving_thumb.png
-     :alt: Visualize Pressure Field of Two Moving Objects
-
-     :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field_moving.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_pressure_field_moving
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Field of Two Colliding Objects">
 
 .. only:: html
@@ -1479,6 +1458,27 @@ Visualizations
    :hidden:
 
    /_auto_examples/visualizations/vis_robot_collision_objects
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Fields of Moving Object">
+
+.. only:: html
+
+ .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_moving_thumb.png
+     :alt: Visualize Pressure Fields of Moving Object
+
+     :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field_moving.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_pressure_field_moving
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

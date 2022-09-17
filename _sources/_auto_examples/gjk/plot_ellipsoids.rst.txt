@@ -739,7 +739,7 @@ Distance between ellipsoids with GJK
     1.6322202534185037
     2.026400737373533
     1.2880677303587615
-    accumulated_time=0.16675591468811035
+    accumulated_time=0.16220450401306152
 
 
 
@@ -791,7 +791,7 @@ Distance between ellipsoids with GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.420 seconds)
+   **Total running time of the script:** ( 0 minutes  0.417 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_ellipsoids.py:

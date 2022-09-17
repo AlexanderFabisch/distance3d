@@ -5,20 +5,20 @@
 
 Computation times
 =================
-**00:01.858** total execution time for **_auto_examples_containment_test** files:
+**00:01.879** total execution time for **_auto_examples_containment_test** files:
 
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_containment_test_plot_capsule.py` (``plot_capsule.py``)     | 00:00.276 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_containment_test_plot_cone.py` (``plot_cone.py``)           | 00:00.297 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_containment_test_plot_ellipsoid.py` (``plot_ellipsoid.py``) | 00:00.272 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_containment_test_plot_ellipsoid.py` (``plot_ellipsoid.py``) | 00:00.281 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_containment_test_plot_box.py` (``plot_box.py``)             | 00:00.271 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_containment_test_plot_capsule.py` (``plot_capsule.py``)     | 00:00.279 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_containment_test_plot_cone.py` (``plot_cone.py``)           | 00:00.268 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_containment_test_plot_box.py` (``plot_box.py``)             | 00:00.272 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_containment_test_plot_cylinder.py` (``plot_cylinder.py``)   | 00:00.266 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_containment_test_plot_cylinder.py` (``plot_cylinder.py``)   | 00:00.270 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_containment_test_plot_mesh.py` (``plot_mesh.py``)           | 00:00.255 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_containment_test_plot_sphere.py` (``plot_sphere.py``)       | 00:00.241 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_containment_test_plot_sphere.py` (``plot_sphere.py``)       | 00:00.250 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_containment_test_plot_mesh.py` (``plot_mesh.py``)           | 00:00.239 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+

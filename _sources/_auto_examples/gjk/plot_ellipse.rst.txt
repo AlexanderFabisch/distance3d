@@ -739,7 +739,7 @@ Distance between ellipses with GJK
     2.18911593208319
     2.360248248928313
     1.6982706224779536
-    accumulated_time=0.12894415855407715
+    accumulated_time=0.12802672386169434
 
 
 
@@ -791,7 +791,7 @@ Distance between ellipses with GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.318 seconds)
+   **Total running time of the script:** ( 0 minutes  0.310 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_ellipse.py:

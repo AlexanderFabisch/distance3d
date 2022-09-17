@@ -539,7 +539,7 @@ Distance between two rectangles
     2.420017590254688
     0.556865239623464
     2.5408232345029944
-    accumulated_time=0.49689173698425293
+    accumulated_time=0.482759952545166
 
 
 
@@ -589,7 +589,7 @@ Distance between two rectangles
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.708 seconds)
+   **Total running time of the script:** ( 0 minutes  0.669 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_rectangle_to_rectangle.py:

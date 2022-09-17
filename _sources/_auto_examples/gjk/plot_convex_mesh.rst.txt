@@ -4039,7 +4039,7 @@ Distance between convex meshes with GJK
     5.641187597335826
     7.743086258931431
     14.587098103322397
-    accumulated_time=0.31775450706481934
+    accumulated_time=0.2914397716522217
 
 
 
@@ -4086,7 +4086,7 @@ Distance between convex meshes with GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.654 seconds)
+   **Total running time of the script:** ( 0 minutes  2.492 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_convex_mesh.py:

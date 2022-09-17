@@ -39,7 +39,7 @@ Cone Containment
  .. code-block:: none
 
 
-    0.010231733322143555 s
+    0.036936283111572266 s
 
 
 
@@ -81,7 +81,7 @@ Cone Containment
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.268 seconds)
+   **Total running time of the script:** ( 0 minutes  0.297 seconds)
 
 
 .. _sphx_glr_download__auto_examples_containment_test_plot_cone.py:

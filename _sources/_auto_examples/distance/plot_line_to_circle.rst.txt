@@ -5039,7 +5039,7 @@ Distance between line and circle
     0.36085576911626416
     1.1640068138050759
     0.5078151588168582
-    accumulated_time=0.9937927722930908
+    accumulated_time=0.9943575859069824
 
 
 
@@ -5088,7 +5088,7 @@ Distance between line and circle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.382 seconds)
+   **Total running time of the script:** ( 0 minutes  1.380 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_to_circle.py:

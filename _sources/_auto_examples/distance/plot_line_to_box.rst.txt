@@ -18039,7 +18039,7 @@ Distance from line to box
     0.6797218902208758
     0.44134123387489
     0.5171843946866663
-    accumulated_time=0.7230405807495117
+    accumulated_time=0.7045376300811768
 
 
 
@@ -18095,7 +18095,7 @@ Distance from line to box
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.769 seconds)
+   **Total running time of the script:** ( 0 minutes  1.713 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_to_box.py:

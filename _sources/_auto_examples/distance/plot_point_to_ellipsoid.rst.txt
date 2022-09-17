@@ -1539,7 +1539,7 @@ Distance from point to ellipsoid
     0.11058048815910392
     0.620967506394471
     1.0069799397312362
-    accumulated_time=0.4596555233001709
+    accumulated_time=0.46262478828430176
 
 
 
@@ -1586,7 +1586,7 @@ Distance from point to ellipsoid
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.776 seconds)
+   **Total running time of the script:** ( 0 minutes  0.777 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_ellipsoid.py:

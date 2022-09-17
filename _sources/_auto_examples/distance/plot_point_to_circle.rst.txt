@@ -65039,7 +65039,7 @@ Distance from point to circle
     1.6817370131741423
     0.48633224648188855
     0.9364402945062739
-    accumulated_time=1.108886957168579
+    accumulated_time=1.0956804752349854
 
 
 
@@ -65088,7 +65088,7 @@ Distance from point to circle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.385 seconds)
+   **Total running time of the script:** ( 0 minutes  3.298 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_circle.py:

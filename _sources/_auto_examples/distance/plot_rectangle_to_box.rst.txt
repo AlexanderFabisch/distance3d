@@ -129,7 +129,7 @@ Distance from rectangle to box
     2.1036004879635324
     3.663961621521724
     1.1634030208569854
-    accumulated_time=0.5702648162841797
+    accumulated_time=0.5592715740203857
 
 
 
@@ -184,7 +184,7 @@ Distance from rectangle to box
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.786 seconds)
+   **Total running time of the script:** ( 0 minutes  0.753 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_rectangle_to_box.py:

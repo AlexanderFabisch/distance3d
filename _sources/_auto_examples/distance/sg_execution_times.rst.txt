@@ -5,74 +5,74 @@
 
 Computation times
 =================
-**00:59.875** total execution time for **_auto_examples_distance** files:
+**00:58.477** total execution time for **_auto_examples_distance** files:
 
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_to_plane.py` (``plot_line_to_plane.py``)                               | 00:05.189 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_to_plane.py` (``plot_line_to_plane.py``)                               | 00:05.122 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_point_to_plane.py` (``plot_point_to_plane.py``)                             | 00:04.918 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_point_to_plane.py` (``plot_point_to_plane.py``)                             | 00:04.745 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_to_line.py` (``plot_line_to_line.py``)                                 | 00:03.618 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_to_line.py` (``plot_line_to_line.py``)                                 | 00:03.433 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_point_to_circle.py` (``plot_point_to_circle.py``)                           | 00:03.385 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_point_to_circle.py` (``plot_point_to_circle.py``)                           | 00:03.298 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_point_to_rectangle.py` (``plot_point_to_rectangle.py``)                     | 00:02.719 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_point_to_rectangle.py` (``plot_point_to_rectangle.py``)                     | 00:02.521 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_point_to_line.py` (``plot_point_to_line.py``)                               | 00:02.557 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_line_segment.py` (``plot_line_segment_to_line_segment.py``) | 00:02.519 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_box.py` (``plot_plane_to_box.py``)                                 | 00:02.518 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_box.py` (``plot_plane_to_box.py``)                                 | 00:02.459 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_line_segment.py` (``plot_line_segment_to_line_segment.py``) | 00:02.444 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_rectangle.py` (``plot_plane_to_rectangle.py``)                     | 00:02.370 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_rectangle.py` (``plot_plane_to_rectangle.py``)                     | 00:02.384 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_point_to_line.py` (``plot_point_to_line.py``)                               | 00:02.362 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_plane.py` (``plot_line_segment_to_plane.py``)               | 00:02.381 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_plane.py` (``plot_line_segment_to_plane.py``)               | 00:02.349 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_point_to_disk.py` (``plot_point_to_disk.py``)                               | 00:02.225 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_point_to_disk.py` (``plot_point_to_disk.py``)                               | 00:02.213 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_point_to_cylinder.py` (``plot_point_to_cylinder.py``)                       | 00:02.084 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_point_to_cylinder.py` (``plot_point_to_cylinder.py``)                       | 00:02.076 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_plane.py` (``plot_plane_to_plane.py``)                             | 00:01.910 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_plane.py` (``plot_plane_to_plane.py``)                             | 00:01.861 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_point_to_line_segment.py` (``plot_point_to_line_segment.py``)               | 00:01.775 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_to_line_segment.py` (``plot_line_to_line_segment.py``)                 | 00:01.715 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_to_box.py` (``plot_line_to_box.py``)                                   | 00:01.769 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_to_box.py` (``plot_line_to_box.py``)                                   | 00:01.713 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_to_line_segment.py` (``plot_line_to_line_segment.py``)                 | 00:01.766 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_point_to_line_segment.py` (``plot_point_to_line_segment.py``)               | 00:01.646 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_point_to_triangle.py` (``plot_point_to_triangle.py``)                       | 00:01.574 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_point_to_box.py` (``plot_point_to_box.py``)                                 | 00:01.577 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_point_to_box.py` (``plot_point_to_box.py``)                                 | 00:01.539 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_point_to_triangle.py` (``plot_point_to_triangle.py``)                       | 00:01.504 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_to_circle.py` (``plot_line_to_circle.py``)                             | 00:01.382 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_to_circle.py` (``plot_line_to_circle.py``)                             | 00:01.380 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_triangle.py` (``plot_plane_to_triangle.py``)                       | 00:01.271 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_triangle.py` (``plot_plane_to_triangle.py``)                       | 00:01.248 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_to_rectangle.py` (``plot_line_to_rectangle.py``)                       | 00:01.197 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_to_rectangle.py` (``plot_line_to_rectangle.py``)                       | 00:01.230 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_circle.py` (``plot_line_segment_to_circle.py``)             | 00:01.087 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_circle.py` (``plot_line_segment_to_circle.py``)             | 00:01.051 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_rectangle.py` (``plot_line_segment_to_rectangle.py``)       | 00:01.040 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_rectangle.py` (``plot_line_segment_to_rectangle.py``)       | 00:00.959 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_disk_to_disk.py` (``plot_disk_to_disk.py``)                                 | 00:00.877 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_box.py` (``plot_line_segment_to_box.py``)                   | 00:00.903 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_box.py` (``plot_line_segment_to_box.py``)                   | 00:00.874 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_disk_to_disk.py` (``plot_disk_to_disk.py``)                                 | 00:00.901 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_rectangle_to_box.py` (``plot_rectangle_to_box.py``)                         | 00:00.786 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_point_to_ellipsoid.py` (``plot_point_to_ellipsoid.py``)                     | 00:00.777 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_point_to_ellipsoid.py` (``plot_point_to_ellipsoid.py``)                     | 00:00.776 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_cylinder.py` (``plot_plane_to_cylinder.py``)                       | 00:00.761 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_cylinder.py` (``plot_plane_to_cylinder.py``)                       | 00:00.736 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_rectangle_to_box.py` (``plot_rectangle_to_box.py``)                         | 00:00.753 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_ellipsoid.py` (``plot_plane_to_ellipsoid.py``)                     | 00:00.720 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_plane_to_ellipsoid.py` (``plot_plane_to_ellipsoid.py``)                     | 00:00.726 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_rectangle_to_rectangle.py` (``plot_rectangle_to_rectangle.py``)             | 00:00.708 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_rectangle_to_rectangle.py` (``plot_rectangle_to_rectangle.py``)             | 00:00.669 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_triangle_to_rectangle.py` (``plot_triangle_to_rectangle.py``)               | 00:00.534 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_triangle_to_rectangle.py` (``plot_triangle_to_rectangle.py``)               | 00:00.526 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_triangle.py` (``plot_line_segment_to_triangle.py``)         | 00:00.455 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_triangle.py` (``plot_line_segment_to_triangle.py``)         | 00:00.457 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_line_to_triangle.py` (``plot_line_to_triangle.py``)                         | 00:00.418 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_line_to_triangle.py` (``plot_line_to_triangle.py``)                         | 00:00.402 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_distance_plot_triangle_to_triangle.py` (``plot_triangle_to_triangle.py``)                 | 00:00.261 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_distance_plot_triangle_to_triangle.py` (``plot_triangle_to_triangle.py``)                 | 00:00.249 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------+-----------+--------+

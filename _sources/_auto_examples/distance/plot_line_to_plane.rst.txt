@@ -120039,7 +120039,7 @@ Distance from line to plane
     0.0
     0.0
     0.0
-    accumulated_time=0.5471899509429932
+    accumulated_time=0.5542395114898682
 
 
 
@@ -120090,7 +120090,7 @@ Distance from line to plane
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.189 seconds)
+   **Total running time of the script:** ( 0 minutes  5.122 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_to_plane.py:
