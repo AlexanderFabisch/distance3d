@@ -1016,7 +1016,7 @@ def test_plane_to_cylinder():
         closest_point_ellipsoid, np.r_[closest_point_plane[:2], -0.5])
 
     cylinder2origin = np.eye(4)
-    cylinder2origin[:3, :3] = pr.matrix_from_angle(1, 0.5)
+    cylinder2origin[:3, :3] = pr.active_matrix_from_angle(1, 0.5)
     dist, closest_point_plane, closest_point_ellipsoid = plane_to_cylinder(
         plane_point, plane_normal, cylinder2origin, radius, length)
     assert approx(dist) == 0

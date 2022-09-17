@@ -178,7 +178,7 @@ def plot_circle(ax, center, radius, normal, show_normal=False,
     u, v = plane_basis_from_normal(normal)
     R = np.column_stack((u, v, normal))
     circle = np.array([
-        center + R.dot(pr.matrix_from_angle(2, angle)).dot([radius, 0, 0])
+        center + R.dot(pr.active_matrix_from_angle(2, angle)).dot([radius, 0, 0])
         for angle in np.linspace(0, 2 * np.pi, 20)])
     ax.plot(circle[:, 0], circle[:, 1], circle[:, 2])
 
