@@ -39,26 +39,30 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2):
     # TODO speed up broad phase with numba
     # TODO store result in RigidBody
 
+    test_AABBs_Tree = False
+    if not test_AABBs_Tree:
+        return _all_aabbs_overlap(aabbs1, aabbs2)
+    else:
+        tree2 = aabbtree.AABBTree()
+        for j, aabb in enumerate(aabbs2):
+            tree2.add(aabbtree.AABB(aabb), j)
+        broad_tetrahedra1 = []
+        broad_tetrahedra2 = []
+        for i, aabb in enumerate(aabbs1):
+            new_indices2 = tree2.overlap_values(aabbtree.AABB(aabb), method='DFS', closed=False, unique=False)
+            broad_tetrahedra2.extend(new_indices2)
+            broad_tetrahedra1.extend([i] * len(new_indices2))
 
-    tree2 = aabbtree.AABBTree()
-    for j, aabb in enumerate(aabbs2):
-        tree2.add(aabbtree.AABB(aabb), j)
-    broad_tetrahedra1 = []
-    broad_tetrahedra2 = []
-    for i, aabb in enumerate(aabbs1):
-        new_indices2 = tree2.overlap_values(aabbtree.AABB(aabb), method='DFS', closed=False, unique=False)
-        broad_tetrahedra2.extend(new_indices2)
-        broad_tetrahedra1.extend([i] * len(new_indices2))
+        broad_pairs = list(zip(broad_tetrahedra1, broad_tetrahedra2))
+        assert len(broad_tetrahedra1) == len(broad_tetrahedra2)
+        for i, aabb in enumerate(aabbs1):
+            if tree2.does_overlap(aabbtree.AABB(aabb)):
+                assert i in broad_tetrahedra1
+            else:
+                assert i not in broad_tetrahedra1
 
-    broad_pairs = list(zip(broad_tetrahedra1, broad_tetrahedra2))
-    assert len(broad_tetrahedra1) == len(broad_tetrahedra2)
-    for i, aabb in enumerate(aabbs1):
-        if tree2.does_overlap(aabbtree.AABB(aabb)):
-            assert i in broad_tetrahedra1
-        else:
-            assert i not in broad_tetrahedra1
+        return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
 
-    return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
 
 @numba.njit(cache=True)
 def _all_aabbs_overlap(aabbs1, aabbs2):
