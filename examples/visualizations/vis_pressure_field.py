@@ -11,10 +11,22 @@ from distance3d import visualization, hydroelastic_contact, benchmark
 
 
 highlight_isect_idx = None
-show_broad_phase = False
+show_broad_phase = True
 
-rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
-rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
+test_Bug = True
+if test_Bug:
+    import pytransform3d.rotations as pr
+
+    rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
+    cube2origin = np.eye(4)
+    cube2origin[:3, :3] = pr.active_matrix_from_extrinsic_euler_zyx([0.1, 0.3, 0.5])
+    cube2origin[:3, 3] = 0.25 * np.ones(3)
+    rigid_body2 = hydroelastic_contact.RigidBody.make_cube(cube2origin, 0.15)
+
+else:
+    rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
+    rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
+
 
 timer = benchmark.Timer()
 timer.start("contact_forces")
