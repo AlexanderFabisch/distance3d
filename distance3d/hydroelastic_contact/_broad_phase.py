@@ -4,7 +4,7 @@ import numba
 from ._mesh_processing import tetrahedral_mesh_aabbs
 
 
-def broad_phase_tetrahedra(rigid_body1, rigid_body2):
+def broad_phase_tetrahedra(rigid_body1, rigid_body2, use_aabb_trees: bool = False):
     """Broad phase collision detection of tetrahedra.
 
     Parameters
@@ -14,6 +14,10 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2):
 
     rigid_body2 : RigidBody
         Second rigid body.
+
+    use_aabb_trees : bool
+        Option to specify the usage of a AABB trees.
+        Currently slower than a standard brute search.
 
     Returns
     -------
@@ -32,15 +36,10 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2):
     aabbs1 = tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
     aabbs2 = tetrahedral_mesh_aabbs(rigid_body2.tetrahedra_points)
 
-    # TODO fix broad phase for cube vs. sphere
-    # Result: The AABBs of an axis aligned Cube contains always two equal AABBs for every side of the cube.
-    # when unique is turned on the AABBs library deletes one pair hence the wrong results.
-
     # TODO speed up broad phase with numba
     # TODO store result in RigidBody
 
-    test_AABBs_Tree = False
-    if not test_AABBs_Tree:
+    if not use_aabb_trees:
         return _all_aabbs_overlap(aabbs1, aabbs2)
     else:
         tree2 = aabbtree.AABBTree()
@@ -61,8 +60,7 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2):
             else:
                 assert i not in broad_tetrahedra1
 
-        return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
-
+        return np.array(broad_tetrahedra1, dtype=int), np.array(broad_tetrahedra2, dtype=int), broad_pairs
 
 @numba.njit(cache=True)
 def _all_aabbs_overlap(aabbs1, aabbs2):
