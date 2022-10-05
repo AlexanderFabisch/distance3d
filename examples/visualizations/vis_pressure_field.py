@@ -9,6 +9,7 @@ import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import visualization, hydroelastic_contact, benchmark
 
+
 highlight_isect_idx = None
 show_broad_phase = False
 
