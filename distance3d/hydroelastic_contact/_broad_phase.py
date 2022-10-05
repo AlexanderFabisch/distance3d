@@ -70,7 +70,7 @@ def _all_aabbs_overlap(aabbs1, aabbs2):
     broad_pairs = []
     for i in range(len(aabbs1)):
         for j in range(len(aabbs2)):
-            if _aabbs_overlap(aabbs1[i], aabbs2[j]):
+            if _aabbs_overlap_no_loop(aabbs1[i], aabbs2[j]):
                 indices1.append(i)
                 indices2.append(j)
                 broad_pairs.append((i, j))
@@ -80,10 +80,7 @@ def _all_aabbs_overlap(aabbs1, aabbs2):
 
 
 @numba.njit(cache=True)
-def _aabbs_overlap(aabb1, aabb2):
-    for (min1, max1), (min2, max2) in zip(aabb1, aabb2):
-        if min1 > max2:
-            return False
-        if min2 > max1:
-            return False
-    return True
+def _aabbs_overlap_no_loop(aabb1, aabb2):
+    return aabb1[0][0] < aabb2[0][1] and aabb2[0][0] < aabb1[0][1] \
+           and aabb1[1][0] < aabb2[1][1] and aabb2[1][0] < aabb1[1][1] \
+           and aabb1[2][0] < aabb2[2][1] and aabb2[2][0] < aabb1[2][1]
