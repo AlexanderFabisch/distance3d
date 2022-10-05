@@ -17,9 +17,9 @@ def cube_unique_pairs(use_aabb_trees):
     assert len(broad_pairs) == 162
 
 
-def test_cube_uique_pairs_brute_force(self):
+def test_cube_uique_pairs_brute_force():
     cube_unique_pairs(False)
 
 
-def test_cube_uique_pairs_aabb_tree(self):
+def test_cube_uique_pairs_aabb_tree():
     cube_unique_pairs(True)
