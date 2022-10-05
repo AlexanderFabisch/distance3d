@@ -1,10 +1,9 @@
 import numpy as np
-import unittest
 from distance3d import hydroelastic_contact
 import pytransform3d.rotations as pr
 
 
-def test_cube_unique_pairs(use_aabb_trees):
+def cube_unique_pairs(use_aabb_trees):
     rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
     cube2origin = np.eye(4)
     cube2origin[:3, :3] = pr.active_matrix_from_extrinsic_euler_zyx([0.1, 0.3, 0.5])
@@ -18,9 +17,9 @@ def test_cube_unique_pairs(use_aabb_trees):
     assert len(broad_pairs) == 162
 
 
-class Testing(unittest.TestCase):
-    def test_cube_uique_pairs_brute_force(self):
-        test_cube_unique_pairs(False)
+def test_cube_uique_pairs_brute_force(self):
+    cube_unique_pairs(False)
 
-    def test_cube_uique_pairs_aabb_tree(self):
-        test_cube_unique_pairs(True)
+
+def test_cube_uique_pairs_aabb_tree(self):
+    cube_unique_pairs(True)
