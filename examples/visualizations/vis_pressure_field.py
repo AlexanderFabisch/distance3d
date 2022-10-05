@@ -9,24 +9,11 @@ import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import visualization, hydroelastic_contact, benchmark
 
-
 highlight_isect_idx = None
-show_broad_phase = True
+show_broad_phase = False
 
-test_Bug = True
-if test_Bug:
-    import pytransform3d.rotations as pr
-
-    rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
-    cube2origin = np.eye(4)
-    cube2origin[:3, :3] = pr.active_matrix_from_extrinsic_euler_zyx([0.1, 0.3, 0.5])
-    cube2origin[:3, 3] = 0.25 * np.ones(3)
-    rigid_body2 = hydroelastic_contact.RigidBody.make_cube(cube2origin, 0.15)
-
-else:
-    rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
-    rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
-
+rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
+rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
 
 timer = benchmark.Timer()
 timer.start("contact_forces")
@@ -65,8 +52,8 @@ if highlight_isect_idx is not None:
     fig.scatter(details["intersecting_tetrahedra1"][highlight_isect_idx], s=0.001, c=(1, 0, 0))
     fig.scatter(details["intersecting_tetrahedra2"][highlight_isect_idx], s=0.001, c=(0, 0, 1))
     fig.scatter([details["contact_coms"][highlight_isect_idx]], s=0.002, c=(1, 0, 1))
-    #visualization.Tetrahedron(details["intersecting_tetrahedra1"][highlight_isect_idx]).add_artist(fig)
-    #visualization.Tetrahedron(details["intersecting_tetrahedra2"][highlight_isect_idx]).add_artist(fig)
+    # visualization.Tetrahedron(details["intersecting_tetrahedra1"][highlight_isect_idx]).add_artist(fig)
+    # visualization.Tetrahedron(details["intersecting_tetrahedra2"][highlight_isect_idx]).add_artist(fig)
 
 fig.plot_vector(details["contact_point"], 100 * wrench21[:3], (1, 0, 0))
 fig.plot_vector(details["contact_point"], 100 * wrench12[:3], (0, 1, 0))
