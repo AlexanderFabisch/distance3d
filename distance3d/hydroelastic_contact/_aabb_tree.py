@@ -32,6 +32,9 @@ def new_tree_from_aabbs(aabbs):
 
     nodes : np.array(4, dtype=int)
         The new nodes array.
+
+    aabbs : np.array([3, 2])
+        Axis-aligned bounding boxes array
     """
 
     root = INDEX_NONE
@@ -79,19 +82,14 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, len):
 
     aabbs : np.array([3, 2])
         The new Axis-aligned bounding boxes array
+
+    l : int
+        New len
     """
 
     # The Node that's going to be added.
     # A node in this system consists of three variables. An int as index.
     # The node array with containing [parent_index, left_child_index, right_child_index, type]
-    leaf_node = nodes[leaf_node_index]
-    leaf_aabb = aabbs[leaf_node_index]
-
-    # Assert if new leaf is actually a new leaf
-    assert leaf_node[PARENT_INDEX] == INDEX_NONE \
-           and leaf_node[LEFT_INDEX] == INDEX_NONE \
-           and leaf_node[RIGHT_INDEX] == INDEX_NONE \
-           and leaf_node[TYPE_INDEX] == TYPE_NONE
 
     nodes[leaf_node_index, TYPE_INDEX] = TYPE_LEAF
 
@@ -104,26 +102,18 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, len):
     while nodes[tree_node_index, TYPE_INDEX] == TYPE_BRANCH:
 
         # Getting nodes from arrays
-        tree_node = nodes[tree_node_index]
-        tree_aabb = aabbs[tree_node_index]
-
-        left_node_index = tree_node[LEFT_INDEX]
-        left_node = nodes[left_node_index]
-        left_aabb = aabbs[left_node_index]
-
-        right_node_index = tree_node[RIGHT_INDEX]
-        right_node = nodes[right_node_index]
-        right_aabb = aabbs[right_node_index]
+        left_node_index = nodes[tree_node_index, LEFT_INDEX]
+        right_node_index = nodes[tree_node_index, RIGHT_INDEX]
 
         # Whether the left or right child is traverse down depends on the cost of increasing the size of the aabbs.
-        new_parent_aabb = merge_aabb(leaf_aabb, tree_aabb)
-        cost_new_parent = aabb_surface(new_parent_aabb)
+        cost_new_parent = aabb_surface(
+            merge_aabb(aabbs[leaf_node_index], aabbs[tree_node_index]))
 
-        new_left_aabb = merge_aabb(leaf_aabb, left_aabb)
-        cost_left = aabb_surface(new_left_aabb)
+        cost_left = aabb_surface(
+            merge_aabb(aabbs[leaf_node_index], aabbs[left_node_index]))
 
-        new_right_aabb = merge_aabb(leaf_aabb, right_aabb)
-        cost_right = aabb_surface(new_right_aabb)
+        cost_right = aabb_surface(
+            merge_aabb(aabbs[leaf_node_index], aabbs[right_node_index]))
 
         if cost_left > cost_new_parent and cost_right > cost_new_parent:
             break
@@ -136,11 +126,9 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, len):
 
     # Setting up sibling node
     sibling_index = tree_node_index
-    sibling_node = nodes[sibling_index]
-    sibling_aabb = aabbs[sibling_index]
 
     # Inserting new leaf into tree
-    old_parent_index = sibling_node[0]
+    old_parent_index = nodes[sibling_index, PARENT_INDEX]
 
     # Adding Parent
     new_parent_index = len
@@ -150,7 +138,7 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, len):
     nodes[new_parent_index, LEFT_INDEX] = sibling_index
     nodes[new_parent_index, RIGHT_INDEX] = leaf_node_index
     nodes[new_parent_index, TYPE_INDEX] = TYPE_BRANCH
-    aabbs[new_parent_index] = merge_aabb(leaf_aabb, sibling_aabb)
+    aabbs[new_parent_index] = merge_aabb(aabbs[leaf_node_index], aabbs[sibling_index])
 
     # Setting Parent in children
     nodes[leaf_node_index, PARENT_INDEX] = new_parent_index
@@ -180,8 +168,7 @@ def fix_upward_tree(tree_node_index, nodes, aabbs):
         # Every branch in the traversal should not have any None fields.
         assert tree_node[LEFT_INDEX] != INDEX_NONE and tree_node[RIGHT_INDEX] != INDEX_NONE
 
-        new_aabb = merge_aabb(aabbs[tree_node[LEFT_INDEX]], aabbs[tree_node[RIGHT_INDEX]])
-        aabbs[tree_node_index] = new_aabb
+        aabbs[tree_node_index] = merge_aabb(aabbs[tree_node[LEFT_INDEX]], aabbs[tree_node[RIGHT_INDEX]])
 
         # Moving on parent up
         tree_node_index = tree_node[PARENT_INDEX]

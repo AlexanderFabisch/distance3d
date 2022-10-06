@@ -36,6 +36,6 @@ AABB Trees No Creation Mean: 0.00243; Std. dev.: 0.00483
 
 plt.plot([0.00139, 0.00200, 0.01090, 0.15937, 2.37237, 40.64899], label='Brute Force')
 plt.plot([0.00265, 0.00239, 0.00279, 0.00247, 0.00232, 0.00244, 0.00310], label='AABB Trees No Creation')
-plt.plot([0.03471, 0.19004, 0.94646, 4.70398, 77.21539], label='AABB Trees')
+plt.plot([0.03471, 0.06843, 0.94646, 4.70398, 77.21539], label='AABB Trees')
 plt.plot([0.2877, 1.60006, 11.77460], label='Old AABB Trees')
 plt.show()
