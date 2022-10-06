@@ -25,7 +25,8 @@ from ._mesh_processing import (
 from ._barycentric_transform import barycentric_transforms
 from ._tetrahedron_intersection import intersect_tetrahedron_pair
 from ._forces import compute_contact_force
-from ._broad_phase import broad_phase_tetrahedra
+from ._broad_phase import broad_phase_tetrahedra, _all_aabbs_overlap
+from ._aabb_tree import new_tree_from_aabbs, insert_leaf, query_overlap, print_aabb_tree, query_overlap_of_other_tree
 
 
 __all__ = [
@@ -35,5 +36,6 @@ __all__ = [
     "center_of_mass_tetrahedral_mesh", "tetrahedral_mesh_aabbs",
     "tetrahedral_mesh_volumes", "barycentric_transforms",
     "intersect_tetrahedron_pair", "compute_contact_force",
-    "broad_phase_tetrahedra"
+    "broad_phase_tetrahedra", "_all_aabbs_overlap",
+    "new_tree_from_aabbs", "insert_leaf", "query_overlap", "print_aabb_tree", "query_overlap_of_other_tree"
 ]

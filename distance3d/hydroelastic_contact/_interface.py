@@ -74,7 +74,7 @@ def find_contact_surface(rigid_body1, rigid_body2):
     rigid_body1.express_in(rigid_body2.body2origin_)
 
     broad_tetrahedra1, broad_tetrahedra2, broad_pairs = broad_phase_tetrahedra(
-        rigid_body1, rigid_body2, False)
+        rigid_body1, rigid_body2, True)
 
     unique_indices1 = np.unique(broad_tetrahedra1)
     unique_indices2 = np.unique(broad_tetrahedra2)
