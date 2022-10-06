@@ -11,7 +11,7 @@ from distance3d import visualization, hydroelastic_contact, benchmark
 
 
 highlight_isect_idx = None
-show_broad_phase = False
+show_broad_phase = True
 
 rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
 rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
