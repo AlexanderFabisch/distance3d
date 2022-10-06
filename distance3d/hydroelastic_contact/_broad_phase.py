@@ -32,33 +32,29 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2, use_aabb_trees=False):
     broad_pairs : list
         List of intersecting tetrahedron pairs.
     """
-
     aabbs1 = tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
     aabbs2 = tetrahedral_mesh_aabbs(rigid_body2.tetrahedra_points)
 
-    # TODO speed up broad phase with numba
-    # TODO store result in RigidBody
-
     if use_aabb_trees:
+        # TODO speed up broad phase with numba
+        # TODO store result in RigidBody
+
         tree2 = aabbtree.AABBTree()
         for j, aabb in enumerate(aabbs2):
             tree2.add(aabbtree.AABB(aabb), j)
         broad_tetrahedra1 = []
         broad_tetrahedra2 = []
         for i, aabb in enumerate(aabbs1):
-            new_indices2 = tree2.overlap_values(aabbtree.AABB(aabb), method='DFS', closed=False, unique=False)
+            new_indices2 = tree2.overlap_values(
+                aabbtree.AABB(aabb), method="DFS", closed=False, unique=False)
             broad_tetrahedra2.extend(new_indices2)
             broad_tetrahedra1.extend([i] * len(new_indices2))
 
-        broad_pairs = list(zip(broad_tetrahedra1, broad_tetrahedra2))
-        assert len(broad_tetrahedra1) == len(broad_tetrahedra2)
-        for i, aabb in enumerate(aabbs1):
-            if tree2.does_overlap(aabbtree.AABB(aabb)):
-                assert i in broad_tetrahedra1
-            else:
-                assert i not in broad_tetrahedra1
+        broad_tetrahedra1 = np.array(broad_tetrahedra1, dtype=int)
+        broad_tetrahedra2 = np.array(broad_tetrahedra2, dtype=int)
+        broad_pairs = np.column_stack((broad_tetrahedra1, broad_tetrahedra2))
 
-        return np.array(broad_tetrahedra1, dtype=int), np.array(broad_tetrahedra2, dtype=int), broad_pairs
+        return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
     else:
         return _all_aabbs_overlap(aabbs1, aabbs2)
 
@@ -81,6 +77,6 @@ def _all_aabbs_overlap(aabbs1, aabbs2):
 
 @numba.njit(cache=True)
 def _aabbs_overlap_no_loop(aabb1, aabb2):
-    return aabb1[0, 0] < aabb2[0, 1] and aabb2[0, 0] < aabb1[0, 1] \
-           and aabb1[1, 0] < aabb2[1, 1] and aabb2[1, 0] < aabb1[1, 1] \
-           and aabb1[2, 0] < aabb2[2, 1] and aabb2[2, 0] < aabb1[2, 1]
+    return (aabb1[0, 0] < aabb2[0, 1] and aabb2[0, 0] < aabb1[0, 1]
+        and aabb1[1, 0] < aabb2[1, 1] and aabb2[1, 0] < aabb1[1, 1]
+        and aabb1[2, 0] < aabb2[2, 1] and aabb2[2, 0] < aabb1[2, 1])
