@@ -33,7 +33,7 @@ class AabbTree:
 
     def __str__(self):
         lines, *_ = print_aabb_tree_recursive(self.root, self.nodes)
-        return '\n'+'\n'.join(lines)
+        return '\r\n'+'\r\n'.join(lines)
 
     def overlaps_aabb_tree(self, other):
         broad_tetrahedra1, broad_tetrahedra2, broad_pairs = query_overlap_of_other_tree(self.root, self.nodes,
