@@ -16,7 +16,11 @@ TYPE_BRANCH = 2
 
 
 class AabbTree:
-    def __init__(self, aabbs):
+    def __init__(self, aabbs, pre_insertion_methode="none"):
+
+        if len(aabbs) == 0:
+            return
+
         root = INDEX_NONE
         filled_len = len(aabbs)
 
@@ -25,7 +29,13 @@ class AabbTree:
         z = np.zeros((len(nodes) - filled_len, 3, 2), dtype=aabbs.dtype)
         aabbs = np.append(aabbs, z, axis=0)
 
-        root, nodes, aabbs = insert_aabbs(root, nodes, aabbs, filled_len)
+        args = np.array(range(filled_len))
+        if pre_insertion_methode == "sort":
+            args = sort_aabbs(aabbs[:len(nodes) - filled_len])
+        elif pre_insertion_methode == "shuffle":
+            np.random.shuffle(args)
+
+        root, nodes, aabbs = insert_aabbs(root, nodes, aabbs, filled_len, args)
 
         self.root = root
         self.nodes = nodes
@@ -47,8 +57,13 @@ class AabbTree:
 
 
 @numba.njit(cache=True)
-def insert_aabbs(root, nodes, aabbs, filled_len):
-    for i in range(filled_len):
+def sort_aabbs(aabbs):
+    return aabbs[:, 0, 0].argsort()
+
+
+@numba.njit(cache=True)
+def insert_aabbs(root, nodes, aabbs, filled_len, args):
+    for i in args:
         root, nodes, aabbs, filled_len = insert_leaf(root, i, nodes, aabbs, filled_len)
 
     return root, nodes, aabbs
