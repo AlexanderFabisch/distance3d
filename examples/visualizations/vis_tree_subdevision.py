@@ -19,10 +19,14 @@ def get_leafs_of_node(node_index, nodes):
         return leafs
 
 
-rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0 * np.ones(3), 0.15, 4)
+rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0 * np.ones(3), 0.15, 1)
 # rigid_body1 = hydroelastic_contact.RigidBody.make_cube(np.eye(4), 0.15)
 
-aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
+# np.random.shuffle(rigid_body1.tetrahedra_points)
+# points = rigid_body1.tetrahedra_points
+points = np.sort(rigid_body1.tetrahedra_points, axis=0)
+aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(points)
+
 aabb_tree = hydroelastic_contact.AabbTree(aabbs1)
 
 print(aabb_tree)
@@ -32,53 +36,30 @@ fig.plot_transform(np.eye(4), s=0.1)
 visualization.RigidBodyTetrahedralMesh(
     rigid_body1.body2origin_, rigid_body1.vertices_, rigid_body1.tetrahedra_).add_artist(fig)
 
-for i in get_leafs_of_node(aabb_tree.nodes[aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 1], 1], 1], aabb_tree.nodes):
-    tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(
-        rigid_body1.body2origin_[:3, :3].T) + rigid_body1.body2origin_[:3, 3]
-    visualization.Tetrahedron(tetrahedron_points1, c=(1, 0, 0)).add_artist(fig)
 
-for i in get_leafs_of_node(aabb_tree.nodes[aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 1], 1], 2], aabb_tree.nodes):
-    tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(
-        rigid_body1.body2origin_[:3, :3].T) + rigid_body1.body2origin_[:3, 3]
-    visualization.Tetrahedron(tetrahedron_points1, c=(1, 0, 0.2)).add_artist(fig)
-
-for i in get_leafs_of_node(aabb_tree.nodes[aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 1], 2], 1], aabb_tree.nodes):
-    tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(
-        rigid_body1.body2origin_[:3, :3].T) + rigid_body1.body2origin_[:3, 3]
-    visualization.Tetrahedron(tetrahedron_points1, c=(1, 0.5, 0)).add_artist(fig)
-
-for i in get_leafs_of_node(aabb_tree.nodes[aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 1], 2], 2], aabb_tree.nodes):
-    tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(
-        rigid_body1.body2origin_[:3, :3].T) + rigid_body1.body2origin_[:3, 3]
-    visualization.Tetrahedron(tetrahedron_points1, c=(1, 0.5, 0.2)).add_artist(fig)
+def color_leaves(index, color):
+    for i in get_leafs_of_node(index, aabb_tree.nodes):
+        tetrahedron_points1 = points[i].dot(
+            rigid_body1.body2origin_[:3, :3].T) + rigid_body1.body2origin_[:3, 3]
+        visualization.Tetrahedron(tetrahedron_points1, c=color).add_artist(fig)
 
 
-for i in get_leafs_of_node(aabb_tree.nodes[aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 2], 1], 1], aabb_tree.nodes):
-    tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(
-        rigid_body1.body2origin_[:3, :3].T) + rigid_body1.body2origin_[:3, 3]
-    visualization.Tetrahedron(tetrahedron_points1, c=(0, 1, 0)).add_artist(fig)
+a = aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 1], 1]
+if a != -1:
+    color_leaves(a, (1, 0, 0))
 
-for i in get_leafs_of_node(aabb_tree.nodes[aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 2], 1], 2], aabb_tree.nodes):
-    tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(
-        rigid_body1.body2origin_[:3, :3].T) + rigid_body1.body2origin_[:3, 3]
-    visualization.Tetrahedron(tetrahedron_points1, c=(0, 1, 0.2)).add_artist(fig)
+a = aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 1], 2]
+if a != -1:
+    color_leaves(a, (1, 0, 0.3))
 
-for i in get_leafs_of_node(aabb_tree.nodes[aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 2], 2], 1], aabb_tree.nodes):
-    tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(
-        rigid_body1.body2origin_[:3, :3].T) + rigid_body1.body2origin_[:3, 3]
-    visualization.Tetrahedron(tetrahedron_points1, c=(0.5, 1, 0)).add_artist(fig)
+a = aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 2], 1]
+if a != -1:
+    color_leaves(a, (0, 1, 0))
 
-for i in get_leafs_of_node(aabb_tree.nodes[aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 2], 2], 2], aabb_tree.nodes):
-    tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(
-        rigid_body1.body2origin_[:3, :3].T) + rigid_body1.body2origin_[:3, 3]
-    visualization.Tetrahedron(tetrahedron_points1, c=(0.5, 1, 0.2)).add_artist(fig)
-
+a = aabb_tree.nodes[aabb_tree.nodes[aabb_tree.root, 2], 2]
+if a != -1:
+    color_leaves(a, (0, 1, 0.3))
 
 
 fig.view_init()
 fig.show()
-
-
-
-
-
