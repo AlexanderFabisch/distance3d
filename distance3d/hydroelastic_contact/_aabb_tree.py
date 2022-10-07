@@ -25,6 +25,9 @@ class AabbTree:
         filled_len = len(aabbs)
 
         # TODO Don't just double the size. RAM is wasted
+        # TODO Documentation
+        # TODO Proper Unit Tests
+
         nodes = np.full([filled_len * 2, 4], INDEX_NONE)
         z = np.zeros((len(nodes) - filled_len, 3, 2), dtype=aabbs.dtype)
         aabbs = np.append(aabbs, z, axis=0)
