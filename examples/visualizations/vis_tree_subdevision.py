@@ -19,12 +19,13 @@ def get_leafs_of_node(node_index, nodes):
         return leafs
 
 
-rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0 * np.ones(3), 0.15, 1)
+rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0 * np.ones(3), 0.15, 7)
 # rigid_body1 = hydroelastic_contact.RigidBody.make_cube(np.eye(4), 0.15)
 
+points = rigid_body1.tetrahedra_points
+
 # np.random.shuffle(rigid_body1.tetrahedra_points)
-# points = rigid_body1.tetrahedra_points
-points = np.sort(rigid_body1.tetrahedra_points, axis=0)
+points = points[points[:, 0, 0].argsort()]
 aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(points)
 
 aabb_tree = hydroelastic_contact.AabbTree(aabbs1)
