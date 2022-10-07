@@ -1,14 +1,18 @@
+from functools import partial
+
 import matplotlib
+
 matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-
-
+from distance3d import hydroelastic_contact
+import timeit
+import numpy as np
+from matplotlib import pyplot
 
 """
-Brute Force Mean: 0.00139; Std. dev.: 0.00268
-AABB Trees No Creation Mean: 0.00265; Std. dev.: 0.00526
-AABB Trees Mean: 0.03471; Std. dev.: 0.00207
-Old AABB Trees Mean: 0.28774; Std. dev.: 0.00624
+Brute Force Mean: 0.00287; Std. dev.: 0.00529
+AABB Trees No Creation Mean: 0.00674; Std. dev.: 0.01290
+AABB Trees Mean: 0.02675; Std. dev.: 0.00457
+Old AABB Trees Mean: 0.24804; Std. dev.: 0.03056
 
 Brute Force Mean: 0.00200; Std. dev.: 0.00282
 AABB Trees No Creation Mean: 0.00239; Std. dev.: 0.00476
@@ -34,8 +38,33 @@ AABB Trees No Creation Mean: 0.00243; Std. dev.: 0.00483
 
 """
 
-plt.plot([0.00139, 0.00200, 0.01090, 0.15937, 2.37237, 40.64899], label='Brute Force')
-plt.plot([0.00265, 0.00239, 0.00279, 0.00247, 0.00232, 0.00244, 0.00310], label='AABB Trees No Creation')
-plt.plot([0.03471, 0.06843, 0.94646, 4.70398, 77.21539], label='AABB Trees')
-plt.plot([0.2877, 1.60006, 11.77460], label='Old AABB Trees')
-plt.show()
+
+values = [['Brute Force', [0.00287, 0.00200, 0.15937, 2.37237]],
+          ['AABB Trees No Creation', [0.00274, 0.00239, 0.00279, 0.00247, 0.00232, 0.00238, 0.00243]],
+          ['AABB Trees', [0.02675, 0.19004, 0.94646, 4.70398]],
+          ['Old AABB Trees', [0.24804, 1.60006, 10.0]]]
+
+for value in values:
+    pyplot.plot(value[1], markersize=20, label=value[0])
+
+pyplot.legend()
+pyplot.show()
+
+"""
+
+rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0 * np.ones(3), 0.15, 4)
+aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
+
+values = []
+step = 100
+for i in range(int(len(aabbs1) / step)):
+    times = timeit.repeat(partial(hydroelastic_contact.AabbTree, aabbs=aabbs1[(len(aabbs1) - i*step):]), repeat=5, number=5)
+    print(f"Nr {i} of {len(aabbs1) / step} Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+    values.append(np.mean(times))
+
+pyplot.plot(values, markersize=20, label="AABB Tree")
+pyplot.legend()
+pyplot.show()
+
+"""
+

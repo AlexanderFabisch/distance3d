@@ -44,7 +44,9 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2, use_aabb_trees=False):
         aabb_tree1 = AabbTree(aabbs1)
         aabb_tree2 = AabbTree(aabbs2)
 
-        return aabb_tree1.overlaps_aabb_tree(aabb_tree2)
+        _, broad_tetrahedra1, broad_tetrahedra2, broad_pairs = aabb_tree1.overlaps_aabb_tree(aabb_tree2)
+
+        return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
     else:
         return _all_aabbs_overlap(aabbs1, aabbs2)
 
