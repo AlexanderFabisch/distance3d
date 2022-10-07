@@ -1,11 +1,7 @@
-import time
-import timeit
-
-import aabbtree
 import numpy as np
 import numba
 from ._mesh_processing import tetrahedral_mesh_aabbs
-from ._aabb_tree import insert_leaf, query_overlap, print_aabb_tree, new_tree_from_aabbs, query_overlap_of_other_tree
+from ._aabb_tree import AabbTree
 
 
 def broad_phase_tetrahedra(rigid_body1, rigid_body2, use_aabb_trees=False):
@@ -45,10 +41,10 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2, use_aabb_trees=False):
 
     if use_aabb_trees:
 
-        root1, nodes1, aabbs1 = new_tree_from_aabbs(aabbs1)
-        root2, nodes2, aabbs2 = new_tree_from_aabbs(aabbs2)
+        aabb_tree1 = AabbTree(aabbs1)
+        aabb_tree2 = AabbTree(aabbs2)
 
-        return query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2)
+        return aabb_tree1.overlaps_aabb_tree(aabb_tree2)
     else:
         return _all_aabbs_overlap(aabbs1, aabbs2)
 

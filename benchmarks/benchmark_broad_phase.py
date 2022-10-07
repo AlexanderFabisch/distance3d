@@ -24,10 +24,10 @@ def brute_force_aabbs(aabbs1, aabbs2):
     hydroelastic_contact._all_aabbs_overlap(aabbs1, aabbs2)
 
 def aabb_tree(aabbs1, aabbs2):
-    root1, nodes1, aabbs1 = hydroelastic_contact.new_tree_from_aabbs(aabbs1)
-    root2, nodes2, aabbs2 = hydroelastic_contact.new_tree_from_aabbs(aabbs2)
+    aabb_tree1 = hydroelastic_contact.AabbTree(aabbs1)
+    aabb_tree2 = hydroelastic_contact.AabbTree(aabbs2)
 
-    hydroelastic_contact.query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2)
+    aabb_tree1.overlaps_aabb_tree(aabb_tree2)
 
 
 def old_aabb_tree(aabbs1, aabbs2):
@@ -42,7 +42,7 @@ def old_aabb_tree(aabbs1, aabbs2):
         broad_tetrahedra1.extend([i] * len(new_indices2))
 
 
-aabbs1, aabbs2 = create_random_spheres(random_state, 1)
+aabbs1, aabbs2 = create_random_spheres(random_state, 3)
 
 repeat = 5
 number = 5
@@ -51,9 +51,10 @@ number = 5
 times = timeit.repeat(partial(brute_force_aabbs, aabbs1=aabbs1, aabbs2=aabbs2), repeat=repeat, number=number)
 print(f"Brute Force Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 
-root1, nodes1, aabbs1 = hydroelastic_contact.new_tree_from_aabbs(aabbs1)# root2, nodes2, aabbs2 = hydroelastic_contact.new_tree_from_aabbs(aabbs2)
+aabb_tree1 = hydroelastic_contact.AabbTree(aabbs1)
+aabb_tree2 = hydroelastic_contact.AabbTree(aabbs2)
 
-times = timeit.repeat(partial(hydroelastic_contact.query_overlap_of_other_tree, root1, nodes1, aabbs1, root2, nodes2, aabbs2),repeat=repeat, number=number)
+times = timeit.repeat(partial(aabb_tree1.overlaps_aabb_tree, aabb_tree2),repeat=repeat, number=number)
 print(f"AABB Trees No Creation Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 
 times = timeit.repeat(partial(aabb_tree, aabbs1=aabbs1, aabbs2=aabbs2), repeat=repeat, number=number)

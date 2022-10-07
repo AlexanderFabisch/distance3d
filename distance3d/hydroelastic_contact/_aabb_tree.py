@@ -3,8 +3,6 @@ import numba
 
 """
 https://github.com/JamesRandall/SimpleVoxelEngine/blob/master/voxelEngine/src/AABBTree.cpp
-
-node = (aabb_index, parent, child0, child1, )
 """
 
 INDEX_NONE = -1
@@ -17,76 +15,47 @@ TYPE_LEAF = 1
 TYPE_BRANCH = 2
 
 
-def new_tree_from_aabbs(aabbs):
-    """ Create root and nodes arrays for new tree.
+class AabbTree:
+    def __init__(self, aabbs):
+        root = INDEX_NONE
+        filled_len = len(aabbs)
 
-    Parameters
-    ----------
-    aabbs : np.array([3, 2])
-        Axis-aligned bounding boxes array
+        # TODO Don't just double the size. RAM is wasted
+        nodes = np.full([filled_len * 2, 4], INDEX_NONE)
+        z = np.zeros((len(nodes) - filled_len, 3, 2), dtype=aabbs.dtype)
+        aabbs = np.append(aabbs, z, axis=0)
 
-    Returns
-    -------
-    root_node_index : int
-        The new index of the root node.
+        root, nodes, aabbs = insert_aabbs(root, nodes, aabbs, filled_len)
 
-    nodes : np.array(4, dtype=int)
-        The new nodes array.
+        self.root = root
+        self.nodes = nodes
+        self.aabbs = aabbs
 
-    aabbs : np.array([3, 2])
-        Axis-aligned bounding boxes array
-    """
+    def __str__(self):
+        lines, *_ = print_aabb_tree_recursive(self.root, self.nodes)
+        return '\n'+'\n'.join(lines)
 
-    root = INDEX_NONE
-    l = len(aabbs)
-    nodes = np.full([l * 2, 4], INDEX_NONE)
-    z = np.zeros((len(nodes) - l, 3, 2), dtype=aabbs.dtype)
-    aabbs = np.append(aabbs, z, axis=0)
+    def overlaps_aabb_tree(self, other):
+        broad_tetrahedra1, broad_tetrahedra2, broad_pairs = query_overlap_of_other_tree(self.root, self.nodes,
+                                                                                        self.aabbs, other.root,
+                                                                                        other.nodes, other.aabbs)
+        return len(broad_pairs) > 0, np.unique(broad_tetrahedra1), np.unique(broad_tetrahedra2), broad_pairs
 
-    return insert_aabbs(root, nodes, aabbs, l)
+    def overlaps_aabb(self, aabb):
+        overlaps = query_overlap(aabb, self.root, self.nodes, self.aabbs)
+        return len(overlaps) > 0, overlaps
 
 
 @numba.njit(cache=True)
-def insert_aabbs(root, nodes, aabbs, l):
-    for i in range(l):
-        root, nodes, aabbs, l = insert_leaf(root, i, nodes, aabbs, l)
+def insert_aabbs(root, nodes, aabbs, filled_len):
+    for i in range(filled_len):
+        root, nodes, aabbs, filled_len = insert_leaf(root, i, nodes, aabbs, filled_len)
 
     return root, nodes, aabbs
 
 
 @numba.njit(cache=True)
-def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, len):
-    """ Inserts a new leaf into the tree.
-
-    Parameters
-    ----------
-    root_node_index : int
-        The index of the root node. Set to -1 if it's the first leaf.
-
-    leaf_node_index : int
-        The index of the new leaf.
-
-    nodes : np.array(4, dtype=int)
-        The nodes array. Completly filled with -1 at the beginning.
-
-    aabbs : np.array([3, 2])
-        Axis-aligned bounding boxes array
-
-    Returns
-    -------
-    root_node_index : int
-        The new index of the root node.
-
-    nodes : np.array(4, dtype=int)
-        The new nodes array.
-
-    aabbs : np.array([3, 2])
-        The new Axis-aligned bounding boxes array
-
-    l : int
-        New len
-    """
-
+def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
     # The Node that's going to be added.
     # A node in this system consists of three variables. An int as index.
     # The node array with containing [parent_index, left_child_index, right_child_index, type]
@@ -95,7 +64,7 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, len):
 
     # If there is no root make new leaf root.
     if root_node_index == INDEX_NONE:
-        return leaf_node_index, nodes, aabbs, len
+        return leaf_node_index, nodes, aabbs, filled_len
 
     # Traverse the tree down till you find a leaf.
     tree_node_index = root_node_index
@@ -131,8 +100,8 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, len):
     old_parent_index = nodes[sibling_index, PARENT_INDEX]
 
     # Adding Parent
-    new_parent_index = len
-    len += 1
+    new_parent_index = filled_len
+    filled_len += 1
 
     nodes[new_parent_index, PARENT_INDEX] = old_parent_index
     nodes[new_parent_index, LEFT_INDEX] = sibling_index
@@ -156,7 +125,7 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, len):
     tree_node_index = nodes[leaf_node_index, PARENT_INDEX]
     aabbs = fix_upward_tree(tree_node_index, nodes, aabbs)
 
-    return root_node_index, nodes, aabbs, len
+    return root_node_index, nodes, aabbs, filled_len
 
 
 @numba.njit(cache=True)
@@ -206,17 +175,32 @@ def aabb_z_size(aabb):
 
 
 @numba.njit(cache=True)
-def aabb_overlap(aabb1, aabb2):
-    return aabb1[0, 0] <= aabb2[0, 1] and aabb1[0, 1] >= aabb2[0, 0] \
-           and aabb1[1, 0] <= aabb2[1, 1] and aabb1[1, 1] >= aabb2[1, 0] \
-           and aabb1[2, 0] <= aabb2[2, 1] and aabb1[2, 1] >= aabb2[2, 0]
+def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
+    broad_tetrahedra1 = []
+    broad_tetrahedra2 = []
+    stack = [root2]
 
+    while len(stack) != 0:
 
-@numba.njit(cache=True)
-def aabb_contains(aabb1, aabb2):
-    return aabb1[0, 0] <= aabb2[0, 0] and aabb1[0, 1] >= aabb2[0, 1] \
-           and aabb1[1, 0] <= aabb2[1, 0] and aabb1[1, 1] >= aabb2[1, 1] \
-           and aabb1[2, 0] <= aabb2[2, 0] and aabb1[2, 1] >= aabb2[2, 1]
+        node_index = stack[-1]
+        stack = stack[:-1]
+
+        if node_index == INDEX_NONE:
+            continue
+
+        node_aabb = aabbs2[node_index]
+        if nodes2[node_index, TYPE_INDEX] == TYPE_BRANCH and \
+                len(query_overlap(node_aabb, root1, nodes1, aabbs1, break_at_first_leaf=True)) >= 1:
+            stack.extend([nodes2[node_index, 1], nodes2[node_index, 2]])
+
+        elif nodes2[node_index, TYPE_INDEX] == TYPE_LEAF:
+            overlaps = query_overlap(node_aabb, root1, nodes1, aabbs1)
+            broad_tetrahedra1.extend(overlaps)
+            broad_tetrahedra2.extend([node_index] * len(overlaps))
+
+    broad_pairs = list(zip(broad_tetrahedra1, broad_tetrahedra2))
+
+    return np.array(broad_tetrahedra1), np.array(broad_tetrahedra2), broad_pairs
 
 
 @numba.njit(cache=True)
@@ -247,38 +231,10 @@ def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=
 
 
 @numba.njit(cache=True)
-def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
-    broad_tetrahedra1 = []
-    broad_tetrahedra2 = []
-    stack = [root2]
-
-    while len(stack) != 0:
-
-        node_index = stack[-1]
-        stack = stack[:-1]
-
-        if node_index == INDEX_NONE:
-            continue
-
-        node_aabb = aabbs2[node_index]
-        if nodes2[node_index, TYPE_INDEX] == TYPE_BRANCH and \
-                len(query_overlap(node_aabb, root1, nodes1, aabbs1, break_at_first_leaf=True)) >= 1:
-            stack.extend([nodes2[node_index, 1], nodes2[node_index, 2]])
-
-        elif nodes2[node_index, TYPE_INDEX] == TYPE_LEAF:
-            overlaps = query_overlap(node_aabb, root1, nodes1, aabbs1)
-            broad_tetrahedra1.extend(overlaps)
-            broad_tetrahedra2.extend([node_index] * len(overlaps))
-
-    broad_pairs = list(zip(broad_tetrahedra1, broad_tetrahedra2))
-
-    return np.array(broad_tetrahedra1), np.array(broad_tetrahedra2), broad_pairs
-
-
-def print_aabb_tree(root_node_index, nodes):
-    lines, *_ = print_aabb_tree_recursive(root_node_index, nodes)
-    for line in lines:
-        print(line)
+def aabb_overlap(aabb1, aabb2):
+    return aabb1[0, 0] <= aabb2[0, 1] and aabb1[0, 1] >= aabb2[0, 0] \
+           and aabb1[1, 0] <= aabb2[1, 1] and aabb1[1, 1] >= aabb2[1, 0] \
+           and aabb1[2, 0] <= aabb2[2, 1] and aabb1[2, 1] >= aabb2[2, 0]
 
 
 def print_aabb_tree_recursive(node_index, nodes):
@@ -326,3 +282,11 @@ def print_aabb_tree_recursive(node_index, nodes):
     zipped_lines = zip(left, right)
     lines = [first_line, second_line] + [a + width * ' ' + b for a, b in zipped_lines]
     return lines, n + m + width, max(p, q) + 2, n + width // 2
+
+
+# Not used
+@numba.njit(cache=True)
+def aabb_contains(aabb1, aabb2):
+    return aabb1[0, 0] <= aabb2[0, 0] and aabb1[0, 1] >= aabb2[0, 1] \
+           and aabb1[1, 0] <= aabb2[1, 0] and aabb1[1, 1] >= aabb2[1, 1] \
+           and aabb1[2, 0] <= aabb2[2, 0] and aabb1[2, 1] >= aabb2[2, 1]
