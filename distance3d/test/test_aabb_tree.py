@@ -41,11 +41,11 @@ def test_aabb_tree_overlap_with_other_aabb_tree():
 
     is_overlap, _, _, _ = aabb_tree.overlaps_aabb_tree(aabb_tree2)
 
+    # TODO More result checks
     assert is_overlap
 
 
 def test_compare_aabb_tree_to_brute_force():
-
     rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
     rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
     rigid_body1.express_in(rigid_body2.body2origin_)
@@ -61,6 +61,3 @@ def test_compare_aabb_tree_to_brute_force():
     _, broad_tetrahedra2, _, _ = aabb_tree1.overlaps_aabb_tree(aabb_tree2)
 
     assert (np.sort(np.unique(broad_tetrahedra1)) == np.sort(np.unique(broad_tetrahedra2))).all()
-
-
-

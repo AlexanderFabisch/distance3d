@@ -5,6 +5,7 @@ import numba
 https://github.com/JamesRandall/SimpleVoxelEngine/blob/master/voxelEngine/src/AABBTree.cpp
 """
 
+
 INDEX_NONE = -1
 PARENT_INDEX = 0
 LEFT_INDEX = 1
@@ -17,6 +18,22 @@ TYPE_BRANCH = 2
 
 class AabbTree:
     def __init__(self, aabbs, pre_insertion_methode="none"):
+        """Creation of the aabb tree
+
+        Parameters
+        ----------
+        aabbs : array, shape (n, 3, 2)
+            An array containing a list of aabbs of the tree.
+
+        pre_insertion_methode : str, optional (default: "none")
+            The operation that is performed on the aabbs before tree creation.
+            Use "sort" for a cleaner tree with slightly longer creation times.
+            Use "shuffle" for a faster creation but with some non-optimal placement in the tree.
+
+        Returns
+        -------
+        aabb_tree : AabbTree
+        """
 
         if len(aabbs) == 0:
             return
@@ -49,14 +66,50 @@ class AabbTree:
         return '\r\n'+'\r\n'.join(lines)
 
     def overlaps_aabb_tree(self, other):
-        broad_tetrahedra1, broad_tetrahedra2, broad_pairs = query_overlap_of_other_tree(self.root, self.nodes,
-                                                                                        self.aabbs, other.root,
+        """ Check overlapping of another tree.
+
+        Parameters
+        ----------
+        other : AabbTree
+            The other Tree for overlap testing.
+
+        Returns
+        -------
+        is_overlapping : bool
+            True if there is an overlap in the two trees.
+
+        overlap_tetrahedron1 : array, shape (n)
+            The indexes of the overlapping tetrahedron in this tree.
+
+        overlap_tetrahedron2 : array, shape (n)
+            The indexes of the overlapping tetrahedron in the other tree.
+
+        overlap_pairs : array, shape (n, 2)
+            An array of all overlapping pairs.
+        """
+        overlap_tetrahedron1, overlap_tetrahedron2, overlap_pairs = query_overlap_of_other_tree(self.root, self.nodes,                                                                        self.aabbs, other.root,
                                                                                         other.nodes, other.aabbs)
-        return len(broad_pairs) > 0, np.unique(broad_tetrahedra1), np.unique(broad_tetrahedra2), broad_pairs
+        is_overlapping = len(overlap_pairs) > 0
+        return is_overlapping, np.unique(overlap_tetrahedron1), np.unique(overlap_tetrahedron2), overlap_pairs
 
     def overlaps_aabb(self, aabb):
-        overlaps = query_overlap(aabb, self.root, self.nodes, self.aabbs)
-        return len(overlaps) > 0, overlaps
+        """ Check overlapping of an aabb.
+
+        Parameters
+        ----------
+        aabb : array, shape (3, 2)
+            The aabb that is checked.
+
+        Returns
+        -------
+        is_overlapping : bool
+            True if there is an overlap in the two trees.
+
+        overlap_pairs : array, shape (n, 2)
+            An array of all overlapping pairs.
+        """
+        overlap_pairs = query_overlap(aabb, self.root, self.nodes, self.aabbs)
+        return len(overlap_pairs) > 0, overlap_pairs
 
 
 @numba.njit(cache=True)
