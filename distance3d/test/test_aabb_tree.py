@@ -48,7 +48,6 @@ def test_aabb_tree_overlap_with_other_aabb_tree():
     assert (overlap_tetrahedron2 == np.array([0, 1, 2])).all()
 
 
-
 def test_compare_aabb_tree_to_brute_force():
     rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
     rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
@@ -57,11 +56,33 @@ def test_compare_aabb_tree_to_brute_force():
     aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
     aabb_tree1 = hydroelastic_contact.AabbTree(aabbs1)
 
-    aabbs2 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
+    aabbs2 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body2.tetrahedra_points)
     aabb_tree2 = hydroelastic_contact.AabbTree(aabbs2)
 
-    broad_tetrahedra1, _, _ = hydroelastic_contact._all_aabbs_overlap(aabbs1, aabbs2)
+    broad_tetrahedra11, broad_tetrahedra12, broad_pairs1 = hydroelastic_contact._all_aabbs_overlap(aabbs1, aabbs2)
 
-    _, broad_tetrahedra2, _, _ = aabb_tree1.overlaps_aabb_tree(aabb_tree2)
+    _, broad_tetrahedra21, broad_tetrahedra22, broad_pairs2 = aabb_tree1.overlaps_aabb_tree(aabb_tree2)
 
-    assert (np.sort(np.unique(broad_tetrahedra1)) == np.sort(np.unique(broad_tetrahedra2))).all()
+    broad_tetrahedra11 = np.sort(np.unique(broad_tetrahedra11))
+    broad_tetrahedra12 = np.sort(np.unique(broad_tetrahedra12))
+    broad_tetrahedra21 = np.sort(np.unique(broad_tetrahedra21))
+    broad_tetrahedra22 = np.sort(np.unique(broad_tetrahedra22))
+
+    dif = []  # [(112, 43), (114, 216), (114, 304), (115, 43), (126, 216), (126, 229), (126, 304), (248, 43), (249,
+    # 216), (249, 304), (251, 216), (251, 304)]
+    for _, i in enumerate(broad_pairs1):
+        found = False
+        for _, j in enumerate(broad_pairs2):
+            if i == j:
+                found = True
+                break
+
+        if not found:
+            dif.append(i)
+
+    # TODO Still fails
+    assert (broad_tetrahedra11 == broad_tetrahedra21).all()
+
+    assert (broad_tetrahedra12 == broad_tetrahedra22).all()
+
+    assert (np.sort(np.unique(broad_pairs1)) == np.sort(np.unique(broad_pairs2))).all()

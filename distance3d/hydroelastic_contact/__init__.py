@@ -13,6 +13,7 @@ The implementation is different, but is inspired by:
 V. Huang, F. Wang, E. Zhang: An Efficient Implementation of Pressure Field
 Models, https://www.ekzhang.com/assets/pdf/Hydroelastics.pdf.
 """
+from ._aabb import _all_aabbs_overlap
 from ._interface import contact_forces, find_contact_surface
 from ._rigid_body import RigidBody
 from ._contact_surface import ContactSurface
@@ -25,7 +26,6 @@ from ._mesh_processing import (
 from ._barycentric_transform import barycentric_transforms
 from ._tetrahedron_intersection import intersect_tetrahedron_pair
 from ._forces import compute_contact_force
-from ._broad_phase import broad_phase_tetrahedra, _all_aabbs_overlap
 from ._aabb_tree import AabbTree
 
 
@@ -36,6 +36,6 @@ __all__ = [
     "center_of_mass_tetrahedral_mesh", "tetrahedral_mesh_aabbs",
     "tetrahedral_mesh_volumes", "barycentric_transforms",
     "intersect_tetrahedron_pair", "compute_contact_force",
-    "broad_phase_tetrahedra", "_all_aabbs_overlap",
+    "_aabb", "_all_aabbs_overlap",
     "AabbTree"
 ]

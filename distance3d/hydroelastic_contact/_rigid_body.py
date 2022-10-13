@@ -4,7 +4,8 @@ from ._tetra_mesh_creation import (
     make_tetrahedral_sphere, make_tetrahedral_ellipsoid,
     make_tetrahedral_cube, make_tetrahedral_box, make_tetrahedral_cylinder,
     make_tetrahedral_capsule)
-from ._mesh_processing import center_of_mass_tetrahedral_mesh
+from ._mesh_processing import center_of_mass_tetrahedral_mesh, tetrahedral_mesh_aabbs
+from ._aabb_tree import AabbTree
 
 
 class RigidBody:
@@ -32,6 +33,9 @@ class RigidBody:
 
         self._tetrahedra_points = None
         self._com = None
+
+        self._aabbs = None
+        self._aabb_tree = None
 
     @staticmethod
     def make_sphere(center, radius, order=4):
@@ -221,3 +225,20 @@ class RigidBody:
 
         self._tetrahedra_points = None
         self._com = None
+        self._aabbs = None
+        self._aabb_tree = None
+
+    @property
+    def aabbs(self):
+        """The aabbs for broad phase collision detection"""
+        if self._aabbs is None:
+            self._aabbs = tetrahedral_mesh_aabbs(self.tetrahedra_points)
+        return self._aabbs
+
+    @property
+    def aabb_tree(self):
+        """The aabb_tree for broad phase collision detection"""
+        if self._aabb_tree is None:
+            self._aabb_tree = AabbTree(self.aabbs, "sort")
+        return self._aabb_tree
+

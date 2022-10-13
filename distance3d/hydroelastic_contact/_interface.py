@@ -1,9 +1,10 @@
 import numpy as np
 from ._forces import contact_surface_forces, accumulate_wrenches
-from ._broad_phase import broad_phase_tetrahedra
 from ._barycentric_transform import barycentric_transforms
 from ._tetrahedron_intersection import intersect_tetrahedron_pairs
 from ._contact_surface import ContactSurface
+from ._aabb import _all_aabbs_overlap
+from ._aabb_tree import AabbTree
 
 
 def contact_forces(rigid_body1, rigid_body2, return_details=False):
@@ -50,7 +51,7 @@ def contact_forces(rigid_body1, rigid_body2, return_details=False):
             contact_surface.intersection, wrench12_in_world, wrench21_in_world)
 
 
-def find_contact_surface(rigid_body1, rigid_body2):
+def find_contact_surface(rigid_body1, rigid_body2, use_aabb_trees=False):
     """Find contact plane of two rigid bodies.
 
     Note that this function will transform rigid_body1 into the frame of
@@ -64,6 +65,9 @@ def find_contact_surface(rigid_body1, rigid_body2):
     rigid_body2 : RigidBody
         Second rigid body.
 
+    use_aabb_trees : bool, optional, default(False)
+        Option to specify zhe usage of aabb_trees.
+
     Returns
     -------
     contact_surface : ContactSurface
@@ -73,15 +77,16 @@ def find_contact_surface(rigid_body1, rigid_body2):
     # reuse the AABB tree of rigid_body2.
     rigid_body1.express_in(rigid_body2.body2origin_)
 
-    broad_tetrahedra1, broad_tetrahedra2, broad_pairs = broad_phase_tetrahedra(
-        rigid_body1, rigid_body2, True)
+    if use_aabb_trees:
+        _, broad_tetrahedra1, broad_tetrahedra2, broad_pairs \
+            = rigid_body1.aabb_tree.overlaps_aabb_tree(rigid_body2.aabb_tree)
+    else:
+        broad_tetrahedra1, broad_tetrahedra2, broad_pairs = _all_aabbs_overlap(rigid_body1.aabbs, rigid_body2.aabbs)
 
-    unique_indices1 = np.unique(broad_tetrahedra1)
-    unique_indices2 = np.unique(broad_tetrahedra2)
-    X1 = barycentric_transforms(rigid_body1.tetrahedra_points[unique_indices1])
-    X2 = barycentric_transforms(rigid_body2.tetrahedra_points[unique_indices2])
-    X1 = {j: X1[i] for i, j in enumerate(unique_indices1)}
-    X2 = {j: X2[i] for i, j in enumerate(unique_indices2)}
+    X1 = barycentric_transforms(rigid_body1.tetrahedra_points[broad_tetrahedra1])
+    X2 = barycentric_transforms(rigid_body2.tetrahedra_points[broad_tetrahedra2])
+    X1 = {j: X1[i] for i, j in enumerate(broad_tetrahedra1)}
+    X2 = {j: X2[i] for i, j in enumerate(broad_tetrahedra2)}
 
     intersection_result = intersect_tetrahedron_pairs(
         broad_pairs,
