@@ -30,7 +30,7 @@ def broad_phase_tetrahedra(rigid_body1, rigid_body2, use_aabb_trees=False):
         first rigid body.
 
     broad_pairs : list
-        List of intersecting tetrahedron pairs.
+        of intersecting tetrahedron pairs.
     """
 
     aabbs1 = tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
