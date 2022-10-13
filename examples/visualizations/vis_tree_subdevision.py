@@ -20,7 +20,6 @@ def get_leafs_of_node(node_index, nodes):
 
 
 rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0 * np.ones(3), 0.15, 4)
-# rigid_body1 = hydroelastic_contact.RigidBody.make_cube(np.eye(4), 0.15)
 
 points = rigid_body1.tetrahedra_points
 aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(points)
