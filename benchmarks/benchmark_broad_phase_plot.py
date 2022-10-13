@@ -52,19 +52,7 @@ pyplot.show()
 
 """
 
-rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0 * np.ones(3), 0.15, 4)
-aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
 
-values = []
-step = 100
-for i in range(int(len(aabbs1) / step)):
-    times = timeit.repeat(partial(hydroelastic_contact.AabbTree, aabbs=aabbs1[(len(aabbs1) - i*step):]), repeat=5, number=5)
-    print(f"Nr {i} of {len(aabbs1) / step} Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
-    values.append(np.mean(times))
-
-pyplot.plot(values, markersize=20, label="AABB Tree")
-pyplot.legend()
-pyplot.show()
 
 """
 
