@@ -2,7 +2,7 @@ import numpy as np
 from distance3d import visualization, hydroelastic_contact
 
 
-def test_aabb_tree_creation():
+def create_test_aabbs():
     aabbs = np.array([[[0, 2], [0, 2], [0, 1]],
                       [[1, 3], [1, 3], [0, 1]],
                       [[3, 4], [0, 1], [0, 1]]])
@@ -10,6 +10,11 @@ def test_aabb_tree_creation():
     aabbs2 = np.array([[[1.5, 3.5], [0, 0.5], [0, 1]],
                        [[1.5, 2], [2.5, 4], [0, 1]],
                        [[3.5, 4.5], [0, 0.5], [0, 1]]])
+    return aabbs, aabbs2
+
+
+def test_aabb_tree_creation():
+    aabbs, aabbs2 = create_test_aabbs()
 
     aabb_tree = hydroelastic_contact.AabbTree(aabbs)
 
@@ -27,12 +32,19 @@ def test_aabb_tree_creation():
     overlaps = np.sort(overlaps)
     assert overlaps[0] == 2
 
-    aabb_tree2 = hydroelastic_contact.AabbTree(aabbs)
 
-    aabb_tree.overlaps_aabb_tree(aabb_tree2)
+def test_aabb_tree_overlap_with_other_aabb_tree():
+    aabbs, aabbs2 = create_test_aabbs()
+
+    aabb_tree = hydroelastic_contact.AabbTree(aabbs)
+    aabb_tree2 = hydroelastic_contact.AabbTree(aabbs2)
+
+    is_overlap, _, _, _ = aabb_tree.overlaps_aabb_tree(aabb_tree2)
+
+    assert is_overlap
 
 
-def test_aabb_tree_compare_to_brute_force():
+def test_compare_aabb_tree_to_brute_force():
 
     rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
     rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
