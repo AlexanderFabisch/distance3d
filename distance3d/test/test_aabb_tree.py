@@ -1,5 +1,5 @@
 import numpy as np
-from distance3d import visualization, hydroelastic_contact
+from distance3d import hydroelastic_contact
 
 
 def create_test_aabbs():
@@ -39,10 +39,14 @@ def test_aabb_tree_overlap_with_other_aabb_tree():
     aabb_tree = hydroelastic_contact.AabbTree(aabbs)
     aabb_tree2 = hydroelastic_contact.AabbTree(aabbs2)
 
-    is_overlap, _, _, _ = aabb_tree.overlaps_aabb_tree(aabb_tree2)
+    is_overlapping, overlap_tetrahedron1, overlap_tetrahedron2, overlap_pairs = aabb_tree.overlaps_aabb_tree(aabb_tree2)
 
-    # TODO More result checks
-    assert is_overlap
+    assert is_overlapping
+
+    assert (overlap_tetrahedron1 == np.array([0, 1, 2])).all()
+
+    assert (overlap_tetrahedron2 == np.array([0, 1, 2])).all()
+
 
 
 def test_compare_aabb_tree_to_brute_force():
