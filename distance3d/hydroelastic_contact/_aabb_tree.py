@@ -213,7 +213,7 @@ def fix_upward_tree(tree_node_index, nodes, aabbs):
     return aabbs
 
 
-#@numba.njit(cache=True)
+@numba.njit(cache=True)
 def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
     broad_tetrahedra1 = []
     broad_tetrahedra2 = []
@@ -242,7 +242,7 @@ def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
     return np.array(broad_tetrahedra1), np.array(broad_tetrahedra2), broad_pairs
 
 
-#@numba.njit(cache=True)
+@numba.njit(cache=True)
 def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=False):
     overlaps = []
     stack = [root_node_index]
@@ -314,3 +314,4 @@ def print_aabb_tree_recursive(node_index, nodes):
     zipped_lines = zip(left, right)
     lines = [first_line, second_line] + [a + width * ' ' + b for a, b in zipped_lines]
     return lines, n + m + width, max(p, q) + 2, n + width // 2
+

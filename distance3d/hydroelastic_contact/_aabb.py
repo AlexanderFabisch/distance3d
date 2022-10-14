@@ -35,7 +35,7 @@ def _merge_aabb(aabb1, aabb2):
     return np.array(
         [[min(aabb1[0, 0], aabb2[0, 0]), max(aabb1[0, 1], aabb2[0, 1])],
          [min(aabb1[1, 0], aabb2[1, 0]), max(aabb1[1, 1], aabb2[1, 1])],
-         [min(aabb1[0, 0], aabb2[2, 0]), max(aabb1[2, 1], aabb2[2, 1])]]
+         [min(aabb1[2, 0], aabb2[2, 0]), max(aabb1[2, 1], aabb2[2, 1])]]
     )
 
 
