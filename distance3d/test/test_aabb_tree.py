@@ -68,21 +68,11 @@ def test_compare_aabb_tree_to_brute_force():
     broad_tetrahedra21 = np.sort(np.unique(broad_tetrahedra21))
     broad_tetrahedra22 = np.sort(np.unique(broad_tetrahedra22))
 
-    dif = []  # [(112, 43), (114, 216), (114, 304), (115, 43), (126, 216), (126, 229), (126, 304), (248, 43), (249,
-    # 216), (249, 304), (251, 216), (251, 304)]
-    for _, i in enumerate(broad_pairs1):
-        found = False
-        for _, j in enumerate(broad_pairs2):
-            if i == j:
-                found = True
-                break
-
-        if not found:
-            dif.append(i)
-
-    # TODO Still fails
     assert (broad_tetrahedra11 == broad_tetrahedra21).all()
 
     assert (broad_tetrahedra12 == broad_tetrahedra22).all()
 
     assert (np.sort(np.unique(broad_pairs1)) == np.sort(np.unique(broad_pairs2))).all()
+
+
+
