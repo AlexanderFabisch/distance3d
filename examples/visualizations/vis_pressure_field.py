@@ -11,7 +11,7 @@ from distance3d import visualization, hydroelastic_contact, benchmark
 
 
 highlight_isect_idx = None
-show_broad_phase = False
+show_broad_phase = True
 
 rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
 rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
@@ -35,13 +35,13 @@ visualization.RigidBodyTetrahedralMesh(
     rigid_body2.body2origin_, rigid_body2.vertices_, rigid_body2.tetrahedra_).add_artist(fig)
 
 if show_broad_phase:
-    broad_overlapping_indices1, broad_overlapping_indices2, broad_pairs = hydroelastic_contact.broad_phase_tetrahedra(
-        rigid_body1, rigid_body2)
-    for i in np.unique(broad_overlapping_indices1):
+    _, broad_tetrahedra1, broad_tetrahedra2, broad_pairs \
+        = rigid_body1.aabb_tree.overlaps_aabb_tree(rigid_body2.aabb_tree)
+    for i in np.unique(broad_tetrahedra1):
         tetrahedron_points1 = rigid_body1.tetrahedra_points[i].dot(
             rigid_body1.body2origin_[:3, :3].T) + rigid_body1.body2origin_[:3, 3]
         visualization.Tetrahedron(tetrahedron_points1, c=(1, 0, 0)).add_artist(fig)
-    for j in np.unique(broad_overlapping_indices2):
+    for j in np.unique(broad_tetrahedra2):
         tetrahedron_points2 = rigid_body2.tetrahedra_points[j].dot(
             rigid_body2.body2origin_[:3, :3].T) + rigid_body2.body2origin_[:3, 3]
         visualization.Tetrahedron(tetrahedron_points2, c=(1, 0, 0)).add_artist(fig)
