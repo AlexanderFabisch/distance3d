@@ -66,7 +66,7 @@ def find_contact_surface(rigid_body1, rigid_body2, use_aabb_trees=False):
         Second rigid body.
 
     use_aabb_trees : bool, optional, default(False)
-        Option to specify zhe usage of aabb_trees.
+        Option to specify the usage of aabb_trees.
 
     Returns
     -------
