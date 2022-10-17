@@ -1,12 +1,16 @@
-import timeit
+from functools import partial
 
 import aabbtree
-import numpy as np
-from functools import partial
+
 from distance3d import hydroelastic_contact
+import timeit
+import numpy as np
+
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 
 random_state = np.random.RandomState(0)
-
 
 def create_random_spheres(random_state, size):
     p = random_state.randn(3)
@@ -47,27 +51,49 @@ aabbs1, aabbs2 = create_random_spheres(random_state, 3)
 repeat = 5
 number = 5
 
+values = [[], [], []]
+y_steps = [[], [], []]
+step = 10
+skip_point = 3.0
+skip_data = [False, False, False]
 
-times = timeit.repeat(partial(brute_force_aabbs, aabbs1=aabbs1, aabbs2=aabbs2), repeat=repeat, number=number)
-print(f"Brute Force Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+for i in range(1, int(len(aabbs1) / step)):
+    print(f"Nr {i * step} of {len(aabbs1)}")
 
-aabb_tree1 = hydroelastic_contact.AabbTree(aabbs1)
-aabb_tree2 = hydroelastic_contact.AabbTree(aabbs2)
+    if not skip_data[0]:
+        times = timeit.repeat(partial(brute_force_aabbs,
+                                      aabbs1=aabbs1[(len(aabbs1) - i*step):],
+                                      aabbs2=aabbs2[(len(aabbs1) - i*step):]),
+                              repeat=repeat, number=number)
+        print(f"Brute: Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+        values[0].append(np.mean(times))
+        skip_data[0] = np.mean(times) > skip_point
+        y_steps[0].append(i * step)
 
-times = timeit.repeat(partial(aabb_tree1.overlaps_aabb_tree, aabb_tree2),repeat=repeat, number=number)
-print(f"AABB Trees No Creation Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+    if not skip_data[1]:
+        times = timeit.repeat(partial(aabb_tree,
+                                      aabbs1=aabbs1[(len(aabbs1) - i * step):],
+                                      aabbs2=aabbs2[(len(aabbs1) - i * step):]),
+                              repeat=repeat, number=number)
 
-times = timeit.repeat(partial(aabb_tree, aabbs1=aabbs1, aabbs2=aabbs2), repeat=repeat, number=number)
-print(f"AABB Trees Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+        print(f"New Tree: Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+        values[1].append(np.mean(times))
+        skip_data[1] = np.mean(times) > skip_point
+        y_steps[1].append(i * step)
 
-times = timeit.repeat(partial(old_aabb_tree, aabbs1=aabbs1, aabbs2=aabbs2), repeat=repeat, number=number)
-print(f"Old AABB Trees Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+    if not skip_data[2]:
+        times = timeit.repeat(partial(old_aabb_tree,
+                                      aabbs1=aabbs1[(len(aabbs1) - i*step):],
+                                      aabbs2=aabbs2[(len(aabbs1) - i*step):]),
+                              repeat=repeat, number=number)
+        print(f"Old Tree: Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+        values[2].append(np.mean(times))
+        skip_data[2] = np.mean(times) > skip_point
+        y_steps[2].append(i * step)
 
 
-"""
-AABB Trees Mean: 0.11631; Std. dev.: 0.00316
-Brute Force Mean: 0.00656; Std. dev.: 0.00315
-
-AABB Trees Mean: 0.08419; Std. dev.: 0.01048
-Brute Force Mean: 0.00623; Std. dev.: 0.00291
-"""
+plt.plot(y_steps[0], values[0], markersize=20, label="Brute")
+plt.plot(y_steps[1], values[1], markersize=20, label="New AABB Tree")
+plt.plot(y_steps[2], values[2], markersize=20, label="Old AABB Tree")
+plt.legend()
+plt.show()
