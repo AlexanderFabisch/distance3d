@@ -2,6 +2,8 @@ import numpy as np
 from distance3d import hydroelastic_contact
 import pytransform3d.rotations as pr
 
+from distance3d.hydroelastic_contact import _all_aabbs_overlap
+
 
 def cube_unique_pairs(use_aabb_trees):
     rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
@@ -11,8 +13,12 @@ def cube_unique_pairs(use_aabb_trees):
     rigid_body2 = hydroelastic_contact.RigidBody.make_cube(cube2origin, 0.15)
 
     rigid_body1.express_in(rigid_body2.body2origin_)
-    broad_tetrahedra1, broad_tetrahedra2, broad_pairs = hydroelastic_contact.broad_phase_tetrahedra(
-        rigid_body1, rigid_body2, use_aabb_trees)
+
+    if use_aabb_trees:
+        _, broad_tetrahedra1, broad_tetrahedra2, broad_pairs \
+            = rigid_body1.aabb_tree.overlaps_aabb_tree(rigid_body2.aabb_tree)
+    else:
+        broad_tetrahedra1, broad_tetrahedra2, broad_pairs = _all_aabbs_overlap(rigid_body1.aabbs, rigid_body2.aabbs)
 
     assert len(broad_pairs) == 162
 
