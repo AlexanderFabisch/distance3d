@@ -50,13 +50,13 @@ class AabbTree:
         z = np.zeros((len(nodes) - filled_len, 3, 2), dtype=aabbs.dtype)
         aabbs = np.append(aabbs, z, axis=0)
 
-        args = np.array(range(filled_len))
+        insert_order = np.array(range(filled_len))
         if pre_insertion_methode == "sort":
-            args = _sort_aabbs(aabbs[:len(nodes) - filled_len])
+            insert_order = _sort_aabbs(aabbs[:len(nodes) - filled_len])
         elif pre_insertion_methode == "shuffle":
-            np.random.shuffle(args)
+            np.random.shuffle(insert_order)
 
-        root, nodes, aabbs = insert_aabbs(root, nodes, aabbs, filled_len, args)
+        root, nodes, aabbs = insert_aabbs(root, nodes, aabbs, filled_len, insert_order)
 
         self.root = root
         self.nodes = nodes
@@ -115,8 +115,43 @@ class AabbTree:
 
 
 @numba.njit(cache=True)
-def insert_aabbs(root, nodes, aabbs, filled_len, args):
-    for i in args:
+def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):
+    """Inserts aabbs into the tree defined in root and nodes.
+
+    Parameters
+    ----------
+    root : int
+        The index of the tree root node.
+
+    nodes : array, shape (n, 4)
+        The index links of the tree structure.
+        The indices of the 1-axis correspond to the aabb indices.
+        The first entry in of the 2-axis is the index of the parent.
+        The second entry in of the 2-axis is the index of the left child.
+        The third entry in of the 2-axis is the index of the right child.
+        The forth entry in of the 2-axis is 1 if leaf and 2 if branch node.
+
+    aabbs : array, shape (3, 2)
+        The aabbs that are inserted.
+
+    filled_len : int
+        The length to which the nodes and aabbs are filled.
+
+    insert_order : array, shape (filled_len)
+        A list of indexes describing the insert order into the tree.
+
+    Returns
+    -------
+    root : int
+        The index of the tree root node.
+
+    nodes : array, shape (n, 4)
+        The index links of the tree structure.
+
+    aabbs : array, shape (3, 2)
+        The aabbs of the tree.
+    """
+    for i in insert_order:
         root, nodes, aabbs, filled_len = insert_leaf(root, i, nodes, aabbs, filled_len)
 
     return root, nodes, aabbs
@@ -124,6 +159,9 @@ def insert_aabbs(root, nodes, aabbs, filled_len, args):
 
 @numba.njit(cache=True)
 def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
+    """
+    Inserts a new leaf into the tree.
+    """
     # The Node that's going to be added.
     # A node in this system consists of three variables. An int as index.
     # The node array with containing [parent_index, left_child_index, right_child_index, type]
@@ -198,6 +236,10 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
 
 @numba.njit(cache=True)
 def fix_upward_tree(tree_node_index, nodes, aabbs):
+    """
+    Fixes the aabbs of the parent branches by setting them to the merge of the children aabbs.
+    """
+
     # Go the tree back up while fixing the aabbs.
     while tree_node_index != INDEX_NONE:
         tree_node = nodes[tree_node_index]
@@ -215,6 +257,10 @@ def fix_upward_tree(tree_node_index, nodes, aabbs):
 
 @numba.njit(cache=True)
 def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
+    """
+    Queries the overlapping aabbs by traversing the trees.
+    """
+
     broad_tetrahedra1 = []
     broad_tetrahedra2 = []
     stack = [root2]
@@ -244,6 +290,9 @@ def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
 
 @numba.njit(cache=True)
 def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=False):
+    """
+    Queries the overlapping aabbs by traversing the tree.
+    """
     overlaps = []
     stack = [root_node_index]
 
