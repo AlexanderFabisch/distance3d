@@ -1,6 +1,6 @@
 import numpy as np
 import numba
-from ._aabb import _aabb_overlap, _merge_aabb, _aabb_surface, _sort_aabbs
+from ._aabb import _aabb_overlap, _merge_aabb, _aabb_volume, _sort_aabbs
 
 """
 https://github.com/JamesRandall/SimpleVoxelEngine/blob/master/voxelEngine/src/AABBTree.cpp
@@ -143,13 +143,13 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
         right_node_index = nodes[tree_node_index, RIGHT_INDEX]
 
         # Whether the left or right child is traverse down depends on the cost of increasing the size of the aabbs.
-        cost_new_parent = _aabb_surface(
+        cost_new_parent = _aabb_volume(
             _merge_aabb(aabbs[leaf_node_index], aabbs[tree_node_index]))
 
-        cost_left = _aabb_surface(
+        cost_left = _aabb_volume(
             _merge_aabb(aabbs[leaf_node_index], aabbs[left_node_index]))
 
-        cost_right = _aabb_surface(
+        cost_right = _aabb_volume(
             _merge_aabb(aabbs[leaf_node_index], aabbs[right_node_index]))
 
         if cost_left > cost_new_parent and cost_right > cost_new_parent:
