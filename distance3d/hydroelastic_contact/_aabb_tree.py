@@ -2,11 +2,6 @@ import numpy as np
 import numba
 from ._aabb import _aabb_overlap, _merge_aabb, _aabb_volume, _sort_aabbs
 
-"""
-https://github.com/JamesRandall/SimpleVoxelEngine/blob/master/voxelEngine/src/AABBTree.cpp
-"""
-
-
 INDEX_NONE = -1
 PARENT_INDEX = 0
 LEFT_INDEX = 1
@@ -42,11 +37,8 @@ class AabbTree:
         root = INDEX_NONE
         filled_len = len(aabbs)
 
-        # TODO Don't just double the size. RAM is wasted
-        # TODO Documentation
-        # TODO Proper Unit Tests
-
-        nodes = np.full([filled_len * 2, 4], INDEX_NONE)
+        nodes = np.full([2 * filled_len - 1, 4], INDEX_NONE)
+        # The maximum number of possible nodes a tree can have is 2n -1
         z = np.zeros((len(nodes) - filled_len, 3, 2), dtype=aabbs.dtype)
         aabbs = np.append(aabbs, z, axis=0)
 
@@ -56,15 +48,15 @@ class AabbTree:
         elif pre_insertion_methode == "shuffle":
             np.random.shuffle(insert_order)
 
-        root, nodes, aabbs = insert_aabbs(root, nodes, aabbs, filled_len, insert_order)
+        root, nodes, aabbs, filled_len = insert_aabbs(root, nodes, aabbs, filled_len, insert_order)
 
         self.root = root
-        self.nodes = nodes
-        self.aabbs = aabbs
+        self.nodes = nodes[:filled_len]
+        self.aabbs = aabbs[:filled_len]
 
     def __str__(self):
         lines, *_ = print_aabb_tree_recursive(self.root, self.nodes)
-        return '\r\n'+'\r\n'.join(lines)
+        return '\r\n' + '\r\n'.join(lines)
 
     def overlaps_aabb_tree(self, other):
         """ Check overlapping of another tree.
@@ -150,11 +142,14 @@ def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):
 
     aabbs : array, shape (3, 2)
         The aabbs of the tree.
+
+    filled_len : int
+        The length to which the nodes and aabbs are filled.
     """
     for i in insert_order:
         root, nodes, aabbs, filled_len = insert_leaf(root, i, nodes, aabbs, filled_len)
 
-    return root, nodes, aabbs
+    return root, nodes, aabbs, filled_len
 
 
 @numba.njit(cache=True)
@@ -162,6 +157,7 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
     """
     Inserts a new leaf into the tree.
     """
+    # From https://github.com/JamesRandall/SimpleVoxelEngine/blob/master/voxelEngine/src/AABBTree.cpp
     # The Node that's going to be added.
     # A node in this system consists of three variables. An int as index.
     # The node array with containing [parent_index, left_child_index, right_child_index, type]
@@ -363,4 +359,3 @@ def print_aabb_tree_recursive(node_index, nodes):
     zipped_lines = zip(left, right)
     lines = [first_line, second_line] + [a + width * ' ' + b for a, b in zipped_lines]
     return lines, n + m + width, max(p, q) + 2, n + width // 2
-
