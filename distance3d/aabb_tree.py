@@ -48,7 +48,7 @@ class AabbTree:
         if len(aabbs) == 0:
             return
 
-        assert external_data_list != None or len(external_data_list) == len(aabbs)
+        assert external_data_list == [None] or len(external_data_list) == len(aabbs)
 
         old_filled_len = self.filled_len
         self.filled_len += len(aabbs)
@@ -61,9 +61,9 @@ class AabbTree:
         new_aabbs = np.zeros([len(self.nodes) - len(self.aabbs), 3, 2])
         self.aabbs = np.append(self.aabbs, new_aabbs, axis=0)
 
-        self.external_data_list.append(external_data_list)
+        self.external_data_list += external_data_list
         empty_external_data = [None] * (len(self.nodes) - len(self.external_data_list))
-        self.external_data_list.append(empty_external_data)
+        self.external_data_list += empty_external_data
 
         insert_order = np.array(range(old_filled_len, self.filled_len))
         if pre_insertion_methode == "sort":
@@ -76,6 +76,7 @@ class AabbTree:
 
         self.nodes = self.nodes[:self.filled_len]
         self.aabbs = self.aabbs[:self.filled_len]
+        self.external_data_list = self.external_data_list[:self.filled_len]
 
     def insert_aabb(self, aabb, external_data=None):
         """Inster aabbs in tree
@@ -179,13 +180,15 @@ class AabbTree:
 
         Returns
         -------
+        external_data_list: array, shape(n)
 
         """
         _, overlaps = self.overlaps_aabb(aabb)
-        return self.external_data_list[overlaps]
+        external_data = [self.external_data_list[index] for index in overlaps]
+        return external_data
 
 
-# @numba.njit(cache=True)
+@numba.njit(cache=True)
 def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):
     """Inserts aabbs into the tree defined in root and nodes.
 
@@ -231,7 +234,7 @@ def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):
     return root, nodes, aabbs, filled_len
 
 
-# @numba.njit(cache=True)
+@numba.njit(cache=True)
 def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
     """
     Inserts a new leaf into the tree.
@@ -309,7 +312,7 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
     return root_node_index, nodes, aabbs, filled_len
 
 
-# @numba.njit(cache=True)
+@numba.njit(cache=True)
 def fix_upward_tree(tree_node_index, nodes, aabbs):
     """
     Fixes the aabbs of the parent branches by setting them to the merge of the children aabbs.
@@ -330,7 +333,7 @@ def fix_upward_tree(tree_node_index, nodes, aabbs):
     return aabbs
 
 
-# @numba.njit(cache=True)
+@numba.njit(cache=True)
 def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
     """
     Queries the overlapping aabbs by traversing the trees.
@@ -363,7 +366,7 @@ def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
     return np.array(broad_tetrahedra1), np.array(broad_tetrahedra2), broad_pairs
 
 
-# @numba.njit(cache=True)
+@numba.njit(cache=True)
 def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=False):
     """
     Queries the overlapping aabbs by traversing the tree.

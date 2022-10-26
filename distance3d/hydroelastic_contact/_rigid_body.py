@@ -240,6 +240,6 @@ class RigidBody:
         """The aabb_tree for broad phase collision detection"""
         if self._aabb_tree is None:
             self._aabb_tree = AabbTree()
-            self._aabb_tree.insert_aabbs(self.aabbs, "sort")
+            self._aabb_tree.insert_aabbs(self.aabbs, pre_insertion_methode="sort")
         return self._aabb_tree
 

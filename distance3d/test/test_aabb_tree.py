@@ -20,7 +20,7 @@ def test_aabb_tree_creation():
     aabb_tree = AabbTree()
     aabb_tree.insert_aabbs(aabbs)
 
-    print(aabb_tree)
+    # print(aabb_tree)
 
     _, overlaps = aabb_tree.overlaps_aabb(aabbs2[0])
     overlaps = np.sort(overlaps)

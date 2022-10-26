@@ -20,26 +20,30 @@ step = 100
 skip_point = 3.0
 skip_data = [False, False, False]
 
+def create_tree(aabbs, pre_insertion_methode):
+    tree = AabbTree()
+    tree.insert_aabbs(aabbs, pre_insertion_methode=pre_insertion_methode)
+
 for i in range(int(len(aabbs1) / step)):
     print(f"Nr {i * step} of {len(aabbs1)}")
     y_steps.append(i * step)
 
     if not skip_data[0]:
-        times = timeit.repeat(partial(AabbTree, aabbs=aabbs1[(len(aabbs1) - i*step):],
+        times = timeit.repeat(partial(create_tree, aabbs=aabbs1[(len(aabbs1) - i*step):],
                                       pre_insertion_methode="none"), repeat=5, number=5)
         print(f"None: Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
         values[0].append(np.mean(times))
         skip_data[0] = np.mean(times) > skip_point
 
     if not skip_data[1]:
-        times = timeit.repeat(partial(AabbTree, aabbs=aabbs1[(len(aabbs1) - i * step):],
+        times = timeit.repeat(partial(create_tree, aabbs=aabbs1[(len(aabbs1) - i * step):],
                                       pre_insertion_methode="shuffle"), repeat=5, number=5)
         print(f"Shuffle: Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
         values[1].append(np.mean(times))
         skip_data[0] = np.mean(times) > skip_point
 
     if not skip_data[2]:
-        times = timeit.repeat(partial(AabbTree, aabbs=aabbs1[(len(aabbs1) - i * step):],
+        times = timeit.repeat(partial(create_tree, aabbs=aabbs1[(len(aabbs1) - i * step):],
                                       pre_insertion_methode="sort"), repeat=5, number=5)
         print(f"Sort: Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
         values[2].append(np.mean(times))
