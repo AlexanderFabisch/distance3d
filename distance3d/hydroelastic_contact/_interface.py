@@ -1,10 +1,8 @@
-import numpy as np
 from ._forces import contact_surface_forces, accumulate_wrenches
 from ._barycentric_transform import barycentric_transforms
 from ._tetrahedron_intersection import intersect_tetrahedron_pairs
 from ._contact_surface import ContactSurface
-from ._aabb import _all_aabbs_overlap
-from ._aabb_tree import AabbTree
+from ..aabb_tree import all_aabbs_overlap
 
 
 def contact_forces(rigid_body1, rigid_body2, return_details=False):
@@ -81,7 +79,7 @@ def find_contact_surface(rigid_body1, rigid_body2, use_aabb_trees=False):
         _, broad_tetrahedra1, broad_tetrahedra2, broad_pairs \
             = rigid_body1.aabb_tree.overlaps_aabb_tree(rigid_body2.aabb_tree)
     else:
-        broad_tetrahedra1, broad_tetrahedra2, broad_pairs = _all_aabbs_overlap(rigid_body1.aabbs, rigid_body2.aabbs)
+        broad_tetrahedra1, broad_tetrahedra2, broad_pairs = all_aabbs_overlap(rigid_body1.aabbs, rigid_body2.aabbs)
 
     X1 = barycentric_transforms(rigid_body1.tetrahedra_points[broad_tetrahedra1])
     X2 = barycentric_transforms(rigid_body2.tetrahedra_points[broad_tetrahedra2])

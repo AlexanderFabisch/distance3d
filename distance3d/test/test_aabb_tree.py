@@ -1,5 +1,6 @@
 import numpy as np
 from distance3d import hydroelastic_contact
+from distance3d.aabb_tree import AabbTree, all_aabbs_overlap
 
 
 def create_test_aabbs():
@@ -16,7 +17,8 @@ def create_test_aabbs():
 def test_aabb_tree_creation():
     aabbs, aabbs2 = create_test_aabbs()
 
-    aabb_tree = hydroelastic_contact.AabbTree(aabbs)
+    aabb_tree = AabbTree()
+    aabb_tree.insert_aabbs(aabbs)
 
     print(aabb_tree)
 
@@ -36,8 +38,10 @@ def test_aabb_tree_creation():
 def test_aabb_tree_overlap_with_other_aabb_tree():
     aabbs, aabbs2 = create_test_aabbs()
 
-    aabb_tree = hydroelastic_contact.AabbTree(aabbs)
-    aabb_tree2 = hydroelastic_contact.AabbTree(aabbs2)
+    aabb_tree = AabbTree()
+    aabb_tree.insert_aabbs(aabbs)
+    aabb_tree2 = AabbTree()
+    aabb_tree2.insert_aabbs(aabbs2)
 
     is_overlapping, overlap_tetrahedron1, overlap_tetrahedron2, overlap_pairs = aabb_tree.overlaps_aabb_tree(aabb_tree2)
 
@@ -54,12 +58,14 @@ def test_compare_aabb_tree_to_brute_force():
     rigid_body1.express_in(rigid_body2.body2origin_)
 
     aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
-    aabb_tree1 = hydroelastic_contact.AabbTree(aabbs1)
+    aabb_tree1 = AabbTree()
+    aabb_tree1.insert_aabbs(aabbs1)
 
     aabbs2 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body2.tetrahedra_points)
-    aabb_tree2 = hydroelastic_contact.AabbTree(aabbs2)
+    aabb_tree2 = AabbTree()
+    aabb_tree2.insert_aabbs(aabbs2)
 
-    broad_tetrahedra11, broad_tetrahedra12, broad_pairs1 = hydroelastic_contact._all_aabbs_overlap(aabbs1, aabbs2)
+    broad_tetrahedra11, broad_tetrahedra12, broad_pairs1 = all_aabbs_overlap(aabbs1, aabbs2)
 
     _, broad_tetrahedra21, broad_tetrahedra22, broad_pairs2 = aabb_tree1.overlaps_aabb_tree(aabb_tree2)
 

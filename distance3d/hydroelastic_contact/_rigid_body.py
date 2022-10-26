@@ -5,7 +5,7 @@ from ._tetra_mesh_creation import (
     make_tetrahedral_cube, make_tetrahedral_box, make_tetrahedral_cylinder,
     make_tetrahedral_capsule)
 from ._mesh_processing import center_of_mass_tetrahedral_mesh, tetrahedral_mesh_aabbs
-from ._aabb_tree import AabbTree
+from distance3d.aabb_tree import AabbTree
 
 
 class RigidBody:
@@ -239,6 +239,7 @@ class RigidBody:
     def aabb_tree(self):
         """The aabb_tree for broad phase collision detection"""
         if self._aabb_tree is None:
-            self._aabb_tree = AabbTree(self.aabbs, "sort")
+            self._aabb_tree = AabbTree()
+            self._aabb_tree.insert_aabbs(self.aabbs, "sort")
         return self._aabb_tree
 

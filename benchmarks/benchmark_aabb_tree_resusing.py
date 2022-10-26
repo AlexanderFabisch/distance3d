@@ -6,7 +6,7 @@ import numpy as np
 
 import matplotlib
 
-from distance3d.hydroelastic_contact import _all_aabbs_overlap
+from distance3d.aabb_tree import all_aabbs_overlap
 
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -21,7 +21,7 @@ def create_random_spheres(random_state, size):
 
 
 def brute(rb1, rb2):
-    broad_tetrahedra1, broad_tetrahedra2, broad_pairs = _all_aabbs_overlap(rb1.aabbs, rb2.aabbs)
+    broad_tetrahedra1, broad_tetrahedra2, broad_pairs = all_aabbs_overlap(rb1.aabbs, rb2.aabbs)
 
 
 def aabb_tree(rb1, rb2):

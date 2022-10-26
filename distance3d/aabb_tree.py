@@ -1,6 +1,5 @@
 import numpy as np
 import numba
-from ._aabb import _aabb_overlap, _merge_aabb, _aabb_volume, _sort_aabbs
 
 INDEX_NONE = -1
 PARENT_INDEX = 0
@@ -13,8 +12,22 @@ TYPE_BRANCH = 2
 
 
 class AabbTree:
-    def __init__(self, aabbs, pre_insertion_methode="none"):
-        """Creation of the aabb tree
+
+    def __init__(self):
+        """Creation of empty aabb tree
+
+        Returns
+        -------
+        aabb_tree : AabbTree
+        """
+
+        self.root = INDEX_NONE
+        self.filled_len = 0
+        self.nodes = np.empty((0, 4), dtype=int)
+        self.aabbs = np.empty((0, 3, 2))
+
+    def insert_aabbs(self, aabbs, pre_insertion_methode="none"):
+        """Inster aabbs in tree
 
         Parameters
         ----------
@@ -34,25 +47,43 @@ class AabbTree:
         if len(aabbs) == 0:
             return
 
-        root = INDEX_NONE
-        filled_len = len(aabbs)
+        old_filled_len = self.filled_len
+        self.filled_len += len(aabbs)
 
-        nodes = np.full([2 * filled_len - 1, 4], INDEX_NONE)
-        # The maximum number of possible nodes a tree can have is 2n -1
-        z = np.zeros((len(nodes) - filled_len, 3, 2), dtype=aabbs.dtype)
-        aabbs = np.append(aabbs, z, axis=0)
+        # The maximum number of possible nodes a tree can have is 2n
+        new_nodes = np.full([2 * (self.filled_len - len(self.nodes)), 4], INDEX_NONE)
+        self.nodes = np.append(self.nodes, new_nodes, axis=0)
 
-        insert_order = np.array(range(filled_len))
+        self.aabbs = np.append(self.aabbs, aabbs, axis=0)
+        new_aabbs = np.zeros([len(self.nodes) - len(self.aabbs), 3, 2], dtype=aabbs.dtype)
+        self.aabbs = np.append(self.aabbs, new_aabbs, axis=0)
+
+        insert_order = np.array(range(old_filled_len, self.filled_len))
         if pre_insertion_methode == "sort":
-            insert_order = _sort_aabbs(aabbs[:len(nodes) - filled_len])
+            insert_order = _sort_aabbs(aabbs[old_filled_len:len(self.nodes) - self.filled_len])
         elif pre_insertion_methode == "shuffle":
             np.random.shuffle(insert_order)
 
-        root, nodes, aabbs, filled_len = insert_aabbs(root, nodes, aabbs, filled_len, insert_order)
+        self.root, self.nodes, self.aabbs, self.filled_len \
+            = insert_aabbs(self.root, self.nodes, self.aabbs, self.filled_len, insert_order)
 
-        self.root = root
-        self.nodes = nodes[:filled_len]
-        self.aabbs = aabbs[:filled_len]
+        self.nodes = self.nodes[:self.filled_len]
+        self.aabbs = self.aabbs[:self.filled_len]
+
+    def insert_aabb(self, aabb):
+        """Inster aabbs in tree
+
+        Parameters
+        ----------
+        aabb : array, shape (3, 2)
+            The aabb that will be inserted into the tree.
+
+        Returns
+        -------
+        aabb_tree : AabbTree
+        """
+
+        self.insert_aabbs([aabb], pre_insertion_methode="none")
 
     def __str__(self):
         lines, *_ = print_aabb_tree_recursive(self.root, self.nodes)
@@ -106,7 +137,7 @@ class AabbTree:
         return len(overlap_pairs) > 0, overlap_pairs
 
 
-@numba.njit(cache=True)
+# @numba.njit(cache=True)
 def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):
     """Inserts aabbs into the tree defined in root and nodes.
 
@@ -152,7 +183,7 @@ def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):
     return root, nodes, aabbs, filled_len
 
 
-@numba.njit(cache=True)
+# @numba.njit(cache=True)
 def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
     """
     Inserts a new leaf into the tree.
@@ -230,7 +261,7 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
     return root_node_index, nodes, aabbs, filled_len
 
 
-@numba.njit(cache=True)
+# @numba.njit(cache=True)
 def fix_upward_tree(tree_node_index, nodes, aabbs):
     """
     Fixes the aabbs of the parent branches by setting them to the merge of the children aabbs.
@@ -251,7 +282,7 @@ def fix_upward_tree(tree_node_index, nodes, aabbs):
     return aabbs
 
 
-@numba.njit(cache=True)
+# @numba.njit(cache=True)
 def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
     """
     Queries the overlapping aabbs by traversing the trees.
@@ -284,7 +315,7 @@ def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
     return np.array(broad_tetrahedra1), np.array(broad_tetrahedra2), broad_pairs
 
 
-@numba.njit(cache=True)
+# @numba.njit(cache=True)
 def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=False):
     """
     Queries the overlapping aabbs by traversing the tree.
@@ -359,3 +390,89 @@ def print_aabb_tree_recursive(node_index, nodes):
     zipped_lines = zip(left, right)
     lines = [first_line, second_line] + [a + width * ' ' + b for a, b in zipped_lines]
     return lines, n + m + width, max(p, q) + 2, n + width // 2
+
+
+@numba.njit(cache=True)
+def all_aabbs_overlap(aabbs1, aabbs2):
+    """Creates result lists of all the overlapping aabbs.
+
+    Parameters
+    ----------
+    aabbs1 : array, shape(n, 3, 2)
+        The aabbs of the first object.
+
+    aabbs2 : array, shape(n, 3, 2)
+        The aabbs of the second object.
+
+    Returns
+    -------
+    broad_tetrahedra1 : array, shape (n)
+        Array of all the overlapping aabb indices of aabbs1
+
+    broad_tetrahedra2 : array, shape (n)
+        Array of all the overlapping aabb indices of aabbs2
+
+    broad_pairs : array, shape(n, 2)
+        A list of a index pairs of the all overlaps.
+    """
+
+    indices1 = []
+    indices2 = []
+    broad_pairs = []
+    for i in range(len(aabbs1)):
+        for j in range(len(aabbs2)):
+            if _aabb_overlap(aabbs1[i], aabbs2[j]):
+                indices1.append(i)
+                indices2.append(j)
+                broad_pairs.append((i, j))
+    broad_tetrahedra1 = np.unique(np.array(indices1, dtype=np.dtype("int")))
+    broad_tetrahedra2 = np.unique(np.array(indices2, dtype=np.dtype("int")))
+    return broad_tetrahedra1, broad_tetrahedra2, broad_pairs
+
+
+@numba.njit(cache=True)
+def _aabb_overlap(aabb1, aabb2):
+    """Returns true if aabb1 and aabb2 overlap."""
+    return aabb1[0, 0] <= aabb2[0, 1] and aabb1[0, 1] >= aabb2[0, 0] \
+           and aabb1[1, 0] <= aabb2[1, 1] and aabb1[1, 1] >= aabb2[1, 0] \
+           and aabb1[2, 0] <= aabb2[2, 1] and aabb1[2, 1] >= aabb2[2, 0]
+
+
+@numba.njit(cache=True)
+def _sort_aabbs(aabbs):
+    """Returns a spatially sorted aabb list."""
+    return aabbs[:, 0, 0].argsort()
+
+
+@numba.njit(cache=True)
+def _merge_aabb(aabb1, aabb2):
+    """Returns the smallest aabb that contains aabb1 and aabb2."""
+    return np.array(
+        [[min(aabb1[0, 0], aabb2[0, 0]), max(aabb1[0, 1], aabb2[0, 1])],
+         [min(aabb1[1, 0], aabb2[1, 0]), max(aabb1[1, 1], aabb2[1, 1])],
+         [min(aabb1[2, 0], aabb2[2, 0]), max(aabb1[2, 1], aabb2[2, 1])]]
+    )
+
+
+@numba.njit(cache=True)
+def _aabb_volume(aabb):
+    """Returns the volume of the aabb."""
+    return _aabb_x_size(aabb) * _aabb_y_size(aabb) * _aabb_z_size(aabb)
+
+
+@numba.njit(cache=True)
+def _aabb_x_size(aabb):
+    """Returns the size of the aabb along the x-axsis."""
+    return aabb[0, 1] - aabb[0, 0]
+
+
+@numba.njit(cache=True)
+def _aabb_y_size(aabb):
+    """Returns the size of the aabb along the y-axsis."""
+    return aabb[1, 1] - aabb[1, 0]
+
+
+@numba.njit(cache=True)
+def _aabb_z_size(aabb):
+    """Returns the size of the aabb along the Z-axsis."""
+    return aabb[2, 1] - aabb[2, 0]

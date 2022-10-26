@@ -5,6 +5,9 @@ import timeit
 import numpy as np
 
 import matplotlib
+
+from distance3d.aabb_tree import AabbTree
+
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
@@ -22,21 +25,21 @@ for i in range(int(len(aabbs1) / step)):
     y_steps.append(i * step)
 
     if not skip_data[0]:
-        times = timeit.repeat(partial(hydroelastic_contact.AabbTree, aabbs=aabbs1[(len(aabbs1) - i*step):],
+        times = timeit.repeat(partial(AabbTree, aabbs=aabbs1[(len(aabbs1) - i*step):],
                                       pre_insertion_methode="none"), repeat=5, number=5)
         print(f"None: Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
         values[0].append(np.mean(times))
         skip_data[0] = np.mean(times) > skip_point
 
     if not skip_data[1]:
-        times = timeit.repeat(partial(hydroelastic_contact.AabbTree, aabbs=aabbs1[(len(aabbs1) - i * step):],
+        times = timeit.repeat(partial(AabbTree, aabbs=aabbs1[(len(aabbs1) - i * step):],
                                       pre_insertion_methode="shuffle"), repeat=5, number=5)
         print(f"Shuffle: Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
         values[1].append(np.mean(times))
         skip_data[0] = np.mean(times) > skip_point
 
     if not skip_data[2]:
-        times = timeit.repeat(partial(hydroelastic_contact.AabbTree, aabbs=aabbs1[(len(aabbs1) - i * step):],
+        times = timeit.repeat(partial(AabbTree, aabbs=aabbs1[(len(aabbs1) - i * step):],
                                       pre_insertion_methode="sort"), repeat=5, number=5)
         print(f"Sort: Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
         values[2].append(np.mean(times))

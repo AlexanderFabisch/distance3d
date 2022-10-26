@@ -7,6 +7,9 @@ import timeit
 import numpy as np
 
 import matplotlib
+
+from distance3d.aabb_tree import all_aabbs_overlap, AabbTree
+
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
@@ -25,11 +28,11 @@ def create_random_spheres(random_state, size):
 
 
 def brute_force_aabbs(aabbs1, aabbs2):
-    hydroelastic_contact._all_aabbs_overlap(aabbs1, aabbs2)
+    all_aabbs_overlap(aabbs1, aabbs2)
 
 def aabb_tree(aabbs1, aabbs2):
-    aabb_tree1 = hydroelastic_contact.AabbTree(aabbs1)
-    aabb_tree2 = hydroelastic_contact.AabbTree(aabbs2)
+    aabb_tree1 = AabbTree(aabbs1)
+    aabb_tree2 = AabbTree(aabbs2)
 
     aabb_tree1.overlaps_aabb_tree(aabb_tree2)
 
