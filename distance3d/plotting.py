@@ -5,6 +5,8 @@ from mpl_toolkits import mplot3d
 import pytransform3d.plot_utils as ppu
 import pytransform3d.rotations as pr
 import pytransform3d.transformations as pt
+
+from .aabb_tree import TYPE_INDEX, TYPE_LEAF, TYPE_BRANCH
 from .utils import plane_basis_from_normal
 
 
@@ -342,7 +344,7 @@ def plot_aabb_tree(ax, tree, alpha=0.5, color="red"):
     ax : Matplotlib 3d axis
         A matplotlib 3d axis.
 
-    tree : aabbtree.AABBTree
+    tree : AabbTree
         Tree of axis-aligned bounding boxes.
 
     alpha : float, optional (default: 0.5)
@@ -351,14 +353,17 @@ def plot_aabb_tree(ax, tree, alpha=0.5, color="red"):
     color : str
         Color of edges.
     """
-    nodes = deque()
-    nodes.append(tree)
-    while nodes:
-        node = nodes.popleft()
-        mins, maxs = np.array(node.aabb.limits).T
-        plot_aabb(ax, mins, maxs, alpha=alpha, color=color)
-        if not node.is_leaf:
-            nodes.extend([node.left, node.right])
+    stack = [tree.root]
+
+    while len(stack) != 0:
+
+        node_index = stack[-1]
+        stack = stack[:-1]
+
+        plot_aabb(ax, tree.aabbs[node_index, :, 0], tree.aabbs[node_index, :, 1], alpha=alpha, color=color)
+
+        if tree.nodes[node_index, TYPE_INDEX] == TYPE_BRANCH:
+            stack.extend([tree.nodes[node_index, 1], tree.nodes[node_index, 2]])
 
 
 def plot_plane(

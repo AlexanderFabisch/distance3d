@@ -19,14 +19,16 @@ class AabbTree:
         Returns
         -------
         aabb_tree : AabbTree
+            The AabbTree Object
         """
 
         self.root = INDEX_NONE
         self.filled_len = 0
         self.nodes = np.empty((0, 4), dtype=int)
         self.aabbs = np.empty((0, 3, 2))
+        self.external_data_list = []
 
-    def insert_aabbs(self, aabbs, pre_insertion_methode="none"):
+    def insert_aabbs(self, aabbs, external_data_list=[None], pre_insertion_methode="none"):
         """Inster aabbs in tree
 
         Parameters
@@ -34,18 +36,19 @@ class AabbTree:
         aabbs : array, shape (n, 3, 2)
             An array containing a list of aabbs of the tree.
 
+        external_data_list : array, shape(n, 3, 2), optional (default: None)
+            Array of data associated with the aabbs.
+
         pre_insertion_methode : str, optional (default: "none")
             The operation that is performed on the aabbs before tree creation.
             Use "sort" for a cleaner tree with slightly longer creation times.
             Use "shuffle" for a faster creation but with some non-optimal placement in the tree.
-
-        Returns
-        -------
-        aabb_tree : AabbTree
         """
 
         if len(aabbs) == 0:
             return
+
+        assert external_data_list != None or len(external_data_list) == len(aabbs)
 
         old_filled_len = self.filled_len
         self.filled_len += len(aabbs)
@@ -55,8 +58,12 @@ class AabbTree:
         self.nodes = np.append(self.nodes, new_nodes, axis=0)
 
         self.aabbs = np.append(self.aabbs, aabbs, axis=0)
-        new_aabbs = np.zeros([len(self.nodes) - len(self.aabbs), 3, 2], dtype=aabbs.dtype)
+        new_aabbs = np.zeros([len(self.nodes) - len(self.aabbs), 3, 2])
         self.aabbs = np.append(self.aabbs, new_aabbs, axis=0)
+
+        self.external_data_list.append(external_data_list)
+        empty_external_data = [None] * (len(self.nodes) - len(self.external_data_list))
+        self.external_data_list.append(empty_external_data)
 
         insert_order = np.array(range(old_filled_len, self.filled_len))
         if pre_insertion_methode == "sort":
@@ -70,7 +77,7 @@ class AabbTree:
         self.nodes = self.nodes[:self.filled_len]
         self.aabbs = self.aabbs[:self.filled_len]
 
-    def insert_aabb(self, aabb):
+    def insert_aabb(self, aabb, external_data=None):
         """Inster aabbs in tree
 
         Parameters
@@ -78,12 +85,11 @@ class AabbTree:
         aabb : array, shape (3, 2)
             The aabb that will be inserted into the tree.
 
-        Returns
-        -------
-        aabb_tree : AabbTree
+        external_data : Any
+            Data associated with the aabb.
         """
 
-        self.insert_aabbs([aabb], pre_insertion_methode="none")
+        self.insert_aabbs([aabb], [external_data], pre_insertion_methode="none")
 
     def __str__(self):
         lines, *_ = print_aabb_tree_recursive(self.root, self.nodes)
@@ -117,6 +123,33 @@ class AabbTree:
         is_overlapping = len(overlap_pairs) > 0
         return is_overlapping, np.unique(overlap_tetrahedron1), np.unique(overlap_tetrahedron2), overlap_pairs
 
+    def overlap_aabb_tree_external_data(self, other):
+        """ Check overlapping of another tree.
+
+        Parameters
+        ----------
+        other : AabbTree
+            The other Tree for overlap testing.
+
+        Returns
+        -------
+        is_overlapping : bool
+            True if there is an overlap in the two trees.
+
+        overlap_tetrahedron1 : array, shape (n)
+            The indexes of the overlapping tetrahedron in this tree.
+
+        overlap_tetrahedron2 : array, shape (n)
+            The indexes of the overlapping tetrahedron in the other tree.
+
+        overlap_pairs : array, shape (n, 2)
+            An array of all overlapping pairs.
+        """
+
+        _, overlaps1, overlaps2, _ = self.overlaps_aabb_tree(other)
+
+        return self.external_data_list[overlaps1], other.external_data_list[overlaps2]
+
     def overlaps_aabb(self, aabb):
         """ Check overlapping of an aabb.
 
@@ -130,11 +163,26 @@ class AabbTree:
         is_overlapping : bool
             True if there is an overlap in the two trees.
 
-        overlap_pairs : array, shape (n, 2)
+        overlaps : array, shape (n, 2)
             An array of all overlapping pairs.
         """
-        overlap_pairs = query_overlap(aabb, self.root, self.nodes, self.aabbs)
-        return len(overlap_pairs) > 0, overlap_pairs
+        overlaps = query_overlap(aabb, self.root, self.nodes, self.aabbs)
+        return len(overlaps) > 0, overlaps
+
+    def overlaps_aabb_external_data(self, aabb):
+        """ Check overlapping of an aabb.
+
+        Parameters
+        ----------
+        aabb : array, shape (3, 2)
+            The aabb that is checked.
+
+        Returns
+        -------
+
+        """
+        _, overlaps = self.overlaps_aabb(aabb)
+        return self.external_data_list[overlaps]
 
 
 # @numba.njit(cache=True)

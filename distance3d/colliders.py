@@ -12,7 +12,6 @@ from .containment import (
     capsule_aabb, ellipsoid_aabb, cone_aabb, disk_aabb, ellipse_aabb)
 from .mesh import MeshHillClimbingSupportFunction
 from .utils import plane_basis_from_normal, norm_vector
-from aabbtree import AABB
 
 
 class ConvexCollider(abc.ABC):
@@ -129,7 +128,7 @@ class ConvexHullVertices(ConvexCollider):
         raise NotImplementedError("update_pose is not implemented!")
 
     def aabb(self):
-        return AABB(np.array(axis_aligned_bounding_box(self.vertices)).T)
+        return np.array(axis_aligned_bounding_box(self.vertices)).T
 
 
 class Box(ConvexHullVertices):
@@ -166,7 +165,7 @@ class Box(ConvexHullVertices):
             self.artist_.set_data(pose)
 
     def aabb(self):
-        return AABB(np.array(box_aabb(self.box2origin, self.size)).T)
+        return np.array(box_aabb(self.box2origin, self.size)).T
 
 
 class MeshGraph(ConvexCollider):
@@ -217,9 +216,9 @@ class MeshGraph(ConvexCollider):
             self.artist_.set_data(mesh2origin)
 
     def aabb(self):
-        return AABB(np.array(axis_aligned_bounding_box(
+        return np.array(axis_aligned_bounding_box(
             self.mesh2origin[np.newaxis, :3, 3] + np.dot(
-                self.vertices, self.mesh2origin[:3, :3].T))).T)
+                self.vertices, self.mesh2origin[:3, :3].T))).T
 
 
 class Sphere(ConvexCollider):
@@ -263,7 +262,7 @@ class Sphere(ConvexCollider):
             self.artist_.set_data(pose)
 
     def aabb(self):
-        return AABB(np.array(sphere_aabb(self.c, self.radius)).T)
+        return np.array(sphere_aabb(self.c, self.radius)).T
 
 
 class Capsule(ConvexCollider):
@@ -312,8 +311,8 @@ class Capsule(ConvexCollider):
             self.artist_.set_data(pose)
 
     def aabb(self):
-        return AABB(np.array(capsule_aabb(
-            self.capsule2origin, self.radius, self.height)).T)
+        return np.array(capsule_aabb(
+            self.capsule2origin, self.radius, self.height)).T
 
 
 class Ellipsoid(ConvexCollider):
@@ -357,8 +356,7 @@ class Ellipsoid(ConvexCollider):
             self.artist_.set_data(pose)
 
     def aabb(self):
-        return AABB(
-            np.array(ellipsoid_aabb(self.ellipsoid2origin, self.radii)).T)
+        return np.array(ellipsoid_aabb(self.ellipsoid2origin, self.radii)).T
 
 
 class Cylinder(ConvexCollider):
@@ -407,8 +405,8 @@ class Cylinder(ConvexCollider):
             self.artist_.set_data(pose)
 
     def aabb(self):
-        return AABB(np.array(cylinder_aabb(
-            self.cylinder2origin, self.radius, self.length)).T)
+        return np.array(cylinder_aabb(
+            self.cylinder2origin, self.radius, self.length)).T
 
 
 class Disk(ConvexCollider):
@@ -462,7 +460,7 @@ class Disk(ConvexCollider):
             self.artist_.set_data(pose)
 
     def aabb(self):
-        return AABB(np.array(disk_aabb(self.c, self.radius, self.normal)).T)
+        return np.array(disk_aabb(self.c, self.radius, self.normal)).T
 
 
 class Ellipse(ConvexCollider):
@@ -509,7 +507,7 @@ class Ellipse(ConvexCollider):
             self.artist_.set_data(pose)
 
     def aabb(self):
-        return AABB(np.array(ellipse_aabb(self.c, self.axes, self.radii)).T)
+        return np.array(ellipse_aabb(self.c, self.axes, self.radii)).T
 
 
 class Cone(ConvexCollider):
@@ -558,8 +556,7 @@ class Cone(ConvexCollider):
             self.artist_.set_data(pose)
 
     def aabb(self):
-        return AABB(np.array(cone_aabb(
-            self.cone2origin, self.radius, self.height)).T)
+        return np.array(cone_aabb(self.cone2origin, self.radius, self.height)).T
 
 
 class Margin(ConvexCollider):
@@ -597,9 +594,9 @@ class Margin(ConvexCollider):
 
     def aabb(self):
         aabb = self.collider.aabb()
-        mins = aabb.limits[:, 0] - self.margin
-        maxs = aabb.limits[:, 1] + self.margin
-        return AABB(np.array([mins, maxs]).T)
+        mins = aabb[:, 0] - self.margin
+        maxs = aabb[:, 1] + self.margin
+        return np.array([mins, maxs]).T
 
 
 COLLIDERS = {

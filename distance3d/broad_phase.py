@@ -1,9 +1,9 @@
 """Broad-phase collision detection."""
 import warnings
 
-from aabbtree import AABBTree
 from pytransform3d import urdf
 
+from .aabb_tree import AabbTree
 from .colliders import Sphere, Box, Cylinder, MeshGraph
 from .urdf_utils import self_collision_whitelists
 from .io import load_mesh
@@ -40,7 +40,7 @@ class BoundingVolumeHierarchy:
         self.tm = tm
         self.base_frame = base_frame
         self.collider_frames = set()
-        self.aabbtree_ = AABBTree()
+        self.aabb_tree = AabbTree()
         self.colliders_ = {}
         self.self_collision_whitelists_ = {}
 
@@ -104,16 +104,16 @@ class BoundingVolumeHierarchy:
         """
         self.collider_frames.add(frame)
         self.colliders_[frame] = collider
-        self.aabbtree_.add(collider.aabb(), (frame, collider))
+        self.aabb_tree.insert_aabb(collider.aabb(), (frame, collider))
 
     def update_collider_poses(self):
         """Update poses of all colliders from transform manager."""
-        self.aabbtree_ = AABBTree()
+        self.aabb_tree = AabbTree()
         for frame in self.colliders_:
             A2B = self.tm.get_transform(frame, self.base_frame)
             collider = self.colliders_[frame]
             collider.update_pose(A2B)
-            self.aabbtree_.add(collider.aabb(), (frame, collider))
+            self.aabb_tree.insert_aabb(collider.aabb(), (frame, collider))
 
     def get_colliders(self):
         """Get all colliders.
@@ -157,7 +157,7 @@ class BoundingVolumeHierarchy:
             Maps frame names to colliders with overlapping AABB.
         """
         aabb = collider.aabb()
-        colliders = dict(self.aabbtree_.overlap_values(aabb))
+        colliders = dict(self.aabb_tree.overlaps_aabb_external_data(aabb))
         for frame in whitelist:
             colliders.pop(frame, None)
         return colliders

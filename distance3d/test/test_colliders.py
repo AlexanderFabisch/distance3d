@@ -10,7 +10,7 @@ def test_all_colliders():
         Collider = colliders.COLLIDERS[name]
         rand = random.RANDOM_GENERATORS[name]
         c = Collider(*rand(random_state))
-        limits = np.array(c.aabb().limits)
+        limits = np.array(c.aabb())
         center = c.center()
         assert all(limits[:, 0] <= center)
         assert all(center <= limits[:, 1])
@@ -35,21 +35,21 @@ def test_all_colliders():
 def test_convex_collider():
     convex = colliders.ConvexHullVertices(np.array([[0.0, 0.0, 1.0], [0.0, 1.0, 0.0]]))
     assert_array_almost_equal(
-        convex.aabb().limits, np.array([[0.0, 0.0], [0.0, 1.0], [0.0, 1.0]]))
+        convex.aabb(), np.array([[0.0, 0.0], [0.0, 1.0], [0.0, 1.0]]))
     assert_array_almost_equal(convex.center(), [0, 0.5, 0.5])
 
 
 def test_box_collider():
     box = colliders.Box(np.eye(4), np.array([1.0, 1.0, 1.0]))
     assert_array_almost_equal(
-        box.aabb().limits, np.array([[-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5]]))
+        box.aabb(), np.array([[-0.5, 0.5], [-0.5, 0.5], [-0.5, 0.5]]))
     assert_array_almost_equal(box.center(), [0, 0, 0])
 
 
 def test_cone_collider():
     cone = colliders.Cone(np.eye(4), 0.5, 1.0)
     assert_array_almost_equal(
-        cone.aabb().limits, np.array([[-0.5, 0.5], [-0.5, 0.5], [0.0, 1.0]]))
+        cone.aabb(), np.array([[-0.5, 0.5], [-0.5, 0.5], [0.0, 1.0]]))
     assert_array_almost_equal(cone.center(), [0, 0, 0.5])
     cone.make_artist(c=(1, 0, 0))
     assert cone.artist_ is not None
@@ -57,13 +57,13 @@ def test_cone_collider():
     cone2origin[:3, 3] = 0.1, 0.2, 0.3
     cone.update_pose(cone2origin)
     assert_array_almost_equal(
-        cone.aabb().limits, np.array([[-0.4, 0.6], [-0.3, 0.7], [0.3, 1.3]]))
+        cone.aabb(), np.array([[-0.4, 0.6], [-0.3, 0.7], [0.3, 1.3]]))
 
 
 def test_disk_collider():
     disk = colliders.Disk(np.zeros(3), 0.5, np.array([0.0, 0.0, 1.0]))
     assert_array_almost_equal(
-        disk.aabb().limits, np.array([[-0.5, 0.5], [-0.5, 0.5], [0.0, 0.0]]))
+        disk.aabb(), np.array([[-0.5, 0.5], [-0.5, 0.5], [0.0, 0.0]]))
     assert_array_almost_equal(disk.center(), [0, 0, 0])
     disk.make_artist(c=(1, 0, 0))
     assert disk.artist_ is not None
@@ -71,7 +71,7 @@ def test_disk_collider():
     disk2origin[:3, 3] = -0.1, -0.2, -0.3
     disk.update_pose(disk2origin)
     assert_array_almost_equal(
-        disk.aabb().limits, np.array([[-0.6, 0.4], [-0.7, 0.3], [-0.3, -0.3]]))
+        disk.aabb(), np.array([[-0.6, 0.4], [-0.7, 0.3], [-0.3, -0.3]]))
 
 
 def test_margin():
@@ -79,7 +79,7 @@ def test_margin():
     box_with_margin = colliders.Margin(box, 0.1)
 
     assert_array_almost_equal(
-        box_with_margin.aabb().limits,
+        box_with_margin.aabb(),
         np.array([[-0.6, 0.6], [-0.6, 0.6], [-0.6, 0.6]]))
     assert_array_almost_equal(box_with_margin.center(), [0, 0, 0])
 
