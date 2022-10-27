@@ -24,7 +24,7 @@ def detect(bvh):
         if frame in contacts:
             continue  # contact was detected before
 
-        candidates = bvh.aabb_overlapping_colliders(
+        candidates = bvh.aabb_overlapping_collider(
             collider, whitelist=bvh.self_collision_whitelists_[frame])
 
         contacts[frame] = False
@@ -55,7 +55,7 @@ def detect_any(bvh):
         Whether there is any self collision or not.
     """
     for frame, collider in bvh.colliders_.items():
-        candidates = bvh.aabb_overlapping_colliders(
+        candidates = bvh.aabb_overlapping_collider(
             collider, whitelist=bvh.self_collision_whitelists_[frame])
 
         for frame2, collider2 in candidates.items():

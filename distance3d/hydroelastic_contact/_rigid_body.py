@@ -5,7 +5,7 @@ from ._tetra_mesh_creation import (
     make_tetrahedral_cube, make_tetrahedral_box, make_tetrahedral_cylinder,
     make_tetrahedral_capsule)
 from ._mesh_processing import center_of_mass_tetrahedral_mesh, tetrahedral_mesh_aabbs
-from distance3d.aabb_tree import AabbTree
+from ..aabb_tree import AabbTree
 
 
 class RigidBody:

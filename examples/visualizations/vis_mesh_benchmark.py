@@ -39,7 +39,7 @@ timer.start("collision")
 collisions = []
 for frame1, collider1 in bvh.colliders_.items():
     timer.start("broad phase")
-    colliders = bvh.aabb_overlapping_colliders(collider1, whitelist=(frame1,))
+    colliders = bvh.aabb_overlapping_collider(collider1, whitelist=(frame1,))
     timer.stop_and_add_to_total("broad phase")
     for frame2, collider2 in colliders.items():
         timer.start("gjk")

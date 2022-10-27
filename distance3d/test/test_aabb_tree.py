@@ -23,8 +23,6 @@ def test_aabb_tree_creation():
     external_data = ["test"] * len(aabbs)
     aabb_tree.insert_aabbs(aabbs, external_data, pre_insertion_methode="shuffle")
 
-    # print(aabb_tree)
-
     _, overlaps = aabb_tree.overlaps_aabb(aabbs2[0])
     overlaps = np.sort(overlaps)
     assert overlaps[0] == 0 and overlaps[1] == 2

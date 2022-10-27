@@ -1,6 +1,8 @@
 """Broad-phase collision detection."""
 import warnings
 
+import numba
+import numpy as np
 from pytransform3d import urdf
 
 from .aabb_tree import AabbTree
@@ -136,7 +138,7 @@ class BoundingVolumeHierarchy:
         return [collider.artist_ for collider in self.colliders_.values()
                 if collider.artist_ is not None]
 
-    def aabb_overlapping_colliders(self, collider, whitelist=()):
+    def aabb_overlapping_collider(self, collider, whitelist=()):
         """Get colliders with an overlapping AABB.
 
         This function performs broad phase collision detection with a bounding
@@ -158,9 +160,52 @@ class BoundingVolumeHierarchy:
         """
         aabb = collider.aabb()
         colliders = dict(self.aabb_tree.overlaps_aabb_external_data(aabb))
+
         for frame in whitelist:
             colliders.pop(frame, None)
+
         return colliders
+
+
+    def aabb_overlapping_with_other_BVH(self, other_bvh, whitelist1=(), whitelist2=()):
+        """Get colliders with an overlapping AABB.
+
+        This function performs broad phase collision detection with a bounding
+        volume hierarchy, where the bounding volumes are axis-aligned bounding
+        boxes.
+
+        Parameters
+        ----------
+        other_bvh : BoundingVolumeHierarchy
+            the other BVH.
+
+        whitelist1 : sequence
+            Names of frames to which collisions are allowed of this BVH.
+
+        whitelist2 : sequence
+            Names of frames to which collisions are allowed of the other BVH.
+
+        Returns
+        -------
+        data_pairs : array, shape(n, 2)
+            A list of colliding colliders.
+        """
+
+        _, _, _, pairs = self.aabb_tree.overlaps_aabb_tree(other_bvh.aabb_tree)
+
+        data_pairs = []
+        for pair in pairs:
+            data_pair = (self.aabb_tree.external_data_list[pair[0]], other_bvh.aabb_tree.external_data_list[pair[1]])
+
+            whitelisted = False
+            for frame in whitelist1:
+                if frame == data_pair[0, 0] or frame == data_pair[1, 0]:
+                    whitelisted = True
+
+            if not whitelisted:
+                data_pairs.append(data_pair)
+
+        return data_pairs
 
     def get_collider_frames(self):
         """Get collider frames.

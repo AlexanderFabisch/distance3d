@@ -124,34 +124,6 @@ class AabbTree:
         is_overlapping = len(overlap_pairs) > 0
         return is_overlapping, np.unique(overlap_tetrahedron1), np.unique(overlap_tetrahedron2), overlap_pairs
 
-    def overlap_aabb_tree_external_data(self, other):
-        """ Check overlapping of another tree.
-
-        Parameters
-        ----------
-        other : AabbTree
-            The other Tree for overlap testing.
-
-        Returns
-        -------
-        is_overlapping : bool
-            True if there is an overlap in the two trees.
-
-        overlap_tetrahedron1 : array, shape (n)
-            The indexes of the overlapping tetrahedron in this tree.
-
-        overlap_tetrahedron2 : array, shape (n)
-            The indexes of the overlapping tetrahedron in the other tree.
-
-        overlap_pairs : array, shape (n, 2)
-            An array of all overlapping pairs.
-        """
-
-        _, overlaps1, overlaps2, _ = self.overlaps_aabb_tree(other)
-
-        return np.array(self.external_data_list)[overlaps1.astype(int)], \
-               np.array(other.external_data_list)[overlaps2.astype(int)]
-
     def overlaps_aabb(self, aabb):
         """ Check overlapping of an aabb.
 
@@ -170,22 +142,6 @@ class AabbTree:
         """
         overlaps = query_overlap(aabb, self.root, self.nodes, self.aabbs)
         return len(overlaps) > 0, overlaps
-
-    def overlaps_aabb_external_data(self, aabb):
-        """ Check overlapping of an aabb.
-
-        Parameters
-        ----------
-        aabb : array, shape (3, 2)
-            The aabb that is checked.
-
-        Returns
-        -------
-        external_data_list: array, shape(n)
-
-        """
-        _, overlaps = self.overlaps_aabb(aabb)
-        return np.array(self.external_data_list)[overlaps.astype(int)]
 
 
 @numba.njit(cache=True)
@@ -527,3 +483,5 @@ def _aabb_y_size(aabb):  # pragma: no cover
 def _aabb_z_size(aabb):  # pragma: no cover
     """Returns the size of the aabb along the Z-axsis."""
     return aabb[2, 1] - aabb[2, 0]
+
+
