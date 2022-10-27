@@ -4,7 +4,6 @@ import distance3d.broad_phase
 import os
 from pytransform3d.urdf import UrdfTransformManager
 
-
 BASE_DIR = "test/data/"
 data_dir = BASE_DIR
 search_path = ".."
@@ -28,7 +27,6 @@ bvh = distance3d.broad_phase.BoundingVolumeHierarchy(tm, "robot_arm")
 def bench():
     bvh.fill_tree_with_colliders(tm, make_artists=False)
 
+
 times = timeit.repeat(bench, repeat=10, number=10)
 print(f"Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
-
-# Mean: 0.06480; Std. dev.: 0.00211
