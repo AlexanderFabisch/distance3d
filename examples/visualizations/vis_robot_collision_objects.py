@@ -89,7 +89,6 @@ class AnimationCallback:
             if self.verbose:
                 print(f"With AABBTree: {total_time}")
 
-
         self.total_time += total_time
 
         for frame in in_contact:
@@ -163,8 +162,3 @@ if "__file__" in globals():
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")
-
-
-# Broad Phase Brute         Total time: 0.038140058517456055
-# Broad Phase Aabb Tree     Total time: 0.05355978012084961
-#
