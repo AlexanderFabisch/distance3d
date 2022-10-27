@@ -35,9 +35,6 @@ def test_aabb_tree_creation():
     overlaps = np.sort(overlaps)
     assert overlaps[0] == 2
 
-    data = aabb_tree.overlaps_aabb_external_data(aabbs2[2])
-    assert data == "test"
-
 
 
 def test_aabb_tree_overlap_with_other_aabb_tree():
@@ -57,8 +54,6 @@ def test_aabb_tree_overlap_with_other_aabb_tree():
     assert (overlap_tetrahedron1 == np.array([0, 1, 2])).all()
 
     assert (overlap_tetrahedron2 == np.array([0, 1, 2])).all()
-
-    aabb_tree.overlap_aabb_tree_external_data(aabb_tree2)
 
 
 def test_compare_aabb_tree_to_brute_force():

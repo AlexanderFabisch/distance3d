@@ -38,6 +38,7 @@ class BoundingVolumeHierarchy:
         Whitelists for self-collision detection in case this BVH represents
         a robot.
     """
+
     def __init__(self, tm, base_frame):
         self.tm = tm
         self.base_frame = base_frame
@@ -159,13 +160,11 @@ class BoundingVolumeHierarchy:
             Maps frame names to colliders with overlapping AABB.
         """
         aabb = collider.aabb()
-        colliders = dict(self.aabb_tree.overlaps_aabb_external_data(aabb))
-
+        _, overlaps = self.aabb_tree.overlaps_aabb(aabb)
+        colliders = dict(np.array(self.aabb_tree.external_data_list)[overlaps.astype(int)])
         for frame in whitelist:
             colliders.pop(frame, None)
-
         return colliders
-
 
     def aabb_overlapping_with_other_BVH(self, other_bvh, whitelist1=(), whitelist2=()):
         """Get colliders with an overlapping AABB.
@@ -199,7 +198,11 @@ class BoundingVolumeHierarchy:
 
             whitelisted = False
             for frame in whitelist1:
-                if frame == data_pair[0, 0] or frame == data_pair[1, 0]:
+                if frame == data_pair[0, 0]:
+                    whitelisted = True
+
+            for frame in whitelist2:
+                if frame == data_pair[1, 0]:
                     whitelisted = True
 
             if not whitelisted:
