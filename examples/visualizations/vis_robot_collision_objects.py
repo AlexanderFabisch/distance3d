@@ -76,7 +76,7 @@ class AnimationCallback:
                 aabbs1.append(collider.aabb())
 
             aabbs2 = []
-            world_coll_list = list(robotBVH.colliders_.items())
+            world_coll_list = list(worldBVH.colliders_.items())
             for _, box in world_coll_list:
                 aabbs2.append(box.aabb())
 
@@ -138,9 +138,9 @@ random_state = np.random.RandomState(5)
 
 fig = pv.figure()
 
-for i in range(2000):
+for i in range(50):
     box2origin, size = random.rand_box(
-        random_state, center_scale=0.3, size_scale=0.3)
+        random_state, center_scale=0.5, size_scale=0.3)
     box2origin[:3, 3] += 0.2
     color = random_state.rand(3)
     box_artist = pv.Box(size=size, A2B=box2origin, c=color)
@@ -169,3 +169,5 @@ if "__file__" in globals():
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")
+
+
