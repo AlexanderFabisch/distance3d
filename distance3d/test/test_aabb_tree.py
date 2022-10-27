@@ -18,7 +18,10 @@ def test_aabb_tree_creation():
     aabbs, aabbs2 = create_test_aabbs()
 
     aabb_tree = AabbTree()
-    aabb_tree.insert_aabbs(aabbs)
+
+    aabb_tree.insert_aabbs([])
+    external_data = ["test"] * len(aabbs)
+    aabb_tree.insert_aabbs(aabbs, external_data, pre_insertion_methode="shuffle")
 
     # print(aabb_tree)
 
@@ -34,14 +37,20 @@ def test_aabb_tree_creation():
     overlaps = np.sort(overlaps)
     assert overlaps[0] == 2
 
+    data = aabb_tree.overlaps_aabb_external_data(aabbs2[2])
+    assert data == "test"
+
+
 
 def test_aabb_tree_overlap_with_other_aabb_tree():
     aabbs, aabbs2 = create_test_aabbs()
 
     aabb_tree = AabbTree()
-    aabb_tree.insert_aabbs(aabbs)
+    external_data1 = ["1"] * len(aabbs)
+    aabb_tree.insert_aabbs(aabbs, external_data1)
     aabb_tree2 = AabbTree()
-    aabb_tree2.insert_aabbs(aabbs2)
+    external_data2 = ["2"] * len(aabbs)
+    aabb_tree2.insert_aabbs(aabbs2, external_data2)
 
     is_overlapping, overlap_tetrahedron1, overlap_tetrahedron2, overlap_pairs = aabb_tree.overlaps_aabb_tree(aabb_tree2)
 
@@ -50,6 +59,8 @@ def test_aabb_tree_overlap_with_other_aabb_tree():
     assert (overlap_tetrahedron1 == np.array([0, 1, 2])).all()
 
     assert (overlap_tetrahedron2 == np.array([0, 1, 2])).all()
+
+    aabb_tree.overlap_aabb_tree_external_data(aabb_tree2)
 
 
 def test_compare_aabb_tree_to_brute_force():

@@ -92,7 +92,7 @@ class AabbTree:
 
         self.insert_aabbs([aabb], [external_data], pre_insertion_methode="none")
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         lines, *_ = print_aabb_tree_recursive(self.root, self.nodes)
         return '\r\n' + '\r\n'.join(lines)
 
@@ -148,10 +148,9 @@ class AabbTree:
         """
 
         _, overlaps1, overlaps2, _ = self.overlaps_aabb_tree(other)
-        
-        external_data1 = [self.external_data_list[index] for index in overlaps1]
-        external_data2 = [other.external_data_list[index] for index in overlaps2]
-        return external_data1, external_data2
+
+        return np.array(self.external_data_list)[overlaps1.astype(int)], \
+               np.array(other.external_data_list)[overlaps2.astype(int)]
 
     def overlaps_aabb(self, aabb):
         """ Check overlapping of an aabb.
@@ -186,12 +185,11 @@ class AabbTree:
 
         """
         _, overlaps = self.overlaps_aabb(aabb)
-        external_data = [self.external_data_list[index] for index in overlaps]
-        return external_data
+        return np.array(self.external_data_list)[overlaps.astype(int)]
 
 
 @numba.njit(cache=True)
-def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):
+def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):  # pragma: no cover
     """Inserts aabbs into the tree defined in root and nodes.
 
     Parameters
@@ -237,7 +235,7 @@ def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):
 
 
 @numba.njit(cache=True)
-def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
+def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):  # pragma: no cover
     """
     Inserts a new leaf into the tree.
     """
@@ -315,7 +313,7 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
 
 
 @numba.njit(cache=True)
-def fix_upward_tree(tree_node_index, nodes, aabbs):
+def fix_upward_tree(tree_node_index, nodes, aabbs):  # pragma: no cover
     """
     Fixes the aabbs of the parent branches by setting them to the merge of the children aabbs.
     """
@@ -336,7 +334,7 @@ def fix_upward_tree(tree_node_index, nodes, aabbs):
 
 
 @numba.njit(cache=True)
-def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
+def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):  # pragma: no cover
     """
     Queries the overlapping aabbs by traversing the trees.
     """
@@ -369,7 +367,7 @@ def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):
 
 
 @numba.njit(cache=True)
-def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=False):
+def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=False):  # pragma: no cover
     """
     Queries the overlapping aabbs by traversing the tree.
     """
@@ -398,7 +396,7 @@ def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=
     return np.array(overlaps)
 
 
-def print_aabb_tree_recursive(node_index, nodes):
+def print_aabb_tree_recursive(node_index, nodes):  # pragma: no cover
     """Returns list of strings, width, height, and horizontal coordinate of the root."""
     # From https://stackoverflow.com/questions/34012886/print-binary-tree-level-by-level-in-python
 
@@ -446,7 +444,7 @@ def print_aabb_tree_recursive(node_index, nodes):
 
 
 @numba.njit(cache=True)
-def all_aabbs_overlap(aabbs1, aabbs2):
+def all_aabbs_overlap(aabbs1, aabbs2):  # pragma: no cover
     """Creates result lists of all the overlapping aabbs.
 
     Parameters
@@ -484,7 +482,7 @@ def all_aabbs_overlap(aabbs1, aabbs2):
 
 
 @numba.njit(cache=True)
-def _aabb_overlap(aabb1, aabb2):
+def _aabb_overlap(aabb1, aabb2):  # pragma: no cover
     """Returns true if aabb1 and aabb2 overlap."""
     return aabb1[0, 0] <= aabb2[0, 1] and aabb1[0, 1] >= aabb2[0, 0] \
            and aabb1[1, 0] <= aabb2[1, 1] and aabb1[1, 1] >= aabb2[1, 0] \
@@ -492,13 +490,13 @@ def _aabb_overlap(aabb1, aabb2):
 
 
 @numba.njit(cache=True)
-def _sort_aabbs(aabbs):
+def _sort_aabbs(aabbs):  # pragma: no cover
     """Returns a spatially sorted aabb list."""
     return aabbs[:, 0, 0].argsort()
 
 
 @numba.njit(cache=True)
-def _merge_aabb(aabb1, aabb2):
+def _merge_aabb(aabb1, aabb2):  # pragma: no cover
     """Returns the smallest aabb that contains aabb1 and aabb2."""
     return np.array(
         [[min(aabb1[0, 0], aabb2[0, 0]), max(aabb1[0, 1], aabb2[0, 1])],
@@ -508,24 +506,24 @@ def _merge_aabb(aabb1, aabb2):
 
 
 @numba.njit(cache=True)
-def _aabb_volume(aabb):
+def _aabb_volume(aabb):  # pragma: no cover
     """Returns the volume of the aabb."""
     return _aabb_x_size(aabb) * _aabb_y_size(aabb) * _aabb_z_size(aabb)
 
 
 @numba.njit(cache=True)
-def _aabb_x_size(aabb):
+def _aabb_x_size(aabb):  # pragma: no cover
     """Returns the size of the aabb along the x-axsis."""
     return aabb[0, 1] - aabb[0, 0]
 
 
 @numba.njit(cache=True)
-def _aabb_y_size(aabb):
+def _aabb_y_size(aabb):  # pragma: no cover
     """Returns the size of the aabb along the y-axsis."""
     return aabb[1, 1] - aabb[1, 0]
 
 
 @numba.njit(cache=True)
-def _aabb_z_size(aabb):
+def _aabb_z_size(aabb):  # pragma: no cover
     """Returns the size of the aabb along the Z-axsis."""
     return aabb[2, 1] - aabb[2, 0]
