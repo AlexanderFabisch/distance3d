@@ -148,8 +148,10 @@ class AabbTree:
         """
 
         _, overlaps1, overlaps2, _ = self.overlaps_aabb_tree(other)
-
-        return self.external_data_list[overlaps1], other.external_data_list[overlaps2]
+        
+        external_data1 = [self.external_data_list[index] for index in overlaps1]
+        external_data2 = [other.external_data_list[index] for index in overlaps2]
+        return external_data1, external_data2
 
     def overlaps_aabb(self, aabb):
         """ Check overlapping of an aabb.

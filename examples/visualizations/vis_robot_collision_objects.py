@@ -12,7 +12,7 @@ import open3d as o3d
 from pytransform3d.urdf import UrdfTransformManager
 import pytransform3d.visualizer as pv
 from distance3d import random, colliders, gjk, mpr, broad_phase
-from distance3d.aabb_tree import all_aabbs_overlap
+from distance3d.aabb_tree import all_aabbs_overlap, AabbTree
 
 
 class AnimationCallback:
@@ -50,14 +50,24 @@ class AnimationCallback:
 
         total_time = 0.0
         if self.with_aabb_tree:
+
             start = time.time()
 
+            aabbs2 = []
             for box in boxes:
-                overlapping_colls = colls.aabb_overlapping_colliders(
-                    box).items()
-                for frame, collider in overlapping_colls:
-                    in_aabb[frame] |= True
-                    in_contact[frame] |= detect_collision(collider, box)
+                aabbs2.append(box.aabb())
+            aabb_tree = AabbTree()
+            aabb_tree.insert_aabbs(aabbs2)
+
+            _, _, _, pairs = colls.aabb_tree.overlaps_aabb_tree(aabb_tree)
+
+            for pair in pairs:
+                frame, collider = colls.aabb_tree.external_data_list[pair[0]]
+                box = boxes[pair[1]]
+
+                in_aabb[frame] |= True
+                in_contact[frame] |= detect_collision(collider, box)
+
             stop = time.time()
             total_time += stop - start
 
