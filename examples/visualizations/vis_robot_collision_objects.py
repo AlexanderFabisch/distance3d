@@ -12,7 +12,7 @@ import open3d as o3d
 from pytransform3d.urdf import UrdfTransformManager
 import pytransform3d.visualizer as pv
 from distance3d import random, colliders, gjk, mpr, broad_phase
-from distance3d.aabb_tree import all_aabbs_overlap, AabbTree
+from distance3d.aabb_tree import all_aabbs_overlap
 
 
 class AnimationCallback:
