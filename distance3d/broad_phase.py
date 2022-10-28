@@ -1,7 +1,6 @@
 """Broad-phase collision detection."""
 import warnings
 
-import numba
 import numpy as np
 from pytransform3d import urdf
 
@@ -161,7 +160,7 @@ class BoundingVolumeHierarchy:
         """
         aabb = collider.aabb()
         _, overlaps = self.aabb_tree.overlaps_aabb(aabb)
-        colliders = dict(np.array(self.aabb_tree.external_data_list)[overlaps.astype(int)])
+        colliders = dict(np.array(self.aabb_tree.external_data_list, dtype=object)[overlaps.astype(int)])
         for frame in whitelist:
             colliders.pop(frame, None)
         return colliders
@@ -207,6 +206,34 @@ class BoundingVolumeHierarchy:
 
             if not whitelisted:
                 data_pairs.append(data_pair)
+
+        return data_pairs
+
+    def aabb_overlapping_with_self(self):
+        """Get colliders with overlapping with itself.
+
+        This function performs broad phase collision detection with a bounding
+        volume hierarchy, where the bounding volumes are axis-aligned bounding
+        boxes.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        data_pairs : array, shape(n, 2)
+            A list of colliding colliders.
+        """
+
+        _, _, _, pairs = self.aabb_tree.overlaps_aabb_tree(self.aabb_tree)
+
+        data_pairs = []
+        for pair in pairs:
+            if pair[0] == pair[1]:
+                continue
+
+            data_pair = (self.aabb_tree.external_data_list[pair[0]], self.aabb_tree.external_data_list[pair[1]])
+            data_pairs.append(data_pair)
 
         return data_pairs
 

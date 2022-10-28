@@ -1,8 +1,10 @@
 """
-=================================================
+======================================
 Visualize Subdivision of the AABB Tree
-=================================================
+======================================
 """
+from distance3d.aabb_tree import AabbTree
+
 print(__doc__)
 
 import numpy as np
@@ -24,7 +26,8 @@ rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0 * np.ones(3), 0.15, 4
 points = rigid_body1.tetrahedra_points
 aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(points)
 
-aabb_tree = hydroelastic_contact.AabbTree(aabbs1, "shuffle")
+aabb_tree = AabbTree()
+aabb_tree.insert_aabbs(aabbs1, pre_insertion_methode="shuffle")
 
 print(aabb_tree)
 
