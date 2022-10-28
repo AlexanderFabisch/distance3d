@@ -90,3 +90,12 @@ def test_bvh_from_colliders():
             overlapping_aabbs2[frame1].append(frame2)
 
     assert overlapping_aabbs == overlapping_aabbs2
+
+    pairs = bvh.aabb_overlapping_with_other_BVH(bvh)
+    pairs1 = []
+    for (frame, collider), (frame2, collider2) in pairs:
+        if frame != frame2:
+            pairs1.append(((frame, collider), (frame2, collider2)))
+
+    pairs2 = bvh.aabb_overlapping_with_self()
+    assert pairs1 == pairs2

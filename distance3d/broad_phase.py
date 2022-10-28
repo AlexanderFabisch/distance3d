@@ -165,7 +165,7 @@ class BoundingVolumeHierarchy:
             colliders.pop(frame, None)
         return colliders
 
-    def aabb_overlapping_with_other_BVH(self, other_bvh, whitelist1=(), whitelist2=()):
+    def aabb_overlapping_with_other_BVH(self, other_bvh):
         """Get colliders with an overlapping AABB.
 
         This function performs broad phase collision detection with a bounding
@@ -194,18 +194,7 @@ class BoundingVolumeHierarchy:
         data_pairs = []
         for pair in pairs:
             data_pair = (self.aabb_tree.external_data_list[pair[0]], other_bvh.aabb_tree.external_data_list[pair[1]])
-
-            whitelisted = False
-            for frame in whitelist1:
-                if frame == data_pair[0, 0]:
-                    whitelisted = True
-
-            for frame in whitelist2:
-                if frame == data_pair[1, 0]:
-                    whitelisted = True
-
-            if not whitelisted:
-                data_pairs.append(data_pair)
+            data_pairs.append(data_pair)
 
         return data_pairs
 

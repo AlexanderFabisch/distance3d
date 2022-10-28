@@ -145,7 +145,7 @@ class AabbTree:
 
 
 @numba.njit(cache=True)
-def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):  # pragma: no cover
+def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):
     """Inserts aabbs into the tree defined in root and nodes.
 
     Parameters
@@ -191,7 +191,7 @@ def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):  # pragma: no co
 
 
 @numba.njit(cache=True)
-def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):  # pragma: no cover
+def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
     """
     Inserts a new leaf into the tree.
     """
@@ -224,8 +224,8 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):  # 
         cost_right = _aabb_volume(
             _merge_aabb(aabbs[leaf_node_index], aabbs[right_node_index]))
 
-        if cost_left > cost_new_parent and cost_right > cost_new_parent:
-            break
+        # This doesn't seem to happen ever. So need to check if it does
+        assert not (cost_left > cost_new_parent and cost_right > cost_new_parent)
 
         # otherwise go down the cheaper child.
         if cost_left < cost_right:
@@ -269,7 +269,7 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):  # 
 
 
 @numba.njit(cache=True)
-def fix_upward_tree(tree_node_index, nodes, aabbs):  # pragma: no cover
+def fix_upward_tree(tree_node_index, nodes, aabbs):
     """
     Fixes the aabbs of the parent branches by setting them to the merge of the children aabbs.
     """
@@ -304,9 +304,6 @@ def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):  
         node_index = stack[-1]
         stack = stack[:-1]
 
-        if node_index == INDEX_NONE:
-            continue
-
         node_aabb = aabbs2[node_index]
         if nodes2[node_index, TYPE_INDEX] == TYPE_BRANCH and \
                 len(query_overlap(node_aabb, root1, nodes1, aabbs1, break_at_first_leaf=True)) >= 1:
@@ -323,7 +320,7 @@ def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):  
 
 
 @numba.njit(cache=True)
-def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=False):  # pragma: no cover
+def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=False):
     """
     Queries the overlapping aabbs by traversing the tree.
     """
@@ -334,9 +331,6 @@ def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=
 
         node_index = stack[-1]
         stack = stack[:-1]
-
-        if node_index == INDEX_NONE:
-            continue
 
         node_aabb = aabbs[node_index]
         if _aabb_overlap(node_aabb, test_aabb):
@@ -400,7 +394,7 @@ def print_aabb_tree_recursive(node_index, nodes):  # pragma: no cover
 
 
 @numba.njit(cache=True)
-def all_aabbs_overlap(aabbs1, aabbs2):  # pragma: no cover
+def all_aabbs_overlap(aabbs1, aabbs2):
     """Creates result lists of all the overlapping aabbs.
 
     Parameters
@@ -438,7 +432,7 @@ def all_aabbs_overlap(aabbs1, aabbs2):  # pragma: no cover
 
 
 @numba.njit(cache=True)
-def _aabb_overlap(aabb1, aabb2):  # pragma: no cover
+def _aabb_overlap(aabb1, aabb2):
     """Returns true if aabb1 and aabb2 overlap."""
     return aabb1[0, 0] <= aabb2[0, 1] and aabb1[0, 1] >= aabb2[0, 0] \
            and aabb1[1, 0] <= aabb2[1, 1] and aabb1[1, 1] >= aabb2[1, 0] \
@@ -446,13 +440,13 @@ def _aabb_overlap(aabb1, aabb2):  # pragma: no cover
 
 
 @numba.njit(cache=True)
-def _sort_aabbs(aabbs):  # pragma: no cover
+def _sort_aabbs(aabbs):
     """Returns a spatially sorted aabb list."""
     return aabbs[:, 0, 0].argsort()
 
 
 @numba.njit(cache=True)
-def _merge_aabb(aabb1, aabb2):  # pragma: no cover
+def _merge_aabb(aabb1, aabb2):
     """Returns the smallest aabb that contains aabb1 and aabb2."""
     return np.array(
         [[min(aabb1[0, 0], aabb2[0, 0]), max(aabb1[0, 1], aabb2[0, 1])],
@@ -462,26 +456,24 @@ def _merge_aabb(aabb1, aabb2):  # pragma: no cover
 
 
 @numba.njit(cache=True)
-def _aabb_volume(aabb):  # pragma: no cover
+def _aabb_volume(aabb):
     """Returns the volume of the aabb."""
     return _aabb_x_size(aabb) * _aabb_y_size(aabb) * _aabb_z_size(aabb)
 
 
 @numba.njit(cache=True)
-def _aabb_x_size(aabb):  # pragma: no cover
+def _aabb_x_size(aabb):
     """Returns the size of the aabb along the x-axsis."""
     return aabb[0, 1] - aabb[0, 0]
 
 
 @numba.njit(cache=True)
-def _aabb_y_size(aabb):  # pragma: no cover
+def _aabb_y_size(aabb):
     """Returns the size of the aabb along the y-axsis."""
     return aabb[1, 1] - aabb[1, 0]
 
 
 @numba.njit(cache=True)
-def _aabb_z_size(aabb):  # pragma: no cover
+def _aabb_z_size(aabb):
     """Returns the size of the aabb along the Z-axsis."""
     return aabb[2, 1] - aabb[2, 0]
-
-
