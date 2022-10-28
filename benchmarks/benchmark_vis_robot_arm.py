@@ -39,7 +39,7 @@ def run(with_aabb_tree, robotBVH, worldBVH):
             gjk.gjk_intersection(collider, box)
 
 
-def start(ammount, space_size):
+def start(amount, space_size):
     BASE_DIR = "test/data/"
     data_dir = BASE_DIR
     search_path = ".."
@@ -64,7 +64,7 @@ def start(ammount, space_size):
 
     random_state = np.random.RandomState(5)
 
-    for i in range(ammount):
+    for i in range(amount):
         box2origin, size = random.rand_box(
             random_state, center_scale=space_size, size_scale=0.3)
         box2origin[:3, 3] += 0.2
@@ -85,7 +85,7 @@ def bench(robotBVH, worldBVH, use_tree):
     return np.mean(times)
 
 
-plt.xlabel("aabb ammount")
+plt.xlabel("aabb amount")
 plt.ylabel("time in sec")
 
 size = 0.3
