@@ -9,10 +9,10 @@ from distance3d import random, colliders, gjk, broad_phase
 import matplotlib.pyplot as plt
 
 
-def run(with_aabb_tree, robotBVH, worldBVH):
+def run(with_aabb_tree, robot_bvh, world_bvh):
     if with_aabb_tree:
 
-        pairs = robotBVH.aabb_overlapping_with_other_BVH(worldBVH)
+        pairs = robot_bvh.aabb_overlapping_with_other_bvh(world_bvh)
 
         for pair in pairs:
             frame, collider = pair[0]
@@ -21,12 +21,12 @@ def run(with_aabb_tree, robotBVH, worldBVH):
             gjk.gjk_intersection(collider, box)
     else:
         aabbs1 = []
-        robot_coll_list = list(robotBVH.colliders_.items())
+        robot_coll_list = list(robot_bvh.colliders_.items())
         for frame, collider in robot_coll_list:
             aabbs1.append(collider.aabb())
 
         aabbs2 = []
-        world_coll_list = list(worldBVH.colliders_.items())
+        world_coll_list = list(world_bvh.colliders_.items())
         for _, box in world_coll_list:
             aabbs2.append(box.aabb())
 

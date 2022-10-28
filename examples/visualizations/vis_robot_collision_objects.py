@@ -52,7 +52,7 @@ class AnimationCallback:
         if self.with_aabb_tree:
 
             start = time.time()
-            pairs = robot_bvh.aabb_overlapping_with_other_BVH(world_bvh)
+            pairs = robot_bvh.aabb_overlapping_with_other_bvh(world_bvh)
             for pair in pairs:
                 frame, collider = pair[0]
                 _, box = pair[1]

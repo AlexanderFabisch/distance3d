@@ -159,12 +159,13 @@ class BoundingVolumeHierarchy:
         """
         aabb = collider.aabb()
         _, overlaps = self.aabbtree_.overlaps_aabb(aabb)
-        colliders = dict(np.array(self.aabbtree_.external_data_list, dtype=object)[overlaps.astype(int)])
+        colliders = dict(np.array(self.aabbtree_.external_data_list,
+                                  dtype=object)[overlaps.astype(int)])
         for frame in whitelist:
             colliders.pop(frame, None)
         return colliders
 
-    def aabb_overlapping_with_other_BVH(self, other_bvh):
+    def aabb_overlapping_with_other_bvh(self, other_bvh):
         """Get colliders with an overlapping AABB.
 
         This function performs broad phase collision detection with a bounding
@@ -176,12 +177,6 @@ class BoundingVolumeHierarchy:
         other_bvh : BoundingVolumeHierarchy
             the other BVH.
 
-        whitelist1 : sequence
-            Names of frames to which collisions are allowed of this BVH.
-
-        whitelist2 : sequence
-            Names of frames to which collisions are allowed of the other BVH.
-
         Returns
         -------
         data_pairs : array, shape(n, 2)
@@ -191,7 +186,8 @@ class BoundingVolumeHierarchy:
 
         data_pairs = []
         for pair in pairs:
-            data_pair = (self.aabbtree_.external_data_list[pair[0]], other_bvh.aabbtree_.external_data_list[pair[1]])
+            data_pair = (self.aabbtree_.external_data_list[pair[0]],
+                         other_bvh.aabbtree_.external_data_list[pair[1]])
             data_pairs.append(data_pair)
 
         return data_pairs
@@ -215,7 +211,8 @@ class BoundingVolumeHierarchy:
             if pair[0] == pair[1]:
                 continue
 
-            data_pair = (self.aabbtree_.external_data_list[pair[0]], self.aabbtree_.external_data_list[pair[1]])
+            data_pair = (self.aabbtree_.external_data_list[pair[0]],
+                         self.aabbtree_.external_data_list[pair[1]])
             data_pairs.append(data_pair)
 
         return data_pairs
