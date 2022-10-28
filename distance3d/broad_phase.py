@@ -137,7 +137,7 @@ class BoundingVolumeHierarchy:
         return [collider.artist_ for collider in self.colliders_.values()
                 if collider.artist_ is not None]
 
-    def aabb_overlapping_collider(self, collider, whitelist=()):
+    def aabb_overlapping_colliders(self, collider, whitelist=()):
         """Get colliders with an overlapping AABB.
 
         This function performs broad phase collision detection with a bounding

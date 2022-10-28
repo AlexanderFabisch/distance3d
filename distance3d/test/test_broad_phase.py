@@ -25,7 +25,7 @@ def test_bvh():
     tm.set_joint("joint1", 3.1415926535)
     bvh.update_collider_poses()
     box = colliders.Box(np.eye(4), np.array([1, 1, 1], dtype=float))
-    colls = bvh.aabb_overlapping_collider(box)
+    colls = bvh.aabb_overlapping_colliders(box)
     assert len(colls) == 5
 
 
@@ -61,7 +61,7 @@ def test_bvh_from_colliders():
     overlapping_aabbs = dict()
     for frame1, coll1 in bvh.colliders_.items():
         overlapping_aabbs[frame1] = []
-        colls = bvh.aabb_overlapping_collider(coll1, whitelist=(frame1,))
+        colls = bvh.aabb_overlapping_colliders(coll1, whitelist=(frame1,))
         for frame2, coll2 in colls.items():
             overlapping_aabbs[frame1].append(frame2)
 
@@ -85,7 +85,7 @@ def test_bvh_from_colliders():
     overlapping_aabbs2 = dict()
     for frame1, coll1 in bvh.colliders_.items():
         overlapping_aabbs2[frame1] = []
-        colls = bvh.aabb_overlapping_collider(coll1, whitelist=(frame1,))
+        colls = bvh.aabb_overlapping_colliders(coll1, whitelist=(frame1,))
         for frame2, coll2 in colls.items():
             overlapping_aabbs2[frame1].append(frame2)
 
