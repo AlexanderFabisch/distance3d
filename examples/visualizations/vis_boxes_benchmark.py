@@ -40,13 +40,12 @@ timer.start("broad phase")
 pairs = bvh.aabb_overlapping_with_self()
 timer.stop_and_add_to_total("broad phase")
 
-timer.start("gjk")
 for (frame1, collider1), (frame2, collider2) in pairs:
+    timer.start("gjk")
     intersection = gjk_intersection(collider1, collider2)
-
+    timer.stop_and_add_to_total("gjk")
     if intersection:
         collisions.append((frame1, frame2))
-timer.stop_and_add_to_total("gjk")
 
 total_collision_detection = timer.stop("collision")
 print(f"Insertion in AABB tree: {timer.total_time_['aabbtree']} s")
