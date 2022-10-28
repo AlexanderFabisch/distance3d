@@ -77,7 +77,7 @@ def find_contact_surface(rigid_body1, rigid_body2, use_aabb_trees=False):
 
     if use_aabb_trees:
         _, broad_tetrahedra1, broad_tetrahedra2, broad_pairs \
-            = rigid_body1.aabb_tree.overlaps_aabb_tree(rigid_body2.aabb_tree)
+            = rigid_body1.aabbtree_.overlaps_aabb_tree(rigid_body2.aabbtree_)
     else:
         broad_tetrahedra1, broad_tetrahedra2, broad_pairs = all_aabbs_overlap(rigid_body1.aabbs, rigid_body2.aabbs)
 

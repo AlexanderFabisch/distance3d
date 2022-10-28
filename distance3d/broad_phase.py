@@ -27,7 +27,7 @@ class BoundingVolumeHierarchy:
 
     Attributes
     ----------
-    aabbtree_ : AABBTree
+    aabbtree_ : AabbTree
         Tree of axis-aligned bounding boxes.
 
     colliders_ : dict
@@ -37,12 +37,11 @@ class BoundingVolumeHierarchy:
         Whitelists for self-collision detection in case this BVH represents
         a robot.
     """
-
     def __init__(self, tm, base_frame):
         self.tm = tm
         self.base_frame = base_frame
         self.collider_frames = set()
-        self.aabb_tree = AabbTree()
+        self.aabbtree_ = AabbTree()
         self.colliders_ = {}
         self.self_collision_whitelists_ = {}
 
@@ -106,16 +105,16 @@ class BoundingVolumeHierarchy:
         """
         self.collider_frames.add(frame)
         self.colliders_[frame] = collider
-        self.aabb_tree.insert_aabb(collider.aabb(), (frame, collider))
+        self.aabbtree_.insert_aabb(collider.aabb(), (frame, collider))
 
     def update_collider_poses(self):
         """Update poses of all colliders from transform manager."""
-        self.aabb_tree = AabbTree()
+        self.aabbtree_ = AabbTree()
         for frame in self.colliders_:
             A2B = self.tm.get_transform(frame, self.base_frame)
             collider = self.colliders_[frame]
             collider.update_pose(A2B)
-            self.aabb_tree.insert_aabb(collider.aabb(), (frame, collider))
+            self.aabbtree_.insert_aabb(collider.aabb(), (frame, collider))
 
     def get_colliders(self):
         """Get all colliders.
@@ -159,8 +158,8 @@ class BoundingVolumeHierarchy:
             Maps frame names to colliders with overlapping AABB.
         """
         aabb = collider.aabb()
-        _, overlaps = self.aabb_tree.overlaps_aabb(aabb)
-        colliders = dict(np.array(self.aabb_tree.external_data_list, dtype=object)[overlaps.astype(int)])
+        _, overlaps = self.aabbtree_.overlaps_aabb(aabb)
+        colliders = dict(np.array(self.aabbtree_.external_data_list, dtype=object)[overlaps.astype(int)])
         for frame in whitelist:
             colliders.pop(frame, None)
         return colliders
@@ -189,11 +188,11 @@ class BoundingVolumeHierarchy:
             A list of colliding colliders.
         """
 
-        _, _, _, pairs = self.aabb_tree.overlaps_aabb_tree(other_bvh.aabb_tree)
+        _, _, _, pairs = self.aabbtree_.overlaps_aabb_tree(other_bvh.aabbtree_)
 
         data_pairs = []
         for pair in pairs:
-            data_pair = (self.aabb_tree.external_data_list[pair[0]], other_bvh.aabb_tree.external_data_list[pair[1]])
+            data_pair = (self.aabbtree_.external_data_list[pair[0]], other_bvh.aabbtree_.external_data_list[pair[1]])
             data_pairs.append(data_pair)
 
         return data_pairs
@@ -214,14 +213,14 @@ class BoundingVolumeHierarchy:
             A list of colliding colliders.
         """
 
-        _, _, _, pairs = self.aabb_tree.overlaps_aabb_tree(self.aabb_tree)
+        _, _, _, pairs = self.aabbtree_.overlaps_aabb_tree(self.aabbtree_)
 
         data_pairs = []
         for pair in pairs:
             if pair[0] == pair[1]:
                 continue
 
-            data_pair = (self.aabb_tree.external_data_list[pair[0]], self.aabb_tree.external_data_list[pair[1]])
+            data_pair = (self.aabbtree_.external_data_list[pair[0]], self.aabbtree_.external_data_list[pair[1]])
             data_pairs.append(data_pair)
 
         return data_pairs

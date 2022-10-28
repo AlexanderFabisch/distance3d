@@ -36,6 +36,6 @@ bvh = distance3d.broad_phase.BoundingVolumeHierarchy(tm, "robot_arm")
 bvh.fill_tree_with_colliders(tm, make_artists=False)
 
 ax = ppu.make_3d_axis(0.6)
-plotting.plot_aabb_tree(ax, bvh.aabb_tree)
+plotting.plot_aabb_tree(ax, bvh.aabbtree_)
 tm.plot_collision_objects("robot_arm", ax, wireframe=False, alpha=0.5)
 plt.show()
