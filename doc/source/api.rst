@@ -323,3 +323,21 @@ API Reference
    ~distance3d.random.rand_ellipse
    ~distance3d.random.rand_cone
    ~distance3d.random.randn_convex
+
+
+:mod:`distance3d.aabb_tree`
+---------------------------
+
+.. automodule:: distance3d.aabb_tree
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: distance3d.aabb_tree
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _autosummary/
+
+   ~distance3d.aabb_tree.AabbTree
+   ~distance3d.aabb_tree.all_aabbs_overlap
+

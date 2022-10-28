@@ -12,16 +12,15 @@ TYPE_BRANCH = 2
 
 
 class AabbTree:
+    """AABB Tree for broad phase collision checking
+
+    Returns
+    -------
+    aabb_tree : AabbTree
+        The AabbTree Object
+    """
 
     def __init__(self):
-        """Creation of empty aabb tree
-
-        Returns
-        -------
-        aabb_tree : AabbTree
-            The AabbTree Object
-        """
-
         self.root = INDEX_NONE
         self.filled_len = 0
         self.nodes = np.empty((0, 4), dtype=int)
@@ -29,7 +28,7 @@ class AabbTree:
         self.external_data_list = []
 
     def insert_aabbs(self, aabbs, external_data_list=[None], pre_insertion_methode="none"):
-        """Inster aabbs in tree
+        """Insert aabbs in tree
 
         Parameters
         ----------
@@ -79,7 +78,7 @@ class AabbTree:
         self.external_data_list = self.external_data_list[:self.filled_len]
 
     def insert_aabb(self, aabb, external_data=None):
-        """Inster aabbs in tree
+        """Insert single aabb in tree
 
         Parameters
         ----------
@@ -97,7 +96,7 @@ class AabbTree:
         return '\r\n' + '\r\n'.join(lines)
 
     def overlaps_aabb_tree(self, other):
-        """ Check overlapping of another tree.
+        """Check overlapping with another tree.
 
         Parameters
         ----------
@@ -125,7 +124,7 @@ class AabbTree:
         return is_overlapping, np.unique(overlap_tetrahedron1), np.unique(overlap_tetrahedron2), overlap_pairs
 
     def overlaps_aabb(self, aabb):
-        """ Check overlapping of an aabb.
+        """Check overlapping with an aabb.
 
         Parameters
         ----------
@@ -395,7 +394,7 @@ def print_aabb_tree_recursive(node_index, nodes):  # pragma: no cover
 
 @numba.njit(cache=True)
 def all_aabbs_overlap(aabbs1, aabbs2):
-    """Creates result lists of all the overlapping aabbs.
+    """Creates result lists of all the overlapping aabbs. (Brute Force)
 
     Parameters
     ----------
