@@ -27,7 +27,7 @@ class AabbTree:
         self.aabbs = np.empty((0, 3, 2))
         self.external_data_list = []
 
-    def insert_aabbs(self, aabbs, external_data_list=[None], pre_insertion_methode="none"):
+    def insert_aabbs(self, aabbs, external_data_list=None, pre_insertion_methode="none"):
         """Insert aabbs in tree
 
         Parameters
@@ -35,7 +35,7 @@ class AabbTree:
         aabbs : array, shape (n, 3, 2)
             An array containing a list of aabbs of the tree.
 
-        external_data_list : array, shape(n, 3, 2), optional (default: None)
+        external_data_list : list, optional (default: None)
             Array of data associated with the aabbs.
 
         pre_insertion_methode : str, optional (default: "none")
@@ -43,11 +43,10 @@ class AabbTree:
             Use "sort" for a cleaner tree with slightly longer creation times.
             Use "shuffle" for a faster creation but with some non-optimal placement in the tree.
         """
-
         if len(aabbs) == 0:
             return
 
-        assert external_data_list == [None] or len(external_data_list) == len(aabbs)
+        assert external_data_list is None or len(external_data_list) == len(aabbs)
 
         old_filled_len = self.filled_len
         self.filled_len += len(aabbs)
@@ -60,7 +59,8 @@ class AabbTree:
         new_aabbs = np.zeros([len(self.nodes) - len(self.aabbs), 3, 2])
         self.aabbs = np.append(self.aabbs, new_aabbs, axis=0)
 
-        self.external_data_list += external_data_list
+        if external_data_list is not None:
+            self.external_data_list += external_data_list
         empty_external_data = [None] * (len(self.nodes) - len(self.external_data_list))
         self.external_data_list += empty_external_data
 
