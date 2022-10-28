@@ -187,7 +187,6 @@ class BoundingVolumeHierarchy:
         data_pairs : array, shape(n, 2)
             A list of colliding colliders.
         """
-
         _, _, _, pairs = self.aabbtree_.overlaps_aabb_tree(other_bvh.aabbtree_)
 
         data_pairs = []
@@ -204,15 +203,11 @@ class BoundingVolumeHierarchy:
         volume hierarchy, where the bounding volumes are axis-aligned bounding
         boxes.
 
-        Parameters
-        ----------
-
         Returns
         -------
         data_pairs : array, shape(n, 2)
             A list of colliding colliders.
         """
-
         _, _, _, pairs = self.aabbtree_.overlaps_aabb_tree(self.aabbtree_)
 
         data_pairs = []
