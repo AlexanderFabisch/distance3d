@@ -24,17 +24,17 @@ class AnimationCallback:
         self.verbose = verbose
         self.total_time = 0.0
 
-    def __call__(self, step, n_frames, tm, robotBVH, worldBVH, joint_names):
+    def __call__(self, step, n_frames, tm, robot_bvh, world_bvh, joint_names):
         if step == 0:
             self.total_time = 0.0
 
         angle = 0.5 * np.cos(2.0 * np.pi * (step / n_frames))
         for joint_name in joint_names:
             tm.set_joint(joint_name, angle)
-        robotBVH.update_collider_poses()
+        robot_bvh.update_collider_poses()
 
-        in_contact = {frame: False for frame in robotBVH.get_collider_frames()}
-        in_aabb = {frame: False for frame in robotBVH.get_collider_frames()}
+        in_contact = {frame: False for frame in robot_bvh.get_collider_frames()}
+        in_aabb = {frame: False for frame in robot_bvh.get_collider_frames()}
 
         if self.collision_detection_algorithm == "gjk":
             detect_collision = lambda x, y: gjk.gjk(x, y)[0] < 1e-6
@@ -52,7 +52,7 @@ class AnimationCallback:
         if self.with_aabb_tree:
 
             start = time.time()
-            pairs = robotBVH.aabb_overlapping_with_other_BVH(worldBVH)
+            pairs = robot_bvh.aabb_overlapping_with_other_BVH(world_bvh)
             for pair in pairs:
                 frame, collider = pair[0]
                 _, box = pair[1]
@@ -69,12 +69,12 @@ class AnimationCallback:
             start = time.time()
 
             aabbs1 = []
-            robot_coll_list = list(robotBVH.colliders_.items())
+            robot_coll_list = list(robot_bvh.colliders_.items())
             for frame, collider in robot_coll_list:
                 aabbs1.append(collider.aabb())
 
             aabbs2 = []
-            world_coll_list = list(worldBVH.colliders_.items())
+            world_coll_list = list(world_bvh.colliders_.items())
             for _, box in world_coll_list:
                 aabbs2.append(box.aabb())
 
@@ -96,7 +96,7 @@ class AnimationCallback:
         self.total_time += total_time
 
         for frame in in_contact:
-            geometry = robotBVH.colliders_[frame].artist_.geometries[0]
+            geometry = robot_bvh.colliders_[frame].artist_.geometries[0]
             if in_contact[frame]:
                 geometry.paint_uniform_color((1, 0, 0))
             elif in_aabb[frame]:
@@ -107,7 +107,7 @@ class AnimationCallback:
         if step == self.n_frames - 1:
             print(f"Total time: {self.total_time}")
 
-        return robotBVH.get_artists()
+        return robot_bvh.get_artists()
 
 
 BASE_DIR = "test/data/"
@@ -127,10 +127,10 @@ joint_names = ["joint%d" % i for i in range(1, 7)]
 for joint_name in joint_names:
     tm.set_joint(joint_name, 0.7)
 
-robotBVH = broad_phase.BoundingVolumeHierarchy(tm, "robot_arm")
-robotBVH.fill_tree_with_colliders(tm, make_artists=True)
+robot_bvh = broad_phase.BoundingVolumeHierarchy(tm, "robot_arm")
+robot_bvh.fill_tree_with_colliders(tm, make_artists=True)
 
-worldBVH = broad_phase.BoundingVolumeHierarchy(tm, "world")
+world_bvh = broad_phase.BoundingVolumeHierarchy(tm, "world")
 
 random_state = np.random.RandomState(5)
 
@@ -145,14 +145,14 @@ for i in range(50):
     box_artist.add_artist(fig)
     box = colliders.Margin(
         colliders.Box(box2origin, size, artist=box_artist), 0.03)
-    worldBVH.add_collider("Box %s" % i, box)
+    world_bvh.add_collider("Box %s" % i, box)
 
     aabb = box.aabb()
     aabb = o3d.geometry.AxisAlignedBoundingBox(aabb[:, 0], aabb[:, 1])
     aabb.color = (1, 0, 0)
     fig.add_geometry(aabb)
 
-for artist in robotBVH.get_artists():
+for artist in robot_bvh.get_artists():
     artist.add_artist(fig)
 fig.view_init()
 fig.set_zoom(1.5)
@@ -163,7 +163,7 @@ animation_callback = AnimationCallback(
     n_frames=n_frames, verbose=0)
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
-                fargs=(n_frames, tm, robotBVH, worldBVH, joint_names))
+                fargs=(n_frames, tm, robot_bvh, world_bvh, joint_names))
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")
