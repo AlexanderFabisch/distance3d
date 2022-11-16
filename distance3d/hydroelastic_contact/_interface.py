@@ -90,7 +90,7 @@ def find_contact_surface(rigid_body1, rigid_body2, use_aabb_trees=False):
         broad_pairs,
         rigid_body1.tetrahedra_points, rigid_body2.tetrahedra_points,
         rigid_body1.tetrahedra_potentials, rigid_body2.tetrahedra_potentials,
-        X1, X2)
+        X1, X2, rigid_body1.youngs_modulus, rigid_body2.youngs_modulus)
     contact_surface = ContactSurface(
         rigid_body2.body2origin_, *intersection_result)
 
