@@ -37,6 +37,8 @@ class RigidBody:
         self._aabbs = None
         self._aabb_tree = None
 
+        self._youngs_modulus = 1.0
+
     @staticmethod
     def make_sphere(center, radius, order=4):
         """Create sphere.
@@ -242,4 +244,12 @@ class RigidBody:
             self._aabb_tree = AabbTree()
             self._aabb_tree.insert_aabbs(self.aabbs, pre_insertion_methode="sort")
         return self._aabb_tree
+
+    def set_youngs_modulus(self, youngs_modulus):
+        self._youngs_modulus = youngs_modulus
+
+    @property
+    def youngs_modulus(self):
+        return self._youngs_modulus
+
 

@@ -6,7 +6,7 @@ from ._halfplanes import intersect_halfplanes
 
 def intersect_tetrahedron_pairs(
         pairs, tetrahedra_points1, tetrahedra_points2,
-        epsilon1, epsilon2, X1, X2):
+        epsilon1, epsilon2, X1, X2, youngs_modulus1=1.0, youngs_modulus2=1.0):
     """Intersect pairs of tetrahedra.
 
     Parameters
@@ -31,6 +31,12 @@ def intersect_tetrahedron_pairs(
 
     X2 : dict
         Maps tetrahedron indices of second rigid body to barycentric transform.
+
+    youngs_modulus1 : float, optional (default: 1.0)
+        Young's modulus of the first rigid body
+
+    youngs_modulus2 : float, optional (default: 1.0)
+        Young's modulus of the second rigid body
 
     Returns
     -------
@@ -57,7 +63,8 @@ def intersect_tetrahedron_pairs(
     for i, j in pairs:
         intersecting, contact_details = intersect_tetrahedron_pair(
             tetrahedra_points1[i], epsilon1[i], X1[i],
-            tetrahedra_points2[j], epsilon2[j], X2[j])
+            tetrahedra_points2[j], epsilon2[j], X2[j],
+            youngs_modulus1, youngs_modulus2)
         if intersecting:
             intersection = True
         else:
@@ -77,7 +84,8 @@ def intersect_tetrahedron_pairs(
 
 @numba.njit(cache=True)
 def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
-                               tetrahedron2, epsilon2, X2):
+                               tetrahedron2, epsilon2, X2,
+                               youngs_modulus1=1.0, youngs_modulus2=1.0):
     """Intersect a pair of tetrahedra.
 
     Parameters
@@ -100,6 +108,12 @@ def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
     X2 : array, shape (4, 4)
         Each row is a halfspace that defines the original tetrahedron.
 
+    youngs_modulus1 : float, optional (default: 1.0)
+        Young's modulus of tetrahedron 1
+
+    youngs_modulus2 : float, optional (default: 1.0)
+        Young's modulus of tetrahedron 2
+
     Returns
     -------
     intersection : bool
@@ -109,7 +123,7 @@ def intersect_tetrahedron_pair(tetrahedron1, epsilon1, X1,
         Contact plane in Hesse normal form, contact polygon and triangles of
         contact polygon.
     """
-    contact_plane_hnf, same = contact_plane(X1, X2, epsilon1, epsilon2)
+    contact_plane_hnf, same = contact_plane(X1, X2, epsilon1, epsilon2, youngs_modulus1, youngs_modulus2)
     if same:
         return True, _handle_same_tetrahedron(epsilon2, tetrahedron2)
 
@@ -148,10 +162,11 @@ def _handle_same_tetrahedron(epsilon, tetrahedron):
 
 @numba.njit(
     numba.types.Tuple((numba.float64[::1], numba.bool_))(
-        numba.float64[:, ::1], numba.float64[:, ::1], numba.float64[::1],
-        numba.float64[::1]),
+        numba.float64[:, ::1], numba.float64[:, ::1],
+        numba.float64[::1], numba.float64[::1],
+        numba.float64, numba.float64),
     cache=True)
-def contact_plane(X1, X2, epsilon1, epsilon2):
+def contact_plane(X1, X2, epsilon1, epsilon2, youngs_modulus1, youngs_modulus2):
     """Compute contact plane.
 
     Parameters
@@ -168,6 +183,12 @@ def contact_plane(X1, X2, epsilon1, epsilon2):
     epsilon2 : array, shape (4,)
         Potentials of the vertices of tetrahedron 2.
 
+    youngs_modulus1 : float, optional (default: 1.0)
+        Young's modulus of tetrahedron 1
+
+    youngs_modulus2 : float, optional (default: 1.0)
+        Young's modulus of tetrahedron 2
+
     Returns
     -------
     plane_hnf : array, shape (4,)
@@ -177,8 +198,7 @@ def contact_plane(X1, X2, epsilon1, epsilon2):
     same : bool
         Are both tetrahedrons actually the same tetrahedron (maybe scaled)?
     """
-    # TODO Young's modulus, see Eq. 16 of paper
-    plane_hnf = epsilon1.dot(X1) - epsilon2.dot(X2)
+    plane_hnf = (epsilon1 / youngs_modulus1).dot(X1) - (epsilon2 / youngs_modulus2).dot(X2)
     norm = np.linalg.norm(plane_hnf[:3])
 
     if norm == 0.0:
@@ -230,10 +250,10 @@ def check_tetrahedra_intersect_contact_plane(
     plane_distances1 = tetrahedron1.dot(plane_normal) - d
     plane_distances2 = tetrahedron2.dot(plane_normal) - d
     return (
-        min(plane_distances1) < -tolerance
-        and max(plane_distances1) > tolerance
-        and min(plane_distances2) < -tolerance
-        and max(plane_distances2) > tolerance)
+            min(plane_distances1) < -tolerance
+            and max(plane_distances1) > tolerance
+            and min(plane_distances2) < -tolerance
+            and max(plane_distances2) > tolerance)
 
 
 @numba.njit(
