@@ -69,6 +69,9 @@ def compute_contact_force(
         Contact polygon between two tetrahedra. Points are ordered
         counter-clockwise around their center.
 
+    youngs_modulus : float, optional (default: 1.0)
+        The stiffness of the material.
+
     Returns
     -------
     intersection_com : array, shape (3,)

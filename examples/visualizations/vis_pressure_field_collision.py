@@ -5,9 +5,8 @@ Physical simulation with collision detection
 """
 print(__doc__)
 import numpy as np
-import pytransform3d.transformations as pt
 import pytransform3d.visualizer as pv
-from distance3d import random, gjk, epa, visualization, colliders, hydroelastic_contact
+from distance3d import visualization, hydroelastic_contact
 
 dt = 0.01
 g = np.array([0, -9.81, 0])
