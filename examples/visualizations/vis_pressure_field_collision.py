@@ -8,7 +8,7 @@ import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import visualization, hydroelastic_contact
 
-dt = 0.01
+dt = 0.001
 g = np.array([0, -9.81, 0])
 
 fig = pv.figure()
@@ -83,20 +83,20 @@ def make_object(rigid_body, mass, acc, fixed):
     return PhysicsObject(rigid_body, artist, mass, acc, fixed)
 
 
-rb1 = hydroelastic_contact.RigidBody.make_box(np.eye(4), np.array([2.0, 1.0, 2.0]))
+rb1 = hydroelastic_contact.RigidBody.make_box(np.eye(4), np.array([0.5, 1.0, 2.0]))
 rb2 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.0, 2.0, 0.0]), 0.15, 2)
 
 GPa = 100000000
-rb1.set_youngs_modulus(0.1*GPa)
+rb1.set_youngs_modulus(100*GPa)
 rb2.set_youngs_modulus(0.1*GPa)
 
 p_object1 = make_object(rb1, 100, np.array([0.0, 0.0, 0.0]), True)
-p_object2 = make_object(rb2, 100, np.array([-0.1, 0.0, 0.0]), False)
+p_object2 = make_object(rb2, 1, np.array([-0.1, 0.0, 0.0]), False)
 
 fig.view_init()
 
 if "__file__" in globals():
-    fig.animate(AnimationCallback(p_object1, p_object2), 500, loop=False)
+    fig.animate(AnimationCallback(p_object1, p_object2), 500, loop=True)
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")
