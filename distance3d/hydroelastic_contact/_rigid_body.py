@@ -25,7 +25,7 @@ class RigidBody:
     potentials : array, shape (n_vertices,)
         Potential of each vertex. Shortest distance to surface.
     """
-    def __init__(self, body2origin, vertices, tetrahedra, potentials):
+    def __init__(self, body2origin, vertices, tetrahedra, potentials, youngs_modulus=1.0):
         self.body2origin_ = body2origin
         self.vertices_ = vertices
         self.tetrahedra_ = tetrahedra
@@ -37,7 +37,7 @@ class RigidBody:
         self._aabbs = None
         self._aabb_tree = None
 
-        self._youngs_modulus = 1.0
+        self._youngs_modulus = youngs_modulus
 
     @staticmethod
     def make_sphere(center, radius, order=4):
