@@ -24,6 +24,9 @@ class RigidBody:
 
     potentials : array, shape (n_vertices,)
         Potential of each vertex. Shortest distance to surface.
+
+    youngs_modulus : float, optional (default: 1.0)
+        The stiffness of the material the rigidbody is made out of.
     """
     def __init__(self, body2origin, vertices, tetrahedra, potentials, youngs_modulus=1.0):
         self.body2origin_ = body2origin
