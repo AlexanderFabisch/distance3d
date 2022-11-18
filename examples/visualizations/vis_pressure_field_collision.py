@@ -1,8 +1,11 @@
 """
-============================================
-Physical simulation with collision detection
-============================================
+=================================================
+Physical simulation exploring the young's modulus
+=================================================
 """
+# Scenario:
+# A rubber ball bouncing on a wooden box
+
 print(__doc__)
 import numpy as np
 import pytransform3d.visualizer as pv
@@ -85,6 +88,7 @@ def make_object(rigid_body, mass, acc, fixed):
 
 rb1 = hydroelastic_contact.RigidBody.make_box(np.eye(4), np.array([0.5, 1.0, 2.0]))
 rb2 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.0, 2.0, 0.0]), 0.15, 2)
+
 
 GPa = 100000000
 rb1.set_youngs_modulus(100*GPa)
