@@ -198,7 +198,7 @@ def contact_plane(X1, X2, epsilon1, epsilon2, youngs_modulus1, youngs_modulus2):
     same : bool
         Are both tetrahedrons actually the same tetrahedron (maybe scaled)?
     """
-    plane_hnf = (epsilon1 / youngs_modulus1).dot(X1) - (epsilon2 / youngs_modulus2).dot(X2)
+    plane_hnf = (epsilon1 * youngs_modulus1).dot(X1) - (epsilon2 * youngs_modulus2).dot(X2)
     norm = np.linalg.norm(plane_hnf[:3])
 
     if norm == 0.0:

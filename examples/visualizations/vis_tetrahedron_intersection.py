@@ -28,7 +28,7 @@ assert intersection
 contact_plane_hnf, contact_polygon = contact
 
 intersection_com, force_vector, _, _ = hydroelastic_contact.compute_contact_force(
-    tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon)
+    tetrahedron1, epsilon1, contact_plane_hnf, contact_polygon, )
 
 fig = pv.figure()
 fig.scatter(tetrahedron1, s=0.01, c=(1, 0, 0))
