@@ -17,7 +17,8 @@ def contact_surface_forces(contact_surface, rigid_body1):
             rigid_body1.tetrahedra_points[tetrahedron_idx],
             tetrahedra_potentials1[tetrahedron_idx],
             contact_surface.contact_planes[intersection_idx],
-            contact_surface.contact_polygons[intersection_idx])
+            contact_surface.contact_polygons[intersection_idx],
+            rigid_body1.youngs_modulus)
 
         triangles.append(triangle)
     return areas, coms, forces, triangles
@@ -50,7 +51,7 @@ TRIANGLES = tesselate_ordered_polygon(8)
 
 @numba.njit(cache=True)
 def compute_contact_force(
-        tetrahedron, epsilon, contact_plane_hnf, contact_polygon):
+        tetrahedron, epsilon, contact_plane_hnf, contact_polygon, youngs_modulus=1.0):
     """Compute contact force from contact polygon.
 
     Parameters
@@ -94,7 +95,7 @@ def compute_contact_force(
         vertices = contact_polygon[triangle]
         com[:3] = (vertices[0] + vertices[1] + vertices[2]) / 3.0
         res = np.linalg.solve(X, com)
-        pressure = np.sum(res * epsilon)
+        pressure = np.sum(res * (epsilon * youngs_modulus))
         area = 0.5 * np.linalg.norm(np.cross(vertices[1] - vertices[0],
                                              vertices[2] - vertices[0]))
         total_force += pressure * area
