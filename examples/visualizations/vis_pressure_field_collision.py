@@ -86,8 +86,8 @@ def make_object(rigid_body, mass, acc, fixed):
     return PhysicsObject(rigid_body, artist, mass, acc, fixed)
 
 
-rb1 = hydroelastic_contact.RigidBody.make_box(np.eye(4), np.array([0.5, 1.0, 2.0]))
-rb2 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.0, 2.0, 0.0]), 0.15, 2)
+rb1 = hydroelastic_contact.RigidBody.make_box(np.eye(4), np.array([0.5, 0.5, 0.5]))
+rb2 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.0, 1.0, 0.0]), 0.15, 2)
 
 
 GPa = 100000000
