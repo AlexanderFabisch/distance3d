@@ -1,7 +1,7 @@
 """
-=================================================
-Physical simulation exploring the young's modulus
-=================================================
+=======================================================================
+Physical simulation exploring the young's modulus with multiple Objects
+=======================================================================
 """
 # Scenario:
 # A rubber ball bouncing on a wooden box
