@@ -16,8 +16,8 @@ show_broad_phase = False
 rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
 rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
 
-rigid_body1.set_youngs_modulus(1.0)
-rigid_body2.set_youngs_modulus(1.0)
+rigid_body1.youngs_modulus = 1.0
+rigid_body2.youngs_modulus = 1.0
 
 timer = benchmark.Timer()
 timer.start("contact_forces")

@@ -101,6 +101,8 @@ def test_compute_contact_plane_overlap():
 def test_compute_contact_force_overlap():
     sphere = hydroelastic_contact.RigidBody.make_sphere(
         np.array([0.1, 0.2, 0.1]), 1.0, order=2)
+    sphere.youngs_modulus = 1.0
+
     tetrahedron = sphere.tetrahedra_points[0]
     epsilon = np.array([0.0, 0.0, 0.0, 1.0])
     X = hydroelastic_contact.barycentric_transforms(

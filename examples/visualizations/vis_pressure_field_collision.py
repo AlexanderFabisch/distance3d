@@ -91,8 +91,8 @@ rb2 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.0, 1.0, 0.0]), 0.15
 
 
 GPa = 100000000
-rb1.set_youngs_modulus(100*GPa)
-rb2.set_youngs_modulus(0.1*GPa)
+rb1.youngs_modulus = 100 * GPa
+rb2.youngs_modulus = 0.1 * GPa
 
 p_object1 = make_object(rb1, 100, np.array([0.0, 0.0, 0.0]), True)
 p_object2 = make_object(rb2, 1, np.array([-0.1, 0.0, 0.0]), False)
