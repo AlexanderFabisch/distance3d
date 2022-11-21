@@ -248,11 +248,14 @@ class RigidBody:
             self._aabb_tree.insert_aabbs(self.aabbs, pre_insertion_methode="sort")
         return self._aabb_tree
 
-    def set_youngs_modulus(self, youngs_modulus):
-        self._youngs_modulus = youngs_modulus
-
     @property
     def youngs_modulus(self):
+        """Get the young's modulus of the Object. (stiffness)"""
         return self._youngs_modulus
+
+    @youngs_modulus.setter
+    def youngs_modulus(self, value):
+        """Set the young's modulus of the Object. (stiffness)"""
+        self._youngs_modulus = value
 
 
