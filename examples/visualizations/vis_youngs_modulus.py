@@ -1,7 +1,7 @@
 """
-=================================================
-Visualize Pressure Field of Two Colliding Objects
-=================================================
+=======================================================
+Visualize pressure fields with different young's moduli
+=======================================================
 """
 print(__doc__)
 
@@ -13,19 +13,19 @@ rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.5, 0, 0]), 
 rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.5, 0.12, 0]), 0.15, 2)
 
 rigid_body1.youngs_modulus = 10
-rigid_body1.youngs_modulus = 0.1
+rigid_body2.youngs_modulus = 0.1
 
 rigid_body3 = hydroelastic_contact.RigidBody.make_sphere(np.array([0, 0, 0]), 0.15, 2)
 rigid_body4 = hydroelastic_contact.RigidBody.make_sphere(np.array([0, 0.12, 0]), 0.15, 2)
 
-rigid_body1.youngs_modulus = 10
-rigid_body1.youngs_modulus = 15
+rigid_body3.youngs_modulus = 10
+rigid_body4.youngs_modulus = 15
 
 rigid_body5 = hydroelastic_contact.RigidBody.make_sphere(np.array([-0.5, 0, 0]), 0.15, 2)
 rigid_body6 = hydroelastic_contact.RigidBody.make_sphere(np.array([-0.5, 0.12, 0]), 0.15, 2)
 
-rigid_body1.youngs_modulus = 0.1
-rigid_body1.youngs_modulus = 0.2
+rigid_body5.youngs_modulus = 0.1
+rigid_body6.youngs_modulus = 0.2
 
 timer = benchmark.Timer()
 timer.start("contact_forces")

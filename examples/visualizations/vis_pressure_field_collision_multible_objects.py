@@ -1,15 +1,17 @@
 """
 =======================================================================
-Physical simulation exploring the young's modulus with multiple Objects
+Physical simulation exploring the young's modulus with multiple objects
 =======================================================================
 """
 # Scenario:
-# A rubber ball bouncing on a wooden box
+# Multiple rubber ball are bouncing in a wooden box
 
 print(__doc__)
 import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import visualization, hydroelastic_contact
+import matplotlib.pyplot as plt
+import time
 
 dt = 0.001
 g = np.array([0, -9.81, 0])
@@ -18,6 +20,15 @@ fig = pv.figure()
 fig.plot_transform(np.eye(4), s=0.1)
 
 p_objects = []
+
+plot = plt.figure()
+ax = plot.add_subplot(1, 1, 1)
+xs = []
+vels = []
+accs = []
+# Format plot
+plt.title('Velocity over Time')
+plt.ylabel('Velocity')
 
 
 class PhysicsObject:
@@ -57,6 +68,7 @@ class AnimationCallback:
             self.artists.append(p_object.artist)
 
     def __call__(self, step):
+        global xs, ys
         for i in range(len(self.p_objects)):
             for j in range(i + 1, len(self.p_objects)):
                 intersection, wrench12, wrench21, details = hydroelastic_contact.contact_forces(
@@ -67,6 +79,22 @@ class AnimationCallback:
                     self.p_objects[j].forces.append(wrench12[:3])
 
             self.p_objects[i].step()
+
+            sum_vel = 0
+            sum_acc = 0
+            for p_object in self.p_objects:
+                o_vel = np.sqrt(p_object.velocity[0] * p_object.velocity[0]
+                                  + p_object.velocity[1] * p_object.velocity[1]
+                                  + p_object.velocity[2] * p_object.velocity[2])
+                o_acc = np.sqrt(p_object.acceleration[0] * p_object.acceleration[0]
+                                  + p_object.acceleration[1] * p_object.acceleration[1]
+                                  + p_object.acceleration[2] * p_object.acceleration[2])
+                sum_vel += o_vel
+                sum_acc += o_acc
+
+            xs.append(time.time())
+            vels.append(sum_vel)
+            accs.append(sum_acc / 100)
 
         return self.artists
 
@@ -135,3 +163,8 @@ if "__file__" in globals():
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")
+
+
+ax.plot(xs, vels)
+ax.plot(xs, accs)
+plot.show()
