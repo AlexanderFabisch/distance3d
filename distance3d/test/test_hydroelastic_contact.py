@@ -251,3 +251,43 @@ def test_tetrahedral_mesh_volumes():
     V = hydroelastic_contact.tetrahedral_mesh_volumes(capsule.tetrahedra_points)
     capsule_volume = np.pi * radius ** 2 * length + 4.0 / 3.0 * np.pi * radius ** 3
     assert approx(np.sum(V), abs=1e-2) == capsule_volume
+
+
+def test_youngs_modulus():
+    rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.5, 0, 0]), 0.15, 2)
+    rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.5, 0.12, 0]), 0.15, 2)
+
+    # Setting the young's modulus to 1 should be the same as not setting the young's modulus.
+
+    intersection1, wrench12_1, wrench21_1, _ = hydroelastic_contact.contact_forces(
+        rigid_body1, rigid_body2, return_details=True)
+
+    rigid_body1.youngs_modulus = 1
+    rigid_body2.youngs_modulus = 1
+
+    intersection_2, wrench12_2, wrench21_2, _ = hydroelastic_contact.contact_forces(
+        rigid_body1, rigid_body2, return_details=True)
+
+    assert intersection1 == intersection_2
+    assert (wrench12_1 == wrench12_2).all()
+    assert (wrench21_1 == wrench21_2).all()
+
+    rigid_body1.youngs_modulus = 10
+    rigid_body2.youngs_modulus = 0.1
+
+    intersection_3, wrench12_3, _, _ = hydroelastic_contact.contact_forces(
+        rigid_body1, rigid_body2, return_details=True)
+
+    assert intersection_3
+
+    expected_vals = [0, 0.00032, 0, 0, 0, 0]
+
+    assert ((wrench12_3 - expected_vals) < 0.00001).all()
+    len_2 = np.sqrt(wrench12_3[0] * wrench12_3[0]
+                   + wrench12_3[1] * wrench12_3[1]
+                   + wrench12_3[2] * wrench12_3[2])
+    len_3 = np.sqrt(wrench12_2[0] * wrench12_2[0]
+                   + wrench12_2[1] * wrench12_2[1]
+                   + wrench12_2[2] * wrench12_2[2])
+    assert len_2 < len_3
+
