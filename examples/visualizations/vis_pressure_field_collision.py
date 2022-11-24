@@ -1,10 +1,10 @@
 """
-=================================================
-Physical simulation exploring the young's modulus
-=================================================
+====================================
+Physical Simulation of Bouncing Ball
+====================================
+
+A rubber ball bouncing on a wooden box.
 """
-# Scenario:
-# A rubber ball bouncing on a wooden box
 
 print(__doc__)
 import numpy as np

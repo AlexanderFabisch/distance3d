@@ -1,10 +1,8 @@
 """
-=======================================================================
-Physical simulation exploring the young's modulus with multiple objects
-=======================================================================
+==========================================================
+Physical Simulation of Soft Balls Bouncing in a Wooden Box
+==========================================================
 """
-# Scenario:
-# Multiple rubber ball are bouncing in a wooden box
 
 print(__doc__)
 import numpy as np
@@ -84,11 +82,11 @@ class AnimationCallback:
             sum_acc = 0
             for p_object in self.p_objects:
                 o_vel = np.sqrt(p_object.velocity[0] * p_object.velocity[0]
-                                  + p_object.velocity[1] * p_object.velocity[1]
-                                  + p_object.velocity[2] * p_object.velocity[2])
+                                + p_object.velocity[1] * p_object.velocity[1]
+                                + p_object.velocity[2] * p_object.velocity[2])
                 o_acc = np.sqrt(p_object.acceleration[0] * p_object.acceleration[0]
-                                  + p_object.acceleration[1] * p_object.acceleration[1]
-                                  + p_object.acceleration[2] * p_object.acceleration[2])
+                                + p_object.acceleration[1] * p_object.acceleration[1]
+                                + p_object.acceleration[2] * p_object.acceleration[2])
                 sum_vel += o_vel
                 sum_acc += o_acc
 
@@ -126,10 +124,10 @@ cube2origin5 = np.eye(4)
 cube2origin5[:3, 3] = np.array([0.0, 1.0, -0.7])
 rb_box5 = hydroelastic_contact.RigidBody.make_box(cube2origin5, np.array([1.5, 2.0, 0.2]))
 
-rb1 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.4, 0.5, 0.2]), 0.15, 2)
-rb2 = hydroelastic_contact.RigidBody.make_sphere(np.array([-0.2, 1.8, -0.4]), 0.15, 2)
-rb3 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.2, 1.0, 0]), 0.15, 2)
-rb4 = hydroelastic_contact.RigidBody.make_sphere(np.array([-0.4, 1.5, -0.4]), 0.15, 2)
+rb1 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.4, 0.5, 0.2]), 0.15, 1)
+rb2 = hydroelastic_contact.RigidBody.make_sphere(np.array([-0.2, 1.8, -0.4]), 0.15, 1)
+rb3 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.2, 1.0, 0]), 0.15, 1)
+rb4 = hydroelastic_contact.RigidBody.make_sphere(np.array([-0.4, 1.5, -0.4]), 0.15, 1)
 
 
 GPa = 100000000
