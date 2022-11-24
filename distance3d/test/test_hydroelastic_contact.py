@@ -269,8 +269,8 @@ def test_youngs_modulus():
         rigid_body1, rigid_body2, return_details=True)
 
     assert intersection1 == intersection_2
-    assert (wrench12_1 == wrench12_2).all()
-    assert (wrench21_1 == wrench21_2).all()
+    assert_array_almost_equal(wrench12_1, wrench12_2)
+    assert_array_almost_equal(wrench21_1, wrench21_2)
 
     rigid_body1.youngs_modulus = 10
     rigid_body2.youngs_modulus = 0.1
@@ -282,12 +282,8 @@ def test_youngs_modulus():
 
     expected_vals = [0, 0.00032, 0, 0, 0, 0]
 
-    assert ((wrench12_3 - expected_vals) < 0.00001).all()
-    len_2 = np.sqrt(wrench12_3[0] * wrench12_3[0]
-                   + wrench12_3[1] * wrench12_3[1]
-                   + wrench12_3[2] * wrench12_3[2])
-    len_3 = np.sqrt(wrench12_2[0] * wrench12_2[0]
-                   + wrench12_2[1] * wrench12_2[1]
-                   + wrench12_2[2] * wrench12_2[2])
+    assert_array_almost_equal(wrench12_3, expected_vals, decimal=4)
+    len_2 = np.linalg.norm(wrench12_3)
+    len_3 = np.linalg.norm(wrench12_2)
     assert len_2 < len_3
 
