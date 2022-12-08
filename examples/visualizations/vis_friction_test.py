@@ -3,6 +3,8 @@
 Visualize Pressure Field of Two Colliding Objects
 =================================================
 """
+from distance3d.hydroelastic_contact._broad_phase import HydroelasticBoundingVolumeHierarchy
+
 print(__doc__)
 
 import os
@@ -17,7 +19,7 @@ show_normals = True
 
 g = np.array([0, 9.81, 0])
 ball_mass = 1
-my_static = 0.4
+my_static = 0.2
 GPa = 100000000
 finger_angle = [1, 1, 1, 1, 0.2]
 
@@ -25,8 +27,8 @@ joint_names = ["j_index_fle", "j_mrl_fle", "j_ring_fle", "j_little_fle", "j_thum
 
 F_g = g * ball_mass
 
-
 fig = pv.figure()
+
 
 BASE_DIR = "test/data/"
 data_dir = BASE_DIR
@@ -45,37 +47,8 @@ with open(filename, "r") as f:
 for i, joint_name in enumerate(joint_names):
     tm.set_joint(joint_name, finger_angle[i])
 
-robot_bvh = broad_phase.BoundingVolumeHierarchy(tm, "mia_hand")
+robot_bvh = HydroelasticBoundingVolumeHierarchy(tm, "mia_hand")
 robot_bvh.fill_tree_with_colliders(tm, make_artists=True)
-
-
-def getSphereRB(sphere):
-    rb = hydroelastic_contact.RigidBody.make_sphere(sphere.c, sphere.radius, 1)
-    return rb
-
-def getBoxRB(box):
-    rb = hydroelastic_contact.RigidBody.make_box(box.box2origin, box.size)
-    return rb
-
-def getCylinderRB(cylinder):
-    rb = hydroelastic_contact.RigidBody.make_cylinder(cylinder.cylinder2origin, cylinder.radius, cylinder.length, resolution_hint=0.01)
-    return rb
-
-hand_rbs = []
-for collider in robot_bvh.get_colliders():
-    switchDict = {distance3d.colliders.Box: getBoxRB,
-                  distance3d.colliders.Sphere: getSphereRB,
-                  distance3d.colliders.Cylinder: getCylinderRB}
-    rb = switchDict[type(collider)](collider)
-
-    rb.youngs_modulus = 100 * GPa
-
-    artist = visualization.RigidBodyTetrahedralMesh(
-        rb.body2origin_, rb.vertices_, rb.tetrahedra_)
-    artist.add_artist(fig)
-
-    hand_rbs.append(rb)
-
 
 sphere_rb = hydroelastic_contact.RigidBody.make_sphere(np.array([-0.03, 0.05, -0.01]), 0.03, 1)
 sphere_rb.youngs_modulus = 100 * GPa
@@ -86,7 +59,10 @@ artist.add_artist(fig)
 contact_forces = []
 contact_norms = []
 contact_force_sum = np.array([0,0,0], dtype=float)
-for hand_rb in hand_rbs:
+for hand_rb in robot_bvh.get_colliders():
+    hand_rb.youngs_modulus = 100 * GPa
+    hand_rb.artist.add_artist(fig)
+
     intersection, wrench12, wrench21, details = hydroelastic_contact.contact_forces(
         hand_rb, sphere_rb, return_details=True)
 
@@ -98,7 +74,7 @@ for hand_rb in hand_rbs:
 
         pos = (polygon[0] + polygon[1] + polygon[2]) / 3
         force_len = np.linalg.norm(force)
-        normal = -(force / force_len)
+        normal = (-force / force_len)
 
         contact_forces.append(-force)
         contact_norms.append(normal)

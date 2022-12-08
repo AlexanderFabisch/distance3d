@@ -134,8 +134,8 @@ class BoundingVolumeHierarchy:
         artists : list
             List of artists.
         """
-        return [collider.artist_ for collider in self.colliders_.values()
-                if collider.artist_ is not None]
+        return [collider.artist for collider in self.colliders_.values()
+                if collider.artist is not None]
 
     def aabb_overlapping_colliders(self, collider, whitelist=()):
         """Get colliders with an overlapping AABB.

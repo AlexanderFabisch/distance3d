@@ -290,12 +290,15 @@ class RigidBodyTetrahedralMesh(pv.Artist):  # pragma: no cover
 
     tetrahedra : array, shape (n_tetrahedra, 4)
         Indices of vertices that form tetrahedra of the mesh.
-    """
-    def __init__(self, body2origin, vertices, tetrahedra):
-        self.mesh = o3d.geometry.TetraMesh()
-        self.set_data(body2origin, vertices, tetrahedra)
 
-    def set_data(self, body2origin, vertices, tetrahedra):
+    c : array-like, shape (3,), optional (default: None)
+        Color(s)
+    """
+    def __init__(self, body2origin, vertices, tetrahedra, c=None):
+        self.mesh = o3d.geometry.TetraMesh()
+        self.set_data(body2origin, vertices, tetrahedra, c)
+
+    def set_data(self, body2origin, vertices, tetrahedra, c=None):
         """Update rigid body.
 
         Parameters
@@ -308,10 +311,15 @@ class RigidBodyTetrahedralMesh(pv.Artist):  # pragma: no cover
 
         tetrahedra : array, shape (n_tetrahedra, 4)
             Indices of vertices that form tetrahedra of the mesh.
+
+        c : array-like, shape (3,), optional (default: None)
+            Color(s)
         """
         self.mesh.vertices = o3d.utility.Vector3dVector(vertices)
         self.mesh.tetras = o3d.utility.Vector4iVector(tetrahedra)
         self.mesh.transform(body2origin)
+        if c is not None:
+            self.mesh.paint_uniform_color(c)
 
     @property
     def geometries(self):
