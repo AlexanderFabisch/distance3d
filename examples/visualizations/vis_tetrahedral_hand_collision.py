@@ -1,35 +1,16 @@
 import os
 from pytransform3d.urdf import UrdfTransformManager
 
-import distance3d.colliders
-from distance3d import broad_phase
 import numpy as np
 import pytransform3d.visualizer as pv
-from distance3d import visualization, hydroelastic_contact
-import matplotlib.pyplot as plt
-import time
+from distance3d import hydroelastic_contact
 
-from distance3d.hydroelastic_contact._tetra_mesh_creation import make_tetrahedral_sphere
-
-# https://www.youtube.com/watch?v=h4OVbqfS6f4
+from distance3d.hydroelastic_contact._broad_phase import HydroelasticBoundingVolumeHierarchy
 
 dt = 0.001
 g = np.array([9.81, 0, 0])
-GPa = 100000000
 
 fig = pv.figure()
-fig.plot_transform(np.eye(4), s=0.1)
-
-p_objects = []
-plot = plt.figure()
-ax = plot.add_subplot(1, 1, 1)
-xs = []
-vels = []
-accs = []
-# Format plot
-plt.title('Velocity over Time')
-plt.ylabel('Velocity')
-
 
 class PhysicsObject:
     def __init__(self, rigid_body, artist, mass, velocity, fixed=False):
@@ -58,7 +39,6 @@ class PhysicsObject:
                              self.rigid_body.tetrahedra_)
 
         self.forces = []
-
 
 class AnimationCallback:
     def __init__(self, p_objects):
@@ -92,12 +72,12 @@ class AnimationCallback:
                 sum_vel += o_vel
                 sum_acc += o_acc
 
-            xs.append(time.time())
-            vels.append(sum_vel)
-            accs.append(sum_acc / 100)
+
 
         return self.artists
 
+
+GPa = 100000000
 
 BASE_DIR = "test/data/"
 data_dir = BASE_DIR
@@ -113,46 +93,22 @@ with open(filename, "r") as f:
     robot_urdf = f.read()
     tm.load_urdf(robot_urdf, mesh_path=data_dir)
 
-robot_bvh = broad_phase.BoundingVolumeHierarchy(tm, "mia_hand")
+robot_bvh = HydroelasticBoundingVolumeHierarchy(tm, "mia_hand")
 robot_bvh.fill_tree_with_colliders(tm, make_artists=True)
 
-
-def getSphereRB(sphere):
-    rb = hydroelastic_contact.RigidBody.make_sphere(sphere.c, sphere.radius, 1)
-    return rb
-
-
-def getBoxRB(box):
-    rb = hydroelastic_contact.RigidBody.make_box(box.box2origin, box.size)
-    return rb
-
-
-def getCylinderRB(cylinder):
-    rb = hydroelastic_contact.RigidBody.make_cylinder(cylinder.cylinder2origin, cylinder.radius, cylinder.length)
-    return rb
-
-def make_object(rigid_body, mass, acc, fixed):
-    artist = visualization.RigidBodyTetrahedralMesh(
-        rigid_body.body2origin_, rigid_body.vertices_, rigid_body.tetrahedra_)
-    artist.add_artist(fig)
-
-    return PhysicsObject(rigid_body, artist, mass, acc, fixed)
-
-for collider in robot_bvh.get_colliders():
-    switchDict = {distance3d.colliders.Box: getBoxRB,
-                  distance3d.colliders.Sphere: getSphereRB,
-                  distance3d.colliders.Cylinder: getCylinderRB}
-    rb = switchDict[type(collider)](collider)
-
+for rb in robot_bvh.get_colliders():
     rb.youngs_modulus = 100 * GPa
-
-    object = make_object(rb, 1, np.array([0.0, 0.0, 0.0]), True)
-    p_objects.append(object)
 
 rb = hydroelastic_contact.RigidBody.make_sphere(np.array([-0.1, 0.01, 0.0]), 0.02, 1)
 rb.youngs_modulus = 100 * GPa
-p_object1 = make_object(rb, 1, np.array([-0.1, 0.0, 0.0]), False)
-p_objects.append(p_object1)
+
+p_objects = []
+for collider in robot_bvh.get_colliders():
+    p_objects.append(PhysicsObject(collider, collider.artist, 100, np.array([0.0, 0.0, 0.0]), True))
+    collider.artist.add_artist(fig)
+
+p_objects.append(PhysicsObject(rb, rb.artist, 100, np.array([0.0, 0.0, 0.0]), False))
+rb.artist.add_artist(fig)
 
 fig.view_init()
 
@@ -161,7 +117,3 @@ if "__file__" in globals():
     fig.show()
 else:
     fig.save_image("__open3d_rendered_image.jpg")
-
-ax.plot(xs, vels)
-ax.plot(xs, accs)
-plot.show()

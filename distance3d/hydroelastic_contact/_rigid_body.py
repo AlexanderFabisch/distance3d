@@ -6,6 +6,7 @@ from ._tetra_mesh_creation import (
     make_tetrahedral_capsule)
 from ._mesh_processing import center_of_mass_tetrahedral_mesh, tetrahedral_mesh_aabbs
 from ..aabb_tree import AabbTree
+from ..visualization import RigidBodyTetrahedralMesh
 
 
 class RigidBody:
@@ -41,6 +42,7 @@ class RigidBody:
         self._aabb_tree = None
 
         self._youngs_modulus = youngs_modulus
+        self._artist = None
 
     @staticmethod
     def make_sphere(center, radius, order=4):
@@ -212,7 +214,7 @@ class RigidBody:
             self._com = center_of_mass_tetrahedral_mesh(self.tetrahedra_points)
         return self._com
 
-    def express_in(self, new_body2origin):
+    def update_pose(self, new_body2origin):
         """Express tetrahedral meshes in another frame.
 
         Vertices will be transformed so that they are expressed in the new
@@ -232,6 +234,9 @@ class RigidBody:
         self._com = None
         self._aabbs = None
         self._aabb_tree = None
+
+    def aabb(self):
+        return self.aabb_tree.get_root_aabb()
 
     @property
     def aabbs(self):
@@ -258,4 +263,12 @@ class RigidBody:
         """Set the young's modulus of the Object. (stiffness)"""
         self._youngs_modulus = value
 
+    @property
+    def artist(self):
+        if self._artist is None:
+            self.make_artist()
+        return self._artist
+
+    def make_artist(self, c=None):
+        self._artist = RigidBodyTetrahedralMesh(self.body2origin_, self.vertices_, self.tetrahedra_, c)
 

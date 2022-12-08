@@ -40,7 +40,7 @@ class AnimationCallback:
         if step == self.n_frames - 1:
             print(f"Total time: {self.total_time}")
 
-        return [obj.artist_] + connections
+        return [obj.artist] + connections
 
 
 random_state = np.random.RandomState(5)

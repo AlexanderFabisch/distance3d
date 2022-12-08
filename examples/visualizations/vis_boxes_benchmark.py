@@ -56,7 +56,7 @@ print(f"GJK: {timer.total_time_['gjk']}")
 print(f"{len(collisions)} collisions")
 
 for frame1, frame2 in collisions:
-    bvh.colliders_[frame1].artist_.geometries[0].paint_uniform_color((1, 0, 0))
+    bvh.colliders_[frame1].artist.geometries[0].paint_uniform_color((1, 0, 0))
 
 fig = pv.figure()
 for artist in bvh.get_artists():
