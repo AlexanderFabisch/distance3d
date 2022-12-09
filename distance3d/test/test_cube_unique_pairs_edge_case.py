@@ -12,7 +12,7 @@ def cube_unique_pairs(use_aabb_trees):
     cube2origin[:3, 3] = 0.25 * np.ones(3)
     rigid_body2 = hydroelastic_contact.RigidBody.make_cube(cube2origin, 0.15)
 
-    rigid_body1.update_pose(rigid_body2.body2origin_)
+    rigid_body1.express_in(rigid_body2.body2origin_)
 
     if use_aabb_trees:
         _, broad_tetrahedra1, broad_tetrahedra2, broad_pairs \
