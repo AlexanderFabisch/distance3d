@@ -8,6 +8,7 @@ from distance3d import visualization, hydroelastic_contact, benchmark, broad_pha
 from distance3d.hydroelastic_contact._broad_phase import HydroelasticBoundingVolumeHierarchy
 
 GPa = 100000000
+MPa = 1000000
 
 fig = pv.figure()
 
@@ -26,7 +27,7 @@ with open(filename, "r") as f:
     robot_urdf = f.read()
     tm.load_urdf(robot_urdf, mesh_path=data_dir)
 
-finger_angle = [0, 0, 0, 0.1, 0.9]
+finger_angle = [0, 0, 0, 0, 1]
 joint_names = ["j_index_fle", "j_mrl_fle", "j_ring_fle", "j_little_fle", "j_thumb_fle"]
 
 for i, joint_name in enumerate(joint_names):
@@ -41,9 +42,9 @@ for rb in robot_bvh.get_colliders():
 
 # Box
 box2origin = np.eye(4)
-box2origin[:3, 3] = np.array([-0.04, 0.07, -0.04])
+box2origin[:3, 3] = np.array([-0.037, 0.07, -0.04])
 box_rb = hydroelastic_contact.RigidBody.make_box(box2origin, np.array([0.03, 0.1, 0.15]))
-box_rb.youngs_modulus = 1 * GPa
+box_rb.youngs_modulus = 0.04 * MPa
 artist = visualization.RigidBodyTetrahedralMesh(
         box_rb.body2origin_, box_rb.vertices_, box_rb.tetrahedra_)
 artist.add_artist(fig)
