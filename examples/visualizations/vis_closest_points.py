@@ -25,7 +25,7 @@ class AnimationCallback:
         angle = np.pi * np.cos(2.0 * np.pi * (step / self.n_frames))
         obj2world = pt.transform_from(
             R=pr.matrix_from_angle(1, angle), p=np.zeros(3))
-        obj.update_pose(obj2world)
+        obj.express_in(obj2world)
 
         total_time = 0.0
         start = time.time()

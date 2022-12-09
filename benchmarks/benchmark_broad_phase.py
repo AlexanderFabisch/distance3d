@@ -13,7 +13,7 @@ def create_random_spheres(random_state, size):
     p = random_state.randn(3)
     rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0 * np.ones(3), 0.15, size)
     rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(p, 0.15, size)
-    rigid_body1.update_pose(rigid_body2.body2origin_)
+    rigid_body1.express_in(rigid_body2.body2origin_)
 
     aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
     aabbs2 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body2.tetrahedra_points)

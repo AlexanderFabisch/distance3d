@@ -113,7 +113,7 @@ class BoundingVolumeHierarchy:
         for frame in self.colliders_:
             A2B = self.tm.get_transform(frame, self.base_frame)
             collider = self.colliders_[frame]
-            collider.update_pose(A2B)
+            collider.express_in(A2B)
             self.aabbtree_.insert_aabb(collider.aabb(), (frame, collider))
 
     def get_colliders(self):
