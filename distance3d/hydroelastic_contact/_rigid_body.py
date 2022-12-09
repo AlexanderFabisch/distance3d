@@ -235,6 +235,11 @@ class RigidBody:
         self._aabbs = None
         self._aabb_tree = None
 
+    def update_pose(self, body2origin):
+        self.body2origin_ = body2origin
+        if self.artist_ is not None:
+            self.artist_.set_data(body2origin)
+
     def aabb(self):
         return self.aabb_tree.get_root_aabb()
 
