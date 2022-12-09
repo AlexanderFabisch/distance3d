@@ -23,13 +23,13 @@ def test_all_colliders():
         a = c.artist_
         aabb = a.geometries[0].get_axis_aligned_bounding_box()
 
-        c.update_pose(np.eye(4))
+        c.express_in(np.eye(4))
         aabb2 = a.geometries[0].get_axis_aligned_bounding_box()
         assert all(np.asarray(aabb.min_bound) != np.asarray(aabb2.min_bound))
         assert all(np.asarray(aabb.max_bound) != np.asarray(aabb2.max_bound))
 
         c.artist_ = None
-        c.update_pose(np.eye(4))
+        c.express_in(np.eye(4))
 
 
 def test_convex_collider():

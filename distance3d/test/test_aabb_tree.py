@@ -59,7 +59,7 @@ def test_aabb_tree_overlap_with_other_aabb_tree():
 def test_compare_aabb_tree_to_brute_force():
     rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(0.13 * np.ones(3), 0.15, 2)
     rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(0.25 * np.ones(3), 0.15, 2)
-    rigid_body1.update_pose(rigid_body2.body2origin_)
+    rigid_body1.express_in(rigid_body2.body2origin_)
 
     aabbs1 = hydroelastic_contact.tetrahedral_mesh_aabbs(rigid_body1.tetrahedra_points)
     aabb_tree1 = AabbTree()
