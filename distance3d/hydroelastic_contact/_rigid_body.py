@@ -214,7 +214,7 @@ class RigidBody:
             self._com = center_of_mass_tetrahedral_mesh(self.tetrahedra_points)
         return self._com
 
-    def express_in(self, new_body2origin):
+    def update_pose(self, new_body2origin):
         """Express tetrahedral meshes in another frame.
 
         Vertices will be transformed so that they are expressed in the new

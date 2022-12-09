@@ -23,9 +23,9 @@ class AnimationCallback:
 
         self.position_offset = position_offset
 
-        self.rigid_body2.express_in(self.rigid_body1.body2origin_)
-        self.rigid_body3.express_in(self.rigid_body1.body2origin_)
-        self.rigid_body4.express_in(self.rigid_body1.body2origin_)
+        self.rigid_body2.update_pose(self.rigid_body1.body2origin_)
+        self.rigid_body3.update_pose(self.rigid_body1.body2origin_)
+        self.rigid_body4.update_pose(self.rigid_body1.body2origin_)
 
         self.mesh1 = visualization.RigidBodyTetrahedralMesh(
             self.rigid_body1.body2origin_, self.rigid_body1.vertices_,
@@ -78,7 +78,7 @@ class AnimationCallback:
         rb12origin = np.eye(4)
         t1 = np.sin(2 * np.pi * step / self.n_frames) / 2.0 + 1.0
         rb12origin[:3, 3] = t1 * self.position_offset
-        self.rigid_body1.express_in(rb12origin)
+        self.rigid_body1.update_pose(rb12origin)
 
         # Move to new pose
         t2 = np.sin(2 * np.pi * (step + 1) / self.n_frames) / 2.0 + 1.0
