@@ -108,7 +108,7 @@ def test_benchmark_distance3d(random_state, n_collision_objects, gui=False):
         fig = pv.figure()
         for c in collision_objects:
             c.make_artist()
-            c.artist.add_artist(fig)
+            c.artist_.add_artist(fig)
         fig.view_init()
         fig.show()
 

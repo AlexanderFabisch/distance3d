@@ -63,7 +63,7 @@ class AnimationCallback:
         self.p_objects = p_objects
         self.artists = []
         for p_object in p_objects:
-            self.artists.append(p_object.artist)
+            self.artists.append(p_object.artist_)
 
     def __call__(self, step):
         global xs, ys

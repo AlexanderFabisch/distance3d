@@ -2,7 +2,6 @@ from distance3d.broad_phase import BoundingVolumeHierarchy
 from pytransform3d import urdf
 from distance3d.hydroelastic_contact import RigidBody
 
-
 class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
     """Hydroelastic Bounding volume hierarchy (BVH) for broad phase collision detection.
 

@@ -61,7 +61,7 @@ contact_norms = []
 contact_force_sum = np.array([0,0,0], dtype=float)
 for hand_rb in robot_bvh.get_colliders():
     hand_rb.youngs_modulus = 100 * GPa
-    hand_rb.artist.add_artist(fig)
+    hand_rb.artist_.add_artist(fig)
 
     intersection, wrench12, wrench21, details = hydroelastic_contact.contact_forces(
         hand_rb, sphere_rb, return_details=True)

@@ -264,7 +264,7 @@ class RigidBody:
         self._youngs_modulus = value
 
     @property
-    def artist(self):
+    def artist_(self):
         if self._artist is None:
             self.make_artist()
         return self._artist

@@ -75,7 +75,7 @@ class AnimationCallback:
         self.p_object1.step([wrench21[:3]])
         self.p_object2.step([wrench12[:3]])
 
-        return [self.p_object1.artist, self.p_object2.artist, self.contact_surface]
+        return [self.p_object1.artist_, self.p_object2.artist_, self.contact_surface]
 
 
 def make_object(rigid_body, mass, acc, fixed):

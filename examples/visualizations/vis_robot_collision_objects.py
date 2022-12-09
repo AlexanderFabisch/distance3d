@@ -96,7 +96,7 @@ class AnimationCallback:
         self.total_time += total_time
 
         for frame in in_contact:
-            geometry = robot_bvh.colliders_[frame].artist.geometries[0]
+            geometry = robot_bvh.colliders_[frame].artist_.geometries[0]
             if in_contact[frame]:
                 geometry.paint_uniform_color((1, 0, 0))
             elif in_aabb[frame]:

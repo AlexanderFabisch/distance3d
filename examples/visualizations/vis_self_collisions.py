@@ -35,7 +35,7 @@ class AnimationCallback:
             self.total_time += stop - start
 
             for frame, collider in bvh.colliders_.items():
-                geometry = collider.artist.geometries[0]
+                geometry = collider.artist_.geometries[0]
                 if contacts:
                     geometry.paint_uniform_color((1, 0, 0))
                 else:
@@ -47,7 +47,7 @@ class AnimationCallback:
             self.total_time += stop - start
 
             for frame, collider in bvh.colliders_.items():
-                geometry = collider.artist.geometries[0]
+                geometry = collider.artist_.geometries[0]
                 if contacts[frame]:
                     geometry.paint_uniform_color((1, 0, 0))
                 else:
