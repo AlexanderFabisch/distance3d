@@ -19,8 +19,8 @@ def test_all_colliders():
         assert all(first_vertex <= limits[:, 1])
 
         c.make_artist(c=(0, 0, 1))
-        assert c.artist is not None
-        a = c.artist
+        assert c.artist_ is not None
+        a = c.artist_
         aabb = a.geometries[0].get_axis_aligned_bounding_box()
 
         c.update_pose(np.eye(4))
@@ -28,7 +28,7 @@ def test_all_colliders():
         assert all(np.asarray(aabb.min_bound) != np.asarray(aabb2.min_bound))
         assert all(np.asarray(aabb.max_bound) != np.asarray(aabb2.max_bound))
 
-        c.artist = None
+        c.artist_ = None
         c.update_pose(np.eye(4))
 
 

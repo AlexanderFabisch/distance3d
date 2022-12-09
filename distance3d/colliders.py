@@ -24,11 +24,11 @@ class ConvexCollider(abc.ABC):
 
     Attributes
     ----------
-    artist : pytransform3d.visualizer.Artist, optional (default: None)
+    artist_ : pytransform3d.visualizer.Artist, optional (default: None)
         Corresponding artist for visualizer.
     """
     def __init__(self, artist=None):
-        self.artist = artist
+        self.artist_ = artist
 
     @abc.abstractmethod
     def make_artist(self, c=None):
@@ -571,13 +571,13 @@ class Margin(ConvexCollider):
         Margin size.
     """
     def __init__(self, collider, margin):
-        super(Margin, self).__init__(collider.artist)
+        super(Margin, self).__init__(collider.artist_)
         self.collider = collider
         self.margin = margin
 
     def make_artist(self, c=None):
         self.collider.make_artist(c)
-        self.artist_ = self.collider.artist
+        self.artist_ = self.collider.artist_
 
     def first_vertex(self):
         return self.collider.first_vertex()

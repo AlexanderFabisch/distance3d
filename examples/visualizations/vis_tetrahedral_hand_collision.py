@@ -45,7 +45,7 @@ class AnimationCallback:
         self.p_objects = p_objects
         self.artists = []
         for p_object in p_objects:
-            self.artists.append(p_object.artist)
+            self.artists.append(p_object.artist_)
 
     def __call__(self, step):
         global xs, ys
@@ -104,11 +104,11 @@ rb.youngs_modulus = 100 * GPa
 
 p_objects = []
 for collider in robot_bvh.get_colliders():
-    p_objects.append(PhysicsObject(collider, collider.artist, 100, np.array([0.0, 0.0, 0.0]), True))
-    collider.artist.add_artist(fig)
+    p_objects.append(PhysicsObject(collider, collider.artist_, 100, np.array([0.0, 0.0, 0.0]), True))
+    collider.artist_.add_artist(fig)
 
-p_objects.append(PhysicsObject(rb, rb.artist, 100, np.array([0.0, 0.0, 0.0]), False))
-rb.artist.add_artist(fig)
+p_objects.append(PhysicsObject(rb, rb.artist_, 100, np.array([0.0, 0.0, 0.0]), False))
+rb.artist_.add_artist(fig)
 
 fig.view_init()
 
