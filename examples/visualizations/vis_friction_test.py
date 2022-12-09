@@ -22,7 +22,6 @@ ball_mass = 1
 my_static = 0.2
 GPa = 100000000
 finger_angle = [1, 1, 1, 1, 0.2]
-
 joint_names = ["j_index_fle", "j_mrl_fle", "j_ring_fle", "j_little_fle", "j_thumb_fle"]
 
 F_g = g * ball_mass
@@ -30,6 +29,7 @@ F_g = g * ball_mass
 fig = pv.figure()
 
 
+# Loading Mia Hand
 BASE_DIR = "test/data/"
 data_dir = BASE_DIR
 search_path = ".."
@@ -50,19 +50,23 @@ for i, joint_name in enumerate(joint_names):
 robot_bvh = HydroelasticBoundingVolumeHierarchy(tm, "mia_hand")
 robot_bvh.fill_tree_with_colliders(tm, make_artists=True)
 
+for hand_rb in robot_bvh.get_colliders():
+    hand_rb.youngs_modulus = 100 * GPa
+    hand_rb.artist_.add_artist(fig)
+
+# Loading Sphere
 sphere_rb = hydroelastic_contact.RigidBody.make_sphere(np.array([-0.03, 0.05, -0.01]), 0.03, 1)
 sphere_rb.youngs_modulus = 100 * GPa
 artist = visualization.RigidBodyTetrahedralMesh(
         sphere_rb.body2origin_, sphere_rb.vertices_, sphere_rb.tetrahedra_)
 artist.add_artist(fig)
 
+
+# Friction force calculations
 contact_forces = []
 contact_norms = []
 contact_force_sum = np.array([0,0,0], dtype=float)
 for hand_rb in robot_bvh.get_colliders():
-    hand_rb.youngs_modulus = 100 * GPa
-    hand_rb.artist_.add_artist(fig)
-
     intersection, wrench12, wrench21, details = hydroelastic_contact.contact_forces(
         hand_rb, sphere_rb, return_details=True)
 
