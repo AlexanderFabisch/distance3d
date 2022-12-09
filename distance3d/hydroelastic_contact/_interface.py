@@ -73,7 +73,7 @@ def find_contact_surface(rigid_body1, rigid_body2, use_aabb_trees=False):
     """
     # We transform vertices of rigid_body1 to rigid_body2 frame to be able to
     # reuse the AABB tree of rigid_body2.
-    rigid_body1.express_in(rigid_body2.body2origin_)
+    rigid_body1.update_pose(rigid_body2.body2origin_)
 
     if use_aabb_trees:
         _, broad_tetrahedra1, broad_tetrahedra2, broad_pairs \

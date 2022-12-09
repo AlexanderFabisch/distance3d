@@ -74,13 +74,13 @@ def test_rigid_body_transforms():
     cube22origin[:3, 3] = np.array([0.0, 0.0, 0.08])
     rigid_body2 = hydroelastic_contact.RigidBody.make_cube(cube22origin, 0.1)
 
-    rigid_body1.express_in(rigid_body2.body2origin_)
+    rigid_body1.update_pose(rigid_body2.body2origin_)
     tetras1_in_2 = rigid_body1.tetrahedra_points  # measure in cube2 frame
 
-    rigid_body1.express_in(cube12origin)
+    rigid_body1.update_pose(cube12origin)
     rigid_body1.body2origin_ = cube1_22origin  # move forward in origin frame
 
-    rigid_body1.express_in(rigid_body2.body2origin_)
+    rigid_body1.update_pose(rigid_body2.body2origin_)
     tetras1_in_2_2 = rigid_body1.tetrahedra_points  # measure in cube frame
 
     assert_array_almost_equal(tetras1_in_2 + 1, tetras1_in_2_2)
@@ -139,7 +139,7 @@ def test_intersect_halfplanes():
 def test_center_of_mass_tetrahedral_mesh():
     center = np.array([0.0, 0.2, -0.3])
     sphere = hydroelastic_contact.RigidBody.make_sphere(center, 0.2)
-    sphere.express_in(np.eye(4))
+    sphere.update_pose(np.eye(4))
     com = hydroelastic_contact.center_of_mass_tetrahedral_mesh(sphere.tetrahedra_points)
     assert_array_almost_equal(com, center)
 
@@ -185,7 +185,7 @@ def test_center_of_mass_tetrahedral_mesh():
 def test_tetrahedral_mesh_aabbs():
     center = np.array([0.0, 0.2, -0.3])
     rb = hydroelastic_contact.RigidBody.make_sphere(center, 0.2, 2)
-    rb.express_in(np.eye(4))
+    rb.update_pose(np.eye(4))
     aabbs = hydroelastic_contact.tetrahedral_mesh_aabbs(rb.tetrahedra_points)
     for i in range(len(rb.tetrahedra_points)):
         mins, maxs = containment.axis_aligned_bounding_box(rb.tetrahedra_points[i])
@@ -197,7 +197,7 @@ def test_tetrahedral_mesh_volumes():
     center = np.array([1.0, 2.0, 3.0])
     radius = 1.0
     sphere = hydroelastic_contact.RigidBody.make_sphere(center, radius)
-    sphere.express_in(np.eye(4))
+    sphere.update_pose(np.eye(4))
     V = hydroelastic_contact.tetrahedral_mesh_volumes(sphere.tetrahedra_points)
     sphere_volume = 4.0 / 3.0 * np.pi * radius ** 3
     assert approx(np.sum(V), abs=1e-2) == sphere_volume
