@@ -25,10 +25,11 @@ from ._mesh_processing import (
 from ._barycentric_transform import barycentric_transforms
 from ._tetrahedron_intersection import intersect_tetrahedron_pair
 from ._forces import compute_contact_force
+from ._broad_phase import HydroelasticBoundingVolumeHierarchy
 
 
 __all__ = [
-    "contact_forces", "find_contact_surface", "RigidBody", "ContactSurface",
+    "contact_forces", "find_contact_surface", "RigidBody", "ContactSurface","HydroelasticBoundingVolumeHierarchy",
     # exported for unit tests and specific examples:
     "intersect_halfplanes", "plot_halfplanes_and_intersections",
     "center_of_mass_tetrahedral_mesh", "tetrahedral_mesh_aabbs",
