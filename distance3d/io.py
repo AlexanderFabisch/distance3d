@@ -77,7 +77,7 @@ def load_tetrahedral_mesh(filename, scale=1.0):
 
     with open(filename, "r") as f:
         content = f.read()
-    lines = content.splitLines()
+    lines = content.splitlines()
     lines = [line.strip() for line in lines]
 
     point_lines = None
