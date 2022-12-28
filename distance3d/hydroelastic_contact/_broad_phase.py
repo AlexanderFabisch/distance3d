@@ -2,10 +2,11 @@ from distance3d.broad_phase import BoundingVolumeHierarchy
 from pytransform3d import urdf
 from distance3d.hydroelastic_contact import RigidBody
 
+
 class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
     """Hydroelastic Bounding volume hierarchy (BVH) for broad phase collision detection.
 
-        This BVH works the same but uses the hydroelastic Rigidbody as the Collider Object.
+        This BVH works the same but uses the hydro-elastic Rigidbody as the Collider Object.
 
         Parameters
         ----------
@@ -32,13 +33,13 @@ class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
         super().__init__(tm, base_frame)
 
     def _make_collider(self, tm, obj, make_artists):
-        A2B = tm.get_transform(obj.frame, self.base_frame)
+        a2_b = tm.get_transform(obj.frame, self.base_frame)
         if isinstance(obj, urdf.Sphere):
-            collider = RigidBody.make_sphere(A2B[:3, 3], obj.radius, 2)
+            collider = RigidBody.make_sphere(a2_b[:3, 3], obj.radius, 2)
         elif isinstance(obj, urdf.Box):
-            collider = RigidBody.make_box(A2B, obj.size)
+            collider = RigidBody.make_box(a2_b, obj.size)
         elif isinstance(obj, urdf.Cylinder):
-            collider = RigidBody.make_cylinder(A2B, obj.radius, obj.length, resolution_hint=0.01)
+            collider = RigidBody.make_cylinder(a2_b, obj.radius, obj.length, resolution_hint=0.01)
         else:
             assert isinstance(obj, urdf.Mesh)
             print("Arbitrary mesh conversion is not implemented!! ")
