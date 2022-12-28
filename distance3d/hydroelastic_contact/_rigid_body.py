@@ -29,6 +29,7 @@ class RigidBody:
     youngs_modulus : float, optional (default: 1.0)
         The stiffness of the material the rigidbody is made out of.
     """
+
     def __init__(self, body2origin, vertices, tetrahedra, potentials, youngs_modulus=1.0):
         self.body2origin_ = body2origin
         self.vertices_ = vertices
@@ -243,10 +244,10 @@ class RigidBody:
             body2origin : array, shape (4, 4)
                 New body2origin
         """
-        #TODO Check if this is correct.
+        # TODO Check if this is correct.
         self.body2origin_ = body2origin
         if self.artist_ is not None:
-            self.artist_.set_data(body2origin)
+            self.artist_.set_data(body2origin, vertices=self.vertices_, tetrahedra=self.tetrahedra_)
 
     def aabb(self):
         """The aabb of the rigidbody"""
@@ -293,4 +294,3 @@ class RigidBody:
                 The color of the wireframe.
         """
         self._artist = RigidBodyTetrahedralMesh(self.body2origin_, self.vertices_, self.tetrahedra_, c)
-
