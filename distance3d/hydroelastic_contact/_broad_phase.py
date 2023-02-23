@@ -1,6 +1,7 @@
 from distance3d.broad_phase import BoundingVolumeHierarchy
 from pytransform3d import urdf
 from distance3d.hydroelastic_contact import RigidBody
+import numpy as np
 
 
 class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
@@ -16,6 +17,9 @@ class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
         base_frame : str
             Name of the base frame in which colliders are represented.
 
+        base_frame2origen : array, shape (4, 4), optional (default: np.eye(4))
+            The position of the base_frame to origen.
+
         Attributes
         ----------
         aabbtree_ : AabbTree
@@ -29,17 +33,18 @@ class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
             a robot.
     """
 
-    def __init__(self, tm, base_frame):
-        super().__init__(tm, base_frame)
+    def __init__(self, tm, base_frame, base_frame2origen=np.eye(4)):
+        super().__init__(tm, base_frame, base_frame2origen)
 
     def _make_collider(self, tm, obj, make_artists):
-        a2_b = tm.get_transform(obj.frame, self.base_frame)
+        A2B = tm.get_transform(obj.frame, "origen")
+
         if isinstance(obj, urdf.Sphere):
-            collider = RigidBody.make_sphere(a2_b[:3, 3], obj.radius, 2)
+            collider = RigidBody.make_sphere(A2B[:3, 3], obj.radius, 2)
         elif isinstance(obj, urdf.Box):
-            collider = RigidBody.make_box(a2_b, obj.size)
+            collider = RigidBody.make_box(A2B, obj.size)
         elif isinstance(obj, urdf.Cylinder):
-            collider = RigidBody.make_cylinder(a2_b, obj.radius, obj.length, resolution_hint=0.01)
+            collider = RigidBody.make_cylinder(A2B, obj.radius, obj.length, resolution_hint=0.01)
         else:
             assert isinstance(obj, urdf.Mesh)
             print("Arbitrary mesh conversion is not implemented!! ")
@@ -71,3 +76,4 @@ class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
             Maps frame names to colliders with overlapping AABB.
         """
         return super().aabb_overlapping_colliders(collider, whitelist)
+
