@@ -81,6 +81,8 @@ class BoundingVolumeHierarchy:
             self.self_collision_whitelists_.update(
                 self_collision_whitelists(tm))
 
+        self.update_collider_poses()
+
     def _make_collider(self, tm, obj, make_artists):
         A2B = tm.get_transform(obj.frame, "origen")
 
