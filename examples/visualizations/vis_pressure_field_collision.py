@@ -29,7 +29,7 @@ class PhysicsObject:
 
         self.acceleration = np.zeros(3, dtype=float)
         self.velocity = velocity
-        self.artist = artist
+        self.artist_ = artist
 
     def step(self, forces=[]):
         if self.fixed:
@@ -41,8 +41,8 @@ class PhysicsObject:
         self.acceleration = np.add.reduce(forces) / self.mass
         self.velocity += dt * self.acceleration
         self.rigid_body.body2origin_[:3, 3] += self.velocity * dt
-        self.artist.set_data(self.rigid_body.body2origin_, self.rigid_body.vertices_,
-                             self.rigid_body.tetrahedra_)
+        self.artist_.set_data(self.rigid_body.body2origin_, self.rigid_body.vertices_,
+                              self.rigid_body.tetrahedra_)
 
 
 class AnimationCallback:

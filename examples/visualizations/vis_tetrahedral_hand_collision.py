@@ -1,3 +1,11 @@
+"""
+============================================
+Physical Simulation of Bouncing Ball on Hand
+============================================
+
+A rubber ball bouncing on a hand.
+"""
+
 import os
 from pytransform3d.urdf import UrdfTransformManager
 
@@ -21,7 +29,7 @@ class PhysicsObject:
 
         self.acceleration = np.zeros(3, dtype=float)
         self.velocity = velocity
-        self.artist = artist
+        self.artist_ = artist
         self.forces = []
 
     def step(self):
@@ -35,8 +43,8 @@ class PhysicsObject:
         self.acceleration = np.add.reduce(self.forces) / self.mass
         self.velocity += dt * self.acceleration
         self.rigid_body.body2origin_[:3, 3] += self.velocity * dt
-        self.artist.set_data(self.rigid_body.body2origin_, self.rigid_body.vertices_,
-                             self.rigid_body.tetrahedra_)
+        self.artist_.set_data(self.rigid_body.body2origin_, self.rigid_body.vertices_,
+                              self.rigid_body.tetrahedra_)
 
         self.forces = []
 
@@ -89,7 +97,7 @@ while (not os.path.exists(data_dir) and
 
 tm = UrdfTransformManager()
 filename = os.path.join(data_dir, "mia_hand_description/urdf/mia_hand.urdf")
-with open(filename, "r") as f:
+with open(filename, "r") as f: # Run: cd test/data/ && git clone git@github.com:aprilprojecteu/mia_hand_description.git
     robot_urdf = f.read()
     tm.load_urdf(robot_urdf, mesh_path=data_dir)
 

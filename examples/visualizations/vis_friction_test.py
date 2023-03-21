@@ -40,7 +40,7 @@ while (not os.path.exists(data_dir) and
 
 tm = UrdfTransformManager()
 filename = os.path.join(data_dir, "mia_hand_description/urdf/mia_hand.urdf")
-with open(filename, "r") as f:
+with open(filename, "r") as f:  # Run: cd test/data/ && git clone git@github.com:aprilprojecteu/mia_hand_description.git
     robot_urdf = f.read()
     tm.load_urdf(robot_urdf, mesh_path=data_dir)
 
@@ -65,7 +65,7 @@ artist.add_artist(fig)
 # Friction force calculations
 contact_forces = []
 contact_norms = []
-contact_force_sum = np.array([0,0,0], dtype=float)
+contact_force_sum = np.array([0, 0, 0], dtype=float)
 for hand_rb in robot_bvh.get_colliders():
     intersection, wrench12, wrench21, details = hydroelastic_contact.contact_forces(
         hand_rb, sphere_rb, return_details=True)
@@ -85,7 +85,7 @@ for hand_rb in robot_bvh.get_colliders():
         contact_force_sum += -force
 
         if show_normals:
-            fig.plot_vector(pos, 0.01* normal, (1, 0, 0))
+            fig.plot_vector(pos, 0.01 * normal, (1, 0, 0))
 
     contact_surface = visualization.ContactSurface(
         np.eye(4), details["contact_polygons"],

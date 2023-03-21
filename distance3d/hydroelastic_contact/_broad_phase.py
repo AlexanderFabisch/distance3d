@@ -76,4 +76,3 @@ class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
             Maps frame names to colliders with overlapping AABB.
         """
         return super().aabb_overlapping_colliders(collider, whitelist)
-
