@@ -96,8 +96,8 @@ while (not os.path.exists(data_dir) and
     data_dir = os.path.join(search_path, BASE_DIR)
 
 tm = UrdfTransformManager()
-filename = os.path.join(data_dir, "mia_hand_description/urdf/mia_hand.urdf")
-with open(filename, "r") as f: # Run: cd test/data/ && git clone git@github.com:aprilprojecteu/mia_hand_description.git
+filename = os.path.join(data_dir, "mia_hand.urdf")
+with open(filename, "r") as f:
     robot_urdf = f.read()
     tm.load_urdf(robot_urdf, mesh_path=data_dir)
 
