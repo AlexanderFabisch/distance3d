@@ -1,14 +1,15 @@
 import numpy as np
-from distance3d import colliders, gjk, geometry, random, distance
-from pytest import approx
-from numpy.testing import assert_array_almost_equal
 
-from distance3d.colliders import ConvexHullVertices
+from distance3d import colliders, gjk, geometry, random, distance
+from distance3d.colliders import MeshGraph
 
 simplex = []
 ray = None
 dir = None
-w = None
+omega = None
+tolerance = None
+rl = None
+alpha = None
 
 
 def normalize(v):
@@ -16,6 +17,10 @@ def normalize(v):
     if norm == 0:
         return v
     return v / norm
+
+
+def squared_norm(a):
+    return np.abs(np.square(a)).sum()
 
 
 def gjk_nesterov_accelerated(s1, s2):
@@ -33,50 +38,74 @@ def gjk_nesterov_accelerated(s1, s2):
     contact : bool
     """
 
-    global simplex, ray, dir, w
+    global simplex, ray, dir, omega, tolerance, rl, alpha
 
     max_interations = 100
-    upper_bound = 1000
-    tolerance = 0.1
+    upper_bound = 1000000000
+    tolerance = 1e-6
     use_nesterov_acceleration = True
+    normalize_support_direction = type(s1) == MeshGraph and type(s2) == MeshGraph
     simplex = []
     inside = False
+    alpha = 0
 
-    ray = np.array(s1.center() - s2.center())  # x in paper
+    ray = np.array([1., 0., 0.])  # x in paper
     rl = np.linalg.norm(ray)
     if rl < tolerance:
         ray = np.array([-1, 0, 0])
         rl = 1
 
-    dir = ray   # d in paper
-    old_dir = ray
-    w = ray     # s in paper
+    dir = ray  # d in paper
+    w = ray  # s in paper
 
     for k in range(max_interations):
 
         if rl < tolerance:
             return True
 
-        old_dir = dir
         if use_nesterov_acceleration:
             momentum = (k + 1) / (k + 3)
             y = momentum * ray + (1 - momentum) * w
             dir = momentum * dir + (1 - momentum) * y
+
+            if normalize_support_direction:
+                dir /= np.linalg.norm(dir)
+
         else:
             dir = ray
 
-        print("dir", dir)
         w = np.array(s1.support_function(-dir) - s2.support_function(dir))
-        print("w: ", w)
+        """
+        for t in simplex:
+            if (t == w).all():
+                print("w in simplex")
+                """
+
         simplex.append(w)
 
-        frank_wolfe_duality_gap = 2 * ray.dot(ray - w)
-        if frank_wolfe_duality_gap - tolerance <= 0:
-            if (old_dir == ray).all():
-                return True
-            else:
-                simplex.pop()
+        omega = dir.dot(w) / np.linalg.norm(dir)
+        if omega > upper_bound:
+            return False
+
+        if use_nesterov_acceleration:
+            frank_wolfe_duality_gap = 2 * ray.dot(ray - w)
+            if frank_wolfe_duality_gap - tolerance <= 0:
                 use_nesterov_acceleration = False
+                simplex.pop()
+                continue
+
+        cv_check_passed = check_convergence()
+        if k > 0 and cv_check_passed:
+            if k > 0:
+                simplex.pop()
+            if use_nesterov_acceleration:
+                use_nesterov_acceleration = False
+                continue
+            distance = rl
+
+            if distance < tolerance:
+                return True
+            break
 
         if len(simplex) == 1:
             ray = w
@@ -86,6 +115,8 @@ def gjk_nesterov_accelerated(s1, s2):
             inside = project_triangle_origen(simplex)
         elif len(simplex) == 4:
             inside = project_tetra_to_origen(simplex)
+        else:
+            print("simplex to big")
 
         if not inside:
             rl = np.linalg.norm(ray)
@@ -96,6 +127,17 @@ def gjk_nesterov_accelerated(s1, s2):
     return False
 
 
+def check_convergence():
+    global omega, tolerance, rl, alpha
+
+    alpha = max(alpha, omega)
+    diff = rl - alpha
+
+    check_passed = (diff - tolerance * rl) <= 0
+
+    return check_passed
+
+
 def origen_to_point(a):
     global ray, simplex
     ray = a
@@ -104,7 +146,7 @@ def origen_to_point(a):
 
 def origen_to_segment(a, b, ab, ab_dot_a0):
     global ray, simplex
-    ray = (ab.dot(b) * a + ab_dot_a0 * b) / np.linalg.norm(ab)
+    ray = (ab.dot(b) * a + ab_dot_a0 * b) / squared_norm(ab)
     simplex = [b, a]
 
 
@@ -121,7 +163,7 @@ def origen_to_triangle(a, b, c, abc, abc_dot_a0):
     else:
         simplex = [b, c, a]
 
-    ray = -abc_dot_a0 / np.linalg.norm(abc) * abc
+    ray = -abc_dot_a0 / squared_norm(abc) * abc
     return False
 
 
@@ -192,7 +234,7 @@ def project_tetra_to_origen(tetra):
     c = tetra[1]
     d = tetra[0]
 
-    aa = np.linalg.norm(a)
+    aa = squared_norm(a)
 
     da = d.dot(a)
     db = d.dot(b)
@@ -348,8 +390,8 @@ def project_tetra_to_origen(tetra):
         else:
             if da_aa <= 0:
                 if -d.dot(a_cross_b) <= 0:
-                    if da * ca_da + dc * da_aa - dd * ca_aa:
-                        if da * da_ba + dd * ba_aa - db * da_aa:
+                    if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
+                        if da * da_ba + dd * ba_aa - db * da_aa <= 0:
                             region_adb()
                         else:
                             region_ad()
@@ -374,51 +416,58 @@ def project_tetra_to_origen(tetra):
     return False
 
 
-def run_gjk_nesterov_accelerated_boxes():
-    box2origin = np.eye(4)
-    size = np.ones(3)
-    box_collider = colliders.Box(box2origin, size)
+def run():
+    random_state = np.random.RandomState(84)
+    shape_names = list(colliders.COLLIDERS.keys())
 
-    # complete overlap
-    contact = gjk_nesterov_accelerated(
-        box_collider, box_collider)
-    assert contact
+    not_the_same_counter = 0
+    k = 1000000
+    skip = 0
 
-    # touching faces, edges, or points
-    for dim1 in range(3):
-        for dim2 in range(3):
-            for dim3 in range(3):
-                for sign1 in [-1, 1]:
-                    for sign2 in [-1, 1]:
-                        for sign3 in [-1, 1]:
-                            box2origin2 = np.eye(4)
-                            box2origin2[dim1, 3] = sign1
-                            box2origin2[dim2, 3] = sign2
-                            box2origin2[dim3, 3] = sign3
-                            size2 = np.ones(3)
-                            box_collider2 = colliders.Box(box2origin2, size2)
+    for i in range(k):
+        if i % 1000 == 0:
+            print(i)
 
-                            contact = gjk_nesterov_accelerated(
-                                box_collider, box_collider2)
-                            assert contact
 
-    box2origin = np.array([
-        [-0.29265666, -0.76990535, 0.56709596, 0.1867558],
-        [0.93923897, -0.12018753, 0.32153556, -0.09772779],
-        [-0.17939408, 0.62673815, 0.75829879, 0.09500884],
-        [0., 0., 0., 1.]])
-    size = np.array([2.89098828, 1.15032456, 2.37517511])
-    box_collider = colliders.Box(box2origin, size)
+        shape1 = shape_names[random_state.randint(len(shape_names))]
+        args1 = random.RANDOM_GENERATORS[shape1](random_state)
+        shape2 = shape_names[random_state.randint(len(shape_names))]
+        args2 = random.RANDOM_GENERATORS[shape2](random_state)
+        collider1 = colliders.COLLIDERS[shape1](*args1)
+        collider2 = colliders.COLLIDERS[shape2](*args2)
 
-    box2origin2 = np.array([
-        [-0.29265666, -0.76990535, 0.56709596, 3.73511598],
-        [0.93923897, -0.12018753, 0.32153556, -1.95455576],
-        [-0.17939408, 0.62673815, 0.75829879, 1.90017684],
-        [0., 0., 0., 1.]])
-    size2 = np.array([0.96366276, 0.38344152, 0.79172504])
-    box_collider2 = colliders.Box(box2origin2, size2)
+        intersection_jolt = gjk.gjk_intersection_jolt(collider1, collider2)
+        intersection_libccd = gjk.gjk_intersection_libccd(collider1, collider2)
 
-    contact = gjk_nesterov_accelerated(box_collider, box_collider2)
-    assert not contact
+        if i == 254:
+            print("Debug")
 
-run_gjk_nesterov_accelerated_boxes()
+        intersection_nesterov = gjk_nesterov_accelerated(collider1, collider2)
+        assert intersection_jolt == intersection_libccd
+
+        same = intersection_nesterov == intersection_libccd
+
+        if not same:
+            if skip != 0:
+                skip -= 1
+                continue
+
+            not_the_same_counter += 1
+            print(f"Not the Same: {i}")
+
+
+            import pytransform3d.visualizer as pv
+            fig = pv.figure()
+            fig.view_init()
+            collider1.make_artist()
+            collider2.make_artist()
+            collider1.artist_.add_artist(fig)
+            collider2.artist_.add_artist(fig)
+            fig.show()
+            break
+
+
+    print(not_the_same_counter / k)
+
+
+run()
