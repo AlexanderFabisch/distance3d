@@ -10,16 +10,16 @@ def test_gjk_points():
     assert gjk.gjk_intersection_libccd(p1, p1)
     assert gjk.gjk_distance_original(p1, p1)[0] == 0.0
     assert gjk.gjk_distance_jolt(p1, p1)[0] == 0.0
-
-    assert gjk.gjk_nesterov_accelerated(p1, p1)
+    assert gjk.gjk_nesterov_accelerated_intersection(p1, p1)
+    assert gjk.gjk_nesterov_accelerated_distance(p1, p1)[0] == 0.0
 
     p2 = colliders.ConvexHullVertices(np.array([[1.0, 0.0, 0.0]]))
     assert not gjk.gjk_intersection_jolt(p1, p2)
     assert not gjk.gjk_intersection_libccd(p1, p2)
     assert gjk.gjk_distance_original(p1, p2)[0] == 1.0
     assert gjk.gjk_distance_jolt(p1, p2)[0] == 1.0
-
-    assert not gjk.gjk_nesterov_accelerated(p1, p2)
+    assert not gjk.gjk_nesterov_accelerated_intersection(p1, p2)
+    assert gjk.gjk_nesterov_accelerated_distance(p1, p2)[0] == 1.0
 
 
 def test_gjk_line_segments():
@@ -29,25 +29,21 @@ def test_gjk_line_segments():
     assert gjk.gjk_intersection_libccd(s1, s1)
     assert gjk.gjk_distance_original(s1, s1)[0] == 0.0
     assert gjk.gjk_distance_jolt(s1, s1)[0] == 0.0
-
-    assert gjk.gjk_nesterov_accelerated(s1, s1)
+    assert gjk.gjk_nesterov_accelerated_distance(s1, s1)[0] == 0.0
 
     p1 = colliders.ConvexHullVertices(np.array([[0.0, 0.0, 0.0]]))
     assert gjk.gjk_intersection_jolt(s1, p1)
     assert gjk.gjk_intersection_libccd(s1, p1)
     assert gjk.gjk_distance_original(s1, p1)[0] == 0.0
     assert gjk.gjk_distance_jolt(s1, p1)[0] == 0.0
-    assert gjk.gjk_nesterov_accelerated(s1, s1)
-
-    assert gjk.gjk_nesterov_accelerated(s1, p1)
+    assert gjk.gjk_nesterov_accelerated_distance(s1, p1)[0] == 0.0
 
     p2 = colliders.ConvexHullVertices(np.array([[1.0, 0.0, 0.0]]))
     assert gjk.gjk_intersection_jolt(s1, p2)
     assert gjk.gjk_intersection_libccd(s1, p2)
     assert gjk.gjk_distance_original(s1, p2)[0] == 0.0
     assert gjk.gjk_distance_jolt(s1, p2)[0] == 0.0
-
-    assert gjk.gjk_nesterov_accelerated(s1, p2)
+    assert gjk.gjk_nesterov_accelerated_distance(s1, p2)[0] == 0.0
 
     s2 = colliders.ConvexHullVertices(np.array([
         [0.0, 1.0, 0.0], [1.0, 1.0, 0.0]]))
@@ -55,8 +51,7 @@ def test_gjk_line_segments():
     assert not gjk.gjk_intersection_libccd(s1, s2)
     assert gjk.gjk_distance_original(s1, s2)[0] == 1.0
     assert gjk.gjk_distance_jolt(s1, s2)[0] == 1.0
-
-    assert not gjk.gjk_nesterov_accelerated(s1, s2)
+    assert gjk.gjk_nesterov_accelerated_distance(s1, s2)[0] == 1.0
 
     s2 = colliders.ConvexHullVertices(np.array([
         [0.5, -1.0, 0.0], [0.5, 1.0, 0.0]]))
@@ -64,8 +59,7 @@ def test_gjk_line_segments():
     assert gjk.gjk_intersection_libccd(s1, s2)
     assert gjk.gjk_distance_original(s1, s2)[0] == 0.0
     assert gjk.gjk_distance_jolt(s1, s2)[0] == 0.0
-
-    assert gjk.gjk_nesterov_accelerated(s1, s2)
+    assert gjk.gjk_nesterov_accelerated_distance(s1, s2)[0] == 0.0
 
 
 def test_gjk_boxes():
@@ -80,7 +74,11 @@ def test_gjk_boxes():
     assert_array_almost_equal(closest_point1, np.array([-0.5, -0.5, -0.5]))
     assert_array_almost_equal(closest_point1, closest_point2)
 
-    assert gjk.gjk_nesterov_accelerated(box_collider, box_collider)
+    dist, closest_point1, closest_point2, _ = gjk.gjk_nesterov_accelerated_distance(
+        box_collider, box_collider)
+    assert approx(dist) == 0.0
+    assert_array_almost_equal(closest_point1, np.array([-0.5, -0.5, -0.5]))
+    assert_array_almost_equal(closest_point1, closest_point2)
 
     # touching faces, edges, or points
     for dim1 in range(3):
@@ -111,7 +109,9 @@ def test_gjk_boxes():
                                 box_collider, box_collider2)
                             assert approx(dist2) == 0.0
 
-                            assert gjk.gjk_nesterov_accelerated(box_collider, box_collider2)
+                            dist3, _, _, _ = gjk.gjk_nesterov_accelerated_distance(
+                                box_collider, box_collider2)
+                            assert approx(dist3) == 0.0
 
 
     box2origin = np.array([
@@ -138,7 +138,8 @@ def test_gjk_boxes():
         box_collider, box_collider2)
     assert approx(dist2) == 1.7900192730149391
 
-    assert not gjk.gjk_nesterov_accelerated(box_collider, box_collider2)
+    dist3, _, _, _ = gjk.gjk_nesterov_accelerated_distance(box_collider, box_collider2)
+    assert approx(dist3) == 1.7900192730149391
 
 
 def test_gjk_spheres():
@@ -152,8 +153,8 @@ def test_gjk_spheres():
     dist, _, _, _ = gjk.gjk_distance_jolt(sphere1, sphere1)
     assert approx(dist) == 0.0
 
-    assert gjk.gjk_nesterov_accelerated(sphere1, sphere1)
-
+    dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere1)
+    assert approx(dist) == 0.0
 
     sphere2 = colliders.Sphere(center=np.array([1, 1, 1], dtype=float), radius=1.0)
     dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
@@ -165,8 +166,8 @@ def test_gjk_spheres():
     dist, _, _, _ = gjk.gjk_distance_jolt(sphere1, sphere2)
     assert approx(dist) == 0.0
 
-    assert gjk.gjk_nesterov_accelerated(sphere1, sphere2)
-
+    dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere2)
+    assert approx(dist) == 0.0
 
     sphere1 = colliders.Sphere(center=np.array([0, 0, 0], dtype=float), radius=1.0)
     sphere2 = colliders.Sphere(center=np.array([0, 0, 3], dtype=float), radius=1.0)
@@ -179,7 +180,8 @@ def test_gjk_spheres():
     dist, _, _, _ = gjk.gjk_distance_jolt(sphere1, sphere2)
     assert approx(dist) == 1.0
 
-    assert not gjk.gjk_nesterov_accelerated(sphere1, sphere2)
+    dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere2)
+    assert approx(dist) == 1.0
 
 
 def test_gjk_cylinders():
@@ -193,7 +195,8 @@ def test_gjk_cylinders():
     dist, _, _, _ = gjk.gjk_distance_jolt(cylinder1, cylinder1)
     assert approx(dist) == 0
 
-    assert gjk.gjk_nesterov_accelerated(cylinder1, cylinder1)
+    dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(cylinder1, cylinder1)
+    assert approx(dist) == 0
 
 
     A2B = np.eye(4)
@@ -208,8 +211,8 @@ def test_gjk_cylinders():
     dist, _, _, _ = gjk.gjk_distance_jolt(cylinder1, cylinder2)
     assert approx(dist) == 1
 
-    assert not gjk.gjk_nesterov_accelerated(cylinder1, cylinder2)
-
+    dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(cylinder1, cylinder2)
+    assert approx(dist) == 1
 
     A2B = np.eye(4)
     A2B[:3, 3] = np.array([0, 0, 4])
@@ -223,7 +226,8 @@ def test_gjk_cylinders():
     dist, _, _, _ = gjk.gjk_distance_jolt(cylinder1, cylinder2)
     assert approx(dist) == 3
 
-    assert not gjk.gjk_nesterov_accelerated(cylinder1, cylinder2)
+    dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(cylinder1, cylinder2)
+    assert approx(dist) == 3
 
 
 def test_gjk_capsules():
@@ -236,7 +240,8 @@ def test_gjk_capsules():
     dist, _, _, _ = gjk.gjk_distance_jolt(capsule1, capsule1)
     assert approx(dist) == 0
 
-    assert gjk.gjk_nesterov_accelerated(capsule1, capsule1)
+    dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule1)
+    assert approx(dist) == 0
 
 
     A2B = np.eye(4)
@@ -251,7 +256,8 @@ def test_gjk_capsules():
     dist, _, _, _ = gjk.gjk_distance_jolt(capsule1, capsule2)
     assert approx(dist) == 1
 
-    assert gjk.gjk_nesterov_accelerated(capsule1, capsule1)
+    dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule2)
+    assert approx(dist) == 1
 
 
     A2B = np.eye(4)
@@ -266,7 +272,8 @@ def test_gjk_capsules():
     dist, _, _, _ = gjk.gjk_distance_jolt(capsule1, capsule2)
     assert approx(dist) == 1
 
-    assert not gjk.gjk_nesterov_accelerated(capsule1, capsule2)
+    dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule2)
+    assert approx(dist) == 1
 
 
 def test_gjk_ellipsoids():
@@ -311,7 +318,7 @@ def test_compare_gjk_intersection_flavours_with_random_shapes():
 
         intersection_jolt = gjk.gjk_intersection_jolt(collider1, collider2)
         intersection_libccd = gjk.gjk_intersection_libccd(collider1, collider2)
-        intersection_nesterov = gjk.gjk_nesterov_accelerated(collider1, collider2)
+        intersection_nesterov = gjk.gjk_nesterov_accelerated_intersection(collider1, collider2)
         assert intersection_jolt == intersection_libccd
         assert intersection_jolt == intersection_nesterov
         assert intersection_nesterov == intersection_libccd
@@ -330,8 +337,12 @@ def test_compare_gjk_distance_flavours_with_random_shapes():
 
         dist_jolt, cp1_jolt, cp2_jolt, _ = gjk.gjk_distance_jolt(collider1, collider2)
         dist_orig, cp1_orig, cp2_orig, _ = gjk.gjk_distance_original(collider1, collider2)
+        dist_nesterov, cp1_nesterov, cp2_nesterov, _ = gjk.gjk_nesterov_accelerated_distance(collider1, collider2)
         assert approx(dist_jolt) == dist_orig
         assert approx(np.linalg.norm(cp1_orig - cp2_orig)) == np.linalg.norm(cp1_jolt - cp2_jolt)
+
+        assert approx(dist_nesterov) == dist_orig
+        assert approx(np.linalg.norm(cp1_nesterov - cp2_nesterov)) == np.linalg.norm(cp1_jolt - cp2_jolt)
 
 
 def test_gjk_random_points():
