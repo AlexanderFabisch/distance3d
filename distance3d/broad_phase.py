@@ -47,7 +47,7 @@ class BoundingVolumeHierarchy:
 
     def fill_tree_with_colliders(
             self, tm, make_artists=False,
-            fill_self_collision_whitelists=False):
+            fill_self_collision_whitelists=False, use_visuals=False):
         """Fill tree with colliders from URDF transform manager.
 
         Parameters
@@ -62,8 +62,16 @@ class BoundingVolumeHierarchy:
             Fill whitelists for self collision detection. All collision
             objects connected to the current link, child, and parent links
             will be ignored.
+
+        use_visuals : bool, optional (default: False)
+            Use visual objects as colliders.
         """
-        for obj in tm.collision_objects:
+        if use_visuals:
+            objects = tm.visuals
+        else:
+            objects = tm.collision_objects
+
+        for obj in objects:
             try:
                 collider = self._make_collider(tm, obj, make_artists)
                 self.add_collider(obj.frame, collider)
