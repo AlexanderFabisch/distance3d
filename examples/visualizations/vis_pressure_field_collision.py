@@ -2,11 +2,9 @@
 ====================================
 Physical Simulation of Bouncing Ball
 ====================================
-
-A rubber ball bouncing on a wooden box.
 """
-
 print(__doc__)
+
 import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import visualization, hydroelastic_contact

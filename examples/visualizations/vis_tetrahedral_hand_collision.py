@@ -2,18 +2,15 @@
 ============================================
 Physical Simulation of Bouncing Ball on Hand
 ============================================
-
-A rubber ball bouncing on a hand.
 """
+print(__doc__)
 
 import os
 from pytransform3d.urdf import UrdfTransformManager
-
 import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import hydroelastic_contact
-
-from distance3d.hydroelastic_contact._broad_phase import HydroelasticBoundingVolumeHierarchy
+from distance3d.hydroelastic_contact import HydroelasticBoundingVolumeHierarchy
 
 dt = 0.001
 g = np.array([9.81, 0, 0])
@@ -47,6 +44,7 @@ class PhysicsObject:
                               self.rigid_body.tetrahedra_)
 
         self.forces = []
+
 
 class AnimationCallback:
     def __init__(self, p_objects):

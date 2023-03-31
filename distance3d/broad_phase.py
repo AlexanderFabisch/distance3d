@@ -84,6 +84,24 @@ class BoundingVolumeHierarchy:
         self.update_collider_poses()
 
     def _make_collider(self, tm, obj, make_artists):
+        """Creates a Collider from an urdf object
+
+        Parameters
+        ----------
+        tm : pytransform3d.urdf.UrdfTransformManager
+            Transform manager that has colliders.
+
+        obj: pytransform3d.urdf.Geometry
+            The urdf object.
+
+        make_artists : bool, optional (default: False)
+            Create artist for visualization for each collision object.
+
+        Returns
+        -------
+        collider : ConvexCollider
+            The corresponding collider.
+        """
         A2B = tm.get_transform(obj.frame, "origen")
 
         if isinstance(obj, urdf.Sphere):
@@ -121,7 +139,7 @@ class BoundingVolumeHierarchy:
         """Update poses of all colliders from transform manager."""
         self.aabbtree_ = AabbTree()
         for frame in self.colliders_:
-            A2B = self.tm.get_transform(frame, "origen")
+            A2B = self.tm.get_transform(frame, "origin")
             collider = self.colliders_[frame]
             collider.update_pose(A2B)
             self.aabbtree_.insert_aabb(collider.aabb(), (frame, collider))

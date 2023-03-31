@@ -3,16 +3,14 @@
 Visualize Pressure Field of Two Colliding Objects
 =================================================
 """
-from distance3d.hydroelastic_contact._broad_phase import HydroelasticBoundingVolumeHierarchy
-
 print(__doc__)
 
 import os
 from pytransform3d.urdf import UrdfTransformManager
-import distance3d
 import numpy as np
 import pytransform3d.visualizer as pv
-from distance3d import visualization, hydroelastic_contact, benchmark, broad_phase
+from distance3d import visualization, hydroelastic_contact
+from distance3d.hydroelastic_contact._broad_phase import HydroelasticBoundingVolumeHierarchy
 
 
 show_normals = True

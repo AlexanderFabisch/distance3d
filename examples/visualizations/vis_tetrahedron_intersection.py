@@ -4,10 +4,10 @@ Visualize Intersection of Tetrahedra
 ====================================
 """
 print(__doc__)
+
 import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import hydroelastic_contact, visualization
-
 
 sphere1 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.1, 0.2, 0.1]), 1.0, order=2)
 sphere1.express_in(np.eye(4))

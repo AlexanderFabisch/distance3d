@@ -7,37 +7,56 @@ import numpy as np
 class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
     """Hydroelastic Bounding volume hierarchy (BVH) for broad phase collision detection.
 
-        This BVH works the same but uses the hydro-elastic Rigidbody as the Collider Object.
+    This BVH works the same but uses the hydro-elastic Rigidbody as the Collider Object.
 
-        Parameters
-        ----------
-        tm : pytransform3d.transform_manager.TransformManager
-            Transform manager that stores the transformations.
+    Parameters
+    ----------
+    tm : pytransform3d.transform_manager.TransformManager
+        Transform manager that stores the transformations.
 
-        base_frame : str
-            Name of the base frame in which colliders are represented.
+    base_frame : str
+        Name of the base frame in which colliders are represented.
 
-        base_frame2origen : array, shape (4, 4), optional (default: np.eye(4))
-            The position of the base_frame to origen.
+    base_frame2origen : array, shape (4, 4), optional (default: np.eye(4))
+        The position of the base_frame to origen.
 
-        Attributes
-        ----------
-        aabbtree_ : AabbTree
-            Tree of axis-aligned bounding boxes.
+    Attributes
+    ----------
+    aabbtree_ : AabbTree
+        Tree of axis-aligned bounding boxes.
 
-        colliders_ : dict
-            Maps frames of collision objects to colliders.
+    colliders_ : dict
+        Maps frames of collision objects to colliders.
 
-        self_collision_whitelists_ : dict
-            Whitelists for self-collision detection in case this BVH represents
-            a robot.
+    self_collision_whitelists_ : dict
+        Whitelists for self-collision detection in case this BVH represents
+        a robot.
     """
 
     def __init__(self, tm, base_frame, base_frame2origen=np.eye(4)):
         super().__init__(tm, base_frame, base_frame2origen)
 
     def _make_collider(self, tm, obj, make_artists):
-        A2B = tm.get_transform(obj.frame, "origen")
+        """Creates a Collider from an urdf object
+
+        Parameters
+        ----------
+        tm : pytransform3d.urdf.UrdfTransformManager
+            Transform manager that has colliders.
+
+        obj: pytransform3d.urdf.Geometry
+            The urdf object.
+
+        make_artists : bool, optional (default: False)
+            Create artist for visualization for each collision object.
+
+        Returns
+        -------
+        collider : ConvexCollider
+            The corresponding collider.
+        """
+
+        A2B = tm.get_transform(obj.frame, "origin")
 
         if isinstance(obj, urdf.Sphere):
             collider = RigidBody.make_sphere(A2B[:3, 3], obj.radius, 2)

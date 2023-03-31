@@ -3,8 +3,8 @@
 Physical Simulation of Soft Balls Bouncing in a Wooden Box
 ==========================================================
 """
-
 print(__doc__)
+
 import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import visualization, hydroelastic_contact

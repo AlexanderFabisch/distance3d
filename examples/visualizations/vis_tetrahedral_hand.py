@@ -1,13 +1,14 @@
+"""
+========================
+Hand as tetrahedral mesh
+========================
+"""
+print(__doc__)
+
 import os
 from pytransform3d.urdf import UrdfTransformManager
-
-import numpy as np
 import pytransform3d.visualizer as pv
-from distance3d import hydroelastic_contact
-
 from distance3d.hydroelastic_contact._broad_phase import HydroelasticBoundingVolumeHierarchy
-
-
 
 fig = pv.figure()
 
