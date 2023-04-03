@@ -484,6 +484,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
     return inside, distance, simplex
 
 
+"""
 def project_line_origen(line):
     a = line[0]
     b = line[1]
@@ -550,7 +551,6 @@ def project_triangle_origen(triangle):
 
 
 def project_tetra_origen(tetra):
-
     def triple(a, b, c):
         return a.dot(np.cross(b, c))
 
@@ -642,5 +642,4 @@ def get_closest_points(simplex):
         p1 += parameterization[i] * simplex[i][2]
 
     return p0, p1
-
-
+"""
