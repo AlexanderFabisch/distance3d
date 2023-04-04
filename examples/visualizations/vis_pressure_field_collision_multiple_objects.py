@@ -3,8 +3,8 @@
 Physical Simulation of Soft Balls Bouncing in a Wooden Box
 ==========================================================
 """
-
 print(__doc__)
+
 import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import visualization, hydroelastic_contact
@@ -38,7 +38,7 @@ class PhysicsObject:
 
         self.acceleration = np.zeros(3, dtype=float)
         self.velocity = velocity
-        self.artist = artist
+        self.artist_ = artist
         self.forces = []
 
     def step(self):
@@ -52,8 +52,8 @@ class PhysicsObject:
         self.acceleration = np.add.reduce(self.forces) / self.mass
         self.velocity += dt * self.acceleration
         self.rigid_body.body2origin_[:3, 3] += self.velocity * dt
-        self.artist.set_data(self.rigid_body.body2origin_, self.rigid_body.vertices_,
-                             self.rigid_body.tetrahedra_)
+        self.artist_.set_data(self.rigid_body.body2origin_, self.rigid_body.vertices_,
+                              self.rigid_body.tetrahedra_)
 
         self.forces = []
 
@@ -61,9 +61,9 @@ class PhysicsObject:
 class AnimationCallback:
     def __init__(self, p_objects):
         self.p_objects = p_objects
-        self.artists = []
+        self.artists_ = []
         for p_object in p_objects:
-            self.artists.append(p_object.artist)
+            self.artists_.append(p_object.artist_)
 
     def __call__(self, step):
         global xs, ys
@@ -94,7 +94,7 @@ class AnimationCallback:
             vels.append(sum_vel)
             accs.append(sum_acc / 100)
 
-        return self.artists
+        return self.artists_
 
 
 def make_object(rigid_body, mass, acc, fixed):

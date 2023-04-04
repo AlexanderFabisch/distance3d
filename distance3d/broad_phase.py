@@ -25,6 +25,9 @@ class BoundingVolumeHierarchy:
     base_frame : str
         Name of the base frame in which colliders are represented.
 
+    base_frame2origen : array, shape (4, 4), optional (default: np.eye(4))
+        The position of the base_frame to origen.
+
     Attributes
     ----------
     aabbtree_ : AabbTree
@@ -37,9 +40,13 @@ class BoundingVolumeHierarchy:
         Whitelists for self-collision detection in case this BVH represents
         a robot.
     """
-    def __init__(self, tm, base_frame):
+    def __init__(self, tm, base_frame, base_frame2origen=np.eye(4)):
+
+        tm.add_transform(base_frame, "origen", base_frame2origen)
+
         self.tm = tm
         self.base_frame = base_frame
+        self.base_frame2origen = base_frame2origen
         self.collider_frames = set()
         self.aabbtree_ = AabbTree()
         self.colliders_ = {}
@@ -82,8 +89,29 @@ class BoundingVolumeHierarchy:
             self.self_collision_whitelists_.update(
                 self_collision_whitelists(tm))
 
+        self.update_collider_poses()
+
     def _make_collider(self, tm, obj, make_artists):
-        A2B = tm.get_transform(obj.frame, self.base_frame)
+        """Creates a Collider from an urdf object
+
+        Parameters
+        ----------
+        tm : pytransform3d.urdf.UrdfTransformManager
+            Transform manager that has colliders.
+
+        obj: pytransform3d.urdf.Geometry
+            The urdf object.
+
+        make_artists : bool, optional (default: False)
+            Create artist for visualization for each collision object.
+
+        Returns
+        -------
+        collider : ConvexCollider
+            The corresponding collider.
+        """
+        A2B = tm.get_transform(obj.frame, "origen")
+
         if isinstance(obj, urdf.Sphere):
             collider = Sphere(center=A2B[:3, 3], radius=obj.radius)
         elif isinstance(obj, urdf.Box):
@@ -119,7 +147,7 @@ class BoundingVolumeHierarchy:
         """Update poses of all colliders from transform manager."""
         self.aabbtree_ = AabbTree()
         for frame in self.colliders_:
-            A2B = self.tm.get_transform(frame, self.base_frame)
+            A2B = self.tm.get_transform(frame, "origin")
             collider = self.colliders_[frame]
             collider.update_pose(A2B)
             self.aabbtree_.insert_aabb(collider.aabb(), (frame, collider))

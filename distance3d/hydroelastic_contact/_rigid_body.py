@@ -6,6 +6,7 @@ from ._tetra_mesh_creation import (
     make_tetrahedral_capsule)
 from ._mesh_processing import center_of_mass_tetrahedral_mesh, tetrahedral_mesh_aabbs
 from ..aabb_tree import AabbTree
+from ..visualization import RigidBodyTetrahedralMesh
 
 
 class RigidBody:
@@ -28,6 +29,7 @@ class RigidBody:
     youngs_modulus : float, optional (default: 1.0)
         The stiffness of the material the rigidbody is made out of.
     """
+
     def __init__(self, body2origin, vertices, tetrahedra, potentials, youngs_modulus=1.0):
         self.body2origin_ = body2origin
         self.vertices_ = vertices
@@ -41,6 +43,7 @@ class RigidBody:
         self._aabb_tree = None
 
         self._youngs_modulus = youngs_modulus
+        self._artist = None
 
     @staticmethod
     def make_sphere(center, radius, order=4):
@@ -233,6 +236,23 @@ class RigidBody:
         self._aabbs = None
         self._aabb_tree = None
 
+    def update_pose(self, body2origin):
+        """Sets body2origin to a new value.
+
+            Parameters
+            ----------
+            body2origin : array, shape (4, 4)
+                New body2origin
+        """
+        # TODO Check if this is correct.
+        self.body2origin_ = body2origin
+        if self.artist_ is not None:
+            self.artist_.set_data(body2origin, vertices=self.vertices_, tetrahedra=self.tetrahedra_)
+
+    def aabb(self):
+        """The aabb of the rigidbody"""
+        return self.aabb_tree.get_root_aabb()
+
     @property
     def aabbs(self):
         """The aabbs for broad phase collision detection"""
@@ -258,4 +278,19 @@ class RigidBody:
         """Set the young's modulus of the Object. (stiffness)"""
         self._youngs_modulus = value
 
+    @property
+    def artist_(self):
+        """The artist to visualize the rigid body as a wireframe."""
+        if self._artist is None:
+            self.make_artist()
+        return self._artist
 
+    def make_artist(self, c=None):
+        """Creates a new artist.
+
+            Parameters
+            ----------
+            c : array, shape (3
+                The color of the wireframe.
+        """
+        self._artist = RigidBodyTetrahedralMesh(self.body2origin_, self.vertices_, self.tetrahedra_, c)

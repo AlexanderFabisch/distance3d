@@ -4,6 +4,7 @@ Closest Points with GJK
 =======================
 """
 print(__doc__)
+
 import time
 import numpy as np
 import pytransform3d.visualizer as pv
