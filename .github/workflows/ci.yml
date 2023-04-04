@@ -25,6 +25,6 @@ jobs:
         python -m pip install -e .[test]
     - name: Test
       run: |
-        NUMBA_DISABLE_JIT=1 pytest
+        NUMBA_DISABLE_JIT=1 pytest distance3d
     - name: Codecov
       uses: codecov/codecov-action@v1.3.2
