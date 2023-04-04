@@ -95,6 +95,16 @@ class ConvexCollider(abc.ABC):
             Axis-aligned bounding box.
         """
 
+    @abc.abstractmethod
+    def to_dict(self):
+        """Return a data dict for json serialization
+
+        Returns
+        -------
+        data : dict
+            data dict
+        """
+
 
 class ConvexHullVertices(ConvexCollider):
     """Convex hull of a set of vertices.
@@ -129,6 +139,14 @@ class ConvexHullVertices(ConvexCollider):
 
     def aabb(self):
         return np.array(axis_aligned_bounding_box(self.vertices)).T
+
+    def to_dict(self):
+        data = {
+            "type": "ConvexHullVertices",
+            "center": self.center().tolist(),
+            "vertices": self.vertices.tolist()
+        }
+        return data
 
 
 class Box(ConvexHullVertices):
@@ -220,6 +238,15 @@ class MeshGraph(ConvexCollider):
             self.mesh2origin[np.newaxis, :3, 3] + np.dot(
                 self.vertices, self.mesh2origin[:3, :3].T))).T
 
+    def to_dict(self):
+        data = {
+            "type": "Mesh",
+            "center": self.center().tolist(),
+            "vertices": self.vertices.tolist(),
+            "triangles": self.triangles.tolist()
+        }
+        return data
+
 
 class Sphere(ConvexCollider):
     """Sphere collider.
@@ -263,6 +290,14 @@ class Sphere(ConvexCollider):
 
     def aabb(self):
         return np.array(sphere_aabb(self.c, self.radius)).T
+
+    def to_dict(self):
+        data = {
+            "type": "Sphere",
+            "center": self.center().tolist(),
+            "radius": self.radius
+        }
+        return data
 
 
 class Capsule(ConvexCollider):
@@ -314,6 +349,15 @@ class Capsule(ConvexCollider):
         return np.array(capsule_aabb(
             self.capsule2origin, self.radius, self.height)).T
 
+    def to_dict(self):
+        data = {
+            "type": "Capsule",
+            "center": self.center().tolist(),
+            "radius": self.radius,
+            "height": self.height
+        }
+        return data
+
 
 class Ellipsoid(ConvexCollider):
     """Ellipsoid collider.
@@ -357,6 +401,14 @@ class Ellipsoid(ConvexCollider):
 
     def aabb(self):
         return np.array(ellipsoid_aabb(self.ellipsoid2origin, self.radii)).T
+
+    def to_dict(self):
+        data = {
+            "type": "Ellipsoid",
+            "center": self.center().tolist(),
+            "radii": self.radii.tolist()
+        }
+        return data
 
 
 class Cylinder(ConvexCollider):
@@ -407,6 +459,15 @@ class Cylinder(ConvexCollider):
     def aabb(self):
         return np.array(cylinder_aabb(
             self.cylinder2origin, self.radius, self.length)).T
+
+    def to_dict(self):
+        data = {
+            "type": "Cylinder",
+            "center": self.center().tolist(),
+            "radius": self.radius,
+            "height": self.length
+        }
+        return data
 
 
 class Disk(ConvexCollider):
@@ -462,6 +523,15 @@ class Disk(ConvexCollider):
     def aabb(self):
         return np.array(disk_aabb(self.c, self.radius, self.normal)).T
 
+    def to_dict(self):
+        data = {
+            "type": "Disk",
+            "center": self.center().tolist(),
+            "radius": self.radius,
+            "normal": self.normal.tolist()
+        }
+        return data
+
 
 class Ellipse(ConvexCollider):
     """Ellipse collider.
@@ -508,6 +578,15 @@ class Ellipse(ConvexCollider):
 
     def aabb(self):
         return np.array(ellipse_aabb(self.c, self.axes, self.radii)).T
+
+    def to_dict(self):
+        data = {
+            "type": "Ellipse",
+            "center": self.center().tolist(),
+            "axes": self.axes.tolist(),
+            "radii": self.radii.tolist()
+        }
+        return data
 
 
 class Cone(ConvexCollider):
@@ -557,6 +636,15 @@ class Cone(ConvexCollider):
 
     def aabb(self):
         return np.array(cone_aabb(self.cone2origin, self.radius, self.height)).T
+
+    def to_dict(self):
+        data = {
+            "type": "Cone",
+            "center": self.center().tolist(),
+            "radius": self.radius,
+            "height": self.height
+        }
+        return data
 
 
 class Margin(ConvexCollider):
