@@ -25,8 +25,8 @@ class BoundingVolumeHierarchy:
     base_frame : str
         Name of the base frame in which colliders are represented.
 
-    base_frame2origen : array, shape (4, 4), optional (default: np.eye(4))
-        The position of the base_frame to origen.
+    base_frame2origin : array, shape (4, 4), optional (default: np.eye(4))
+        The position of the base_frame to origin.
 
     Attributes
     ----------
@@ -40,13 +40,13 @@ class BoundingVolumeHierarchy:
         Whitelists for self-collision detection in case this BVH represents
         a robot.
     """
-    def __init__(self, tm, base_frame, base_frame2origen=np.eye(4)):
+    def __init__(self, tm, base_frame, base_frame2origin=np.eye(4)):
 
-        tm.add_transform(base_frame, "origen", base_frame2origen)
+        tm.add_transform(base_frame, "origin", base_frame2origin)
 
         self.tm = tm
         self.base_frame = base_frame
-        self.base_frame2origen = base_frame2origen
+        self.base_frame2origin = base_frame2origin
         self.collider_frames = set()
         self.aabbtree_ = AabbTree()
         self.colliders_ = {}
@@ -92,7 +92,7 @@ class BoundingVolumeHierarchy:
         self.update_collider_poses()
 
     def _make_collider(self, tm, obj, make_artists):
-        """Creates a Collider from an urdf object
+        """Creates a collider from a URDF object.
 
         Parameters
         ----------
@@ -110,7 +110,7 @@ class BoundingVolumeHierarchy:
         collider : ConvexCollider
             The corresponding collider.
         """
-        A2B = tm.get_transform(obj.frame, "origen")
+        A2B = tm.get_transform(obj.frame, "origin")
 
         if isinstance(obj, urdf.Sphere):
             collider = Sphere(center=A2B[:3, 3], radius=obj.radius)

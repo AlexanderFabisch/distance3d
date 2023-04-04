@@ -29,8 +29,8 @@ class RigidBody:
     youngs_modulus : float, optional (default: 1.0)
         The stiffness of the material the rigidbody is made out of.
     """
-
-    def __init__(self, body2origin, vertices, tetrahedra, potentials, youngs_modulus=1.0):
+    def __init__(self, body2origin, vertices, tetrahedra, potentials,
+                 youngs_modulus=1.0):
         self.body2origin_ = body2origin
         self.vertices_ = vertices
         self.tetrahedra_ = tetrahedra
@@ -237,12 +237,12 @@ class RigidBody:
         self._aabb_tree = None
 
     def update_pose(self, body2origin):
-        """Sets body2origin to a new value.
+        """Set new pose.
 
-            Parameters
-            ----------
-            body2origin : array, shape (4, 4)
-                New body2origin
+        Parameters
+        ----------
+        body2origin : array, shape (4, 4)
+            New pose.
         """
         # TODO Check if this is correct.
         self.body2origin_ = body2origin

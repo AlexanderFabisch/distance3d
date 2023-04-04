@@ -5,9 +5,10 @@ import numpy as np
 
 
 class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
-    """Hydroelastic Bounding volume hierarchy (BVH) for broad phase collision detection.
+    """Hydroelastic BVH for broad phase collision detection.
 
-    This BVH works the same but uses the hydro-elastic Rigidbody as the Collider Object.
+    This BVH works the same but uses the hydroelastic RigidBody as the
+    collider object.
 
     Parameters
     ----------
@@ -17,8 +18,8 @@ class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
     base_frame : str
         Name of the base frame in which colliders are represented.
 
-    base_frame2origen : array, shape (4, 4), optional (default: np.eye(4))
-        The position of the base_frame to origen.
+    base_frame2origin : array, shape (4, 4), optional (default: np.eye(4))
+        The position of the base_frame to origin.
 
     Attributes
     ----------
@@ -33,11 +34,11 @@ class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
         a robot.
     """
 
-    def __init__(self, tm, base_frame, base_frame2origen=np.eye(4)):
-        super().__init__(tm, base_frame, base_frame2origen)
+    def __init__(self, tm, base_frame, base_frame2origin=np.eye(4)):
+        super().__init__(tm, base_frame, base_frame2origin)
 
     def _make_collider(self, tm, obj, make_artists):
-        """Creates a Collider from an urdf object
+        """Creates a collider from a URDF object.
 
         Parameters
         ----------
@@ -55,7 +56,6 @@ class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
         collider : ConvexCollider
             The corresponding collider.
         """
-
         A2B = tm.get_transform(obj.frame, "origin")
 
         if isinstance(obj, urdf.Sphere):
@@ -63,17 +63,18 @@ class HydroelasticBoundingVolumeHierarchy(BoundingVolumeHierarchy):
         elif isinstance(obj, urdf.Box):
             collider = RigidBody.make_box(A2B, obj.size)
         elif isinstance(obj, urdf.Cylinder):
-            collider = RigidBody.make_cylinder(A2B, obj.radius, obj.length, resolution_hint=0.01)
-        else:
+            collider = RigidBody.make_cylinder(
+                A2B, obj.radius, obj.length, resolution_hint=0.01)
+        else:  # pragma: no cover
             assert isinstance(obj, urdf.Mesh)
-            print("Arbitrary mesh conversion is not implemented!! ")
-            # TODO Arbitrary mesh conversion
+            raise NotImplementedError(
+                "Arbitrary mesh conversion is not implemented!")
 
         if make_artists:
             collider.make_artist()
         return collider
 
-    # Only overwritten to change the Doku.
+    # Override to change the docstring.
     def aabb_overlapping_colliders(self, collider, whitelist=()):
         """Get colliders with an overlapping AABB.
 
