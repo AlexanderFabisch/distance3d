@@ -31,7 +31,7 @@ class AnimationCallback:
         total_time = 0.0
         start = time.time()
         for collider, connection in zip(env, connections):
-            _, cp1, cp2, _ = gjk.gjk_distance_original(obj, collider)
+            _, cp1, cp2, _ = gjk.gjk(obj, collider)
             connection.set_data(np.row_stack((cp1, cp2)))
         stop = time.time()
         total_time += stop - start
