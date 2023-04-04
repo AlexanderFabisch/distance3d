@@ -1,6 +1,5 @@
 import numpy as np
 
-from distance3d import colliders, gjk, random
 from distance3d.colliders import MeshGraph
 
 
@@ -20,34 +19,6 @@ def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
         Shapes collide
     """
     return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[0]
-
-
-def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None):
-    """
-    Parameters
-    ----------
-    collider1 : ConvexCollider
-        Convex collider 1.
-
-    collider2 : ConvexCollider
-        Convex collider 2.
-
-    Returns
-    -------
-    distance : float
-        Distance between shapes
-
-    closest_point_1
-
-    closest_point_2
-
-    simplex
-
-    """
-    inside, dist, simplex = gjk_nesterov_accelerated(collider1, collider2, ray_guess)
-
-    return dist, None, None, np.array(simplex)[:, 0]
-
 
 # ----- Math helper functions -----
 def norm(v):

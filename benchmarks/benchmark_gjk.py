@@ -4,8 +4,9 @@ import timeit
 import numpy as np
 from distance3d import colliders, random
 from distance3d.gjk import gjk_nesterov_accelerated_intersection, gjk_distance_original, gjk_intersection_jolt
+from numba import config
 
-iterations = 1000
+iterations = 10
 shapes = []
 random_state = np.random.RandomState(84)
 shape_names = list(colliders.COLLIDERS.keys())
@@ -39,8 +40,13 @@ def benchmark_nesterov_accelerated():
 times = timeit.repeat(benchmark_original, repeat=10, number=1)
 print(f"Original Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 
+config.DISABLE_JIT = True
 times = timeit.repeat(benchmark_jolt, repeat=10, number=1)
 print(f"Jolt Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+config.DISABLE_JIT = False
+
+times = timeit.repeat(benchmark_jolt, repeat=10, number=1)
+print(f"Jolt with Numba Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 
 times = timeit.repeat(benchmark_nesterov_accelerated, repeat=10, number=1)
 print(f"Nesterov Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
