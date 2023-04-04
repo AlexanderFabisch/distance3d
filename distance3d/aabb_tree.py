@@ -143,7 +143,7 @@ class AabbTree:
         return len(overlaps) > 0, overlaps
 
     def get_root_aabb(self):
-        """Return the Aabb of the entire tree.
+        """Return the aabb of the entire tree.
 
         Returns
         -------
