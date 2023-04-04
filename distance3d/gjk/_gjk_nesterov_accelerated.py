@@ -84,17 +84,17 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
 
         return check_passed
 
-    def origen_to_point(a_index, a):
+    def origin_to_point(a_index, a):
         nonlocal ray, simplex
         ray = a
         simplex = [simplex[a_index]]
 
-    def origen_to_segment(a_index, b_index, a, b, ab, ab_dot_a0):
+    def origin_to_segment(a_index, b_index, a, b, ab, ab_dot_a0):
         nonlocal ray, simplex
         ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
         simplex = [simplex[b_index], simplex[a_index]]
 
-    def origen_to_triangle(a_index, b_index, c_index, a, b, c, abc, abc_dot_a0):
+    def origin_to_triangle(a_index, b_index, c_index, a, b, c, abc, abc_dot_a0):
         nonlocal ray, simplex
 
         if abc_dot_a0 == 0:
@@ -110,7 +110,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
         ray = -abc_dot_a0 / abc.dot(abc) * abc
         return False
 
-    def project_line_origen(line):
+    def project_line_origin(line):
         # A is the last point we added.
         a_index = 1
         b_index = 0
@@ -127,16 +127,16 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
             #    function did not do any progress and GJK should have stopped.
             #  - A == origin
             # In any case, A is the closest to the origin
-            origen_to_point(a_index, a)
+            origin_to_point(a_index, a)
             return (a == np.array([0, 0, 0])).all()
         if d < 0:
-            origen_to_point(a_index, a)
+            origin_to_point(a_index, a)
         else:
-            origen_to_segment(a_index, b_index, a, b, ab, d)
+            origin_to_segment(a_index, b_index, a, b, ab, d)
 
         return False
 
-    def project_triangle_origen(triangle):
+    def project_triangle_origin(triangle):
         # A is the last point we added.
         a_index = 2
         b_index = 1
@@ -155,15 +155,15 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
         def t_b():
             towards_b = ab.dot(-a)
             if towards_b < 0:
-                origen_to_point(a_index, a)
+                origin_to_point(a_index, a)
             else:
-                origen_to_segment(a_index, b_index, a, b, ab, towards_b)
+                origin_to_segment(a_index, b_index, a, b, ab, towards_b)
 
         if edge_ac2o >= 0:
 
             towards_c = ac.dot(-a)
             if towards_c >= 0:
-                origen_to_segment(a_index, c_index, a, c, ac, towards_c)
+                origin_to_segment(a_index, c_index, a, c, ac, towards_c)
             else:
                 t_b()
         else:
@@ -172,11 +172,11 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
             if edge_ab2o >= 0:
                 t_b()
             else:
-                return origen_to_triangle(a_index, b_index, c_index, a, b, c, abc, abc.dot(-a))
+                return origin_to_triangle(a_index, b_index, c_index, a, b, c, abc, abc.dot(-a))
 
         return False
 
-    def project_tetra_to_origen(tetra):
+    def project_tetra_to_origin(tetra):
         a_index = 3
         b_index = 2
         c_index = 1
@@ -219,25 +219,25 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
             return True
 
         def region_abc():
-            origen_to_triangle(a_index, b_index, c_index, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))
+            origin_to_triangle(a_index, b_index, c_index, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))
 
         def region_acd():
-            origen_to_triangle(a_index, c_index, d_index, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))
+            origin_to_triangle(a_index, c_index, d_index, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))
 
         def region_adb():
-            origen_to_triangle(a_index, d_index, b_index, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))
+            origin_to_triangle(a_index, d_index, b_index, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))
 
         def region_ab():
-            origen_to_segment(a_index, b_index, a, b, b - a, -ba_aa)
+            origin_to_segment(a_index, b_index, a, b, b - a, -ba_aa)
 
         def region_ac():
-            origen_to_segment(a_index, c_index, a, c, c - a, -ca_aa)
+            origin_to_segment(a_index, c_index, a, c, c - a, -ca_aa)
 
         def region_ad():
-            origen_to_segment(a_index, d_index, a, d, d - a, -da_aa)
+            origin_to_segment(a_index, d_index, a, d, d - a, -da_aa)
 
         def region_a():
-            origen_to_point(a_index, a)
+            origin_to_point(a_index, a)
 
         if ba_aa <= 0:
             if -d.dot(a_cross_b) <= 0:
@@ -422,11 +422,11 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
         if len(simplex) == 1:
             ray = support_point[0]
         elif len(simplex) == 2:
-            inside = project_line_origen(simplex)
+            inside = project_line_origin(simplex)
         elif len(simplex) == 3:
-            inside = project_triangle_origen(simplex)
+            inside = project_triangle_origin(simplex)
         elif len(simplex) == 4:
-            inside = project_tetra_to_origen(simplex)
+            inside = project_tetra_to_origin(simplex)
         else:
             print("LOGIC ERROR: invalid simplex len")
 
@@ -442,7 +442,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
 
 
 """
-def project_line_origen(line):
+def project_line_origin(line):
     a = line[0]
     b = line[1]
 
@@ -465,7 +465,7 @@ def project_line_origen(line):
     return [0, 0], 0
 
 
-def project_triangle_origen(triangle):
+def project_triangle_origin(triangle):
     a = triangle[0]
     b = triangle[1]
     c = triangle[2]
@@ -483,7 +483,7 @@ def project_triangle_origen(triangle):
         for i in range(3):
             if triangle[i].dot(np.cross(dl[i], n)) > 0:
                 j = next_index[i]
-                line_parameterization, line_sqr_distance = project_line_origen([triangle[i], triangle[j]])
+                line_parameterization, line_sqr_distance = project_line_origin([triangle[i], triangle[j]])
 
                 if min_dist < 0 or line_sqr_distance < min_dist:
                     min_dist = line_sqr_distance
@@ -507,7 +507,7 @@ def project_triangle_origen(triangle):
     return parameterization, sqr_distance
 
 
-def project_tetra_origen(tetra):
+def project_tetra_origin(tetra):
     def triple(a, b, c):
         return a.dot(np.cross(b, c))
 
@@ -531,7 +531,7 @@ def project_tetra_origen(tetra):
             j = next_index[i]
             s = vl * d.dot(np.cross(dl[i], dl[j]))
             if s > 0:
-                triangle_parameterization, triangle_sqr_distance = project_triangle_origen([tetra[i], tetra[i], d])
+                triangle_parameterization, triangle_sqr_distance = project_triangle_origin([tetra[i], tetra[i], d])
 
                 if min_dist < 0 or triangle_sqr_distance < min_dist:
                     min_dist = triangle_sqr_distance
@@ -552,7 +552,7 @@ def project_tetra_origen(tetra):
         sqr_distance = min_dist
 
     elif not ng:
-        triangle_parameterization, triangle_sqr_distance = project_triangle_origen([a, b, c])
+        triangle_parameterization, triangle_sqr_distance = project_triangle_origin([a, b, c])
         parameterization = [triangle_parameterization[0], triangle_parameterization[1], triangle_parameterization[2], 0]
         sqr_distance = triangle_sqr_distance
 
@@ -587,10 +587,10 @@ def get_closest_points(simplex):
 
     parameterization = None
     if len(simplex) == 3:
-        parameterization, _ = project_triangle_origen(simplex)
+        parameterization, _ = project_triangle_origin(simplex)
 
     elif len(simplex) == 4:
-        parameterization, _ = project_tetra_origen(simplex)
+        parameterization, _ = project_tetra_origin(simplex)
 
     p0 = 0
     p1 = 0
