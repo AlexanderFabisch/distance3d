@@ -29,7 +29,8 @@ from ._broad_phase import HydroelasticBoundingVolumeHierarchy
 
 
 __all__ = [
-    "contact_forces", "find_contact_surface", "RigidBody", "ContactSurface", "HydroelasticBoundingVolumeHierarchy",
+    "contact_forces", "find_contact_surface", "RigidBody", "ContactSurface",
+    "HydroelasticBoundingVolumeHierarchy",
     # exported for unit tests and specific examples:
     "intersect_halfplanes", "plot_halfplanes_and_intersections",
     "center_of_mass_tetrahedral_mesh", "tetrahedral_mesh_aabbs",
