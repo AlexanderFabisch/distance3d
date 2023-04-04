@@ -146,10 +146,19 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
     return inside, distance, simplex
 
 
+@numba.njit(cache=True)
 def origin_to_point(simplex, a_index, a):
     return a, [simplex[a_index]]
 
 
+@numba.njit(cache=True)
+def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
+    ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
+    simplex = [simplex[b_index], simplex[a_index]]
+    return ray, simplex
+
+
+@numba.njit(cache=True)
 def project_line_origin(line):
     # A is the last point we added.
     a_index = 1
@@ -177,17 +186,12 @@ def project_line_origin(line):
     return ray, simplex, False
 
 
+@numba.njit(cache=True)
 def region_a(simplex, a_index, a):
     return origin_to_point(simplex, a_index, a)
 
 
 @numba.njit(cache=True)
-def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
-    ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
-    simplex = [simplex[b_index], simplex[a_index]]
-    return ray, simplex
-
-
 def project_triangle_origin(triangle):
     # A is the last point we added.
     a_index = 2
@@ -222,6 +226,7 @@ def project_triangle_origin(triangle):
     return ray, simplex, False
 
 
+@numba.njit(cache=True)
 def t_b(triangle, a_index, b_index, a, b, ab):
     towards_b = ab.dot(-a)
     if towards_b < 0:
@@ -230,10 +235,11 @@ def t_b(triangle, a_index, b_index, a, b, ab):
         return origin_to_segment(triangle, a_index, b_index, a, b, ab, towards_b)
 
 
+@numba.njit(cache=True)
 def origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, abc, abc_dot_a0):
     if abc_dot_a0 == 0:
         simplex = [simplex[c_index], simplex[b_index], simplex[a_index]]
-        ray = [0, 0, 0]
+        ray = np.zeros(3)
         return ray, simplex, True
 
     if abc_dot_a0 > 0:
@@ -245,30 +251,37 @@ def origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, abc, abc_dot
     return ray, simplex, False
 
 
+@numba.njit(cache=True)
 def region_abc(simplex, a_index, b_index, c_index, a, b, c, a_cross_b):
     return origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))[:2]
 
 
+@numba.njit(cache=True)
 def region_acd(simplex, a_index, c_index, d_index, a, c, d, a_cross_c):
     return origin_to_triangle(simplex, a_index, c_index, d_index, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))[:2]
 
 
+@numba.njit(cache=True)
 def region_adb(simplex, a_index, d_index, b_index, a, d, b, a_cross_b):
     return origin_to_triangle(simplex, a_index, d_index, b_index, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))[:2]
 
 
+@numba.njit(cache=True)
 def region_ab(simplex, a_index, b_index, a, b, ba_aa):
     return origin_to_segment(simplex, a_index, b_index, a, b, b - a, -ba_aa)
 
 
+@numba.njit(cache=True)
 def region_ac(simplex, a_index, c_index, a, c, ca_aa):
     return origin_to_segment(simplex, a_index, c_index, a, c, c - a, -ca_aa)
 
 
+@numba.njit(cache=True)
 def region_ad(simplex, a_index, d_index, a, d, da_aa):
     return origin_to_segment(simplex, a_index, d_index, a, d, d - a, -da_aa)
 
 
+@numba.njit(cache=True)
 def check_convergence(alpha, omega, ray_len, tolerance):
     alpha = max(alpha, omega)
     diff = ray_len - alpha
@@ -278,6 +291,7 @@ def check_convergence(alpha, omega, ray_len, tolerance):
     return check_passed
 
 
+@numba.njit(cache=True)
 def project_tetra_to_origin(tetra):
     a_index = 3
     b_index = 2
