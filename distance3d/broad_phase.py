@@ -41,9 +41,7 @@ class BoundingVolumeHierarchy:
         a robot.
     """
     def __init__(self, tm, base_frame, base_frame2origin=np.eye(4)):
-
         tm.add_transform(base_frame, "origin", base_frame2origin)
-
         self.tm = tm
         self.base_frame = base_frame
         self.base_frame2origin = base_frame2origin
