@@ -419,6 +419,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
                 inside = True
             break
 
+        assert 1 <= len(simplex) <= 4
         if len(simplex) == 1:
             ray = support_point[0]
         elif len(simplex) == 2:
@@ -427,8 +428,6 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
             inside = project_triangle_origin(simplex)
         elif len(simplex) == 4:
             inside = project_tetra_to_origin(simplex)
-        else:
-            print("LOGIC ERROR: invalid simplex len")
 
         if not inside:
             ray_len = np.linalg.norm(ray)
