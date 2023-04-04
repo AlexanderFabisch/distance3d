@@ -1,6 +1,7 @@
 import numpy as np
 
-from distance3d.colliders import MeshGraph
+from ..colliders import MeshGraph
+from ..utils import norm_vector
 
 
 def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
@@ -19,21 +20,6 @@ def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
         Shapes collide
     """
     return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[0]
-
-# ----- Math helper functions -----
-def norm(v):
-    return np.linalg.norm(v)
-
-
-def squared_norm(a):
-    return np.abs(np.square(a)).sum()
-
-
-def normalize(v):
-    norm = np.linalg.norm(v)
-    if norm == 0:
-        return v
-    return v / norm
 
 
 def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
@@ -79,7 +65,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
     if ray_guess is not None:
         ray = ray_guess
 
-    ray_len = norm(ray)
+    ray_len = np.linalg.norm(ray)
     if ray_len < tolerance:
         ray = np.array([1.0, 0.0, 0.0])
         ray_len = 1
@@ -105,7 +91,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
 
     def origen_to_segment(a_index, b_index, a, b, ab, ab_dot_a0):
         nonlocal ray, simplex
-        ray = (ab.dot(b) * a + ab_dot_a0 * b) / squared_norm(ab)
+        ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
         simplex = [simplex[b_index], simplex[a_index]]
 
     def origen_to_triangle(a_index, b_index, c_index, a, b, c, abc, abc_dot_a0):
@@ -121,7 +107,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
         else:
             simplex = [simplex[b_index], simplex[c_index], simplex[a_index]]
 
-        ray = -abc_dot_a0 / squared_norm(abc) * abc
+        ray = -abc_dot_a0 / abc.dot(abc) * abc
         return False
 
     def project_line_origen(line):
@@ -201,7 +187,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
         c = tetra[c_index][0]
         d = tetra[d_index][0]
 
-        aa = squared_norm(a)
+        aa = a.dot(a)
 
         da = d.dot(a)
         db = d.dot(b)
@@ -397,7 +383,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
             ray_dir = momentum * ray_dir + (1 - momentum) * y
 
             if normalize_support_direction:
-                ray_dir = normalize(ray_dir)
+                ray_dir = norm_vector(ray_dir)
 
         else:
             ray_dir = ray
@@ -407,7 +393,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
         support_point = np.array([s0 - s1, s0, s1])
         simplex.append(support_point)
 
-        omega = ray_dir.dot(support_point[0]) / norm(ray_dir)
+        omega = ray_dir.dot(support_point[0]) / np.linalg.norm(ray_dir)
         if omega > upper_bound:
             distance = omega - inflation
             inside = False
@@ -445,7 +431,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
             print("LOGIC ERROR: invalid simplex len")
 
         if not inside:
-            ray_len = norm(ray)
+            ray_len = np.linalg.norm(ray)
 
         if inside or ray_len == 0:
             distance = -inflation
@@ -512,8 +498,8 @@ def project_triangle_origen(triangle):
             o_to_project = n * (d / l)
             min_dist = squared_norm(o_to_project)
 
-            parameterization[0] = normalize(np.cross(dl[1], b - o_to_project)) / s
-            parameterization[1] = normalize(np.cross(dl[2], c - o_to_project)) / s
+            parameterization[0] = norm_vector(np.cross(dl[1], b - o_to_project)) / s
+            parameterization[1] = norm_vector(np.cross(dl[2], c - o_to_project)) / s
             parameterization[2] = 1 - parameterization[0] - parameterization[1]
 
         sqr_distance = min_dist
