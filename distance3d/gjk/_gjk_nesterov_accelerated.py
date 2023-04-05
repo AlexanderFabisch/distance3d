@@ -55,7 +55,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
 
     inflation = 0
 
-    alpha = 0
+    alpha = 0.0
 
     inside = False
     simplex = []
@@ -291,7 +291,9 @@ def region_ad(simplex, a_index, d_index, a, d, da_aa):
     return origin_to_segment(simplex, a_index, d_index, a, d, d - a, -da_aa)
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.bool_(numba.float64, numba.float64, numba.float64, numba.float64),
+    cache=True)
 def check_convergence(alpha, omega, ray_len, tolerance):
     alpha = max(alpha, omega)
     diff = ray_len - alpha
