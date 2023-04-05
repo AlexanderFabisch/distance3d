@@ -171,7 +171,7 @@ def test_gjk_spheres():
     dist, _, _, _ = gjk.gjk_distance_jolt(sphere1, sphere2)
     assert approx(dist) == 1.0
 
-    assert gjk.gjk_nesterov_accelerated_intersection(sphere1, sphere2)
+    assert not gjk.gjk_nesterov_accelerated_intersection(sphere1, sphere2)
     # dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere2)
     # assert approx(dist) == 1.0
 
@@ -306,7 +306,9 @@ def test_gjk_ellipsoids():
 def test_compare_gjk_intersection_flavours_with_random_shapes():
     random_state = np.random.RandomState(84)
     shape_names = list(colliders.COLLIDERS.keys())
-    for _ in range(100):
+    for i in range(100):
+        print(i)
+
         shape1 = shape_names[random_state.randint(len(shape_names))]
         args1 = random.RANDOM_GENERATORS[shape1](random_state)
         shape2 = shape_names[random_state.randint(len(shape_names))]
