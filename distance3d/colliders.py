@@ -686,6 +686,13 @@ class Margin(ConvexCollider):
         maxs = aabb[:, 1] + self.margin
         return np.array([mins, maxs]).T
 
+    def to_dict(self):
+        data = {
+            "type": "Margin",
+            "center": self.center().tolist(),
+        }
+        return data
+
 
 COLLIDERS = {
     "sphere": Sphere,

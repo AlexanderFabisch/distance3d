@@ -140,7 +140,7 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
 
     assert 1 <= simplex_len <= 4
     if simplex_len == 1:
-        ray = support_point[0]
+        ray = np.copy(support_point[0])
     elif simplex_len == 2:
         ray, simplex, simplex_len, inside = project_line_origin(simplex)
     elif simplex_len == 3:
@@ -162,7 +162,7 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
 def origin_to_point(simplex, a_index, a):
     simplex[0] = simplex[a_index]
     simplex_len = 1
-    return a, simplex, simplex_len
+    return np.copy(a), simplex, simplex_len
 
 
 @numba.njit(cache=True)
