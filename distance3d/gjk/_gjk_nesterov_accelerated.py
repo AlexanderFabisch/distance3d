@@ -56,7 +56,6 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
     inflation = 0
 
     alpha = 0
-    omega = 0
 
     inside = False
     simplex = []
@@ -74,10 +73,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
     ray_dir = ray  # d in paper
     support_point = np.array([ray, ray, ray])  # s in paper
 
-    # ----- Actual Algorthm -----
-
     for k in range(max_interations):
-
         if ray_len < tolerance:
             distance = -inflation
             inside = True
@@ -87,10 +83,8 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
             momentum = (k + 1) / (k + 3)
             y = momentum * ray + (1 - momentum) * support_point[0]
             ray_dir = momentum * ray_dir + (1 - momentum) * y
-
             if normalize_support_direction:
                 ray_dir = norm_vector(ray_dir)
-
         else:
             ray_dir = ray
 
@@ -99,51 +93,61 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
         support_point = np.array([s0 - s1, s0, s1])
         simplex.append(support_point)
 
-        omega = ray_dir.dot(support_point[0]) / np.linalg.norm(ray_dir)
-        if omega > upper_bound:
-            distance = omega - inflation
-            inside = False
-            break
-
-        if use_nesterov_acceleration:
-            frank_wolfe_duality_gap = 2 * ray.dot(ray - support_point[0])
-            if frank_wolfe_duality_gap - tolerance <= 0:
-                use_nesterov_acceleration = False
-                simplex.pop()
-                continue
-
-        cv_check_passed = check_convergence(alpha, omega, ray_len, tolerance)
-        if k > 0 and cv_check_passed:
-            if k > 0:
-                simplex.pop()
-            if use_nesterov_acceleration:
-                use_nesterov_acceleration = False
-                continue
-            distance = ray_len - inflation
-
-            if distance < tolerance:
-                inside = True
-            break
-
-        assert 1 <= len(simplex) <= 4
-        if len(simplex) == 1:
-            ray = support_point[0]
-        elif len(simplex) == 2:
-            ray, simplex, inside = project_line_origin(simplex)
-        elif len(simplex) == 3:
-            ray, simplex, inside = project_triangle_origin(simplex)
-        elif len(simplex) == 4:
-            ray, simplex, inside = project_tetra_to_origin(simplex)
-
-        if not inside:
-            ray_len = np.linalg.norm(ray)
-
-        if inside or ray_len == 0:
-            distance = -inflation
-            inside = True
+        distance, inside, ray, ray_len, simplex, use_nesterov_acceleration, converged = iteration(
+            alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
+            simplex, support_point, tolerance, upper_bound,
+            use_nesterov_acceleration)
+        if converged:
             break
 
     return inside, distance, simplex
+
+
+@numba.njit(cache=True)
+def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
+              simplex, support_point, tolerance, upper_bound,
+              use_nesterov_acceleration):
+    omega = ray_dir.dot(support_point[0]) / np.linalg.norm(ray_dir)
+    if omega > upper_bound:
+        distance = omega - inflation
+        inside = False
+        return distance, inside, ray, ray_len, simplex, use_nesterov_acceleration, True
+    if use_nesterov_acceleration:
+        frank_wolfe_duality_gap = 2 * ray.dot(ray - support_point[0])
+        if frank_wolfe_duality_gap - tolerance <= 0:
+            use_nesterov_acceleration = False
+            simplex.pop()
+            return distance, inside, ray, ray_len, simplex, use_nesterov_acceleration, False
+    cv_check_passed = check_convergence(alpha, omega, ray_len, tolerance)
+    if k > 0 and cv_check_passed:
+        if k > 0:
+            simplex.pop()
+        if use_nesterov_acceleration:
+            use_nesterov_acceleration = False
+            return distance, inside, ray, ray_len, simplex, use_nesterov_acceleration, False
+        distance = ray_len - inflation
+
+        if distance < tolerance:
+            inside = True
+        return distance, inside, ray, ray_len, simplex, use_nesterov_acceleration, True
+
+    assert 1 <= len(simplex) <= 4
+    if len(simplex) == 1:
+        ray = support_point[0]
+    elif len(simplex) == 2:
+        ray, simplex, inside = project_line_origin(simplex)
+    elif len(simplex) == 3:
+        ray, simplex, inside = project_triangle_origin(simplex)
+    elif len(simplex) == 4:
+        ray, simplex, inside = project_tetra_to_origin(simplex)
+    if not inside:
+        ray_len = np.linalg.norm(ray)
+    if inside or ray_len == 0:
+        distance = -inflation
+        inside = True
+        return distance, inside, ray, ray_len, simplex, use_nesterov_acceleration, True
+
+    return distance, inside, ray, ray_len, simplex, use_nesterov_acceleration, False
 
 
 @numba.njit(cache=True)
