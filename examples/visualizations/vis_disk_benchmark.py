@@ -4,6 +4,7 @@ Benchmark collision detection for disks
 =======================================
 """
 print(__doc__)
+
 import numpy as np
 from pytransform3d.transform_manager import TransformManager
 import pytransform3d.visualizer as pv
