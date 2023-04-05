@@ -80,11 +80,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
             break
 
         if use_nesterov_acceleration:
-            momentum = (k + 1) / (k + 3)
-            y = momentum * ray + (1 - momentum) * support_point[0]
-            ray_dir = momentum * ray_dir + (1 - momentum) * y
-            if normalize_support_direction:
-                ray_dir = norm_vector(ray_dir)
+            ray_dir = nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_point)
         else:
             ray_dir = ray
 
@@ -101,6 +97,16 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None):
             break
 
     return inside, distance, simplex
+
+
+@numba.njit(cache=True)
+def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_point):
+    momentum = (k + 1) / (k + 3)
+    y = momentum * ray + (1 - momentum) * support_point[0]
+    ray_dir = momentum * ray_dir + (1 - momentum) * y
+    if normalize_support_direction:
+        ray_dir = norm_vector(ray_dir)
+    return ray_dir
 
 
 @numba.njit(cache=True)
