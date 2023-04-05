@@ -181,7 +181,7 @@ def project_line_origin(line):
         #  - A == origin
         # In any case, A is the closest to the origin
         ray, simplex = origin_to_point(line, a_index, a)
-        return ray, simplex, (a == np.array([0, 0, 0])).all()
+        return ray, simplex, np.all(a == 0.0)
     if d < 0:
         ray, simplex = origin_to_point(line, a_index, a)
     else:
