@@ -163,13 +163,22 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
     return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.int64))(
+        numba.float64[:, :, ::1], numba.int64, numba.float64[::1]
+    ),
+    cache=True)
 def origin_to_point(simplex, a_index, a):
     simplex[0] = simplex[a_index]
     return a, 1
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.int64))(
+        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.float64[::1],
+        numba.float64[::1], numba.float64[::1], numba.float64
+    ),
+    cache=True)
 def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
     ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
     # TODO check if swapping works correctly
@@ -178,7 +187,43 @@ def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
     return ray, 2
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.int64, numba.bool_))(
+        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.int64,
+        numba.float64[::1], numba.float64[::1], numba.float64[::1],
+        numba.float64[::1], numba.float64
+    ),
+    cache=True)
+def origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, abc, abc_dot_a0):
+    # TODO check if swapping works correctly
+    if abc_dot_a0 == 0:
+        simplex[0] = simplex[c_index]
+        simplex[1] = simplex[b_index]
+        simplex[2] = simplex[a_index]
+
+        return np.zeros(3), 3, True
+
+    if abc_dot_a0 > 0:
+        simplex[0] = simplex[c_index]
+        simplex[1] = simplex[b_index]
+        simplex[2] = simplex[a_index]
+    else:
+        simplex[0] = simplex[b_index]
+        simplex[1] = simplex[c_index]
+        simplex[2] = simplex[a_index]
+
+    abc_sq_norm = abc.dot(abc)
+    ray = -abc_dot_a0 * abc
+    if abc_sq_norm >= EPSILON:
+        ray /= abc_sq_norm
+    return ray, 3, False
+
+
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.int64, numba.bool_))(
+        numba.float64[:, :, ::1]
+    ),
+    cache=True)
 def project_line_origin(line):
     # A is the last point we added.
     a_index = 1
@@ -206,12 +251,25 @@ def project_line_origin(line):
     return ray, simplex_len, False
 
 
-@numba.njit(cache=True)
-def region_a(simplex, a_index, a):
-    return origin_to_point(simplex, a_index, a)
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.bool_))(
+        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.float64[::1],
+        numba.float64[::1], numba.float64[::1]
+    ),
+    cache=True)
+def t_b(triangle, a_index, b_index, a, b, ab):
+    towards_b = ab.dot(-a)
+    if towards_b < 0:
+        return origin_to_point(triangle, a_index, a)
+    else:
+        return origin_to_segment(triangle, a_index, b_index, a, b, ab, towards_b)
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.int64, numba.bool_))(
+        numba.float64[:, :, ::1]
+    ),
+    cache=True)
 def project_triangle_origin(triangle):
     # A is the last point we added.
     a_index = 2
@@ -246,67 +304,47 @@ def project_triangle_origin(triangle):
     return ray, simplex_len, False
 
 
-@numba.njit(cache=True)
-def t_b(triangle, a_index, b_index, a, b, ab):
-    towards_b = ab.dot(-a)
-    if towards_b < 0:
-        return origin_to_point(triangle, a_index, a)
-    else:
-        return origin_to_segment(triangle, a_index, b_index, a, b, ab, towards_b)
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.bool_))(
+        numba.float64[:, :, ::1], numba.int64, numba.float64[::1]
+    ),
+    cache=True)
+def region_a(simplex, a_index, a):
+    return origin_to_point(simplex, a_index, a)
 
 
-@numba.njit(cache=True)
-def origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, abc, abc_dot_a0):
-    # TODO check if swapping works correctly
-    if abc_dot_a0 == 0:
-        simplex[0] = simplex[c_index]
-        simplex[1] = simplex[b_index]
-        simplex[2] = simplex[a_index]
-
-        return ZERO_DIRECTION, 3, True
-
-    if abc_dot_a0 > 0:
-        simplex[0] = simplex[c_index]
-        simplex[1] = simplex[b_index]
-        simplex[2] = simplex[a_index]
-    else:
-        simplex[0] = simplex[b_index]
-        simplex[1] = simplex[c_index]
-        simplex[2] = simplex[a_index]
-
-    abc_sq_norm = abc.dot(abc)
-    ray = -abc_dot_a0 * abc
-    if abc_sq_norm >= EPSILON:
-        ray /= abc_sq_norm
-    return ray, 3, False
-
-
-@numba.njit(cache=True)
-def region_abc(simplex, a_index, b_index, c_index, a, b, c, a_cross_b):
-    return origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))[:2]
-
-
-@numba.njit(cache=True)
-def region_acd(simplex, a_index, c_index, d_index, a, c, d, a_cross_c):
-    return origin_to_triangle(simplex, a_index, c_index, d_index, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))[:2]
-
-
-@numba.njit(cache=True)
-def region_adb(simplex, a_index, d_index, b_index, a, d, b, a_cross_b):
-    return origin_to_triangle(simplex, a_index, d_index, b_index, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))[:2]
-
-
-@numba.njit(cache=True)
+@numba.njit(
+    cache=True)
 def region_ab(simplex, a_index, b_index, a, b, ba_aa):
     return origin_to_segment(simplex, a_index, b_index, a, b, b - a, -ba_aa)
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    cache=True)
 def region_ac(simplex, a_index, c_index, a, c, ca_aa):
     return origin_to_segment(simplex, a_index, c_index, a, c, c - a, -ca_aa)
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    cache=True)
+def region_abc(simplex, a_index, b_index, c_index, a, b, c, a_cross_b):
+    return origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))[:2]
+
+
+@numba.njit(
+    cache=True)
+def region_acd(simplex, a_index, c_index, d_index, a, c, d, a_cross_c):
+    return origin_to_triangle(simplex, a_index, c_index, d_index, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))[:2]
+
+
+@numba.njit(
+    cache=True)
+def region_adb(simplex, a_index, d_index, b_index, a, d, b, a_cross_b):
+    return origin_to_triangle(simplex, a_index, d_index, b_index, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))[:2]
+
+
+@numba.njit(
+    cache=True)
 def region_ad(simplex, a_index, d_index, a, d, da_aa):
     return origin_to_segment(simplex, a_index, d_index, a, d, d - a, -da_aa)
 
@@ -320,7 +358,11 @@ def check_convergence(alpha, omega, ray_len, tolerance):
     return (diff - tolerance * ray_len) <= 0
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    #numba.types.Tuple((numba.float64[:], numba.int64, numba.bool_))(
+    #    numba.float64[:, :, :]
+    #),
+    cache=True)
 def project_tetra_to_origin(tetra):
     a_index = 3
     b_index = 2
@@ -343,7 +385,6 @@ def project_tetra_to_origin(tetra):
     ca = c.dot(a)
     cb = c.dot(b)
     cc = c.dot(c)
-    cd = dc
     ca_aa = ca - aa
 
     ba = b.dot(a)
@@ -358,6 +399,8 @@ def project_tetra_to_origin(tetra):
     a_cross_b = np.cross(a, b)
     a_cross_c = np.cross(a, c)
 
+    ZERO_DIRECTION = np.zeros(3)
+
     if ba_aa <= 0:
         if -d.dot(a_cross_b) <= 0:
             if ba * da_ba + bd * ba_aa - bb * da_aa <= 0:
@@ -369,7 +412,7 @@ def project_tetra_to_origin(tetra):
                 else:
                     if ba * ba_ca + bb * ca_aa - bc * ba_aa <= 0:
                         if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
-                            if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
+                            if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
                                 ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                             else:
                                 ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
@@ -381,7 +424,7 @@ def project_tetra_to_origin(tetra):
                 if da * da_ba + dd * ba_aa - db * da_aa <= 0:
                     ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                 else:
-                    if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
+                    if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
                             ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
@@ -395,7 +438,7 @@ def project_tetra_to_origin(tetra):
             if c.dot(a_cross_b) <= 0:
                 if ba * ba_ca + bb * ca_aa - bc * ba_aa <= 0:
                     if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
-                        if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
+                        if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
                             ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                         else:
                             ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
@@ -405,7 +448,7 @@ def project_tetra_to_origin(tetra):
                     ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
             else:
                 if d.dot(a_cross_c) <= 0:
-                    if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
+                    if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
                             ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
@@ -421,7 +464,7 @@ def project_tetra_to_origin(tetra):
         if ca_aa <= 0:
             if d.dot(a_cross_c) <= 0:
                 if da_aa <= 0:
-                    if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
+                    if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
                             if da * da_ba + dd * ba_aa - db * da_aa <= 0:
                                 ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
@@ -436,7 +479,7 @@ def project_tetra_to_origin(tetra):
                             ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                 else:
                     if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
-                        if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
+                        if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
                             ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                         else:
                             ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
