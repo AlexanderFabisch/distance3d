@@ -134,9 +134,7 @@ def origin_to_point(simplex, a_index, a):
     cache=True)
 def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
     ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
-    # TODO check if swapping works correctly
-    simplex[0] = simplex[b_index]
-    simplex[1] = simplex[a_index]
+    simplex[0], simplex[1] = simplex[b_index], simplex[a_index]
     return ray, 2
 
 
@@ -148,22 +146,14 @@ def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
     ),
     cache=True)
 def origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, abc, abc_dot_a0):
-    # TODO check if swapping works correctly
     if abc_dot_a0 == 0:
-        simplex[0] = simplex[c_index]
-        simplex[1] = simplex[b_index]
-        simplex[2] = simplex[a_index]
-
+        simplex[0], simplex[1], simplex[2] = simplex[c_index], simplex[b_index], simplex[a_index]
         return np.zeros(3), 3, True
 
     if abc_dot_a0 > 0:
-        simplex[0] = simplex[c_index]
-        simplex[1] = simplex[b_index]
-        simplex[2] = simplex[a_index]
+        simplex[0], simplex[1], simplex[2] = simplex[c_index], simplex[b_index], simplex[a_index]
     else:
-        simplex[0] = simplex[b_index]
-        simplex[1] = simplex[c_index]
-        simplex[2] = simplex[a_index]
+        simplex[0], simplex[1], simplex[2] = simplex[b_index], simplex[c_index], simplex[a_index]
 
     abc_sq_norm = abc.dot(abc)
     ray = -abc_dot_a0 * abc
