@@ -184,8 +184,8 @@ def project_line_origin(line):
     a_index = 1
     b_index = 0
 
-    a = line[a_index][0]
-    b = line[b_index][0]
+    a = line[a_index, 0]
+    b = line[b_index, 0]
 
     ab = b - a
     d = np.dot(ab, -a)
@@ -218,9 +218,9 @@ def project_triangle_origin(triangle):
     b_index = 1
     c_index = 0
 
-    a = triangle[a_index][0]
-    b = triangle[b_index][0]
-    c = triangle[c_index][0]
+    a = triangle[a_index, 0]
+    b = triangle[b_index, 0]
+    c = triangle[c_index, 0]
 
     ab = b - a
     ac = c - a
@@ -332,10 +332,10 @@ def project_tetra_to_origin(tetra):
     c_index = 1
     d_index = 0
 
-    a = tetra[a_index][0]
-    b = tetra[b_index][0]
-    c = tetra[c_index][0]
-    d = tetra[d_index][0]
+    a = tetra[a_index, 0]
+    b = tetra[b_index, 0]
+    c = tetra[c_index, 0]
+    d = tetra[d_index, 0]
 
     aa = a.dot(a)
 
