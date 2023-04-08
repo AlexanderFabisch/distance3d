@@ -54,9 +54,9 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
     alpha = 0.0
 
     inside = False
-    simplex = np.zeros([4, 3, 3], dtype=float)
+    simplex = np.empty([4, 3, 3], dtype=float)
     simplex_len = 0
-    distance = 0
+    distance = 0.0
 
     ray = np.array([1.0, 0.0, 0.0])  # x in paper
     if ray_guess is not None:
