@@ -90,7 +90,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
         support_point = simplex[simplex_len]
         simplex_len += 1
 
-        distance, inside, ray, ray_len, simplex, simplex_len, use_nesterov_acceleration, converged = iteration(
+        distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, converged = iteration(
             alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
             simplex, simplex_len, support_point, tolerance, upper_bound,
             use_nesterov_acceleration)
@@ -118,14 +118,14 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
     if omega > upper_bound:
         distance = omega - inflation
         inside = False
-        return distance, inside, ray, ray_len, simplex, simplex_len, use_nesterov_acceleration, True
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
 
     if use_nesterov_acceleration:
         frank_wolfe_duality_gap = 2 * ray.dot(ray - support_point[0])
         if frank_wolfe_duality_gap - tolerance <= 0:
             use_nesterov_acceleration = False
             simplex_len -= 1
-            return distance, inside, ray, ray_len, simplex, simplex_len, use_nesterov_acceleration, False
+            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
 
     cv_check_passed = check_convergence(alpha, omega, ray_len, tolerance)
     if k > 0 and cv_check_passed:
@@ -133,38 +133,38 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
             simplex_len -= 1
         if use_nesterov_acceleration:
             use_nesterov_acceleration = False
-            return distance, inside, ray, ray_len, simplex, simplex_len, use_nesterov_acceleration, False
+            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
         distance = ray_len - inflation
 
         if distance < tolerance:
             inside = True
-        return distance, inside, ray, ray_len, simplex, simplex_len, use_nesterov_acceleration, True
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
 
     assert 1 <= simplex_len <= 4
     if simplex_len == 1:
         ray = np.copy(support_point[0])
     elif simplex_len == 2:
-        ray, simplex, simplex_len, inside = project_line_origin(simplex)
+        ray, simplex_len, inside = project_line_origin(simplex)
     elif simplex_len == 3:
-        ray, simplex, simplex_len, inside = project_triangle_origin(simplex)
+        ray, simplex_len, inside = project_triangle_origin(simplex)
     elif simplex_len == 4:
-        ray, simplex, simplex_len, inside = project_tetra_to_origin(simplex)
+        ray, simplex_len, inside = project_tetra_to_origin(simplex)
 
     if not inside:
         ray_len = np.linalg.norm(ray)
     if inside or ray_len == 0:
         distance = -inflation
         inside = True
-        return distance, inside, ray, ray_len, simplex, simplex_len, use_nesterov_acceleration, True
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
 
-    return distance, inside, ray, ray_len, simplex, simplex_len, use_nesterov_acceleration, False
+    return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
 
 
 @numba.njit(cache=True)
 def origin_to_point(simplex, a_index, a):
     simplex[0] = simplex[a_index]
     simplex_len = 1
-    return a, simplex, simplex_len
+    return a, simplex_len
 
 
 @numba.njit(cache=True)
@@ -172,8 +172,7 @@ def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
     ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
     simplex[0] = simplex[b_index]
     simplex[1] = simplex[a_index]
-    simplex_len = 2
-    return ray, simplex, simplex_len
+    return ray, 2
 
 
 @numba.njit(cache=True)
@@ -194,14 +193,14 @@ def project_line_origin(line):
         #    function did not do any progress and GJK should have stopped.
         #  - A == origin
         # In any case, A is the closest to the origin
-        ray, simplex, simplex_len = origin_to_point(line, a_index, a)
-        return ray, simplex, simplex_len, np.all(a == 0.0)
+        ray, simplex_len = origin_to_point(line, a_index, a)
+        return ray, simplex_len, np.all(a == 0.0)
     if d < 0:
-        ray, simplex, simplex_len = origin_to_point(line, a_index, a)
+        ray, simplex_len = origin_to_point(line, a_index, a)
     else:
-        ray, simplex, simplex_len = origin_to_segment(line, a_index, b_index, a, b, ab, d)
+        ray, simplex_len = origin_to_segment(line, a_index, b_index, a, b, ab, d)
 
-    return ray, simplex, simplex_len, False
+    return ray, simplex_len, False
 
 
 @numba.njit(cache=True)
@@ -230,18 +229,18 @@ def project_triangle_origin(triangle):
 
         towards_c = ac.dot(-a)
         if towards_c >= 0:
-            ray, simplex, simplex_len = origin_to_segment(triangle, a_index, c_index, a, c, ac, towards_c)
+            ray, simplex_len = origin_to_segment(triangle, a_index, c_index, a, c, ac, towards_c)
         else:
-            ray, simplex, simplex_len = t_b(triangle, a_index, b_index, a, b, ab)
+            ray, simplex_len = t_b(triangle, a_index, b_index, a, b, ab)
     else:
 
         edge_ab2o = np.cross(ab, abc).dot(-a)
         if edge_ab2o >= 0:
-            ray, simplex, simplex_len = t_b(triangle, a_index, b_index, a, b, ab)
+            ray, simplex_len = t_b(triangle, a_index, b_index, a, b, ab)
         else:
             return origin_to_triangle(triangle, a_index, b_index, c_index, a, b, c, abc, abc.dot(-a))
 
-    return ray, simplex, simplex_len, False
+    return ray, simplex_len, False
 
 
 @numba.njit(cache=True)
@@ -262,7 +261,7 @@ def origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, abc, abc_dot
         simplex_len = 3
 
         ray = np.zeros(3)
-        return ray, simplex, simplex_len, True
+        return ray, simplex_len, True
 
     if abc_dot_a0 > 0:
         simplex[0] = simplex[c_index]
@@ -279,22 +278,22 @@ def origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, abc, abc_dot
     ray = -abc_dot_a0 * abc
     if abc_sq_norm >= EPSILON:
         ray /= abc_sq_norm
-    return ray, simplex, simplex_len, False
+    return ray, simplex_len, False
 
 
 @numba.njit(cache=True)
 def region_abc(simplex, a_index, b_index, c_index, a, b, c, a_cross_b):
-    return origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))[:3]
+    return origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))[:2]
 
 
 @numba.njit(cache=True)
 def region_acd(simplex, a_index, c_index, d_index, a, c, d, a_cross_c):
-    return origin_to_triangle(simplex, a_index, c_index, d_index, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))[:3]
+    return origin_to_triangle(simplex, a_index, c_index, d_index, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))[:2]
 
 
 @numba.njit(cache=True)
 def region_adb(simplex, a_index, d_index, b_index, a, d, b, a_cross_b):
-    return origin_to_triangle(simplex, a_index, d_index, b_index, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))[:3]
+    return origin_to_triangle(simplex, a_index, d_index, b_index, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))[:2]
 
 
 @numba.njit(cache=True)
@@ -367,60 +366,60 @@ def project_tetra_to_origin(tetra):
             if ba * da_ba + bd * ba_aa - bb * da_aa <= 0:
                 if da_aa <= 0:
                     if ba * ba_ca + bb * ca_aa - bc * ba_aa <= 0:
-                        ray, simplex, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
+                        ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                     else:
-                        ray, simplex, simplex_len = region_ab(tetra, a_index, b_index, a, b, ba_aa)
+                        ray, simplex_len = region_ab(tetra, a_index, b_index, a, b, ba_aa)
                 else:
                     if ba * ba_ca + bb * ca_aa - bc * ba_aa <= 0:
                         if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
                             if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
-                                ray, simplex, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
+                                ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                             else:
-                                ray, simplex, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
+                                ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                         else:
-                            ray, simplex, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
+                            ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                     else:
-                        ray, simplex, simplex_len = region_ab(tetra, a_index, b_index, a, b, ba_aa)
+                        ray, simplex_len = region_ab(tetra, a_index, b_index, a, b, ba_aa)
             else:
                 if da * da_ba + dd * ba_aa - db * da_aa <= 0:
-                    ray, simplex, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
+                    ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                 else:
                     if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
-                            ray, simplex, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
-                            ray, simplex, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                     else:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
-                            ray, simplex, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
-                            ray, simplex, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
+                            ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
         else:
             if c.dot(a_cross_b) <= 0:
                 if ba * ba_ca + bb * ca_aa - bc * ba_aa <= 0:
                     if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
                         if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
-                            ray, simplex, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                         else:
-                            ray, simplex, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
+                            ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                     else:
-                        ray, simplex, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
+                        ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                 else:
-                    ray, simplex, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
+                    ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
             else:
                 if d.dot(a_cross_c) <= 0:
                     if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
-                            ray, simplex, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
-                            ray, simplex, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                     else:
                         if ca_aa <= 0:
-                            ray, simplex, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
+                            ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                         else:
-                            ray, simplex, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                 else:
-                    return np.zeros(3), tetra, 4, True
+                    return np.zeros(3), 4, True
     else:
         if ca_aa <= 0:
             if d.dot(a_cross_c) <= 0:
@@ -428,68 +427,68 @@ def project_tetra_to_origin(tetra):
                     if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
                             if da * da_ba + dd * ba_aa - db * da_aa <= 0:
-                                ray, simplex, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
+                                ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                             else:
-                                ray, simplex, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
+                                ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
-                            ray, simplex, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                     else:
                         if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
-                            ray, simplex, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
+                            ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                         else:
-                            ray, simplex, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
+                            ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                 else:
                     if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
                         if ca * ca_da + cc * da_aa - cd * ca_aa <= 0:
-                            ray, simplex, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                         else:
-                            ray, simplex, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
+                            ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                     else:
                         if c.dot(a_cross_b):
-                            ray, simplex, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
+                            ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                         else:
-                            ray, simplex, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
             else:
                 if c.dot(a_cross_b) <= 0:
                     if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
-                        ray, simplex, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
+                        ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                     else:
-                        ray, simplex, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
+                        ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                 else:
                     if -d.dot(a_cross_b) <= 0:
                         if da * da_ba + dd * ba_aa - db * da_aa <= 0:
-                            ray, simplex, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
+                            ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                         else:
-                            ray, simplex, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                     else:
-                        return np.zeros(3), tetra, 4, True
+                        return np.zeros(3), 4, True
         else:
             if da_aa <= 0:
                 if -d.dot(a_cross_b) <= 0:
                     if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
                         if da * da_ba + dd * ba_aa - db * da_aa <= 0:
-                            ray, simplex, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
+                            ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                         else:
-                            ray, simplex, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                     else:
                         if d.dot(a_cross_c) <= 0:
-                            ray, simplex, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                         else:
                             if c.dot(a_cross_b) <= 0:  # ???
-                                ray, simplex, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
+                                ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                             else:
-                                ray, simplex , simplex_len= region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
+                                ray, simplex_len= region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                 else:
                     if d.dot(a_cross_c) <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
-                            ray, simplex, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
-                            ray, simplex, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                     else:
-                        return np.zeros(3), tetra, 4, True
+                        return np.zeros(3), 4, True
             else:
-                ray, simplex, simplex_len = region_a(tetra, a_index, a)
-    return ray, simplex, simplex_len, False
+                ray, simplex_len = region_a(tetra, a_index, a)
+    return ray, simplex_len, False
 
 
 def compare_gjk_intersection_flavours_with_random_shapes():
