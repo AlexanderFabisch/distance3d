@@ -68,7 +68,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
         ray_len = 1
 
     ray_dir = ray  # d in paper
-    support_point = np.array([ray, ray, ray])  # s in paper
+    support_point = np.array((ray, ray, ray))  # s in paper
 
     for k in range(max_interations):
         if ray_len < tolerance:
@@ -108,8 +108,9 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
     cache=True)
 def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_point):
     momentum = (k + 1) / (k + 3)
-    y = momentum * ray + (1 - momentum) * support_point[0]
-    ray_dir = momentum * ray_dir + (1 - momentum) * y
+    minv = (1.0 - momentum)
+    y = momentum * ray + minv * support_point[0]
+    ray_dir = momentum * ray_dir + minv * y
     if normalize_support_direction:
         ray_dir = norm_vector(ray_dir)
     return ray_dir
