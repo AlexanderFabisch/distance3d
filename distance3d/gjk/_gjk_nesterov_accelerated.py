@@ -5,6 +5,9 @@ from ..colliders import MeshGraph
 from ..utils import norm_vector, EPSILON
 
 
+ZERO_DIRECTION = np.zeros(3)
+
+
 def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
     """
     Parameters
@@ -260,8 +263,7 @@ def origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, abc, abc_dot
         simplex[2] = simplex[a_index]
         simplex_len = 3
 
-        ray = np.zeros(3)
-        return ray, simplex_len, True
+        return ZERO_DIRECTION, simplex_len, True
 
     if abc_dot_a0 > 0:
         simplex[0] = simplex[c_index]
@@ -419,7 +421,7 @@ def project_tetra_to_origin(tetra):
                         else:
                             ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                 else:
-                    return np.zeros(3), 4, True
+                    return ZERO_DIRECTION, 4, True
     else:
         if ca_aa <= 0:
             if d.dot(a_cross_c) <= 0:
@@ -461,7 +463,7 @@ def project_tetra_to_origin(tetra):
                         else:
                             ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                     else:
-                        return np.zeros(3), 4, True
+                        return ZERO_DIRECTION, 4, True
         else:
             if da_aa <= 0:
                 if -d.dot(a_cross_b) <= 0:
@@ -485,7 +487,7 @@ def project_tetra_to_origin(tetra):
                         else:
                             ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                     else:
-                        return np.zeros(3), 4, True
+                        return ZERO_DIRECTION, 4, True
             else:
                 ray, simplex_len = region_a(tetra, a_index, a)
     return ray, simplex_len, False
