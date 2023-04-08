@@ -1,8 +1,8 @@
 import numpy as np
 import numba
 
-from distance3d.colliders import MeshGraph
-from distance3d.utils import norm_vector
+from ..colliders import MeshGraph
+from ..utils import norm_vector, EPSILON
 
 
 def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
@@ -273,7 +273,10 @@ def origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, abc, abc_dot
         simplex[2] = simplex[a_index]
         simplex_len = 3
 
-    ray = -abc_dot_a0 / abc.dot(abc) * abc
+    abc_sq_norm = abc.dot(abc)
+    ray = -abc_dot_a0 * abc
+    if abc_sq_norm >= EPSILON:
+        ray /= abc_sq_norm
     return ray, simplex, simplex_len, False
 
 
