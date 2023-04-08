@@ -83,9 +83,11 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
 
         s0 = collider1.support_function(-ray_dir)
         s1 = collider2.support_function(ray_dir)
-        support_point = np.array([s0 - s1, s0, s1])
 
-        simplex[simplex_len] = support_point
+        simplex[simplex_len, 0] = s0 - s1
+        simplex[simplex_len, 1] = s0
+        simplex[simplex_len, 2] = s1
+        support_point = simplex[simplex_len]
         simplex_len += 1
 
         distance, inside, ray, ray_len, simplex, simplex_len, use_nesterov_acceleration, converged = iteration(
