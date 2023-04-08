@@ -166,13 +166,13 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
 @numba.njit(cache=True)
 def origin_to_point(simplex, a_index, a):
     simplex[0] = simplex[a_index]
-    simplex_len = 1
-    return a, simplex_len
+    return a, 1
 
 
 @numba.njit(cache=True)
 def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
     ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
+    # TODO check if swapping works correctly
     simplex[0] = simplex[b_index]
     simplex[1] = simplex[a_index]
     return ray, 2
@@ -257,30 +257,28 @@ def t_b(triangle, a_index, b_index, a, b, ab):
 
 @numba.njit(cache=True)
 def origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, abc, abc_dot_a0):
+    # TODO check if swapping works correctly
     if abc_dot_a0 == 0:
         simplex[0] = simplex[c_index]
         simplex[1] = simplex[b_index]
         simplex[2] = simplex[a_index]
-        simplex_len = 3
 
-        return ZERO_DIRECTION, simplex_len, True
+        return ZERO_DIRECTION, 3, True
 
     if abc_dot_a0 > 0:
         simplex[0] = simplex[c_index]
         simplex[1] = simplex[b_index]
         simplex[2] = simplex[a_index]
-        simplex_len = 3
     else:
         simplex[0] = simplex[b_index]
         simplex[1] = simplex[c_index]
         simplex[2] = simplex[a_index]
-        simplex_len = 3
 
     abc_sq_norm = abc.dot(abc)
     ray = -abc_dot_a0 * abc
     if abc_sq_norm >= EPSILON:
         ray /= abc_sq_norm
-    return ray, simplex_len, False
+    return ray, 3, False
 
 
 @numba.njit(cache=True)
@@ -319,10 +317,7 @@ def region_ad(simplex, a_index, d_index, a, d, da_aa):
 def check_convergence(alpha, omega, ray_len, tolerance):
     alpha = max(alpha, omega)
     diff = ray_len - alpha
-
-    check_passed = (diff - tolerance * ray_len) <= 0
-
-    return check_passed
+    return (diff - tolerance * ray_len) <= 0
 
 
 @numba.njit(cache=True)
