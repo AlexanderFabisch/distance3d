@@ -5,9 +5,6 @@ from ..colliders import MeshGraph
 from ..utils import norm_vector, EPSILON
 
 
-ZERO_DIRECTION = np.zeros(3)
-
-
 def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
     """
     Parameters
@@ -103,7 +100,12 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
     return inside, distance, simplex
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.float64[::1](
+        numba.int64, numba.bool_, numba.float64[::1], numba.float64[::1],
+        numba.float64[:, ::1]
+    ),
+    cache=True)
 def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_point):
     momentum = (k + 1) / (k + 3)
     y = momentum * ray + (1 - momentum) * support_point[0]
@@ -111,56 +113,6 @@ def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_poi
     if normalize_support_direction:
         ray_dir = norm_vector(ray_dir)
     return ray_dir
-
-
-@numba.njit(cache=True)
-def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
-              simplex, simplex_len, support_point, tolerance, upper_bound,
-              use_nesterov_acceleration):
-    omega = ray_dir.dot(support_point[0]) / np.linalg.norm(ray_dir)
-    if omega > upper_bound:
-        distance = omega - inflation
-        inside = False
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
-
-    if use_nesterov_acceleration:
-        frank_wolfe_duality_gap = 2 * ray.dot(ray - support_point[0])
-        if frank_wolfe_duality_gap - tolerance <= 0:
-            use_nesterov_acceleration = False
-            simplex_len -= 1
-            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
-
-    cv_check_passed = check_convergence(alpha, omega, ray_len, tolerance)
-    if k > 0 and cv_check_passed:
-        if k > 0:
-            simplex_len -= 1
-        if use_nesterov_acceleration:
-            use_nesterov_acceleration = False
-            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
-        distance = ray_len - inflation
-
-        if distance < tolerance:
-            inside = True
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
-
-    assert 1 <= simplex_len <= 4
-    if simplex_len == 1:
-        ray = np.copy(support_point[0])
-    elif simplex_len == 2:
-        ray, simplex_len, inside = project_line_origin(simplex)
-    elif simplex_len == 3:
-        ray, simplex_len, inside = project_triangle_origin(simplex)
-    elif simplex_len == 4:
-        ray, simplex_len, inside = project_tetra_to_origin(simplex)
-
-    if not inside:
-        ray_len = np.linalg.norm(ray)
-    if inside or ray_len == 0:
-        distance = -inflation
-        inside = True
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
-
-    return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
 
 
 @numba.njit(
@@ -314,39 +266,66 @@ def region_a(simplex, a_index, a):
 
 
 @numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.bool_))(
+        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.float64[::1],
+        numba.float64[::1], numba.float64
+    ),
     cache=True)
 def region_ab(simplex, a_index, b_index, a, b, ba_aa):
     return origin_to_segment(simplex, a_index, b_index, a, b, b - a, -ba_aa)
 
 
 @numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.bool_))(
+        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.float64[::1],
+        numba.float64[::1], numba.float64
+    ),
     cache=True)
 def region_ac(simplex, a_index, c_index, a, c, ca_aa):
     return origin_to_segment(simplex, a_index, c_index, a, c, c - a, -ca_aa)
 
 
 @numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.bool_))(
+        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.float64[::1],
+        numba.float64[::1], numba.float64
+    ),
+    cache=True)
+def region_ad(simplex, a_index, d_index, a, d, da_aa):
+    return origin_to_segment(simplex, a_index, d_index, a, d, d - a, -da_aa)
+
+
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.bool_))(
+        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.int64,
+        numba.float64[::1], numba.float64[::1], numba.float64[::1],
+        numba.float64[::1]
+    ),
     cache=True)
 def region_abc(simplex, a_index, b_index, c_index, a, b, c, a_cross_b):
     return origin_to_triangle(simplex, a_index, b_index, c_index, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))[:2]
 
 
 @numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.bool_))(
+        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.int64,
+        numba.float64[::1], numba.float64[::1], numba.float64[::1],
+        numba.float64[::1]
+    ),
     cache=True)
 def region_acd(simplex, a_index, c_index, d_index, a, c, d, a_cross_c):
     return origin_to_triangle(simplex, a_index, c_index, d_index, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))[:2]
 
 
 @numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.bool_))(
+        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.int64,
+        numba.float64[::1], numba.float64[::1], numba.float64[::1],
+        numba.float64[::1]
+    ),
     cache=True)
 def region_adb(simplex, a_index, d_index, b_index, a, d, b, a_cross_b):
     return origin_to_triangle(simplex, a_index, d_index, b_index, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))[:2]
-
-
-@numba.njit(
-    cache=True)
-def region_ad(simplex, a_index, d_index, a, d, da_aa):
-    return origin_to_segment(simplex, a_index, d_index, a, d, d - a, -da_aa)
 
 
 @numba.njit(
@@ -359,9 +338,9 @@ def check_convergence(alpha, omega, ray_len, tolerance):
 
 
 @numba.njit(
-    #numba.types.Tuple((numba.float64[:], numba.int64, numba.bool_))(
-    #    numba.float64[:, :, :]
-    #),
+    numba.types.Tuple((numba.float64[::1], numba.int64, numba.bool_))(
+        numba.float64[:, :, ::1]
+    ),
     cache=True)
 def project_tetra_to_origin(tetra):
     a_index = 3
@@ -398,8 +377,6 @@ def project_tetra_to_origin(tetra):
 
     a_cross_b = np.cross(a, b)
     a_cross_c = np.cross(a, c)
-
-    ZERO_DIRECTION = np.zeros(3)
 
     if ba_aa <= 0:
         if -d.dot(a_cross_b) <= 0:
@@ -459,7 +436,7 @@ def project_tetra_to_origin(tetra):
                         else:
                             ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                 else:
-                    return ZERO_DIRECTION, 4, True
+                    return np.zeros(3), 4, True
     else:
         if ca_aa <= 0:
             if d.dot(a_cross_c) <= 0:
@@ -501,7 +478,7 @@ def project_tetra_to_origin(tetra):
                         else:
                             ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                     else:
-                        return ZERO_DIRECTION, 4, True
+                        return np.zeros(3), 4, True
         else:
             if da_aa <= 0:
                 if -d.dot(a_cross_b) <= 0:
@@ -525,10 +502,69 @@ def project_tetra_to_origin(tetra):
                         else:
                             ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                     else:
-                        return ZERO_DIRECTION, 4, True
+                        return np.zeros(3), 4, True
             else:
                 ray, simplex_len = region_a(tetra, a_index, a)
     return ray, simplex_len, False
+
+
+@numba.njit(
+    numba.types.Tuple((
+            numba.float64, numba.bool_, numba.float64[::1], numba.float64,
+            numba.int64, numba.bool_, numba.bool_))(
+        numba.float64, numba.float64, numba.float64, numba.bool_, numba.int64,
+        numba.float64[::1], numba.float64[::1], numba.float64,
+        numba.float64[:, :, ::1], numba.int64, numba.float64[:, ::1],
+        numba.float64, numba.float64, numba.bool_
+    ),
+    cache=True)
+def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
+              simplex, simplex_len, support_point, tolerance, upper_bound,
+              use_nesterov_acceleration):
+    omega = ray_dir.dot(support_point[0]) / np.linalg.norm(ray_dir)
+    if omega > upper_bound:
+        distance = omega - inflation
+        inside = False
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
+
+    if use_nesterov_acceleration:
+        frank_wolfe_duality_gap = 2 * ray.dot(ray - support_point[0])
+        if frank_wolfe_duality_gap - tolerance <= 0:
+            use_nesterov_acceleration = False
+            simplex_len -= 1
+            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
+
+    cv_check_passed = check_convergence(alpha, omega, ray_len, tolerance)
+    if k > 0 and cv_check_passed:
+        if k > 0:
+            simplex_len -= 1
+        if use_nesterov_acceleration:
+            use_nesterov_acceleration = False
+            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
+        distance = ray_len - inflation
+
+        if distance < tolerance:
+            inside = True
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
+
+    assert 1 <= simplex_len <= 4
+    if simplex_len == 1:
+        ray = np.copy(support_point[0])
+    elif simplex_len == 2:
+        ray, simplex_len, inside = project_line_origin(simplex)
+    elif simplex_len == 3:
+        ray, simplex_len, inside = project_triangle_origin(simplex)
+    elif simplex_len == 4:
+        ray, simplex_len, inside = project_tetra_to_origin(simplex)
+
+    if not inside:
+        ray_len = np.linalg.norm(ray)
+    if inside or ray_len == 0:
+        distance = -inflation
+        inside = True
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
+
+    return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
 
 
 def compare_gjk_intersection_flavours_with_random_shapes():
