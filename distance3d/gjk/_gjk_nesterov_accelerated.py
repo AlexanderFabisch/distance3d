@@ -164,7 +164,7 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
 def origin_to_point(simplex, a_index, a):
     simplex[0] = simplex[a_index]
     simplex_len = 1
-    return np.copy(a), simplex, simplex_len
+    return a, simplex, simplex_len
 
 
 @numba.njit(cache=True)
