@@ -102,7 +102,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
     cache=True)
 def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_point):
     momentum = (k + 1) / (k + 3)
-    minv = (1.0 - momentum)
+    minv = 1.0 - momentum
     y = momentum * ray + minv * support_point[0]
     ray_dir = momentum * ray_dir + minv * y
     if normalize_support_direction:
