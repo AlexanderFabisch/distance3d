@@ -84,16 +84,10 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
         s0 = collider1.support_function(-ray_dir)
         s1 = collider2.support_function(ray_dir)
 
-        simplex[simplex_len, 0] = s0 - s1
-        simplex[simplex_len, 1] = s0
-        simplex[simplex_len, 2] = s1
-        support_point = simplex[simplex_len]
-        simplex_len += 1
-
         distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, converged = iteration(
             alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
-            simplex, simplex_len, support_point, tolerance, upper_bound,
-            use_nesterov_acceleration)
+            simplex, simplex_len, tolerance, upper_bound,
+            use_nesterov_acceleration, s0, s1)
         if converged:
             break
 
@@ -505,13 +499,19 @@ def project_tetra_to_origin(tetra):
             numba.int64, numba.bool_, numba.bool_))(
         numba.float64, numba.float64, numba.float64, numba.bool_, numba.int64,
         numba.float64[::1], numba.float64[::1], numba.float64,
-        numba.float64[:, :, ::1], numba.int64, numba.float64[:, ::1],
-        numba.float64, numba.float64, numba.bool_
+        numba.float64[:, :, ::1], numba.int64, numba.float64, numba.float64,
+        numba.bool_, numba.float64[::1], numba.float64[::1]
     ),
     cache=True)
 def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
-              simplex, simplex_len, support_point, tolerance, upper_bound,
-              use_nesterov_acceleration):
+              simplex, simplex_len, tolerance, upper_bound,
+              use_nesterov_acceleration, s0, s1):
+    simplex[simplex_len, 0] = s0 - s1
+    simplex[simplex_len, 1] = s0
+    simplex[simplex_len, 2] = s1
+    support_point = simplex[simplex_len]
+    simplex_len += 1
+
     omega = ray_dir.dot(support_point[0]) / np.linalg.norm(ray_dir)
     if omega > upper_bound:
         distance = omega - inflation
