@@ -241,7 +241,7 @@ class MeshGraph(ConvexCollider):
     def to_dict(self):
         data = {
             "type": "Mesh",
-            "center": self.center().tolist(),
+            "collider2origin": self.mesh2origin.tolist(),
             "vertices": self.vertices.tolist(),
             "triangles": self.triangles.tolist()
         }
@@ -352,7 +352,7 @@ class Capsule(ConvexCollider):
     def to_dict(self):
         data = {
             "type": "Capsule",
-            "center": self.center().tolist(),
+            "collider2origin": self.capsule2origin.tolist(),
             "radius": self.radius,
             "height": self.height
         }
@@ -405,7 +405,7 @@ class Ellipsoid(ConvexCollider):
     def to_dict(self):
         data = {
             "type": "Ellipsoid",
-            "center": self.center().tolist(),
+            "collider2origin": self.ellipsoid2origin.tolist(),
             "radii": self.radii.tolist()
         }
         return data
@@ -463,7 +463,7 @@ class Cylinder(ConvexCollider):
     def to_dict(self):
         data = {
             "type": "Cylinder",
-            "center": self.center().tolist(),
+            "collider2origin": self.cylinder2origin.tolist(),
             "radius": self.radius,
             "height": self.length
         }
@@ -640,7 +640,7 @@ class Cone(ConvexCollider):
     def to_dict(self):
         data = {
             "type": "Cone",
-            "center": self.center().tolist(),
+            "collider2origin": self.cone2origin.tolist(),
             "radius": self.radius,
             "height": self.height
         }

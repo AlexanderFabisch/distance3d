@@ -112,6 +112,7 @@ def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_poi
 def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
               simplex, simplex_len, support_point, tolerance, upper_bound,
               use_nesterov_acceleration):
+
     omega = ray_dir.dot(support_point[0]) / np.linalg.norm(ray_dir)
     if omega > upper_bound:
         distance = omega - inflation
