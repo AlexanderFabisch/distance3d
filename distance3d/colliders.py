@@ -105,6 +105,11 @@ class ConvexCollider(abc.ABC):
             data dict
         """
 
+    @abc.abstractmethod
+    def round_values(self, precision):
+        """Rounds the values of the collider to a sertion precision.
+        """
+
 
 class ConvexHullVertices(ConvexCollider):
     """Convex hull of a set of vertices.
@@ -142,11 +147,14 @@ class ConvexHullVertices(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "type": "ConvexHullVertices",
+            "typ": "ConvexHullVertices",
             "center": self.center().tolist(),
             "vertices": self.vertices.tolist()
         }
         return data
+
+    def round_values(self, precision):
+        self.vertices = np.round(self.vertices, precision)
 
 
 class Box(ConvexHullVertices):
@@ -240,12 +248,16 @@ class MeshGraph(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "type": "Mesh",
+            "typ": "Mesh",
             "collider2origin": self.mesh2origin.tolist(),
             "vertices": self.vertices.tolist(),
             "triangles": self.triangles.tolist()
         }
         return data
+
+    def round_values(self, precision):
+        self.mesh2origin = np.round(self.mesh2origin, precision)
+        self.vertices = np.round(self.vertices, precision)
 
 
 class Sphere(ConvexCollider):
@@ -293,11 +305,15 @@ class Sphere(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "type": "Sphere",
+            "typ": "Sphere",
             "center": self.center().tolist(),
             "radius": self.radius
         }
         return data
+
+    def round_values(self, precision):
+        self.c = np.round(self.c, precision)
+        self.radius = np.round(self.radius, precision)
 
 
 class Capsule(ConvexCollider):
@@ -351,12 +367,17 @@ class Capsule(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "type": "Capsule",
+            "typ": "Capsule",
             "collider2origin": self.capsule2origin.tolist(),
             "radius": self.radius,
             "height": self.height
         }
         return data
+
+    def round_values(self, precision):
+        self.capsule2origin = np.round(self.capsule2origin, precision)
+        self.radius = np.round(self.radius, precision)
+        self.height = np.round(self.height, precision)
 
 
 class Ellipsoid(ConvexCollider):
@@ -404,11 +425,15 @@ class Ellipsoid(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "type": "Ellipsoid",
+            "typ": "Ellipsoid",
             "collider2origin": self.ellipsoid2origin.tolist(),
             "radii": self.radii.tolist()
         }
         return data
+
+    def round_values(self, precision):
+        self.ellipsoid2origin = np.round(self.ellipsoid2origin, precision)
+        self.radii = np.round(self.radii, precision)
 
 
 class Cylinder(ConvexCollider):
@@ -462,12 +487,17 @@ class Cylinder(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "type": "Cylinder",
+            "typ": "Cylinder",
             "collider2origin": self.cylinder2origin.tolist(),
             "radius": self.radius,
             "height": self.length
         }
         return data
+
+    def round_values(self, precision):
+        self.cylinder2origin = np.round(self.cylinder2origin, precision)
+        self.radius = np.round(self.radius, precision)
+        self.length = np.round(self.length, precision)
 
 
 class Disk(ConvexCollider):
@@ -525,12 +555,17 @@ class Disk(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "type": "Disk",
+            "typ": "Disk",
             "center": self.center().tolist(),
             "radius": self.radius,
             "normal": self.normal.tolist()
         }
         return data
+
+    def round_values(self, precision):
+        self.c = np.round(self.c, precision)
+        self.radius = np.round(self.radius, precision)
+        self.normal = np.round(self.normal, precision)
 
 
 class Ellipse(ConvexCollider):
@@ -581,12 +616,17 @@ class Ellipse(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "type": "Ellipse",
+            "typ": "Ellipse",
             "center": self.center().tolist(),
             "axes": self.axes.tolist(),
             "radii": self.radii.tolist()
         }
         return data
+
+    def round_values(self, precision):
+        self.c = np.round(self.c, precision)
+        self.axes = np.round(self.axes, precision)
+        self.radii = np.round(self.radii, precision)
 
 
 class Cone(ConvexCollider):
@@ -639,12 +679,17 @@ class Cone(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "type": "Cone",
-            "collider2origin": self.cone2origin.tolist(),
+            "typ": "Cone",
+            "collider2origin": self.cone2origin.around(),
             "radius": self.radius,
             "height": self.height
         }
         return data
+
+    def round_values(self, precision):
+        self.cone2origin = np.round(self.cone2origin, precision)
+        self.radius = np.round(self.radius, precision)
+        self.height = np.round(self.height, precision)
 
 
 class Margin(ConvexCollider):
@@ -693,6 +738,10 @@ class Margin(ConvexCollider):
             "margin": self.margin,
         }
         return data
+
+    def round_values(self, precision):
+        self.collider.round_values(precision)
+        self.margin = np.round(self.margin, precision)
 
 
 COLLIDERS = {

@@ -6,7 +6,7 @@ from distance3d import colliders, random
 from distance3d.gjk import gjk_nesterov_accelerated_intersection, gjk_distance_original, gjk_intersection_jolt
 from numba import config
 
-iterations = 10
+iterations = 100
 shapes = []
 random_state = np.random.RandomState(84)
 shape_names = list(colliders.COLLIDERS.keys())

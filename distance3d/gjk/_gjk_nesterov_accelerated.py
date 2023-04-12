@@ -23,6 +23,24 @@ def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
     return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[0]
 
 
+def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None):
+    """
+    Parameters
+    ----------
+    collider1 : ConvexCollider
+        Convex collider 1.
+
+    collider2 : ConvexCollider
+        Convex collider 2.
+
+    Returns
+    -------
+    contact : bool
+        Shapes collide
+    """
+    return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[1]
+
+
 def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interations=100, upper_bound=1000000000, tolerance=1e-6):
     """
     Parameters
@@ -70,7 +88,11 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
     ray_dir = ray  # d in paper
     support_point = np.array([ray, ray, ray])  # s in paper
 
+    i = 0
+
     for k in range(max_interations):
+        i = k
+
         if ray_len < tolerance:
             distance = -inflation
             inside = True
