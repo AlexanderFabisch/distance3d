@@ -142,6 +142,16 @@ class AabbTree:
         overlaps = query_overlap(aabb, self.root, self.nodes, self.aabbs)
         return len(overlaps) > 0, overlaps
 
+    def get_root_aabb(self):
+        """Return the aabb of the entire tree.
+
+        Returns
+        -------
+        aabb : array, shape (3, 2)
+            The aabb of the root node.
+        """
+        return self.aabbs[self.root]
+
 
 @numba.njit(cache=True)
 def insert_aabbs(root, nodes, aabbs, filled_len, insert_order):

@@ -3,14 +3,12 @@
 Visualize Subdivision of the AABB Tree
 ======================================
 """
-from distance3d.aabb_tree import AabbTree
-
 print(__doc__)
 
+from distance3d.aabb_tree import AabbTree
 import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import visualization, hydroelastic_contact
-
 
 def get_leafs_of_node(node_index, nodes):
     if nodes[node_index, 3] == 1:

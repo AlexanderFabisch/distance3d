@@ -2,13 +2,15 @@
 branch = True
 source = distance3d
 omit =
-    */setup.py
+    setup.py
     distance3d/plotting.py
-    distance3d/test/*
 
 [report]
 omit =
+    bin/*
+    examples/*
     distance3d/plotting.py
+    distance3d/test/*
 exclude_lines =
     pragma: no cover
     except ImportError:

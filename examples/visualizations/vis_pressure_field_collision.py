@@ -2,11 +2,9 @@
 ====================================
 Physical Simulation of Bouncing Ball
 ====================================
-
-A rubber ball bouncing on a wooden box.
 """
-
 print(__doc__)
+
 import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import visualization, hydroelastic_contact
@@ -29,7 +27,7 @@ class PhysicsObject:
 
         self.acceleration = np.zeros(3, dtype=float)
         self.velocity = velocity
-        self.artist = artist
+        self.artist_ = artist
 
     def step(self, forces=[]):
         if self.fixed:
@@ -41,8 +39,8 @@ class PhysicsObject:
         self.acceleration = np.add.reduce(forces) / self.mass
         self.velocity += dt * self.acceleration
         self.rigid_body.body2origin_[:3, 3] += self.velocity * dt
-        self.artist.set_data(self.rigid_body.body2origin_, self.rigid_body.vertices_,
-                             self.rigid_body.tetrahedra_)
+        self.artist_.set_data(self.rigid_body.body2origin_, self.rigid_body.vertices_,
+                              self.rigid_body.tetrahedra_)
 
 
 class AnimationCallback:
@@ -75,7 +73,7 @@ class AnimationCallback:
         self.p_object1.step([wrench21[:3]])
         self.p_object2.step([wrench12[:3]])
 
-        return [self.p_object1.artist, self.p_object2.artist, self.contact_surface]
+        return [self.p_object1.artist_, self.p_object2.artist_, self.contact_surface]
 
 
 def make_object(rigid_body, mass, acc, fixed):
