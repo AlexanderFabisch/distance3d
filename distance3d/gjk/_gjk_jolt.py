@@ -26,7 +26,10 @@ class GjkState(Enum):
     Clipped = 3
 
 
-def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10):
+def gjk_intersection_jolt_iterations(collider1, collider2):
+    return gjk_intersection_jolt(collider1, collider2, return_iterations=True)
+
+def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10, return_iterations=False):
     """Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.
 
     This implementation differs in several ways from the libccd version:
@@ -68,7 +71,9 @@ def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10):
     prev_v_len_sq = MAX_FLOAT
     search_direction = np.array([1.0, 0.0, 0.0])
 
+    iterations = 0
     while True:
+        iterations += 1
         # Get support points for shape A and B in search direction
         p = collider1.support_function(search_direction)
         q = collider2.support_function(-search_direction)
@@ -77,6 +82,9 @@ def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10):
         if state == GjkState.Unknown:
             continue
         else:
+            if return_iterations:
+                return iterations
+
             return state == GjkState.Intersection
 
 

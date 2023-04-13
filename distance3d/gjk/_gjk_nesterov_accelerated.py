@@ -5,7 +5,7 @@ from distance3d.colliders import MeshGraph
 from distance3d.utils import norm_vector
 
 
-def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
+def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None, print_iterations=False):
     """
     Parameters
     ----------
@@ -20,10 +20,10 @@ def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
     contact : bool
         Shapes collide
     """
-    return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[0]
+    return gjk_nesterov_accelerated(collider1, collider2, ray_guess, print_iterations)[0]
 
 
-def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None):
+def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None, print_iterations=False):
     """
     Parameters
     ----------
@@ -38,10 +38,14 @@ def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None):
     contact : bool
         Shapes collide
     """
-    return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[1]
+    return gjk_nesterov_accelerated(collider1, collider2, ray_guess, print_iterations)[1]
 
 
-def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interations=100, upper_bound=1000000000, tolerance=1e-6):
+def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
+    return gjk_nesterov_accelerated(collider1, collider2, ray_guess, return_iterations=True)
+
+
+def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interations=100, upper_bound=1000000000, tolerance=1e-6, return_iterations=False):
     """
     Parameters
     ----------
@@ -116,6 +120,9 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
             use_nesterov_acceleration)
         if converged:
             break
+
+    if return_iterations:
+        return i
 
     return inside, distance, simplex
 

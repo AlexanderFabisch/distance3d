@@ -5,7 +5,11 @@ import numpy as np
 EPSILON = 10.0 * np.finfo(float).eps
 
 
-def gjk_distance_original(collider1, collider2):
+def gjk_distance_iterations(collider1, collider2):
+    return gjk_distance_original(collider1, collider2, return_interations=True)
+
+
+def gjk_distance_original(collider1, collider2, return_interations=False):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
 
     The original implementation is quite slow, since the distance subalgorithm
@@ -85,6 +89,9 @@ def gjk_distance_original(collider1, collider2):
                     distance = 0.0
                 else:
                     distance = new_solution.distance
+
+                if return_interations:
+                    return iteration
 
                 return distance, closest_point1, closest_point2, simplex.points
             else:
