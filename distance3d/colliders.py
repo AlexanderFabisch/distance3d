@@ -193,6 +193,18 @@ class Box(ConvexHullVertices):
     def aabb(self):
         return np.array(box_aabb(self.box2origin, self.size)).T
 
+    def to_dict(self):
+        data = {
+            "typ": "Box",
+            "collider2origin": self.box2origin.tolist(),
+            "vertices": self.vertices.tolist()
+        }
+        return data
+
+    def round_values(self, precision):
+        self.box2origin = np.round(self.box2origin, precision)
+        self.vertices = np.round(self.vertices, precision)
+
 
 class MeshGraph(ConvexCollider):
     """Mesh collider that uses triangles for hill climbing.

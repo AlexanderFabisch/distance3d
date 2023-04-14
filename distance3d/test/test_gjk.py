@@ -143,8 +143,8 @@ def test_gjk_spheres():
     assert approx(dist) == 0.0
 
     assert gjk.gjk_nesterov_accelerated_intersection(sphere1, sphere1)
-    # dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere1)
-    # assert approx(dist) == 0.0
+    dist = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere1)
+    assert approx(dist) == 0.0
 
     sphere2 = colliders.Sphere(center=np.array([1, 1, 1], dtype=float), radius=1.0)
     dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
@@ -157,8 +157,8 @@ def test_gjk_spheres():
     assert approx(dist) == 0.0
 
     assert gjk.gjk_nesterov_accelerated_intersection(sphere1, sphere2)
-    # dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere2)
-    # assert approx(dist) == 0.0
+    dist = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere2)
+    assert approx(dist) == 0.0
 
     sphere1 = colliders.Sphere(center=np.array([0, 0, 0], dtype=float), radius=1.0)
     sphere2 = colliders.Sphere(center=np.array([0, 0, 3], dtype=float), radius=1.0)
@@ -172,8 +172,8 @@ def test_gjk_spheres():
     assert approx(dist) == 1.0
 
     assert not gjk.gjk_nesterov_accelerated_intersection(sphere1, sphere2)
-    # dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere2)
-    # assert approx(dist) == 1.0
+    dist = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere2)
+    assert approx(dist) == 1.0
 
 
 def test_gjk_cylinders():
@@ -188,8 +188,8 @@ def test_gjk_cylinders():
     assert approx(dist) == 0
 
     assert gjk.gjk_nesterov_accelerated_intersection(cylinder1, cylinder1)
-    # dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(cylinder1, cylinder1)
-    # assert approx(dist) == 0
+    dist = gjk.gjk_nesterov_accelerated_distance(cylinder1, cylinder1)
+    assert approx(dist) == 0
 
 
     A2B = np.eye(4)
@@ -221,8 +221,8 @@ def test_gjk_cylinders():
     assert approx(dist) == 3
 
     assert not gjk.gjk_nesterov_accelerated_intersection(cylinder1, cylinder2)
-    # dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(cylinder1, cylinder2)
-    # assert approx(dist) == 3
+    dist = gjk.gjk_nesterov_accelerated_distance(cylinder1, cylinder2)
+    assert approx(dist) == 3
 
 
 def test_gjk_capsules():
@@ -236,8 +236,8 @@ def test_gjk_capsules():
     assert approx(dist) == 0
 
     assert gjk.gjk_nesterov_accelerated_intersection(capsule1, capsule1)
-    # dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule1)
-    # assert approx(dist) == 0
+    dist = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule1)
+    assert approx(dist) == 0
 
 
     A2B = np.eye(4)
@@ -253,8 +253,8 @@ def test_gjk_capsules():
     assert approx(dist) == 1
 
     assert not gjk.gjk_nesterov_accelerated_intersection(capsule1, capsule2)
-    # dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule2)
-    # assert approx(dist) == 1
+    dist = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule2)
+    assert approx(dist) == 1
 
 
     A2B = np.eye(4)
@@ -270,8 +270,8 @@ def test_gjk_capsules():
     assert approx(dist) == 1
 
     assert not gjk.gjk_nesterov_accelerated_intersection(capsule1, capsule2)
-    # dist, _, _, _ = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule2)
-    # assert approx(dist) == 1
+    dist = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule2)
+    assert approx(dist) == 1
 
 
 def test_gjk_ellipsoids():
@@ -337,12 +337,11 @@ def test_compare_gjk_distance_flavours_with_random_shapes():
 
         dist_jolt, cp1_jolt, cp2_jolt, _ = gjk.gjk_distance_jolt(collider1, collider2)
         dist_orig, cp1_orig, cp2_orig, _ = gjk.gjk_distance_original(collider1, collider2)
-        # dist_nesterov, cp1_nesterov, cp2_nesterov, _ = gjk.gjk_nesterov_accelerated_distance(collider1, collider2)
+        dist_nesterov = gjk.gjk_nesterov_accelerated_distance(collider1, collider2)
         assert approx(dist_jolt) == dist_orig
         assert approx(np.linalg.norm(cp1_orig - cp2_orig)) == np.linalg.norm(cp1_jolt - cp2_jolt)
 
-        # assert approx(dist_nesterov) == dist_orig
-        # assert approx(np.linalg.norm(cp1_nesterov - cp2_nesterov)) == np.linalg.norm(cp1_jolt - cp2_jolt)
+        assert approx(dist_nesterov) == dist_orig
 
 
 def test_gjk_random_points():
