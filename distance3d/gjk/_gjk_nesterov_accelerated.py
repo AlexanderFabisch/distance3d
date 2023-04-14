@@ -122,7 +122,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
         s0 = collider1.support_function(-ray_dir)
         s1 = collider2.support_function(ray_dir)
 
-        distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, converged = iteration(
+        distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, converged = iteration(
             alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
             simplex, simplex_len, tolerance, upper_bound,
             use_nesterov_acceleration, s0, s1)
@@ -155,7 +155,7 @@ def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_poi
     cache=True)
 def origin_to_point(simplex, a_index, a):
     simplex[0] = simplex[a_index]
-    return a, 1
+    return np.copy(a), 1
 
 
 @numba.njit(
@@ -553,14 +553,14 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
     if omega > upper_bound:
         distance = omega - inflation
         inside = False
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
 
     if use_nesterov_acceleration:
         frank_wolfe_duality_gap = 2 * ray.dot(ray - support_point[0])
         if frank_wolfe_duality_gap - tolerance <= 0:
             use_nesterov_acceleration = False
             simplex_len -= 1
-            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
+            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
 
     cv_check_passed = check_convergence(alpha, omega, ray_len, tolerance)
     if k > 0 and cv_check_passed:
@@ -568,12 +568,12 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
             simplex_len -= 1
         if use_nesterov_acceleration:
             use_nesterov_acceleration = False
-            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
+            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
         distance = ray_len - inflation
 
         if distance < tolerance:
             inside = True
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
 
     assert 1 <= simplex_len <= 4
     if simplex_len == 1:
@@ -590,8 +590,8 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
     if inside or ray_len == 0:
         distance = -inflation
         inside = True
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, True
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
 
-    return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, False
+    return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
 
 
