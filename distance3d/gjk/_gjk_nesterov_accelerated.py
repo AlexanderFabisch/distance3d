@@ -59,7 +59,7 @@ def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
     return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[3]
 
 
-def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interations=100, upper_bound=1000000000, tolerance=1e-6):
+def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interations=100, upper_bound=1000000000, tolerance=1e-8):
     """
     Parameters
     ----------
@@ -82,7 +82,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
     """
 
     # ------ Initialize Variables ------
-    use_nesterov_acceleration = True
+    use_nesterov_acceleration = False
     normalize_support_direction = type(collider1) == MeshGraph and type(collider2) == MeshGraph
 
     inflation = 0
@@ -100,7 +100,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
 
     ray_len = np.linalg.norm(ray)
     if ray_len < tolerance:
-        ray = np.array([1.0, 0.0, 0.0])
+        ray = np.array([-1.0, 0.0, 0.0])
         ray_len = 1
 
     ray_dir = ray  # d in paper
@@ -139,12 +139,15 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
     ),
     cache=True)
 def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_point):
-    momentum = (k + 1) / (k + 3)
-    minv = 1.0 - momentum
-    y = momentum * ray + minv * support_point[0]
-    ray_dir = momentum * ray_dir + minv * y
     if normalize_support_direction:
-        ray_dir = norm_vector(ray_dir)
+        momentum = (k + 2) / (k + 3)
+        y = momentum * ray + (1.0 - momentum) * support_point[0]
+        ray_dir = momentum * norm_vector(ray_dir) + (1.0 - momentum) * norm_vector(y)
+    else:
+        momentum = (k + 1) / (k + 3)
+        y = momentum * ray + (1.0 - momentum) * support_point[0]
+        ray_dir = momentum * ray_dir + (1.0 - momentum) * y
+
     return ray_dir
 
 
