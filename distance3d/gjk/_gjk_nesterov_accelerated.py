@@ -59,7 +59,7 @@ def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
     return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[3]
 
 
-def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interations=100, upper_bound=1000000000, tolerance=1e-8):
+def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interations=100, upper_bound=1000000000.0, tolerance=1e-6, inflation = 1.0):
     """
     Parameters
     ----------
@@ -84,8 +84,6 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
     # ------ Initialize Variables ------
     use_nesterov_acceleration = False
     normalize_support_direction = type(collider1) == MeshGraph and type(collider2) == MeshGraph
-
-    inflation = 0
 
     alpha = 0.0
 
@@ -549,7 +547,7 @@ def project_tetra_to_origin(tetra):
 def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
               simplex, simplex_len, tolerance, upper_bound,
               use_nesterov_acceleration, s0, s1):
-    simplex[simplex_len, 0] = s1 - s0
+    simplex[simplex_len, 0] = s0 - s1
     simplex[simplex_len, 1] = s0
     simplex[simplex_len, 2] = s1
     support_point = simplex[simplex_len]
@@ -619,6 +617,6 @@ def support_capsule(dir, capsule0, capsule1):
 
     support1 = np.dot(oR1, support1) + ot1
 
-    return support0, -support1
+    return support0, support1
 
 

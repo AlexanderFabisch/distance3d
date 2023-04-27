@@ -17,7 +17,8 @@ https://graphics.stanford.edu/courses/cs448b-00-winter/papers/gilbert.pdf
 from ._gjk_original import gjk_distance_original
 from ._gjk_libccd import gjk_intersection_libccd
 from ._gjk_jolt import gjk_distance_jolt, gjk_intersection_jolt
-from ._gjk_nesterov_accelerated import gjk_nesterov_accelerated_intersection, gjk_nesterov_accelerated_distance
+from ._gjk_nesterov_accelerated import gjk_nesterov_accelerated_intersection, gjk_nesterov_accelerated_distance, \
+    gjk_nesterov_accelerated
 
 
 # Aliases
@@ -35,5 +36,7 @@ __all__ = [
     "gjk_intersection",
     "gjk_nesterov_accelerated_intersection",
     "gjk_nesterov_accelerated_distance",
-    "gjk"
+    "gjk",
+
+    "gjk_nesterov_accelerated"
 ]
