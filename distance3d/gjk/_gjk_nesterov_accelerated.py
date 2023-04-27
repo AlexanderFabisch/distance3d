@@ -1,7 +1,7 @@
 import numpy as np
 import numba
 
-from ..colliders import MeshGraph
+from ..colliders import MeshGraph, Capsule
 from ..utils import norm_vector, EPSILON
 
 
@@ -119,8 +119,11 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
         else:
             ray_dir = ray
 
-        s0 = collider1.support_function(-ray_dir)
-        s1 = collider2.support_function(ray_dir)
+        if type(collider1) == Capsule and type(collider2) == Capsule:
+            s0, s1 = support_capsule(-ray_dir, collider1, collider2)
+        else:
+            s0 = collider1.support_function(-ray_dir)
+            s1 = collider2.support_function(ray_dir)
 
         distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, converged = iteration(
             alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
@@ -546,7 +549,7 @@ def project_tetra_to_origin(tetra):
 def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
               simplex, simplex_len, tolerance, upper_bound,
               use_nesterov_acceleration, s0, s1):
-    simplex[simplex_len, 0] = s0 - s1
+    simplex[simplex_len, 0] = s1 - s0
     simplex[simplex_len, 1] = s0
     simplex[simplex_len, 2] = s1
     support_point = simplex[simplex_len]
@@ -596,5 +599,26 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
         return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
 
     return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
+
+
+def support_capsule(dir, capsule0, capsule1):
+    support0 = np.array([0.0, 0.0, 0.0])
+    if dir[2] > 0:
+        support0[2] = capsule0.height / 2
+    else:
+        support0[2] = -capsule0.height / 2
+
+    oR1 = np.dot(capsule0.capsule2origin[:3, :3].T, capsule1.capsule2origin[:3, :3])
+    ot1 = np.dot(capsule0.capsule2origin[:3, :3].T, capsule1.capsule2origin[:3, 3] - capsule0.capsule2origin[:3, 3])
+
+    support1 = np.array([0.0, 0.0, 0.0])
+    if np.dot(-oR1.T, dir)[2] > 0:
+        support1[2] = capsule1.height / 2
+    else:
+        support1[2] = -capsule1.height / 2
+
+    support1 = np.dot(oR1, support1) + ot1
+
+    return support0, -support1
 
 
