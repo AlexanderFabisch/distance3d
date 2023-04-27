@@ -1,7 +1,7 @@
 import numpy as np
 import numba
 
-from ..colliders import MeshGraph, Capsule, Sphere
+from ..colliders import MeshGraph, Capsule, Sphere, Box, Ellipse, Cone, Cylinder
 from ..utils import norm_vector, EPSILON
 
 
@@ -611,24 +611,38 @@ def support_function(dir, collider0, collider1):
     oR1 = np.dot(collider0.capsule2origin[:3, :3].T, collider1.capsule2origin[:3, :3])
     ot1 = np.dot(collider0.capsule2origin[:3, :3].T, collider1.capsule2origin[:3, 3] - collider0.capsule2origin[:3, 3])
 
-    support0 = select_support(dir, collider0)
+    support0, found0 = select_support(dir, collider0)
 
     support1 = select_support(np.dot(-oR1.T, dir), collider1)
-    support1 = np.dot(oR1, support1) + ot1
+    support1, found1 = np.dot(oR1, support1) + ot1
 
-    return support0, support1
+    if found0 and found1:
+        return support0, support1
+
+    return collider0.support_function(dir), collider1.support_function(-dir)
 
 
 def select_support(dir, collider):
     if type(collider) == Sphere:
-        return sphere_support()
+        return sphere_support(), True
 
     if type(collider) == Capsule:
-        return capsule_support(dir, collider)
+        return capsule_support(dir, collider), True
 
-    # TODO Other Types
-    print("Logic Error invalid collider type")
-    return np.array([0.0, 0.0, 0.0])
+    if type(collider) == Box:
+        return box_support(dir, collider), True
+
+    if type(collider) == Ellipse:
+        return box_support(dir, collider), True
+
+    if type(collider) == Cone:
+        return cone_support(dir, collider), True
+
+    if type(collider) == Cylinder:
+        return cylinder_support(dir, collider), True
+
+    # Type not found
+    return np.array([0.0, 0.0, 0.0]), False
 
 
 def sphere_support():
@@ -643,5 +657,99 @@ def capsule_support(dir, capsule):
         support[2] = -capsule.height / 2
 
     return support
+
+
+def box_support(dir, box):
+    inflate = 1.0
+    if (dir == 0).any():
+        inflate = 1.00000001
+
+    support = np.array([0.0, 0.0, 0.0])
+    for i in range(0, 3):
+        if dir[i] > 0:
+            support[i] = inflate * (box.size[i] / 2)
+        else:
+            support[i] = -inflate * (box.size[i] / 2)
+
+    return support
+
+
+def ellipsoid_support(dir, ellipsoid):
+    a2 = ellipsoid.radii[0] * ellipsoid.radii[0]
+    b2 = ellipsoid.radii[1] * ellipsoid.radii[1]
+    c2 = ellipsoid.radii[2] * ellipsoid.radii[2]
+
+    v = np.array([a2 * dir[0], b2 * dir[1], c2 * dir[2]])
+    d = np.sqrt(v.dot(dir))
+
+    return v / d
+
+
+def cone_support(dir, cone):
+    support = np.array([0.0, 0.0, 0.0])
+
+    inflate = 1.00001
+    h = cone.length / 2
+    r = cone.radius
+
+    if (dir[:2] == 0).all():
+        if dir[2] > 0:
+            support[2] = h
+        else:
+            support[2] = -inflate * h
+        return support
+
+    zdist = dir[0] * dir[0] + dir[1] * dir[1]
+    len = zdist + dir[2] * dir[2]
+    zdist = np.sqrt(zdist)
+
+    if dir[2] <= 0:
+        rad = r / zdist
+        support[:2] = rad[:2] * dir
+        support[2] = -h
+        return support
+
+    len = np.sqrt(len)
+    sin_a = r / np.sqrt(r * r + 4 * h * h)
+
+    if dir[2] > len * sin_a:
+        support = np.array([0.0, 0.0, h])
+        return support
+
+    rad = r / zdist
+    support[:2] = rad[:2] * dir
+    support[2] = -h
+    return support
+
+
+def cylinder_support(dir, cylinder):
+    support = np.array([0.0, 0.0, 0.0])
+
+    inflate = 1.00001
+
+    half_h = cylinder.length / 2
+    r = cylinder.radius
+
+    if (dir[:2] == np.array([0.0, 0.0])).all():
+        half_h *= inflate
+
+    if dir[2] > 0:
+        support[2] = half_h
+    elif dir[2] < 0:
+        support[2] = -half_h
+    else:
+        support[2] = 0
+        r *= inflate
+
+    if (dir[:2] == np.array([0.0, 0.0])).all():
+        support[0] = 0.0
+        support[1] = 0.0
+    else:
+        support[:2] = dir * r
+
+
+
+
+
 
 
