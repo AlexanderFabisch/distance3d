@@ -1,7 +1,7 @@
 import numpy as np
 import numba
 
-from ..colliders import MeshGraph, Capsule
+from ..colliders import MeshGraph, Capsule, Sphere
 from ..utils import norm_vector, EPSILON
 
 
@@ -59,14 +59,14 @@ def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
     return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[3]
 
 
-def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interations=100, upper_bound=1000000000.0, tolerance=1e-6, inflation = 1.0):
+def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6):
     """
     Parameters
     ----------
-    collider1 : ConvexCollider
+    collider0 : ConvexCollider
         Convex collider 1.
 
-    collider2 : ConvexCollider
+    collider1 : ConvexCollider
         Convex collider 2.
 
     Returns
@@ -83,7 +83,19 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
 
     # ------ Initialize Variables ------
     use_nesterov_acceleration = False
-    normalize_support_direction = type(collider1) == MeshGraph and type(collider2) == MeshGraph
+
+    # normalize_support_direction is for soem reason only needed when both colliders are an mesh.
+    normalize_support_direction = type(collider0) == MeshGraph and type(collider1) == MeshGraph
+
+    # Infaltion is only used with spheres and capsules
+    inflation = 0.0
+    if type(collider0) == Sphere or type(collider0) == Capsule:
+        inflation += collider0.radius
+
+    if type(collider1) == Sphere or type(collider1) == Capsule:
+        inflation += collider1.radius
+
+    upper_bound += inflation
 
     alpha = 0.0
 
@@ -117,11 +129,7 @@ def gjk_nesterov_accelerated(collider1, collider2, ray_guess=None, max_interatio
         else:
             ray_dir = ray
 
-        if type(collider1) == Capsule and type(collider2) == Capsule:
-            s0, s1 = support_capsule(-ray_dir, collider1, collider2)
-        else:
-            s0 = collider1.support_function(-ray_dir)
-            s1 = collider2.support_function(ray_dir)
+        s0, s1 = support_function(-ray_dir, collider0, collider1)
 
         distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, converged = iteration(
             alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
@@ -599,24 +607,41 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
     return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
 
 
-def support_capsule(dir, capsule0, capsule1):
-    support0 = np.array([0.0, 0.0, 0.0])
-    if dir[2] > 0:
-        support0[2] = capsule0.height / 2
-    else:
-        support0[2] = -capsule0.height / 2
+def support_function(dir, collider0, collider1):
+    oR1 = np.dot(collider0.capsule2origin[:3, :3].T, collider1.capsule2origin[:3, :3])
+    ot1 = np.dot(collider0.capsule2origin[:3, :3].T, collider1.capsule2origin[:3, 3] - collider0.capsule2origin[:3, 3])
 
-    oR1 = np.dot(capsule0.capsule2origin[:3, :3].T, capsule1.capsule2origin[:3, :3])
-    ot1 = np.dot(capsule0.capsule2origin[:3, :3].T, capsule1.capsule2origin[:3, 3] - capsule0.capsule2origin[:3, 3])
+    support0 = select_support(dir, collider0)
 
-    support1 = np.array([0.0, 0.0, 0.0])
-    if np.dot(-oR1.T, dir)[2] > 0:
-        support1[2] = capsule1.height / 2
-    else:
-        support1[2] = -capsule1.height / 2
-
+    support1 = select_support(np.dot(-oR1.T, dir), collider1)
     support1 = np.dot(oR1, support1) + ot1
 
     return support0, support1
+
+
+def select_support(dir, collider):
+    if type(collider) == Sphere:
+        return sphere_support()
+
+    if type(collider) == Capsule:
+        return capsule_support(dir, collider)
+
+    # TODO Other Types
+    print("Logic Error invalid collider type")
+    return np.array([0.0, 0.0, 0.0])
+
+
+def sphere_support():
+    return np.array([0.0, 0.0, 0.0])
+
+
+def capsule_support(dir, capsule):
+    support = np.array([0.0, 0.0, 0.0])
+    if dir[2] > 0:
+        support[2] = capsule.height / 2
+    else:
+        support[2] = -capsule.height / 2
+
+    return support
 
 
