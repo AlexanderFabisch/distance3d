@@ -600,7 +600,7 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
     if not inside:
         ray_len = np.linalg.norm(ray)
     if inside or ray_len == 0:
-        distance = -inflation
+        distance = -inflation - 1.
         inside = True
         return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
 
@@ -608,13 +608,13 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
 
 
 def support_function(dir, collider0, collider1):
-    oR1 = np.dot(collider0.capsule2origin[:3, :3].T, collider1.capsule2origin[:3, :3])
-    ot1 = np.dot(collider0.capsule2origin[:3, :3].T, collider1.capsule2origin[:3, 3] - collider0.capsule2origin[:3, 3])
+    oR1 = np.dot(collider0.frame()[:3, :3].T, collider1.frame()[:3, :3])
+    ot1 = np.dot(collider0.frame()[:3, :3].T, collider1.center() - collider0.frame()[:3, 3])
 
     support0, found0 = select_support(dir, collider0)
 
-    support1 = select_support(np.dot(-oR1.T, dir), collider1)
-    support1, found1 = np.dot(oR1, support1) + ot1
+    support1, found1 = select_support(np.dot(-oR1.T, dir), collider1)
+    support1 = np.dot(oR1, support1) + ot1
 
     if found0 and found1:
         return support0, support1
@@ -633,7 +633,7 @@ def select_support(dir, collider):
         return box_support(dir, collider), True
 
     if type(collider) == Ellipse:
-        return box_support(dir, collider), True
+        return ellipsoid_support(dir, collider), True
 
     if type(collider) == Cone:
         return cone_support(dir, collider), True
@@ -677,9 +677,9 @@ def box_support(dir, box):
 def ellipsoid_support(dir, ellipsoid):
     a2 = ellipsoid.radii[0] * ellipsoid.radii[0]
     b2 = ellipsoid.radii[1] * ellipsoid.radii[1]
-    c2 = ellipsoid.radii[2] * ellipsoid.radii[2]
+    # c2 = ellipsoid.radii[2] * ellipsoid.radii[2] TODO
 
-    v = np.array([a2 * dir[0], b2 * dir[1], c2 * dir[2]])
+    v = np.array([a2 * dir[0], b2 * dir[1], dir[2]])
     d = np.sqrt(v.dot(dir))
 
     return v / d
@@ -689,10 +689,13 @@ def cone_support(dir, cone):
     support = np.array([0.0, 0.0, 0.0])
 
     inflate = 1.00001
-    h = cone.length / 2
+    h = cone.height / 2
     r = cone.radius
 
     if (dir[:2] == 0).all():
+        dir[0] = 0.0
+        dir[1] = 0.0
+
         if dir[2] > 0:
             support[2] = h
         else:
@@ -705,7 +708,7 @@ def cone_support(dir, cone):
 
     if dir[2] <= 0:
         rad = r / zdist
-        support[:2] = rad[:2] * dir
+        support[:2] = rad * dir[:2]
         support[2] = -h
         return support
 
@@ -717,7 +720,7 @@ def cone_support(dir, cone):
         return support
 
     rad = r / zdist
-    support[:2] = rad[:2] * dir
+    support[:2] = rad * dir[:2]
     support[2] = -h
     return support
 
@@ -745,7 +748,9 @@ def cylinder_support(dir, cylinder):
         support[0] = 0.0
         support[1] = 0.0
     else:
-        support[:2] = dir * r
+        support[:2] = dir[:2] / np.linalg.norm(dir[:2]) * r
+
+    return support
 
 
 

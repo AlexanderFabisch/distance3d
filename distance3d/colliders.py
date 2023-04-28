@@ -110,6 +110,11 @@ class ConvexCollider(abc.ABC):
         """Rounds the values of the collider to a sertion precision.
         """
 
+    @abc.abstractmethod
+    def frame(self):
+        """The frame of the collider
+        """
+
 
 class ConvexHullVertices(ConvexCollider):
     """Convex hull of a set of vertices.
@@ -155,6 +160,9 @@ class ConvexHullVertices(ConvexCollider):
 
     def round_values(self, precision):
         self.vertices = np.round(self.vertices, precision)
+
+    def frame(self):
+        return np.eye(4)
 
 
 class Box(ConvexHullVertices):
@@ -204,6 +212,9 @@ class Box(ConvexHullVertices):
     def round_values(self, precision):
         self.box2origin = np.round(self.box2origin, precision)
         self.vertices = np.round(self.vertices, precision)
+
+    def frame(self):
+        return self.box2origin
 
 
 class MeshGraph(ConvexCollider):
@@ -271,6 +282,9 @@ class MeshGraph(ConvexCollider):
         self.mesh2origin = np.round(self.mesh2origin, precision)
         self.vertices = np.round(self.vertices, precision)
 
+    def frame(self):
+        return self.mesh2origin
+
 
 class Sphere(ConvexCollider):
     """Sphere collider.
@@ -326,6 +340,11 @@ class Sphere(ConvexCollider):
     def round_values(self, precision):
         self.c = np.round(self.c, precision)
         self.radius = np.round(self.radius, precision)
+
+    def frame(self):
+        sphere2origin = np.eye(4)
+        sphere2origin[:3, 3] = self.c
+        return sphere2origin
 
 
 class Capsule(ConvexCollider):
@@ -391,6 +410,9 @@ class Capsule(ConvexCollider):
         self.radius = np.round(self.radius, precision)
         self.height = np.round(self.height, precision)
 
+    def frame(self):
+        return self.capsule2origin
+
 
 class Ellipsoid(ConvexCollider):
     """Ellipsoid collider.
@@ -446,6 +468,9 @@ class Ellipsoid(ConvexCollider):
     def round_values(self, precision):
         self.ellipsoid2origin = np.round(self.ellipsoid2origin, precision)
         self.radii = np.round(self.radii, precision)
+
+    def frame(self):
+        return self.ellipsoid2origin
 
 
 class Cylinder(ConvexCollider):
@@ -510,6 +535,9 @@ class Cylinder(ConvexCollider):
         self.cylinder2origin = np.round(self.cylinder2origin, precision)
         self.radius = np.round(self.radius, precision)
         self.length = np.round(self.length, precision)
+
+    def frame(self):
+        return self.cylinder2origin
 
 
 class Disk(ConvexCollider):
@@ -579,6 +607,13 @@ class Disk(ConvexCollider):
         self.radius = np.round(self.radius, precision)
         self.normal = np.round(self.normal, precision)
 
+    def frame(self):
+        x, y = plane_basis_from_normal(self.normal)
+        disk2origin = np.eye(4)
+        disk2origin[:3, :3] = np.column_stack((x, y, self.normal))
+        disk2origin[:3, 3] = self.c
+        return disk2origin
+
 
 class Ellipse(ConvexCollider):
     """Ellipse collider.
@@ -639,6 +674,12 @@ class Ellipse(ConvexCollider):
         self.c = np.round(self.c, precision)
         self.axes = np.round(self.axes, precision)
         self.radii = np.round(self.radii, precision)
+
+    def frame(self):
+        ellipse2origin = np.eye(4)
+        ellipse2origin[:3, 3] = self.c
+        return ellipse2origin
+
 
 
 class Cone(ConvexCollider):
@@ -703,6 +744,9 @@ class Cone(ConvexCollider):
         self.radius = np.round(self.radius, precision)
         self.height = np.round(self.height, precision)
 
+    def frame(self):
+        return self.cone2origin
+
 
 class Margin(ConvexCollider):
     """Margin around collider.
@@ -754,6 +798,9 @@ class Margin(ConvexCollider):
     def round_values(self, precision):
         self.collider.round_values(precision)
         self.margin = np.round(self.margin, precision)
+
+    def frame(self):
+        return self.collider.frame()
 
 
 COLLIDERS = {
