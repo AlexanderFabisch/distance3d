@@ -1,8 +1,8 @@
 import numpy as np
 import numba
 
-from ..colliders import MeshGraph, Capsule, Sphere, Box, Ellipse, Cone, Cylinder, Ellipsoid
-from ..utils import norm_vector, EPSILON
+from ..colliders import MeshGraph, Capsule, Sphere, Box, Cone, Cylinder, Ellipsoid
+from ..utils import norm_vector
 
 
 def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
@@ -100,7 +100,7 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
     alpha = 0.0
 
     inside = False
-    simplex = np.empty([4, 3, 3], dtype=float)
+    simplex = np.empty([4, 3], dtype=float)
     simplex_len = 0
     distance = 0.0
 
@@ -114,7 +114,7 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
         ray_len = 1
 
     ray_dir = ray  # d in paper
-    support_point = np.array((ray, ray, ray))  # s in paper
+    support_point = np.array(ray)  # s in paper
 
     iterations = 0
     for k in range(max_interations):
@@ -142,6 +142,71 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
 
 
 @numba.njit(
+    numba.types.Tuple((
+            numba.float64, numba.bool_, numba.float64[::1], numba.float64,
+            numba.int64, numba.bool_, numba.bool_))(
+        numba.float64, numba.float64, numba.float64, numba.bool_, numba.int64,
+        numba.float64[::1], numba.float64[::1], numba.float64,
+        numba.float64[:, :, ::1], numba.int64, numba.float64, numba.float64,
+        numba.bool_, numba.float64[::1], numba.float64[::1]
+    ),
+    cache=True)
+def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
+              simplex, simplex_len, tolerance, upper_bound,
+              use_nesterov_acceleration, s0, s1):
+    simplex[simplex_len] = s0 - s1
+    support_point = simplex[simplex_len]
+    simplex_len += 1
+
+    omega = ray_dir.dot(support_point) / np.linalg.norm(ray_dir)
+    if omega > upper_bound:
+        distance = omega - inflation
+        inside = False
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
+
+    if use_nesterov_acceleration:
+        frank_wolfe_duality_gap = 2 * ray.dot(ray - support_point)
+        if frank_wolfe_duality_gap - tolerance <= 0:
+            use_nesterov_acceleration = False
+            simplex_len -= 1
+            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
+
+    cv_check_passed = check_convergence(alpha, omega, ray_len, tolerance)
+    if k > 0 and cv_check_passed:
+        if k > 0:
+            simplex_len -= 1
+        if use_nesterov_acceleration:
+            use_nesterov_acceleration = False
+            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
+        distance = ray_len - inflation
+
+        if distance < tolerance:
+            inside = True
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
+
+    assert 1 <= simplex_len <= 4
+    if simplex_len == 1:
+        ray = np.copy(support_point)
+    elif simplex_len == 2:
+        ray, simplex_len, inside = project_line_origin(simplex)
+    elif simplex_len == 3:
+        ray, simplex_len, inside = project_triangle_origin(simplex)
+    elif simplex_len == 4:
+        ray, simplex_len, inside = project_tetra_to_origin(simplex)
+
+    if not inside:
+        ray_len = np.linalg.norm(ray)
+    if inside or ray_len == 0:
+        distance = -inflation - 1.
+        inside = True
+        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
+
+    return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
+
+
+
+
+@numba.njit(
     numba.float64[::1](
         numba.int64, numba.bool_, numba.float64[::1], numba.float64[::1],
         numba.float64[:, ::1]
@@ -150,11 +215,11 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
 def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_point):
     if normalize_support_direction:
         momentum = (k + 2) / (k + 3)
-        y = momentum * ray + (1.0 - momentum) * support_point[0]
+        y = momentum * ray + (1.0 - momentum) * support_point
         ray_dir = momentum * norm_vector(ray_dir) + (1.0 - momentum) * norm_vector(y)
     else:
         momentum = (k + 1) / (k + 3)
-        y = momentum * ray + (1.0 - momentum) * support_point[0]
+        y = momentum * ray + (1.0 - momentum) * support_point
         ray_dir = momentum * ray_dir + (1.0 - momentum) * y
 
     return ray_dir
@@ -165,7 +230,7 @@ def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_poi
         numba.float64[:, :, ::1], numba.int64, numba.float64[::1]
     ),
     cache=True)
-def origin_to_point(simplex, a_index, a):
+def origin_to_point(simplex, a):
     simplex[0] = a
     return np.copy(a), 1
 
@@ -176,7 +241,7 @@ def origin_to_point(simplex, a_index, a):
         numba.float64[::1], numba.float64[::1], numba.float64
     ),
     cache=True)
-def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
+def origin_to_segment(simplex, a, b, ab, ab_dot_a0):
     ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
     simplex[0], simplex[1] = b, a
     return ray, 2
@@ -196,7 +261,7 @@ def origin_to_triangle(simplex, a, b, c, abc, abc_dot_a0):
     if abc_dot_a0 > 0:
         simplex[0], simplex[1], simplex[2] = c, b, a
     else:
-        simplex[0], simplex[1], simplex[2] = np.copy(b), np.copy(c), np.copy(a)
+        simplex[0], simplex[1], simplex[2] = np.copy(b), np.copy(c), np.copy(b)
 
     ray = -abc_dot_a0 / abc.dot(abc) * abc
     return ray, 3, False
@@ -212,8 +277,8 @@ def project_line_origin(line):
     a_index = 1
     b_index = 0
 
-    a = line[a_index, 0]
-    b = line[b_index, 0]
+    a = line[a_index]
+    b = line[b_index]
 
     ab = b - a
     d = np.dot(ab, -a)
@@ -224,12 +289,12 @@ def project_line_origin(line):
         #    function did not do any progress and GJK should have stopped.
         #  - A == origin
         # In any case, A is the closest to the origin
-        ray, simplex_len = origin_to_point(line, a_index, a)
+        ray, simplex_len = origin_to_point(line, a)
         return ray, simplex_len, np.all(a == 0.0)
     if d < 0:
-        ray, simplex_len = origin_to_point(line, a_index, a)
+        ray, simplex_len = origin_to_point(line, a)
     else:
-        ray, simplex_len = origin_to_segment(line, a_index, b_index, a, b, ab, d)
+        ray, simplex_len = origin_to_segment(line, a, b, ab, d)
 
     return ray, simplex_len, False
 
@@ -240,12 +305,12 @@ def project_line_origin(line):
         numba.float64[::1], numba.float64[::1]
     ),
     cache=True)
-def t_b(triangle, a_index, b_index, a, b, ab):
+def t_b(triangle, a, b, ab):
     towards_b = ab.dot(-a)
     if towards_b < 0:
-        return origin_to_point(triangle, a_index, a)
+        return origin_to_point(triangle, a)
     else:
-        return origin_to_segment(triangle, a_index, b_index, a, b, ab, towards_b)
+        return origin_to_segment(triangle, a, b, ab, towards_b)
 
 
 @numba.njit(
@@ -259,9 +324,9 @@ def project_triangle_origin(triangle):
     b_index = 1
     c_index = 0
 
-    a = triangle[a_index, 0]
-    b = triangle[b_index, 0]
-    c = triangle[c_index, 0]
+    a = triangle[a_index]
+    b = triangle[b_index]
+    c = triangle[c_index]
 
     ab = b - a
     ac = c - a
@@ -273,14 +338,14 @@ def project_triangle_origin(triangle):
 
         towards_c = ac.dot(-a)
         if towards_c >= 0:
-            ray, simplex_len = origin_to_segment(triangle, a_index, c_index, a, c, ac, towards_c)
+            ray, simplex_len = origin_to_segment(triangle, a, c, ac, towards_c)
         else:
-            ray, simplex_len = t_b(triangle, a_index, b_index, a, b, ab)
+            ray, simplex_len = t_b(triangle, a, b, ab)
     else:
 
         edge_ab2o = np.cross(ab, abc).dot(-a)
         if edge_ab2o >= 0:
-            ray, simplex_len = t_b(triangle, a_index, b_index, a, b, ab)
+            ray, simplex_len = t_b(triangle, a, b, ab)
         else:
             return origin_to_triangle(triangle, a, b, c, abc, abc.dot(-a))
 
@@ -293,7 +358,7 @@ def project_triangle_origin(triangle):
     ),
     cache=True)
 def region_a(simplex, a_index, a):
-    return origin_to_point(simplex, a_index, a)
+    return origin_to_point(simplex, a)
 
 
 @numba.njit(
@@ -303,7 +368,7 @@ def region_a(simplex, a_index, a):
     ),
     cache=True)
 def region_ab(simplex, a_index, b_index, a, b, ba_aa):
-    return origin_to_segment(simplex, a_index, b_index, a, b, b - a, -ba_aa)
+    return origin_to_segment(simplex, a, b, b - a, -ba_aa)
 
 
 @numba.njit(
@@ -313,7 +378,7 @@ def region_ab(simplex, a_index, b_index, a, b, ba_aa):
     ),
     cache=True)
 def region_ac(simplex, a_index, c_index, a, c, ca_aa):
-    return origin_to_segment(simplex, a_index, c_index, a, c, c - a, -ca_aa)
+    return origin_to_segment(simplex, a, c, c - a, -ca_aa)
 
 
 @numba.njit(
@@ -323,7 +388,7 @@ def region_ac(simplex, a_index, c_index, a, c, ca_aa):
     ),
     cache=True)
 def region_ad(simplex, a_index, d_index, a, d, da_aa):
-    return origin_to_segment(simplex, a_index, d_index, a, d, d - a, -da_aa)
+    return origin_to_segment(simplex, a, d, d - a, -da_aa)
 
 
 @numba.njit(
@@ -379,10 +444,10 @@ def project_tetra_to_origin(tetra):
     c_index = 1
     d_index = 0
 
-    a = tetra[a_index, 0]
-    b = tetra[b_index, 0]
-    c = tetra[c_index, 0]
-    d = tetra[d_index, 0]
+    a = tetra[a_index]
+    b = tetra[b_index]
+    c = tetra[c_index]
+    d = tetra[d_index]
 
     aa = a.dot(a)
 
@@ -537,72 +602,6 @@ def project_tetra_to_origin(tetra):
             else:
                 ray, simplex_len = region_a(tetra, a_index, a)
     return ray, simplex_len, False
-
-
-@numba.njit(
-    numba.types.Tuple((
-            numba.float64, numba.bool_, numba.float64[::1], numba.float64,
-            numba.int64, numba.bool_, numba.bool_))(
-        numba.float64, numba.float64, numba.float64, numba.bool_, numba.int64,
-        numba.float64[::1], numba.float64[::1], numba.float64,
-        numba.float64[:, :, ::1], numba.int64, numba.float64, numba.float64,
-        numba.bool_, numba.float64[::1], numba.float64[::1]
-    ),
-    cache=True)
-def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
-              simplex, simplex_len, tolerance, upper_bound,
-              use_nesterov_acceleration, s0, s1):
-    simplex[simplex_len, 0] = s0 - s1
-    simplex[simplex_len, 1] = s0
-    simplex[simplex_len, 2] = s1
-    support_point = simplex[simplex_len]
-    simplex_len += 1
-
-    omega = ray_dir.dot(support_point[0]) / np.linalg.norm(ray_dir)
-    if omega > upper_bound:
-        distance = omega - inflation
-        inside = False
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
-
-    if use_nesterov_acceleration:
-        frank_wolfe_duality_gap = 2 * ray.dot(ray - support_point[0])
-        if frank_wolfe_duality_gap - tolerance <= 0:
-            use_nesterov_acceleration = False
-            simplex_len -= 1
-            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
-
-    cv_check_passed = check_convergence(alpha, omega, ray_len, tolerance)
-    if k > 0 and cv_check_passed:
-        if k > 0:
-            simplex_len -= 1
-        if use_nesterov_acceleration:
-            use_nesterov_acceleration = False
-            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
-        distance = ray_len - inflation
-
-        if distance < tolerance:
-            inside = True
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
-
-    assert 1 <= simplex_len <= 4
-    if simplex_len == 1:
-        ray = np.copy(support_point[0])
-    elif simplex_len == 2:
-        ray, simplex_len, inside = project_line_origin(simplex)
-    elif simplex_len == 3:
-        ray, simplex_len, inside = project_triangle_origin(simplex)
-    elif simplex_len == 4:
-        ray, simplex_len, inside = project_tetra_to_origin(simplex)
-
-    if not inside:
-        ray_len = np.linalg.norm(ray)
-    if inside or ray_len == 0:
-        distance = -inflation - 1.
-        inside = True
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
-
-    return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
-
 
 def support_function(dir, collider0, collider1):
     oR1 = np.dot(collider0.frame()[:3, :3].T, collider1.frame()[:3, :3])
