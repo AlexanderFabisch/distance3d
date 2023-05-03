@@ -226,12 +226,20 @@ def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_poi
 
 
 @numba.njit(
+    numba.bool_(numba.float64, numba.float64, numba.float64, numba.float64),
+    cache=True)
+def check_convergence(alpha, omega, ray_len, tolerance):
+    alpha = max(alpha, omega)
+    diff = ray_len - alpha
+    return (diff - tolerance * ray_len) <= 0
+
+@numba.njit(
     numba.types.Tuple((numba.float64[::1], numba.int64))(
         numba.float64[:, :, ::1], numba.int64, numba.float64[::1]
     ),
     cache=True)
 def origin_to_point(simplex, a):
-    simplex[0] = a
+    simplex[0] = np.copy(a)
     return np.copy(a), 1
 
 
@@ -243,7 +251,7 @@ def origin_to_point(simplex, a):
     cache=True)
 def origin_to_segment(simplex, a, b, ab, ab_dot_a0):
     ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
-    simplex[0], simplex[1] = b, a
+    simplex[0], simplex[1] = np.copy(b), np.copy(a)
     return ray, 2
 
 
@@ -255,13 +263,13 @@ def origin_to_segment(simplex, a, b, ab, ab_dot_a0):
     cache=True)
 def origin_to_triangle(simplex, a, b, c, abc, abc_dot_a0):
     if abc_dot_a0 == 0:
-        simplex[0], simplex[1], simplex[2] = c, b, a
+        simplex[0], simplex[1], simplex[2] = np.copy(c), np.copy(b), np.copy(a)
         return np.zeros(3), 3, True
 
     if abc_dot_a0 > 0:
-        simplex[0], simplex[1], simplex[2] = c, b, a
+        simplex[0], simplex[1], simplex[2] = np.copy(c), np.copy(b), np.copy(a)
     else:
-        simplex[0], simplex[1], simplex[2] = np.copy(b), np.copy(c), np.copy(b)
+        simplex[0], simplex[1], simplex[2] = np.copy(b), np.copy(c), np.copy(a)
 
     ray = -abc_dot_a0 / abc.dot(abc) * abc
     return ray, 3, False
@@ -422,16 +430,6 @@ def region_acd(simplex, a_index, c_index, d_index, a, c, d, a_cross_c):
     cache=True)
 def region_adb(simplex, a_index, d_index, b_index, a, d, b, a_cross_b):
     return origin_to_triangle(simplex, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))[:2]
-
-
-@numba.njit(
-    numba.bool_(numba.float64, numba.float64, numba.float64, numba.float64),
-    cache=True)
-def check_convergence(alpha, omega, ray_len, tolerance):
-    alpha = max(alpha, omega)
-    diff = ray_len - alpha
-    return (diff - tolerance * ray_len) <= 0
-
 
 @numba.njit(
     numba.types.Tuple((numba.float64[::1], numba.int64, numba.bool_))(
@@ -602,6 +600,7 @@ def project_tetra_to_origin(tetra):
             else:
                 ray, simplex_len = region_a(tetra, a_index, a)
     return ray, simplex_len, False
+
 
 def support_function(dir, collider0, collider1):
     oR1 = np.dot(collider0.frame()[:3, :3].T, collider1.frame()[:3, :3])

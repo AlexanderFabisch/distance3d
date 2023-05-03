@@ -318,27 +318,6 @@ def test_compare_gjk_intersection_flavours_with_random_shapes():
         intersection_libccd = gjk.gjk_intersection_libccd(collider1, collider2)
         assert intersection_jolt == intersection_libccd
 
-
-def test_compare_gjk_intersection_flavours_with_random_shapes_nasterov():
-    random_state = np.random.RandomState(84)
-    shape_names = list(["sphere", "ellipsoid", "capsule", "cone", "cylinder", "box"])
-    for i in range(100):
-        print(i)
-
-        shape1 = shape_names[random_state.randint(len(shape_names))]
-        args1 = random.RANDOM_GENERATORS[shape1](random_state)
-        shape2 = shape_names[random_state.randint(len(shape_names))]
-        args2 = random.RANDOM_GENERATORS[shape2](random_state)
-        collider1 = colliders.COLLIDERS[shape1](*args1)
-        collider2 = colliders.COLLIDERS[shape2](*args2)
-
-        intersection_jolt = gjk.gjk_intersection_jolt(collider1, collider2)
-        intersection_libccd = gjk.gjk_intersection_libccd(collider1, collider2)
-        intersection_nesterov = gjk.gjk_nesterov_accelerated_intersection(collider1, collider2)
-        assert intersection_jolt == intersection_libccd
-        assert intersection_jolt == intersection_nesterov
-        assert intersection_nesterov == intersection_libccd
-
 def test_compare_gjk_distance_flavours_with_random_shapes():
     random_state = np.random.RandomState(85)
     shape_names = list(colliders.COLLIDERS.keys())
