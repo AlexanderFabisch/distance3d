@@ -198,10 +198,7 @@ def origin_to_triangle(simplex, a_index, b_index, c_index, abc, abc_dot_a0):
     else:
         simplex[0], simplex[1], simplex[2] = simplex[b_index], simplex[c_index], simplex[a_index]
 
-    abc_sq_norm = abc.dot(abc)
-    ray = -abc_dot_a0 * abc
-    if abc_sq_norm >= EPSILON:
-        ray /= abc_sq_norm
+    ray = -abc_dot_a0 / abc.dot(abc) * abc
     return ray, 3, False
 
 
