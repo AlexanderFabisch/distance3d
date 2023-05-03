@@ -1,7 +1,7 @@
 import numpy as np
 import numba
 
-from ..colliders import MeshGraph, Capsule, Sphere, Box, Ellipse, Cone, Cylinder
+from ..colliders import MeshGraph, Capsule, Sphere, Box, Ellipse, Cone, Cylinder, Ellipsoid
 from ..utils import norm_vector, EPSILON
 
 
@@ -38,7 +38,7 @@ def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None):
     contact : bool
         Shapes collide
     """
-    return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[1]
+    return max(gjk_nesterov_accelerated(collider1, collider2, ray_guess)[1], 0.0)
 
 
 def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
@@ -632,7 +632,7 @@ def select_support(dir, collider):
     if type(collider) == Box:
         return box_support(dir, collider), True
 
-    if type(collider) == Ellipse:
+    if type(collider) == Ellipsoid:
         return ellipsoid_support(dir, collider), True
 
     if type(collider) == Cone:
@@ -677,9 +677,9 @@ def box_support(dir, box):
 def ellipsoid_support(dir, ellipsoid):
     a2 = ellipsoid.radii[0] * ellipsoid.radii[0]
     b2 = ellipsoid.radii[1] * ellipsoid.radii[1]
-    # c2 = ellipsoid.radii[2] * ellipsoid.radii[2] TODO
+    c2 = ellipsoid.radii[2] * ellipsoid.radii[2]
 
-    v = np.array([a2 * dir[0], b2 * dir[1], dir[2]])
+    v = np.array([a2 * dir[0], b2 * dir[1], c2 * dir[2]])
     d = np.sqrt(v.dot(dir))
 
     return v / d
