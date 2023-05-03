@@ -166,7 +166,7 @@ def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_poi
     ),
     cache=True)
 def origin_to_point(simplex, a_index, a):
-    simplex[0] = simplex[a_index]
+    simplex[0] = a
     return np.copy(a), 1
 
 
@@ -178,7 +178,7 @@ def origin_to_point(simplex, a_index, a):
     cache=True)
 def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
     ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
-    simplex[0], simplex[1] = simplex[b_index], simplex[a_index]
+    simplex[0], simplex[1] = b, a
     return ray, 2
 
 
@@ -188,15 +188,15 @@ def origin_to_segment(simplex, a_index, b_index, a, b, ab, ab_dot_a0):
         numba.float64[::1], numba.float64
     ),
     cache=True)
-def origin_to_triangle(simplex, a_index, b_index, c_index, abc, abc_dot_a0):
+def origin_to_triangle(simplex, a, b, c, abc, abc_dot_a0):
     if abc_dot_a0 == 0:
-        simplex[0], simplex[1], simplex[2] = simplex[c_index], simplex[b_index], simplex[a_index]
+        simplex[0], simplex[1], simplex[2] = c, b, a
         return np.zeros(3), 3, True
 
     if abc_dot_a0 > 0:
-        simplex[0], simplex[1], simplex[2] = simplex[c_index], simplex[b_index], simplex[a_index]
+        simplex[0], simplex[1], simplex[2] = c, b, a
     else:
-        simplex[0], simplex[1], simplex[2] = simplex[b_index], simplex[c_index], simplex[a_index]
+        simplex[0], simplex[1], simplex[2] = np.copy(b), np.copy(c), np.copy(a)
 
     ray = -abc_dot_a0 / abc.dot(abc) * abc
     return ray, 3, False
@@ -282,7 +282,7 @@ def project_triangle_origin(triangle):
         if edge_ab2o >= 0:
             ray, simplex_len = t_b(triangle, a_index, b_index, a, b, ab)
         else:
-            return origin_to_triangle(triangle, a_index, b_index, c_index, abc, abc.dot(-a))
+            return origin_to_triangle(triangle, a, b, c, abc, abc.dot(-a))
 
     return ray, simplex_len, False
 
@@ -334,7 +334,7 @@ def region_ad(simplex, a_index, d_index, a, d, da_aa):
     ),
     cache=True)
 def region_abc(simplex, a_index, b_index, c_index, a, b, c, a_cross_b):
-    return origin_to_triangle(simplex, a_index, b_index, c_index, np.cross(b - a, c - a), -c.dot(a_cross_b))[:2]
+    return origin_to_triangle(simplex, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))[:2]
 
 
 @numba.njit(
@@ -345,7 +345,7 @@ def region_abc(simplex, a_index, b_index, c_index, a, b, c, a_cross_b):
     ),
     cache=True)
 def region_acd(simplex, a_index, c_index, d_index, a, c, d, a_cross_c):
-    return origin_to_triangle(simplex, a_index, c_index, d_index, np.cross(c - a, d - a), -d.dot(a_cross_c))[:2]
+    return origin_to_triangle(simplex, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))[:2]
 
 
 @numba.njit(
@@ -356,7 +356,7 @@ def region_acd(simplex, a_index, c_index, d_index, a, c, d, a_cross_c):
     ),
     cache=True)
 def region_adb(simplex, a_index, d_index, b_index, a, d, b, a_cross_b):
-    return origin_to_triangle(simplex, a_index, d_index, b_index, np.cross(d - a, b - a), d.dot(a_cross_b))[:2]
+    return origin_to_triangle(simplex, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))[:2]
 
 
 @numba.njit(
