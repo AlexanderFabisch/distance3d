@@ -124,120 +124,74 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
             break
 
         if use_nesterov_acceleration:
-            ray_dir = nesterov_direction(i, normalize_support_direction, ray, ray_dir, support_point)
+            if normalize_support_direction:
+                momentum = (i + 2) / (i + 3)
+                y = momentum * ray + (1.0 - momentum) * support_point
+                ray_dir = momentum * norm_vector(ray_dir) + (1.0 - momentum) * norm_vector(y)
+            else:
+                momentum = (i + 1) / (i + 3)
+                y = momentum * ray + (1.0 - momentum) * support_point
+                ray_dir = momentum * ray_dir + (1.0 - momentum) * y
         else:
             ray_dir = ray
 
         s0, s1 = support_function(-ray_dir, collider0, collider1)
 
-        last_use_nesterov_acceleration = use_nesterov_acceleration
-        distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, converged = iteration(
-            alpha, distance, inflation, inside, i, ray, ray_dir, ray_len,
-            simplex, simplex_len, tolerance, upper_bound,
-            use_nesterov_acceleration, s0, s1)
+        simplex[simplex_len] = s0 - s1
+        support_point = simplex[simplex_len]
+        simplex_len += 1
 
-        if last_use_nesterov_acceleration != use_nesterov_acceleration:
-            continue
+        omega = ray_dir.dot(support_point) / np.linalg.norm(ray_dir)
+        if omega > upper_bound:
+            distance = omega - inflation
+            inside = False
+            break
 
-        if converged:
+        if use_nesterov_acceleration:
+            frank_wolfe_duality_gap = 2 * ray.dot(ray - support_point)
+            if frank_wolfe_duality_gap - tolerance <= 0:
+                use_nesterov_acceleration = False
+                simplex_len -= 1
+                continue
+
+        # Check convergence
+        alpha = max(alpha, omega)
+        diff = ray_len - alpha
+        cv_check_passed = (diff - tolerance * ray_len) <= 0
+
+        if i > 0 and cv_check_passed:
+            if i > 0:
+                simplex_len -= 1
+            if use_nesterov_acceleration:
+                use_nesterov_acceleration = False
+                continue
+            distance = ray_len - inflation
+
+            if distance < tolerance:
+                inside = True
+            break
+
+        assert 1 <= simplex_len <= 4
+        if simplex_len == 1:
+            ray = np.copy(support_point)
+        elif simplex_len == 2:
+            ray, simplex_len, inside = project_line_origin(simplex)
+        elif simplex_len == 3:
+            ray, simplex_len, inside = project_triangle_origin(simplex)
+        elif simplex_len == 4:
+            ray, simplex_len, inside = project_tetra_to_origin(simplex)
+
+        if not inside:
+            ray_len = np.linalg.norm(ray)
+        if inside or ray_len == 0:
+            distance = -inflation - 1.
+            inside = True
             break
 
         i += 1
 
     return inside, distance, simplex, i
 
-
-@numba.njit(
-    numba.types.Tuple((
-            numba.float64, numba.bool_, numba.float64[::1], numba.float64,
-            numba.int64, numba.bool_, numba.bool_))(
-        numba.float64, numba.float64, numba.float64, numba.bool_, numba.int64,
-        numba.float64[::1], numba.float64[::1], numba.float64,
-        numba.float64[:, :, ::1], numba.int64, numba.float64, numba.float64,
-        numba.bool_, numba.float64[::1], numba.float64[::1]
-    ),
-    cache=True)
-def iteration(alpha, distance, inflation, inside, i, ray, ray_dir, ray_len,
-              simplex, simplex_len, tolerance, upper_bound,
-              use_nesterov_acceleration, s0, s1):
-    simplex[simplex_len] = s0 - s1
-    support_point = simplex[simplex_len]
-    simplex_len += 1
-
-    omega = ray_dir.dot(support_point) / np.linalg.norm(ray_dir)
-    if omega > upper_bound:
-        distance = omega - inflation
-        inside = False
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
-
-    if use_nesterov_acceleration:
-        frank_wolfe_duality_gap = 2 * ray.dot(ray - support_point)
-        if frank_wolfe_duality_gap - tolerance <= 0:
-            use_nesterov_acceleration = False
-            simplex_len -= 1
-            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
-
-    cv_check_passed = check_convergence(alpha, omega, ray_len, tolerance)
-    if i > 0 and cv_check_passed:
-        if i > 0:
-            simplex_len -= 1
-        if use_nesterov_acceleration:
-            use_nesterov_acceleration = False
-            return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
-        distance = ray_len - inflation
-
-        if distance < tolerance:
-            inside = True
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
-
-    assert 1 <= simplex_len <= 4
-    if simplex_len == 1:
-        ray = np.copy(support_point)
-    elif simplex_len == 2:
-        ray, simplex_len, inside = project_line_origin(simplex)
-    elif simplex_len == 3:
-        ray, simplex_len, inside = project_triangle_origin(simplex)
-    elif simplex_len == 4:
-        ray, simplex_len, inside = project_tetra_to_origin(simplex)
-
-    if not inside:
-        ray_len = np.linalg.norm(ray)
-    if inside or ray_len == 0:
-        distance = -inflation - 1.
-        inside = True
-        return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, True
-
-    return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
-
-
-
-
-@numba.njit(
-    numba.float64[::1](
-        numba.int64, numba.bool_, numba.float64[::1], numba.float64[::1],
-        numba.float64[:, ::1]
-    ),
-    cache=True)
-def nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_point):
-    if normalize_support_direction:
-        momentum = (k + 2) / (k + 3)
-        y = momentum * ray + (1.0 - momentum) * support_point
-        ray_dir = momentum * norm_vector(ray_dir) + (1.0 - momentum) * norm_vector(y)
-    else:
-        momentum = (k + 1) / (k + 3)
-        y = momentum * ray + (1.0 - momentum) * support_point
-        ray_dir = momentum * ray_dir + (1.0 - momentum) * y
-
-    return ray_dir
-
-
-@numba.njit(
-    numba.bool_(numba.float64, numba.float64, numba.float64, numba.float64),
-    cache=True)
-def check_convergence(alpha, omega, ray_len, tolerance):
-    alpha = max(alpha, omega)
-    diff = ray_len - alpha
-    return (diff - tolerance * ray_len) <= 0
 
 @numba.njit(
     numba.types.Tuple((numba.float64[::1], numba.int64))(
