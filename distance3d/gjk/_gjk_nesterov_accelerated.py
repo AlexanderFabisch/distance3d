@@ -1,18 +1,17 @@
 import numpy as np
 import numba
 
-from ..colliders import MeshGraph, Capsule, Sphere, Box, Cone, Cylinder, Ellipsoid
-from ..utils import norm_vector
+from ..colliders import Capsule, Sphere, Box, Cone, Cylinder, Ellipsoid
 
 
-def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
+def gjk_nesterov_accelerated_intersection(collider0, collider1, ray_guess=None):
     """
     Parameters
     ----------
-    collider1 : ConvexCollider
+    collider0 : ConvexCollider
         Convex collider 1.
 
-    collider2 : ConvexCollider
+    collider1 : ConvexCollider
         Convex collider 2.
 
     Returns
@@ -20,17 +19,17 @@ def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
     contact : bool
         Shapes collide
     """
-    return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[0]
+    return gjk_nesterov_accelerated(collider0, collider1, ray_guess)[0]
 
 
-def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None):
+def gjk_nesterov_accelerated_distance(collider0, collider1, ray_guess=None):
     """
     Parameters
     ----------
-    collider1 : ConvexCollider
+    collider0 : ConvexCollider
         Convex collider 1.
 
-    collider2 : ConvexCollider
+    collider1 : ConvexCollider
         Convex collider 2.
 
     Returns
@@ -38,7 +37,7 @@ def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None):
     contact : bool
         Shapes collide
     """
-    return max(gjk_nesterov_accelerated(collider1, collider2, ray_guess)[1], 0.0)
+    return max(gjk_nesterov_accelerated(collider0, collider1, ray_guess)[1], 0.0)
 
 
 def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
@@ -59,32 +58,57 @@ def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
     return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[3]
 
 
+def get_minkowski_diff(collider0, collider1):
+    # Tuple data
+    # - 0 type0 (int)
+    # - 1 data0 (vec3)
+    # - 2 type1 (int)
+    # - 3 data1 (vec3
+    # - 4 oR1  (mat4)
+    # - 5 ot1  (vec3)
+
+    data0, type0 = get_data_from_collider(collider0)
+    data1, type1 = get_data_from_collider(collider1)
+    oR1 = np.dot(collider0.frame()[:3, :3].T, collider1.frame()[:3, :3])
+    ot1 = np.dot(collider0.frame()[:3, :3].T, collider1.center() - collider0.frame()[:3, 3])
+
+    minkowski_diff = (type0, data0, type1, data1, oR1, ot1)
+    return minkowski_diff
+
+
+def get_data_from_collider(collider):
+    if type(collider) == Sphere:
+        return np.array([0.0, 0.0, 0.0]), 0
+
+    if type(collider) == Capsule:
+        h = collider.height / 2
+        return np.array([h, 0.0, 0.0]), 1
+
+    if type(collider) == Box:
+        s = collider.size / 2
+        return s, 2
+
+    if type(collider) == Ellipsoid:
+        a2 = collider.radii[0] * collider.radii[0]
+        b2 = collider.radii[1] * collider.radii[1]
+        c2 = collider.radii[2] * collider.radii[2]
+        return np.array([a2, b2, c2]), 3
+
+    if type(collider) == Cone:
+        h = collider.height / 2
+        r = collider.radius
+        return np.array([h, r, 0.0]), 4
+
+    if type(collider) == Cylinder:
+        h = collider.length / 2
+        r = collider.radius
+        return np.array([h, r, 0.0]), 5
+
+    print("Invalid Collider!!!")
+
+
 def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6, use_nesterov_acceleration=False):
-    """
-    Parameters
-    ----------
-    collider0 : ConvexCollider
-        Convex collider 1.
-
-    collider1 : ConvexCollider
-        Convex collider 2.
-
-    Returns
-    -------
-    contact : bool
-        Shapes collide
-
-    distance : float
-        Distance between shapes
-
-    simplex :
-        Distance between shapes
-    """
-
-    # ------ Initialize Variables ------
-
-    # normalize_support_direction is for soem reason only needed when both colliders are an mesh.
-    normalize_support_direction = type(collider0) == MeshGraph and type(collider1) == MeshGraph
+    minkowski_diff = get_minkowski_diff(collider0, collider1)
 
     # Infaltion is only used with spheres and capsules
     inflation = 0.0
@@ -93,6 +117,12 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
 
     if type(collider1) == Sphere or type(collider1) == Capsule:
         inflation += collider1.radius
+
+    return run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance, use_nesterov_acceleration)
+
+
+def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance, use_nesterov_acceleration):
+    # ------ Initialize Variables ------
 
     upper_bound += inflation
 
@@ -124,18 +154,13 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
             break
 
         if use_nesterov_acceleration:
-            if normalize_support_direction:
-                momentum = (i + 2) / (i + 3)
-                y = momentum * ray + (1.0 - momentum) * support_point
-                ray_dir = momentum * norm_vector(ray_dir) + (1.0 - momentum) * norm_vector(y)
-            else:
-                momentum = (i + 1) / (i + 3)
-                y = momentum * ray + (1.0 - momentum) * support_point
-                ray_dir = momentum * ray_dir + (1.0 - momentum) * y
+            momentum = (i + 1) / (i + 3)
+            y = momentum * ray + (1.0 - momentum) * support_point
+            ray_dir = momentum * ray_dir + (1.0 - momentum) * y
         else:
             ray_dir = ray
 
-        s0, s1 = support_function(-ray_dir, collider0, collider1)
+        s0, s1 = support_function(-ray_dir, minkowski_diff)
 
         simplex[simplex_len] = s0 - s1
         support_point = simplex[simplex_len]
@@ -562,59 +587,53 @@ def project_tetra_to_origin(tetra):
     return ray, simplex_len, False
 
 
-def support_function(dir, collider0, collider1):
-    oR1 = np.dot(collider0.frame()[:3, :3].T, collider1.frame()[:3, :3])
-    ot1 = np.dot(collider0.frame()[:3, :3].T, collider1.center() - collider0.frame()[:3, 3])
+def support_function(dir, minkowski_diff):
+    oR1 = minkowski_diff[4]
+    ot1 = minkowski_diff[5]
 
-    support0, found0 = select_support(dir, collider0)
+    support0 = select_support(dir, minkowski_diff[0], minkowski_diff[1])
 
-    support1, found1 = select_support(np.dot(-oR1.T, dir), collider1)
+    support1 = select_support(np.dot(-oR1.T, dir), minkowski_diff[2], minkowski_diff[3])
     support1 = np.dot(oR1, support1) + ot1
 
-    if found0 and found1:
-        return support0, support1
-
-    return collider0.support_function(dir), collider1.support_function(-dir)
+    return support0, support1
 
 
-def select_support(dir, collider):
-    if type(collider) == Sphere:
-        return sphere_support(), True
+def select_support(dir, type, data):
+    if type == 0:
+        return sphere_support()
 
-    if type(collider) == Capsule:
-        return capsule_support(dir, collider), True
+    if type == 1:
+        return capsule_support(dir, data)
 
-    if type(collider) == Box:
-        return box_support(dir, collider), True
+    if type == 2:
+        return box_support(dir, data)
 
-    if type(collider) == Ellipsoid:
-        return ellipsoid_support(dir, collider), True
+    if type == 3:
+        return ellipsoid_support(dir, data)
 
-    if type(collider) == Cone:
-        return cone_support(dir, collider), True
+    if type == 4:
+        return cone_support(dir, data)
 
-    if type(collider) == Cylinder:
-        return cylinder_support(dir, collider), True
-
-    # Type not found
-    return np.array([0.0, 0.0, 0.0]), False
+    if type == 5:
+        return cylinder_support(dir, data)
 
 
 def sphere_support():
     return np.array([0.0, 0.0, 0.0])
 
 
-def capsule_support(dir, capsule):
+def capsule_support(dir, data):
     support = np.array([0.0, 0.0, 0.0])
     if dir[2] > 0:
-        support[2] = capsule.height / 2
+        support[2] = data[0]
     else:
-        support[2] = -capsule.height / 2
+        support[2] = -data[0]
 
     return support
 
 
-def box_support(dir, box):
+def box_support(dir, data):
     inflate = 1.0
     if (dir == 0).any():
         inflate = 1.00000001
@@ -622,30 +641,26 @@ def box_support(dir, box):
     support = np.array([0.0, 0.0, 0.0])
     for i in range(0, 3):
         if dir[i] > 0:
-            support[i] = inflate * (box.size[i] / 2)
+            support[i] = inflate * data[i]
         else:
-            support[i] = -inflate * (box.size[i] / 2)
+            support[i] = -inflate * data[i]
 
     return support
 
 
-def ellipsoid_support(dir, ellipsoid):
-    a2 = ellipsoid.radii[0] * ellipsoid.radii[0]
-    b2 = ellipsoid.radii[1] * ellipsoid.radii[1]
-    c2 = ellipsoid.radii[2] * ellipsoid.radii[2]
-
-    v = np.array([a2 * dir[0], b2 * dir[1], c2 * dir[2]])
+def ellipsoid_support(dir, data):
+    v = data * dir
     d = np.sqrt(v.dot(dir))
 
     return v / d
 
 
-def cone_support(dir, cone):
+def cone_support(dir, data):
     support = np.array([0.0, 0.0, 0.0])
 
     inflate = 1.00001
-    h = cone.height / 2
-    r = cone.radius
+    h = data[0]
+    r = data[1]
 
     if (dir[:2] == 0).all():
         dir[0] = 0.0
@@ -680,21 +695,21 @@ def cone_support(dir, cone):
     return support
 
 
-def cylinder_support(dir, cylinder):
+def cylinder_support(dir, data):
     support = np.array([0.0, 0.0, 0.0])
 
     inflate = 1.00001
 
-    half_h = cylinder.length / 2
-    r = cylinder.radius
+    h = data[0]
+    r = data[1]
 
     if (dir[:2] == np.array([0.0, 0.0])).all():
-        half_h *= inflate
+        h *= inflate
 
     if dir[2] > 0:
-        support[2] = half_h
+        support[2] = h
     elif dir[2] < 0:
-        support[2] = -half_h
+        support[2] = -h
     else:
         support[2] = 0
         r *= inflate
