@@ -59,7 +59,7 @@ def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
     return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[3]
 
 
-def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6):
+def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6, use_nesterov_acceleration=False):
     """
     Parameters
     ----------
@@ -82,7 +82,6 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
     """
 
     # ------ Initialize Variables ------
-    use_nesterov_acceleration = False
 
     # normalize_support_direction is for soem reason only needed when both colliders are an mesh.
     normalize_support_direction = type(collider0) == MeshGraph and type(collider1) == MeshGraph
@@ -116,29 +115,36 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
     ray_dir = ray  # d in paper
     support_point = np.array(ray)  # s in paper
 
-    iterations = 0
-    for k in range(max_interations):
-        iterations = k
+
+    i = 0
+    while i < max_interations:
         if ray_len < tolerance:
             distance = -inflation
             inside = True
             break
 
         if use_nesterov_acceleration:
-            ray_dir = nesterov_direction(k, normalize_support_direction, ray, ray_dir, support_point)
+            ray_dir = nesterov_direction(i, normalize_support_direction, ray, ray_dir, support_point)
         else:
             ray_dir = ray
 
         s0, s1 = support_function(-ray_dir, collider0, collider1)
 
+        last_use_nesterov_acceleration = use_nesterov_acceleration
         distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, converged = iteration(
-            alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
+            alpha, distance, inflation, inside, i, ray, ray_dir, ray_len,
             simplex, simplex_len, tolerance, upper_bound,
             use_nesterov_acceleration, s0, s1)
+
+        if last_use_nesterov_acceleration != use_nesterov_acceleration:
+            continue
+
         if converged:
             break
 
-    return inside, distance, simplex, iterations
+        i += 1
+
+    return inside, distance, simplex, i
 
 
 @numba.njit(
@@ -151,7 +157,7 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
         numba.bool_, numba.float64[::1], numba.float64[::1]
     ),
     cache=True)
-def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
+def iteration(alpha, distance, inflation, inside, i, ray, ray_dir, ray_len,
               simplex, simplex_len, tolerance, upper_bound,
               use_nesterov_acceleration, s0, s1):
     simplex[simplex_len] = s0 - s1
@@ -172,8 +178,8 @@ def iteration(alpha, distance, inflation, inside, k, ray, ray_dir, ray_len,
             return distance, inside, ray, ray_len, simplex_len, use_nesterov_acceleration, support_point, False
 
     cv_check_passed = check_convergence(alpha, omega, ray_len, tolerance)
-    if k > 0 and cv_check_passed:
-        if k > 0:
+    if i > 0 and cv_check_passed:
+        if i > 0:
             simplex_len -= 1
         if use_nesterov_acceleration:
             use_nesterov_acceleration = False
