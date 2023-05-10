@@ -107,7 +107,7 @@ def get_data_from_collider(collider):
     print("Invalid Collider!!!")
 
 
-def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6, use_nesterov_acceleration=False):
+def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6, use_nesterov_acceleration=True):
     minkowski_diff = get_minkowski_diff(collider0, collider1)
 
     # Inflation is only used with spheres and capsules
@@ -121,6 +121,7 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
     return run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance, use_nesterov_acceleration)
 
 
+@numba.njit(cache=True)
 def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance, use_nesterov_acceleration):
     # ------ Initialize Variables ------
 
@@ -129,7 +130,7 @@ def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_inter
     alpha = 0.0
 
     inside = False
-    simplex = np.empty([4, 3], dtype=float)
+    simplex = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
     simplex_len = 0
     distance = 0.0
 
@@ -143,7 +144,7 @@ def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_inter
         ray_len = 1
 
     ray_dir = ray  # d in paper
-    support_point = np.array(ray)  # s in paper
+    support_point = ray.copy()  # s in paper
 
     i = 0
     while i < max_interations:
@@ -217,34 +218,20 @@ def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_inter
     return inside, distance, simplex, i
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.int64))(
-        numba.float64[:, :, ::1], numba.int64, numba.float64[::1]
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def origin_to_point(simplex, a):
     simplex[0] = np.copy(a)
     return np.copy(a), 1
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.int64))(
-        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.float64[::1],
-        numba.float64[::1], numba.float64[::1], numba.float64
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def origin_to_segment(simplex, a, b, ab, ab_dot_a0):
     ray = (ab.dot(b) * a + ab_dot_a0 * b) / ab.dot(ab)
     simplex[0], simplex[1] = np.copy(b), np.copy(a)
     return ray, 2
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.int64, numba.bool_))(
-        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.int64,
-        numba.float64[::1], numba.float64
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def origin_to_triangle(simplex, a, b, c, abc, abc_dot_a0):
     if abc_dot_a0 == 0:
         simplex[0], simplex[1], simplex[2] = np.copy(c), np.copy(b), np.copy(a)
@@ -259,11 +246,7 @@ def origin_to_triangle(simplex, a, b, c, abc, abc_dot_a0):
     return ray, 3, False
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.int64, numba.bool_))(
-        numba.float64[:, :, ::1]
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def project_line_origin(line):
     # A is the last point we added.
     a_index = 1
@@ -291,12 +274,7 @@ def project_line_origin(line):
     return ray, simplex_len, False
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.bool_))(
-        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.float64[::1],
-        numba.float64[::1], numba.float64[::1]
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def t_b(triangle, a, b, ab):
     towards_b = ab.dot(-a)
     if towards_b < 0:
@@ -305,11 +283,7 @@ def t_b(triangle, a, b, ab):
         return origin_to_segment(triangle, a, b, ab, towards_b)
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.int64, numba.bool_))(
-        numba.float64[:, :, ::1]
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def project_triangle_origin(triangle):
     # A is the last point we added.
     a_index = 2
@@ -344,82 +318,41 @@ def project_triangle_origin(triangle):
     return ray, simplex_len, False
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.bool_))(
-        numba.float64[:, :, ::1], numba.int64, numba.float64[::1]
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def region_a(simplex, a):
     return origin_to_point(simplex, a)
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.bool_))(
-        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.float64[::1],
-        numba.float64[::1], numba.float64
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def region_ab(simplex, a, b, ba_aa):
     return origin_to_segment(simplex, a, b, b - a, -ba_aa)
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.bool_))(
-        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.float64[::1],
-        numba.float64[::1], numba.float64
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def region_ac(simplex, a, c, ca_aa):
     return origin_to_segment(simplex, a, c, c - a, -ca_aa)
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.bool_))(
-        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.float64[::1],
-        numba.float64[::1], numba.float64
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def region_ad(simplex, a, d, da_aa):
     return origin_to_segment(simplex, a, d, d - a, -da_aa)
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.bool_))(
-        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.int64,
-        numba.float64[::1], numba.float64[::1], numba.float64[::1],
-        numba.float64[::1]
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def region_abc(simplex, a, b, c, a_cross_b):
     return origin_to_triangle(simplex, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))[:2]
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.bool_))(
-        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.int64,
-        numba.float64[::1], numba.float64[::1], numba.float64[::1],
-        numba.float64[::1]
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def region_acd(simplex, a, c, d, a_cross_c):
     return origin_to_triangle(simplex, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))[:2]
 
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.bool_))(
-        numba.float64[:, :, ::1], numba.int64, numba.int64, numba.int64,
-        numba.float64[::1], numba.float64[::1], numba.float64[::1],
-        numba.float64[::1]
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def region_adb(simplex, a, d, b, a_cross_b):
     return origin_to_triangle(simplex, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))[:2]
 
-@numba.njit(
-    numba.types.Tuple((numba.float64[::1], numba.int64, numba.bool_))(
-        numba.float64[:, :, ::1]
-    ),
-    cache=True)
+@numba.njit(cache=True)
 def project_tetra_to_origin(tetra):
     a_index = 3
     b_index = 2
@@ -582,7 +515,7 @@ def project_tetra_to_origin(tetra):
                 ray, simplex_len = region_a(tetra, a)
     return ray, simplex_len, False
 
-
+@numba.njit(cache=True)
 def support_function(dir, minkowski_diff):
     oR1 = minkowski_diff[4]
     ot1 = minkowski_diff[5]
@@ -594,7 +527,7 @@ def support_function(dir, minkowski_diff):
 
     return support0, support1
 
-
+@numba.njit(cache=True)
 def select_support(dir, type, data):
     if type == 0:
         return sphere_support()
@@ -614,11 +547,11 @@ def select_support(dir, type, data):
     if type == 5:
         return cylinder_support(dir, data)
 
-
+@numba.njit(cache=True)
 def sphere_support():
     return np.array([0.0, 0.0, 0.0])
 
-
+@numba.njit(cache=True)
 def capsule_support(dir, data):
     support = np.array([0.0, 0.0, 0.0])
     if dir[2] > 0:
@@ -628,7 +561,7 @@ def capsule_support(dir, data):
 
     return support
 
-
+@numba.njit(cache=True)
 def box_support(dir, data):
     inflate = 1.0
     if (dir == 0).any():
@@ -643,14 +576,14 @@ def box_support(dir, data):
 
     return support
 
-
+@numba.njit(cache=True)
 def ellipsoid_support(dir, data):
     v = data * dir
     d = np.sqrt(v.dot(dir))
 
     return v / d
 
-
+@numba.njit(cache=True)
 def cone_support(dir, data):
     support = np.array([0.0, 0.0, 0.0])
 
@@ -690,7 +623,7 @@ def cone_support(dir, data):
     support[2] = -h
     return support
 
-
+@numba.njit(cache=True)
 def cylinder_support(dir, data):
     support = np.array([0.0, 0.0, 0.0])
 
