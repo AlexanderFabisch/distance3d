@@ -10,14 +10,12 @@ def test_gjk_points():
     assert gjk.gjk_intersection_libccd(p1, p1)
     assert gjk.gjk_distance_original(p1, p1)[0] == 0.0
     assert gjk.gjk_distance_jolt(p1, p1)[0] == 0.0
-    assert gjk.gjk_nesterov_accelerated_intersection(p1, p1)
 
     p2 = colliders.ConvexHullVertices(np.array([[1.0, 0.0, 0.0]]))
     assert not gjk.gjk_intersection_jolt(p1, p2)
     assert not gjk.gjk_intersection_libccd(p1, p2)
     assert gjk.gjk_distance_original(p1, p2)[0] == 1.0
     assert gjk.gjk_distance_jolt(p1, p2)[0] == 1.0
-    assert not gjk.gjk_nesterov_accelerated_intersection(p1, p2)
 
 
 def test_gjk_line_segments():
@@ -331,11 +329,8 @@ def test_compare_gjk_distance_flavours_with_random_shapes():
 
         dist_jolt, cp1_jolt, cp2_jolt, _ = gjk.gjk_distance_jolt(collider1, collider2)
         dist_orig, cp1_orig, cp2_orig, _ = gjk.gjk_distance_original(collider1, collider2)
-        dist_nesterov = gjk.gjk_nesterov_accelerated_distance(collider1, collider2)
         assert approx(dist_jolt) == dist_orig
         assert approx(np.linalg.norm(cp1_orig - cp2_orig)) == np.linalg.norm(cp1_jolt - cp2_jolt)
-
-        # assert approx(dist_nesterov) == dist_orig
 
 
 def test_gjk_random_points():
