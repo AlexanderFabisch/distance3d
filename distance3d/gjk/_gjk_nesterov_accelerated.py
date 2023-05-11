@@ -2,6 +2,7 @@ import numpy as np
 import numba
 
 from ..colliders import Capsule, Sphere, Box, Cone, Cylinder, Ellipsoid
+from ..utils import EPSILON
 
 
 def gjk_nesterov_accelerated_intersection(collider0, collider1, ray_guess=None):
@@ -118,12 +119,27 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
     if type(collider1) == Sphere or type(collider1) == Capsule:
         inflation += collider1.radius
 
+    search_direction = np.array([1.0, 0.0, 0.0])
+    p = collider0.support_function(search_direction)
+    q = collider1.support_function(-search_direction)
+    support_point = p - q
+
+    # If the support point is in the opposite direction as search_direction,
+    # then we have found a separating axis and there is no intersection
+    if support_point.dot(search_direction) < -EPSILON:
+        # Separating axis found
+        return False, 0.0, np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]), 1
+
+
+
     return run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance, use_nesterov_acceleration)
 
 
 @numba.njit(cache=True)
 def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance, use_nesterov_acceleration):
     # ------ Initialize Variables ------
+
+
 
     upper_bound += inflation
 
@@ -148,6 +164,8 @@ def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_inter
 
     i = 0
     while i < max_interations:
+
+
         if ray_len < tolerance:
             distance = -inflation
             inside = True
