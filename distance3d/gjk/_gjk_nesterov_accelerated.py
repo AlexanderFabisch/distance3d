@@ -107,7 +107,7 @@ def get_data_from_collider(collider):
     print("Invalid Collider!!!")
 
 
-def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6, use_nesterov_acceleration=True):
+def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6, use_nesterov_acceleration=False):
     minkowski_diff = get_minkowski_diff(collider0, collider1)
 
     # Inflation is only used with spheres and capsules
