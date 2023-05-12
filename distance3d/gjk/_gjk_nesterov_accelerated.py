@@ -130,8 +130,6 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
         # Separating axis found
         return False, 0.0, np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]), 1
 
-
-
     return run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance, use_nesterov_acceleration)
 
 
