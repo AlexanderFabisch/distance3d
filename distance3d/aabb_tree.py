@@ -342,7 +342,7 @@ def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=
         stack = stack[:-1]
 
         node_aabb = aabbs[node_index]
-        if _aabb_overlap(node_aabb, test_aabb):
+        if aabb_overlap(node_aabb, test_aabb):
 
             if nodes[node_index, TYPE_INDEX] == TYPE_LEAF:
                 overlaps.extend([node_index])
@@ -431,7 +431,7 @@ def all_aabbs_overlap(aabbs1, aabbs2):
     broad_pairs = []
     for i in range(len(aabbs1)):
         for j in range(len(aabbs2)):
-            if _aabb_overlap(aabbs1[i], aabbs2[j]):
+            if aabb_overlap(aabbs1[i], aabbs2[j]):
                 indices1.append(i)
                 indices2.append(j)
                 broad_pairs.append((i, j))
@@ -441,7 +441,7 @@ def all_aabbs_overlap(aabbs1, aabbs2):
 
 
 @numba.njit(cache=True)
-def _aabb_overlap(aabb1, aabb2):
+def aabb_overlap(aabb1, aabb2):
     """Returns true if aabb1 and aabb2 overlap."""
     return aabb1[0, 0] <= aabb2[0, 1] and aabb1[0, 1] >= aabb2[0, 0] \
            and aabb1[1, 0] <= aabb2[1, 1] and aabb1[1, 1] >= aabb2[1, 0] \
