@@ -340,4 +340,5 @@ API Reference
 
    ~distance3d.aabb_tree.AabbTree
    ~distance3d.aabb_tree.all_aabbs_overlap
+   ~distance3d.aabb_tree.aabb_overlap
 
