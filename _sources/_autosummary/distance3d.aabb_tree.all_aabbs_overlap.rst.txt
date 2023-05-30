@@ -1,0 +1,6 @@
+﻿distance3d.aabb\_tree.all\_aabbs\_overlap
+=========================================
+
+.. currentmodule:: distance3d.aabb_tree
+
+.. autofunction:: all_aabbs_overlap

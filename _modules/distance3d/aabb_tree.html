@@ -1,0 +1,596 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.aabb_tree &#8212; distance3d 0.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distance3d.aabb_tree</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numba</span>
+
+<span class="n">INDEX_NONE</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="n">PARENT_INDEX</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">LEFT_INDEX</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">RIGHT_INDEX</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">TYPE_INDEX</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">TYPE_NONE</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="n">TYPE_LEAF</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">TYPE_BRANCH</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<div class="viewcode-block" id="AabbTree"><a class="viewcode-back" href="../../_autosummary/distance3d.aabb_tree.AabbTree.html#distance3d.aabb_tree.AabbTree">[docs]</a><span class="k">class</span> <span class="nc">AabbTree</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;AABB Tree for broad phase collision checking</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    aabb_tree : AabbTree</span>
+<span class="sd">        The AabbTree Object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AabbTree.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.aabb_tree.AabbTree.html#distance3d.aabb_tree.AabbTree.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">INDEX_NONE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_data_list</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+    <span class="k">def</span> <span class="nf">insert_aabbs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">,</span> <span class="n">external_data_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pre_insertion_methode</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Insert aabbs in tree</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        aabbs : array, shape (n, 3, 2)</span>
+<span class="sd">            An array containing a list of aabbs of the tree.</span>
+
+<span class="sd">        external_data_list : list, optional (default: None)</span>
+<span class="sd">            Array of data associated with the aabbs.</span>
+
+<span class="sd">        pre_insertion_methode : str, optional (default: &quot;none&quot;)</span>
+<span class="sd">            The operation that is performed on the aabbs before tree creation.</span>
+<span class="sd">            Use &quot;sort&quot; for a cleaner tree with slightly longer creation times.</span>
+<span class="sd">            Use &quot;shuffle&quot; for a faster creation but with some non-optimal placement in the tree.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">aabbs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">assert</span> <span class="n">external_data_list</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">external_data_list</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">aabbs</span><span class="p">)</span>
+
+        <span class="n">old_filled_len</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">aabbs</span><span class="p">)</span>
+
+        <span class="c1"># The maximum number of possible nodes a tree can have is 2n</span>
+        <span class="n">new_nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">([</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)),</span> <span class="mi">4</span><span class="p">],</span> <span class="n">INDEX_NONE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">new_nodes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">new_aabbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span><span class="p">,</span> <span class="n">new_aabbs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">external_data_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">external_data_list</span> <span class="o">+=</span> <span class="n">external_data_list</span>
+        <span class="n">empty_external_data</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_data_list</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_data_list</span> <span class="o">+=</span> <span class="n">empty_external_data</span>
+
+        <span class="n">insert_order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">old_filled_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">pre_insertion_methode</span> <span class="o">==</span> <span class="s2">&quot;sort&quot;</span><span class="p">:</span>
+            <span class="n">insert_order</span> <span class="o">=</span> <span class="n">_sort_aabbs</span><span class="p">(</span><span class="n">aabbs</span><span class="p">[</span><span class="n">old_filled_len</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">pre_insertion_methode</span> <span class="o">==</span> <span class="s2">&quot;shuffle&quot;</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">insert_order</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span> \
+            <span class="o">=</span> <span class="n">insert_aabbs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span><span class="p">,</span> <span class="n">insert_order</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_data_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_data_list</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">filled_len</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">insert_aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aabb</span><span class="p">,</span> <span class="n">external_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Insert single aabb in tree</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        aabb : array, shape (3, 2)</span>
+<span class="sd">            The aabb that will be inserted into the tree.</span>
+
+<span class="sd">        external_data : Any</span>
+<span class="sd">            Data associated with the aabb.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_aabbs</span><span class="p">([</span><span class="n">aabb</span><span class="p">],</span> <span class="p">[</span><span class="n">external_data</span><span class="p">],</span> <span class="n">pre_insertion_methode</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">lines</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">print_aabb_tree_recursive</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">overlaps_aabb_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check overlapping with another tree.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : AabbTree</span>
+<span class="sd">            The other Tree for overlap testing.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_overlapping : bool</span>
+<span class="sd">            True if there is an overlap in the two trees.</span>
+
+<span class="sd">        overlap_tetrahedron1 : array, shape (n)</span>
+<span class="sd">            The indexes of the overlapping tetrahedron in this tree.</span>
+
+<span class="sd">        overlap_tetrahedron2 : array, shape (n)</span>
+<span class="sd">            The indexes of the overlapping tetrahedron in the other tree.</span>
+
+<span class="sd">        overlap_pairs : array, shape (n, 2)</span>
+<span class="sd">            An array of all overlapping pairs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">overlap_tetrahedron1</span><span class="p">,</span> <span class="n">overlap_tetrahedron2</span><span class="p">,</span> <span class="n">overlap_pairs</span> <span class="o">=</span> <span class="n">query_overlap_of_other_tree</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">aabbs</span><span class="p">)</span>
+
+        <span class="n">is_overlapping</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlap_pairs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">is_overlapping</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">overlap_tetrahedron1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">overlap_tetrahedron2</span><span class="p">),</span> <span class="n">overlap_pairs</span>
+
+    <span class="k">def</span> <span class="nf">overlaps_aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aabb</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check overlapping with an aabb.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        aabb : array, shape (3, 2)</span>
+<span class="sd">            The aabb that is checked.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_overlapping : bool</span>
+<span class="sd">            True if there is an overlap in the two trees.</span>
+
+<span class="sd">        overlaps : array, shape (n, 2)</span>
+<span class="sd">            An array of all overlapping pairs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">overlaps</span> <span class="o">=</span> <span class="n">query_overlap</span><span class="p">(</span><span class="n">aabb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlaps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">overlaps</span>
+
+    <span class="k">def</span> <span class="nf">get_root_aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the aabb of the entire tree.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        aabb : array, shape (3, 2)</span>
+<span class="sd">            The aabb of the root node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aabbs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">]</span></div>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">insert_aabbs</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">,</span> <span class="n">filled_len</span><span class="p">,</span> <span class="n">insert_order</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Inserts aabbs into the tree defined in root and nodes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    root : int</span>
+<span class="sd">        The index of the tree root node.</span>
+
+<span class="sd">    nodes : array, shape (n, 4)</span>
+<span class="sd">        The index links of the tree structure.</span>
+<span class="sd">        The indices of the 1-axis correspond to the aabb indices.</span>
+<span class="sd">        The first entry in of the 2-axis is the index of the parent.</span>
+<span class="sd">        The second entry in of the 2-axis is the index of the left child.</span>
+<span class="sd">        The third entry in of the 2-axis is the index of the right child.</span>
+<span class="sd">        The forth entry in of the 2-axis is 1 if leaf and 2 if branch node.</span>
+
+<span class="sd">    aabbs : array, shape (3, 2)</span>
+<span class="sd">        The aabbs that are inserted.</span>
+
+<span class="sd">    filled_len : int</span>
+<span class="sd">        The length to which the nodes and aabbs are filled.</span>
+
+<span class="sd">    insert_order : array, shape (filled_len)</span>
+<span class="sd">        A list of indexes describing the insert order into the tree.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    root : int</span>
+<span class="sd">        The index of the tree root node.</span>
+
+<span class="sd">    nodes : array, shape (n, 4)</span>
+<span class="sd">        The index links of the tree structure.</span>
+
+<span class="sd">    aabbs : array, shape (3, 2)</span>
+<span class="sd">        The aabbs of the tree.</span>
+
+<span class="sd">    filled_len : int</span>
+<span class="sd">        The length to which the nodes and aabbs are filled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">insert_order</span><span class="p">:</span>
+        <span class="n">root</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">,</span> <span class="n">filled_len</span> <span class="o">=</span> <span class="n">insert_leaf</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">,</span> <span class="n">filled_len</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">root</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">,</span> <span class="n">filled_len</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">insert_leaf</span><span class="p">(</span><span class="n">root_node_index</span><span class="p">,</span> <span class="n">leaf_node_index</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">,</span> <span class="n">filled_len</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inserts a new leaf into the tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># From https://github.com/JamesRandall/SimpleVoxelEngine/blob/master/voxelEngine/src/AABBTree.cpp</span>
+    <span class="c1"># The Node that&#39;s going to be added.</span>
+    <span class="c1"># A node in this system consists of three variables. An int as index.</span>
+    <span class="c1"># The node array with containing [parent_index, left_child_index, right_child_index, type]</span>
+
+    <span class="n">nodes</span><span class="p">[</span><span class="n">leaf_node_index</span><span class="p">,</span> <span class="n">TYPE_INDEX</span><span class="p">]</span> <span class="o">=</span> <span class="n">TYPE_LEAF</span>
+
+    <span class="c1"># If there is no root make new leaf root.</span>
+    <span class="k">if</span> <span class="n">root_node_index</span> <span class="o">==</span> <span class="n">INDEX_NONE</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">leaf_node_index</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">,</span> <span class="n">filled_len</span>
+
+    <span class="c1"># Traverse the tree down till you find a leaf.</span>
+    <span class="n">tree_node_index</span> <span class="o">=</span> <span class="n">root_node_index</span>
+    <span class="k">while</span> <span class="n">nodes</span><span class="p">[</span><span class="n">tree_node_index</span><span class="p">,</span> <span class="n">TYPE_INDEX</span><span class="p">]</span> <span class="o">==</span> <span class="n">TYPE_BRANCH</span><span class="p">:</span>
+
+        <span class="c1"># Getting nodes from arrays</span>
+        <span class="n">left_node_index</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">tree_node_index</span><span class="p">,</span> <span class="n">LEFT_INDEX</span><span class="p">]</span>
+        <span class="n">right_node_index</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">tree_node_index</span><span class="p">,</span> <span class="n">RIGHT_INDEX</span><span class="p">]</span>
+
+        <span class="c1"># Whether the left or right child is traverse down depends on the cost of increasing the size of the aabbs.</span>
+        <span class="n">cost_new_parent</span> <span class="o">=</span> <span class="n">_aabb_volume</span><span class="p">(</span>
+            <span class="n">_merge_aabb</span><span class="p">(</span><span class="n">aabbs</span><span class="p">[</span><span class="n">leaf_node_index</span><span class="p">],</span> <span class="n">aabbs</span><span class="p">[</span><span class="n">tree_node_index</span><span class="p">]))</span>
+
+        <span class="n">cost_left</span> <span class="o">=</span> <span class="n">_aabb_volume</span><span class="p">(</span>
+            <span class="n">_merge_aabb</span><span class="p">(</span><span class="n">aabbs</span><span class="p">[</span><span class="n">leaf_node_index</span><span class="p">],</span> <span class="n">aabbs</span><span class="p">[</span><span class="n">left_node_index</span><span class="p">]))</span>
+
+        <span class="n">cost_right</span> <span class="o">=</span> <span class="n">_aabb_volume</span><span class="p">(</span>
+            <span class="n">_merge_aabb</span><span class="p">(</span><span class="n">aabbs</span><span class="p">[</span><span class="n">leaf_node_index</span><span class="p">],</span> <span class="n">aabbs</span><span class="p">[</span><span class="n">right_node_index</span><span class="p">]))</span>
+
+        <span class="c1"># This doesn&#39;t seem to happen ever. So need to check if it does</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="p">(</span><span class="n">cost_left</span> <span class="o">&gt;</span> <span class="n">cost_new_parent</span> <span class="ow">and</span> <span class="n">cost_right</span> <span class="o">&gt;</span> <span class="n">cost_new_parent</span><span class="p">)</span>
+
+        <span class="c1"># otherwise go down the cheaper child.</span>
+        <span class="k">if</span> <span class="n">cost_left</span> <span class="o">&lt;</span> <span class="n">cost_right</span><span class="p">:</span>
+            <span class="n">tree_node_index</span> <span class="o">=</span> <span class="n">left_node_index</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tree_node_index</span> <span class="o">=</span> <span class="n">right_node_index</span>
+
+    <span class="c1"># Setting up sibling node</span>
+    <span class="n">sibling_index</span> <span class="o">=</span> <span class="n">tree_node_index</span>
+
+    <span class="c1"># Inserting new leaf into tree</span>
+    <span class="n">old_parent_index</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">sibling_index</span><span class="p">,</span> <span class="n">PARENT_INDEX</span><span class="p">]</span>
+
+    <span class="c1"># Adding Parent</span>
+    <span class="n">new_parent_index</span> <span class="o">=</span> <span class="n">filled_len</span>
+    <span class="n">filled_len</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">nodes</span><span class="p">[</span><span class="n">new_parent_index</span><span class="p">,</span> <span class="n">PARENT_INDEX</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_parent_index</span>
+    <span class="n">nodes</span><span class="p">[</span><span class="n">new_parent_index</span><span class="p">,</span> <span class="n">LEFT_INDEX</span><span class="p">]</span> <span class="o">=</span> <span class="n">sibling_index</span>
+    <span class="n">nodes</span><span class="p">[</span><span class="n">new_parent_index</span><span class="p">,</span> <span class="n">RIGHT_INDEX</span><span class="p">]</span> <span class="o">=</span> <span class="n">leaf_node_index</span>
+    <span class="n">nodes</span><span class="p">[</span><span class="n">new_parent_index</span><span class="p">,</span> <span class="n">TYPE_INDEX</span><span class="p">]</span> <span class="o">=</span> <span class="n">TYPE_BRANCH</span>
+    <span class="n">aabbs</span><span class="p">[</span><span class="n">new_parent_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">_merge_aabb</span><span class="p">(</span><span class="n">aabbs</span><span class="p">[</span><span class="n">leaf_node_index</span><span class="p">],</span> <span class="n">aabbs</span><span class="p">[</span><span class="n">sibling_index</span><span class="p">])</span>
+
+    <span class="c1"># Setting Parent in children</span>
+    <span class="n">nodes</span><span class="p">[</span><span class="n">leaf_node_index</span><span class="p">,</span> <span class="n">PARENT_INDEX</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_parent_index</span>
+    <span class="n">nodes</span><span class="p">[</span><span class="n">sibling_index</span><span class="p">,</span> <span class="n">PARENT_INDEX</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_parent_index</span>
+
+    <span class="k">if</span> <span class="n">old_parent_index</span> <span class="o">==</span> <span class="n">INDEX_NONE</span><span class="p">:</span>
+        <span class="n">root_node_index</span> <span class="o">=</span> <span class="n">new_parent_index</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nodes</span><span class="p">[</span><span class="n">old_parent_index</span><span class="p">,</span> <span class="n">LEFT_INDEX</span><span class="p">]</span> <span class="o">==</span> <span class="n">sibling_index</span><span class="p">:</span>
+            <span class="n">nodes</span><span class="p">[</span><span class="n">old_parent_index</span><span class="p">,</span> <span class="n">LEFT_INDEX</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_parent_index</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nodes</span><span class="p">[</span><span class="n">old_parent_index</span><span class="p">,</span> <span class="n">RIGHT_INDEX</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_parent_index</span>
+
+    <span class="c1"># Set the index to the parent for upward traversal.</span>
+    <span class="n">tree_node_index</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">leaf_node_index</span><span class="p">,</span> <span class="n">PARENT_INDEX</span><span class="p">]</span>
+    <span class="n">aabbs</span> <span class="o">=</span> <span class="n">fix_upward_tree</span><span class="p">(</span><span class="n">tree_node_index</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">root_node_index</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">,</span> <span class="n">filled_len</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">fix_upward_tree</span><span class="p">(</span><span class="n">tree_node_index</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fixes the aabbs of the parent branches by setting them to the merge of the children aabbs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Go the tree back up while fixing the aabbs.</span>
+    <span class="k">while</span> <span class="n">tree_node_index</span> <span class="o">!=</span> <span class="n">INDEX_NONE</span><span class="p">:</span>
+        <span class="n">tree_node</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">tree_node_index</span><span class="p">]</span>
+
+        <span class="c1"># Every branch in the traversal should not have any None fields.</span>
+        <span class="k">assert</span> <span class="n">tree_node</span><span class="p">[</span><span class="n">LEFT_INDEX</span><span class="p">]</span> <span class="o">!=</span> <span class="n">INDEX_NONE</span> <span class="ow">and</span> <span class="n">tree_node</span><span class="p">[</span><span class="n">RIGHT_INDEX</span><span class="p">]</span> <span class="o">!=</span> <span class="n">INDEX_NONE</span>
+
+        <span class="n">aabbs</span><span class="p">[</span><span class="n">tree_node_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">_merge_aabb</span><span class="p">(</span><span class="n">aabbs</span><span class="p">[</span><span class="n">tree_node</span><span class="p">[</span><span class="n">LEFT_INDEX</span><span class="p">]],</span> <span class="n">aabbs</span><span class="p">[</span><span class="n">tree_node</span><span class="p">[</span><span class="n">RIGHT_INDEX</span><span class="p">]])</span>
+
+        <span class="c1"># Moving on parent up</span>
+        <span class="n">tree_node_index</span> <span class="o">=</span> <span class="n">tree_node</span><span class="p">[</span><span class="n">PARENT_INDEX</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">aabbs</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">query_overlap_of_other_tree</span><span class="p">(</span><span class="n">root1</span><span class="p">,</span> <span class="n">nodes1</span><span class="p">,</span> <span class="n">aabbs1</span><span class="p">,</span> <span class="n">root2</span><span class="p">,</span> <span class="n">nodes2</span><span class="p">,</span> <span class="n">aabbs2</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Queries the overlapping aabbs by traversing the trees.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">broad_tetrahedra1</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">broad_tetrahedra2</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">root2</span><span class="p">]</span>
+
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+        <span class="n">node_index</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">node_aabb</span> <span class="o">=</span> <span class="n">aabbs2</span><span class="p">[</span><span class="n">node_index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nodes2</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">TYPE_INDEX</span><span class="p">]</span> <span class="o">==</span> <span class="n">TYPE_BRANCH</span> <span class="ow">and</span> \
+                <span class="nb">len</span><span class="p">(</span><span class="n">query_overlap</span><span class="p">(</span><span class="n">node_aabb</span><span class="p">,</span> <span class="n">root1</span><span class="p">,</span> <span class="n">nodes1</span><span class="p">,</span> <span class="n">aabbs1</span><span class="p">,</span> <span class="n">break_at_first_leaf</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">stack</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">nodes2</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">nodes2</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+
+        <span class="k">elif</span> <span class="n">nodes2</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">TYPE_INDEX</span><span class="p">]</span> <span class="o">==</span> <span class="n">TYPE_LEAF</span><span class="p">:</span>
+            <span class="n">overlaps</span> <span class="o">=</span> <span class="n">query_overlap</span><span class="p">(</span><span class="n">node_aabb</span><span class="p">,</span> <span class="n">root1</span><span class="p">,</span> <span class="n">nodes1</span><span class="p">,</span> <span class="n">aabbs1</span><span class="p">)</span>
+            <span class="n">broad_tetrahedra1</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">overlaps</span><span class="p">)</span>
+            <span class="n">broad_tetrahedra2</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">node_index</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlaps</span><span class="p">))</span>
+
+    <span class="n">broad_pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">broad_tetrahedra1</span><span class="p">,</span> <span class="n">broad_tetrahedra2</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">broad_tetrahedra1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">broad_tetrahedra2</span><span class="p">),</span> <span class="n">broad_pairs</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">query_overlap</span><span class="p">(</span><span class="n">test_aabb</span><span class="p">,</span> <span class="n">root_node_index</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">aabbs</span><span class="p">,</span> <span class="n">break_at_first_leaf</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Queries the overlapping aabbs by traversing the tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">overlaps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">root_node_index</span><span class="p">]</span>
+
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+        <span class="n">node_index</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">node_aabb</span> <span class="o">=</span> <span class="n">aabbs</span><span class="p">[</span><span class="n">node_index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">aabb_overlap</span><span class="p">(</span><span class="n">node_aabb</span><span class="p">,</span> <span class="n">test_aabb</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">TYPE_INDEX</span><span class="p">]</span> <span class="o">==</span> <span class="n">TYPE_LEAF</span><span class="p">:</span>
+                <span class="n">overlaps</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">node_index</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">break_at_first_leaf</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">overlaps</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">print_aabb_tree_recursive</span><span class="p">(</span><span class="n">node_index</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns list of strings, width, height, and horizontal coordinate of the root.&quot;&quot;&quot;</span>
+    <span class="c1"># From https://stackoverflow.com/questions/34012886/print-binary-tree-level-by-level-in-python</span>
+
+    <span class="c1"># No child.</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">node_index</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">LEFT_INDEX</span><span class="p">]</span> <span class="o">==</span> <span class="n">INDEX_NONE</span> <span class="ow">and</span> <span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">RIGHT_INDEX</span><span class="p">]</span> <span class="o">==</span> <span class="n">INDEX_NONE</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">node_index</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">middle</span> <span class="o">=</span> <span class="n">width</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">line</span><span class="p">],</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">middle</span>
+
+    <span class="c1"># Only left child.</span>
+    <span class="k">if</span> <span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">RIGHT_INDEX</span><span class="p">]</span> <span class="o">==</span> <span class="n">INDEX_NONE</span><span class="p">:</span>
+        <span class="n">lines</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">print_aabb_tree_recursive</span><span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">LEFT_INDEX</span><span class="p">],</span> <span class="n">nodes</span><span class="p">)</span>
+
+        <span class="n">first_line</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">line</span>
+        <span class="n">second_line</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">width</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span>
+        <span class="n">shifted_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="o">+</span> <span class="n">width</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">first_line</span><span class="p">,</span> <span class="n">second_line</span><span class="p">]</span> <span class="o">+</span> <span class="n">shifted_lines</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="n">width</span><span class="p">,</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="n">width</span> <span class="o">//</span> <span class="mi">2</span>
+
+    <span class="c1"># Only right child.</span>
+    <span class="k">if</span> <span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">LEFT_INDEX</span><span class="p">]</span> <span class="o">==</span> <span class="n">INDEX_NONE</span><span class="p">:</span>
+        <span class="n">lines</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">print_aabb_tree_recursive</span><span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">RIGHT_INDEX</span><span class="p">],</span> <span class="n">nodes</span><span class="p">)</span>
+
+        <span class="n">first_line</span> <span class="o">=</span> <span class="n">line</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span>
+        <span class="n">second_line</span> <span class="o">=</span> <span class="p">(</span><span class="n">width</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span>
+        <span class="n">shifted_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">width</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">first_line</span><span class="p">,</span> <span class="n">second_line</span><span class="p">]</span> <span class="o">+</span> <span class="n">shifted_lines</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="n">width</span><span class="p">,</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">width</span> <span class="o">//</span> <span class="mi">2</span>
+
+    <span class="c1"># Two children.</span>
+    <span class="n">left</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">print_aabb_tree_recursive</span><span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">LEFT_INDEX</span><span class="p">],</span> <span class="n">nodes</span><span class="p">)</span>
+    <span class="n">right</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">print_aabb_tree_recursive</span><span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="n">RIGHT_INDEX</span><span class="p">],</span> <span class="n">nodes</span><span class="p">)</span>
+
+    <span class="n">first_line</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">line</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span>
+    <span class="n">second_line</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">width</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="n">q</span><span class="p">:</span>
+        <span class="n">left</span> <span class="o">+=</span> <span class="p">[</span><span class="n">n</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">q</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">:</span>
+        <span class="n">right</span> <span class="o">+=</span> <span class="p">[</span><span class="n">m</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">q</span><span class="p">)</span>
+    <span class="n">zipped_lines</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">first_line</span><span class="p">,</span> <span class="n">second_line</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">a</span> <span class="o">+</span> <span class="n">width</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">b</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">zipped_lines</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">lines</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="n">m</span> <span class="o">+</span> <span class="n">width</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="n">width</span> <span class="o">//</span> <span class="mi">2</span>
+
+
+<div class="viewcode-block" id="all_aabbs_overlap"><a class="viewcode-back" href="../../_autosummary/distance3d.aabb_tree.all_aabbs_overlap.html#distance3d.aabb_tree.all_aabbs_overlap">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">all_aabbs_overlap</span><span class="p">(</span><span class="n">aabbs1</span><span class="p">,</span> <span class="n">aabbs2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates result lists of all the overlapping aabbs. (Brute Force)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    aabbs1 : array, shape(n, 3, 2)</span>
+<span class="sd">        The aabbs of the first object.</span>
+
+<span class="sd">    aabbs2 : array, shape(n, 3, 2)</span>
+<span class="sd">        The aabbs of the second object.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    broad_tetrahedra1 : array, shape (n)</span>
+<span class="sd">        Array of all the overlapping aabb indices of aabbs1</span>
+
+<span class="sd">    broad_tetrahedra2 : array, shape (n)</span>
+<span class="sd">        Array of all the overlapping aabb indices of aabbs2</span>
+
+<span class="sd">    broad_pairs : array, shape(n, 2)</span>
+<span class="sd">        A list of a index pairs of the all overlaps.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">indices1</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">indices2</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">broad_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aabbs1</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aabbs2</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">aabb_overlap</span><span class="p">(</span><span class="n">aabbs1</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">aabbs2</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+                <span class="n">indices1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">indices2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+                <span class="n">broad_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
+    <span class="n">broad_tetrahedra1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">indices1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)))</span>
+    <span class="n">broad_tetrahedra2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">indices2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">broad_tetrahedra1</span><span class="p">,</span> <span class="n">broad_tetrahedra2</span><span class="p">,</span> <span class="n">broad_pairs</span></div>
+
+
+<div class="viewcode-block" id="aabb_overlap"><a class="viewcode-back" href="../../_autosummary/distance3d.aabb_tree.aabb_overlap.html#distance3d.aabb_tree.aabb_overlap">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">aabb_overlap</span><span class="p">(</span><span class="n">aabb1</span><span class="p">,</span> <span class="n">aabb2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns true if aabb1 and aabb2 overlap.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">aabb1</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">aabb1</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> \
+           <span class="ow">and</span> <span class="n">aabb1</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">aabb1</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> \
+           <span class="ow">and</span> <span class="n">aabb1</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">aabb1</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span></div>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_sort_aabbs</span><span class="p">(</span><span class="n">aabbs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a spatially sorted aabb list.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">aabbs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_merge_aabb</span><span class="p">(</span><span class="n">aabb1</span><span class="p">,</span> <span class="n">aabb2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the smallest aabb that contains aabb1 and aabb2.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[[</span><span class="nb">min</span><span class="p">(</span><span class="n">aabb1</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">aabb1</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])],</span>
+         <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">aabb1</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">aabb1</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])],</span>
+         <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">aabb1</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">aabb1</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">aabb2</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])]]</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_aabb_volume</span><span class="p">(</span><span class="n">aabb</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the volume of the aabb.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_aabb_x_size</span><span class="p">(</span><span class="n">aabb</span><span class="p">)</span> <span class="o">*</span> <span class="n">_aabb_y_size</span><span class="p">(</span><span class="n">aabb</span><span class="p">)</span> <span class="o">*</span> <span class="n">_aabb_z_size</span><span class="p">(</span><span class="n">aabb</span><span class="p">)</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_aabb_x_size</span><span class="p">(</span><span class="n">aabb</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the size of the aabb along the x-axsis.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">aabb</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">aabb</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_aabb_y_size</span><span class="p">(</span><span class="n">aabb</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the size of the aabb along the y-axsis.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">aabb</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">aabb</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_aabb_z_size</span><span class="p">(</span><span class="n">aabb</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the size of the aabb along the Z-axsis.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">aabb</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">aabb</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

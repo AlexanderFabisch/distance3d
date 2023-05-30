@@ -1,0 +1,419 @@
+
+
+.. _sphx_glr__auto_examples_visualizations:
+
+Visualizations
+--------------
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Tetrahedral Mesh">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedral_mesh_thumb.png
+    :alt: Visualize Tetrahedral Mesh
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedral_mesh.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Visualize Tetrahedral Mesh</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Hand as tetrahedral mesh">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedral_hand_thumb.png
+    :alt: Hand as tetrahedral mesh
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedral_hand.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Hand as tetrahedral mesh</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Intersection of Tetrahedra">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedron_intersection_thumb.png
+    :alt: Visualize Intersection of Tetrahedra
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedron_intersection.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Visualize Intersection of Tetrahedra</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Subdivision of the AABB Tree">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tree_subdevision_thumb.png
+    :alt: Visualize Subdivision of the AABB Tree
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_tree_subdevision.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Visualize Subdivision of the AABB Tree</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for boxes">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_boxes_benchmark_thumb.png
+    :alt: Benchmark collision detection for boxes
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_boxes_benchmark.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for boxes</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for disks">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_disk_benchmark_thumb.png
+    :alt: Benchmark collision detection for disks
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_disk_benchmark.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for disks</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for ellipses">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_ellipse_benchmark_thumb.png
+    :alt: Benchmark collision detection for ellipses
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_ellipse_benchmark.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for ellipses</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Physical simulation with collision detection">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_collision_physics_thumb.png
+    :alt: Physical simulation with collision detection
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_collision_physics.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Physical simulation with collision detection</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for cones">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_cone_benchmark_thumb.png
+    :alt: Benchmark collision detection for cones
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_cone_benchmark.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for cones</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for ellipsoids">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_ellipsoids_benchmark_thumb.png
+    :alt: Benchmark collision detection for ellipsoids
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_ellipsoids_benchmark.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for ellipsoids</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for capsules">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_capsules_benchmark_thumb.png
+    :alt: Benchmark collision detection for capsules
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_capsules_benchmark.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for capsules</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for cylinders">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_cylinders_benchmark_thumb.png
+    :alt: Benchmark collision detection for cylinders
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_cylinders_benchmark.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for cylinders</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize pressure fields with different young&#x27;s moduli">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_youngs_modulus_thumb.png
+    :alt: Visualize pressure fields with different young's moduli
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_youngs_modulus.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Visualize pressure fields with different young's moduli</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for meshes">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_mesh_benchmark_thumb.png
+    :alt: Benchmark collision detection for meshes
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_mesh_benchmark.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for meshes</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Self-collisions of a robot">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_self_collisions_thumb.png
+    :alt: Self-collisions of a robot
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_self_collisions.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Self-collisions of a robot</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Field of Two Colliding Objects">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_thumb.png
+    :alt: Visualize Pressure Field of Two Colliding Objects
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Visualize Pressure Field of Two Colliding Objects</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Physical Simulation of Bouncing Ball">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_collision_thumb.png
+    :alt: Physical Simulation of Bouncing Ball
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field_collision.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Physical Simulation of Bouncing Ball</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Closest Points with GJK">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_closest_points_thumb.png
+    :alt: Closest Points with GJK
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_closest_points.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Closest Points with GJK</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Physical Simulation of Bouncing Ball on Hand">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedral_hand_collision_thumb.png
+    :alt: Physical Simulation of Bouncing Ball on Hand
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedral_hand_collision.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Physical Simulation of Bouncing Ball on Hand</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Collisions between robot and environment">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_robot_collision_objects_thumb.png
+    :alt: Collisions between robot and environment
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_robot_collision_objects.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Collisions between robot and environment</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Physical Simulation of Soft Balls Bouncing in a Wooden Box">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_collision_multiple_objects_thumb.png
+    :alt: Physical Simulation of Soft Balls Bouncing in a Wooden Box
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field_collision_multiple_objects.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Physical Simulation of Soft Balls Bouncing in a Wooden Box</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Fields of Moving Object">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_moving_thumb.png
+    :alt: Visualize Pressure Fields of Moving Object
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field_moving.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Visualize Pressure Fields of Moving Object</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/visualizations/vis_tetrahedral_mesh
+   /_auto_examples/visualizations/vis_tetrahedral_hand
+   /_auto_examples/visualizations/vis_tetrahedron_intersection
+   /_auto_examples/visualizations/vis_tree_subdevision
+   /_auto_examples/visualizations/vis_boxes_benchmark
+   /_auto_examples/visualizations/vis_disk_benchmark
+   /_auto_examples/visualizations/vis_ellipse_benchmark
+   /_auto_examples/visualizations/vis_collision_physics
+   /_auto_examples/visualizations/vis_cone_benchmark
+   /_auto_examples/visualizations/vis_ellipsoids_benchmark
+   /_auto_examples/visualizations/vis_capsules_benchmark
+   /_auto_examples/visualizations/vis_cylinders_benchmark
+   /_auto_examples/visualizations/vis_youngs_modulus
+   /_auto_examples/visualizations/vis_mesh_benchmark
+   /_auto_examples/visualizations/vis_self_collisions
+   /_auto_examples/visualizations/vis_pressure_field
+   /_auto_examples/visualizations/vis_pressure_field_collision
+   /_auto_examples/visualizations/vis_closest_points
+   /_auto_examples/visualizations/vis_tetrahedral_hand_collision
+   /_auto_examples/visualizations/vis_robot_collision_objects
+   /_auto_examples/visualizations/vis_pressure_field_collision_multiple_objects
+   /_auto_examples/visualizations/vis_pressure_field_moving
+

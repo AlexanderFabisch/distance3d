@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Hand as tetrahedral mesh &#8212; distance3d 0.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Visualize Intersection of Tetrahedra" href="vis_tetrahedron_intersection.html" />
+    <link rel="prev" title="Visualize Tetrahedral Mesh" href="vis_tetrahedral_mesh.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-visualizations-vis-tetrahedral-hand-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="hand-as-tetrahedral-mesh">
+<span id="sphx-glr-auto-examples-visualizations-vis-tetrahedral-hand-py"></span><h1>Hand as tetrahedral mesh<a class="headerlink" href="#hand-as-tetrahedral-mesh" title="Permalink to this heading">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pytransform3d.urdf</span> <span class="kn">import</span> <span class="n">UrdfTransformManager</span>
+<span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
+<span class="kn">from</span> <span class="nn">distance3d.hydroelastic_contact._broad_phase</span> <span class="kn">import</span> <span class="n">HydroelasticBoundingVolumeHierarchy</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="s2">&quot;test/data/&quot;</span>
+<span class="n">data_dir</span> <span class="o">=</span> <span class="n">BASE_DIR</span>
+<span class="n">search_path</span> <span class="o">=</span> <span class="s2">&quot;..&quot;</span>
+<span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="ow">and</span>
+       <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">search_path</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;distance3d&quot;</span><span class="p">):</span>
+    <span class="n">search_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">search_path</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">)</span>
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">search_path</span><span class="p">,</span> <span class="n">BASE_DIR</span><span class="p">)</span>
+
+<span class="n">tm</span> <span class="o">=</span> <span class="n">UrdfTransformManager</span><span class="p">()</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s2">&quot;mia_hand.urdf&quot;</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">robot_urdf</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">tm</span><span class="o">.</span><span class="n">load_urdf</span><span class="p">(</span><span class="n">robot_urdf</span><span class="p">,</span> <span class="n">mesh_path</span><span class="o">=</span><span class="n">data_dir</span><span class="p">)</span>
+
+<span class="n">finger_angle</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
+<span class="n">joint_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;j_index_fle&quot;</span><span class="p">,</span> <span class="s2">&quot;j_mrl_fle&quot;</span><span class="p">,</span> <span class="s2">&quot;j_ring_fle&quot;</span><span class="p">,</span> <span class="s2">&quot;j_little_fle&quot;</span><span class="p">,</span> <span class="s2">&quot;j_thumb_fle&quot;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">joint_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">joint_names</span><span class="p">):</span>
+    <span class="n">tm</span><span class="o">.</span><span class="n">set_joint</span><span class="p">(</span><span class="n">joint_name</span><span class="p">,</span> <span class="n">finger_angle</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="n">robot_bvh</span> <span class="o">=</span> <span class="n">HydroelasticBoundingVolumeHierarchy</span><span class="p">(</span><span class="n">tm</span><span class="p">,</span> <span class="s2">&quot;mia_hand&quot;</span><span class="p">)</span>
+<span class="n">robot_bvh</span><span class="o">.</span><span class="n">fill_tree_with_colliders</span><span class="p">(</span><span class="n">tm</span><span class="p">,</span> <span class="n">make_artists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">artist</span> <span class="ow">in</span> <span class="n">robot_bvh</span><span class="o">.</span><span class="n">get_artists</span><span class="p">():</span>
+    <span class="n">artist</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">view_init</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-visualizations-vis-tetrahedral-hand-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/fdf1111c7e2e8a07e48e66f8f4dfa37c/vis_tetrahedral_hand.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">vis_tetrahedral_hand.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/c9f514239d293a20198cf7917c6a6be1/vis_tetrahedral_hand.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">vis_tetrahedral_hand.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#aabb-tree">AABB Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#containment-tests">Containment Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#distance">Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gjk">GJK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#visualizations">Visualizations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#planar-algorithms">Planar Algorithms</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../aabbtree/index.html">AABB Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../containment_test/index.html">Containment Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../distance/index.html">Distance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gjk/index.html">GJK</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Visualizations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plane/index.html">Planar Algorithms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Examples</a><ul>
+  <li><a href="index.html">Visualizations</a><ul>
+      <li>Previous: <a href="vis_tetrahedral_mesh.html" title="previous chapter">Visualize Tetrahedral Mesh</a></li>
+      <li>Next: <a href="vis_tetrahedron_intersection.html" title="next chapter">Visualize Intersection of Tetrahedra</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/_auto_examples/visualizations/vis_tetrahedral_hand.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

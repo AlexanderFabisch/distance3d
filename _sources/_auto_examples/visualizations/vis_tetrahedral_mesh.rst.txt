@@ -27,11 +27,11 @@ Visualize Tetrahedral Mesh
 .. code-block:: default
 
     print(__doc__)
+
     import os
     import numpy as np
     import pytransform3d.visualizer as pv
     from distance3d import io, visualization
-
 
     BASE_DIR = "test/data/"
     data_dir = BASE_DIR
@@ -61,23 +61,18 @@ Visualize Tetrahedral Mesh
 
 .. _sphx_glr_download__auto_examples_visualizations_vis_tetrahedral_mesh.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: vis_tetrahedral_mesh.py <vis_tetrahedral_mesh.py>`
 
-     :download:`Download Python source code: vis_tetrahedral_mesh.py <vis_tetrahedral_mesh.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: vis_tetrahedral_mesh.ipynb <vis_tetrahedral_mesh.ipynb>`
+      :download:`Download Jupyter notebook: vis_tetrahedral_mesh.ipynb <vis_tetrahedral_mesh.ipynb>`
 
 
 .. only:: html

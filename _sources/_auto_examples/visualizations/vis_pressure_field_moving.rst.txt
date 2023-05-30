@@ -179,23 +179,18 @@ Visualize Pressure Fields of Moving Object
 
 .. _sphx_glr_download__auto_examples_visualizations_vis_pressure_field_moving.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: vis_pressure_field_moving.py <vis_pressure_field_moving.py>`
 
-     :download:`Download Python source code: vis_pressure_field_moving.py <vis_pressure_field_moving.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: vis_pressure_field_moving.ipynb <vis_pressure_field_moving.ipynb>`
+      :download:`Download Jupyter notebook: vis_pressure_field_moving.ipynb <vis_pressure_field_moving.ipynb>`
 
 
 .. only:: html

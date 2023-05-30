@@ -4,8 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Examples &#8212; distance3d 0.7.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Examples &#8212; distance3d 0.7.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,8 +21,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Robot" href="aabbtree/plot_robot.html" />
-    <link rel="prev" title="distance3d.random.randn_convex" href="../_autosummary/distance3d.random.randn_convex.html" />
+    <link rel="next" title="AABB Tree" href="aabbtree/index.html" />
+    <link rel="prev" title="distance3d.aabb_tree.all_aabbs_overlap" href="../_autosummary/distance3d.aabb_tree.all_aabbs_overlap.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -38,445 +39,261 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="examples">
-<span id="sphx-glr-auto-examples"></span><h1>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h1>
+  <section id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h1>
 <p>The following examples show how distance3d can be used.</p>
-<div class="contents local topic" id="contents">
+<nav class="contents local" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#aabb-tree" id="id69">AABB Tree</a></p></li>
-<li><p><a class="reference internal" href="#containment-tests" id="id70">Containment Tests</a></p></li>
-<li><p><a class="reference internal" href="#distance" id="id71">Distance</a></p></li>
-<li><p><a class="reference internal" href="#gjk" id="id72">GJK</a></p></li>
-<li><p><a class="reference internal" href="#visualizations" id="id73">Visualizations</a></p></li>
-<li><p><a class="reference internal" href="#planar-algorithms" id="id74">Planar Algorithms</a></p></li>
+<li><p><a class="reference internal" href="#aabb-tree" id="id1">AABB Tree</a></p></li>
+<li><p><a class="reference internal" href="#containment-tests" id="id2">Containment Tests</a></p></li>
+<li><p><a class="reference internal" href="#distance" id="id3">Distance</a></p></li>
+<li><p><a class="reference internal" href="#gjk" id="id4">GJK</a></p></li>
+<li><p><a class="reference internal" href="#visualizations" id="id5">Visualizations</a></p></li>
+<li><p><a class="reference internal" href="#planar-algorithms" id="id6">Planar Algorithms</a></p></li>
 </ul>
-</div>
-<div class="sphx-glr-clear"></div><div class="section" id="aabb-tree">
-<span id="sphx-glr-auto-examples-aabbtree"></span><h2><a class="toc-backref" href="#id69">AABB Tree</a><a class="headerlink" href="#aabb-tree" title="Permalink to this heading">¶</a></h2>
-<div class="sphx-glr-thumbcontainer" tooltip="Plot AABB tree of a robot."><div class="figure align-default" id="id1">
-<img alt="Robot" src="../_images/sphx_glr_plot_robot_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="aabbtree/plot_robot.html#sphx-glr-auto-examples-aabbtree-plot-robot-py"><span class="std std-ref">Robot</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Plot AABB tree."><div class="figure align-default" id="id2">
-<img alt="AABB Tree" src="../_images/sphx_glr_plot_aabbtree_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="aabbtree/plot_aabbtree.html#sphx-glr-auto-examples-aabbtree-plot-aabbtree-py"><span class="std std-ref">AABB Tree</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-clear"></div></div>
-<div class="section" id="containment-tests">
-<span id="sphx-glr-auto-examples-containment-test"></span><h2><a class="toc-backref" href="#id70">Containment Tests</a><a class="headerlink" href="#containment-tests" title="Permalink to this heading">¶</a></h2>
-<div class="sphx-glr-thumbcontainer" tooltip="Sphere Containment"><div class="figure align-default" id="id3">
-<img alt="Sphere Containment" src="../_images/sphx_glr_plot_sphere_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="containment_test/plot_sphere.html#sphx-glr-auto-examples-containment-test-plot-sphere-py"><span class="std std-ref">Sphere Containment</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Box Containment"><div class="figure align-default" id="id4">
-<img alt="Box Containment" src="../_images/sphx_glr_plot_box_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="containment_test/plot_box.html#sphx-glr-auto-examples-containment-test-plot-box-py"><span class="std std-ref">Box Containment</span></a></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Mesh Containment"><div class="figure align-default" id="id5">
-<img alt="Mesh Containment" src="../_images/sphx_glr_plot_mesh_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="containment_test/plot_mesh.html#sphx-glr-auto-examples-containment-test-plot-mesh-py"><span class="std std-ref">Mesh Containment</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Ellipsoid Containment"><div class="figure align-default" id="id6">
-<img alt="Ellipsoid Containment" src="../_images/sphx_glr_plot_ellipsoid_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="containment_test/plot_ellipsoid.html#sphx-glr-auto-examples-containment-test-plot-ellipsoid-py"><span class="std std-ref">Ellipsoid Containment</span></a></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Cone Containment"><div class="figure align-default" id="id7">
-<img alt="Cone Containment" src="../_images/sphx_glr_plot_cone_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="containment_test/plot_cone.html#sphx-glr-auto-examples-containment-test-plot-cone-py"><span class="std std-ref">Cone Containment</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Capsule Containment"><div class="figure align-default" id="id8">
-<img alt="Capsule Containment" src="../_images/sphx_glr_plot_capsule_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="containment_test/plot_capsule.html#sphx-glr-auto-examples-containment-test-plot-capsule-py"><span class="std std-ref">Capsule Containment</span></a></span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Cylinder Containment"><div class="figure align-default" id="id9">
-<img alt="Cylinder Containment" src="../_images/sphx_glr_plot_cylinder_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="containment_test/plot_cylinder.html#sphx-glr-auto-examples-containment-test-plot-cylinder-py"><span class="std std-ref">Cylinder Containment</span></a></span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-clear"></div></div>
-<div class="section" id="distance">
-<span id="sphx-glr-auto-examples-distance"></span><h2><a class="toc-backref" href="#id71">Distance</a><a class="headerlink" href="#distance" title="Permalink to this heading">¶</a></h2>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to triangle"><div class="figure align-default" id="id10">
-<img alt="Distance from point to triangle" src="../_images/sphx_glr_plot_point_to_triangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_point_to_triangle.html#sphx-glr-auto-examples-distance-plot-point-to-triangle-py"><span class="std std-ref">Distance from point to triangle</span></a></span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to line"><div class="figure align-default" id="id11">
-<img alt="Distance from point to line" src="../_images/sphx_glr_plot_point_to_line_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_point_to_line.html#sphx-glr-auto-examples-distance-plot-point-to-line-py"><span class="std std-ref">Distance from point to line</span></a></span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to line segment"><div class="figure align-default" id="id12">
-<img alt="Distance from point to line segment" src="../_images/sphx_glr_plot_point_to_line_segment_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_point_to_line_segment.html#sphx-glr-auto-examples-distance-plot-point-to-line-segment-py"><span class="std std-ref">Distance from point to line segment</span></a></span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to plane"><div class="figure align-default" id="id13">
-<img alt="Distance from point to plane" src="../_images/sphx_glr_plot_point_to_plane_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_point_to_plane.html#sphx-glr-auto-examples-distance-plot-point-to-plane-py"><span class="std std-ref">Distance from point to plane</span></a></span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to rectangle"><div class="figure align-default" id="id14">
-<img alt="Distance from point to rectangle" src="../_images/sphx_glr_plot_point_to_rectangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_point_to_rectangle.html#sphx-glr-auto-examples-distance-plot-point-to-rectangle-py"><span class="std std-ref">Distance from point to rectangle</span></a></span><a class="headerlink" href="#id14" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to box"><div class="figure align-default" id="id15">
-<img alt="Distance from point to box" src="../_images/sphx_glr_plot_point_to_box_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_point_to_box.html#sphx-glr-auto-examples-distance-plot-point-to-box-py"><span class="std std-ref">Distance from point to box</span></a></span><a class="headerlink" href="#id15" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to ellipsoid"><div class="figure align-default" id="id16">
-<img alt="Distance from point to ellipsoid" src="../_images/sphx_glr_plot_point_to_ellipsoid_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_point_to_ellipsoid.html#sphx-glr-auto-examples-distance-plot-point-to-ellipsoid-py"><span class="std std-ref">Distance from point to ellipsoid</span></a></span><a class="headerlink" href="#id16" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line to triangle"><div class="figure align-default" id="id17">
-<img alt="Distance from line to triangle" src="../_images/sphx_glr_plot_line_to_triangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_to_triangle.html#sphx-glr-auto-examples-distance-plot-line-to-triangle-py"><span class="std std-ref">Distance from line to triangle</span></a></span><a class="headerlink" href="#id17" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to disk"><div class="figure align-default" id="id18">
-<img alt="Distance from point to disk" src="../_images/sphx_glr_plot_point_to_disk_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_point_to_disk.html#sphx-glr-auto-examples-distance-plot-point-to-disk-py"><span class="std std-ref">Distance from point to disk</span></a></span><a class="headerlink" href="#id18" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to box"><div class="figure align-default" id="id19">
-<img alt="Distance from line segment to box" src="../_images/sphx_glr_plot_line_segment_to_box_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_segment_to_box.html#sphx-glr-auto-examples-distance-plot-line-segment-to-box-py"><span class="std std-ref">Distance from line segment to box</span></a></span><a class="headerlink" href="#id19" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to circle"><div class="figure align-default" id="id20">
-<img alt="Distance from point to circle" src="../_images/sphx_glr_plot_point_to_circle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_point_to_circle.html#sphx-glr-auto-examples-distance-plot-point-to-circle-py"><span class="std std-ref">Distance from point to circle</span></a></span><a class="headerlink" href="#id20" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line to line segment"><div class="figure align-default" id="id21">
-<img alt="Distance from line to line segment" src="../_images/sphx_glr_plot_line_to_line_segment_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_to_line_segment.html#sphx-glr-auto-examples-distance-plot-line-to-line-segment-py"><span class="std std-ref">Distance from line to line segment</span></a></span><a class="headerlink" href="#id21" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to triangle"><div class="figure align-default" id="id22">
-<img alt="Distance from line segment to triangle" src="../_images/sphx_glr_plot_line_segment_to_triangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_segment_to_triangle.html#sphx-glr-auto-examples-distance-plot-line-segment-to-triangle-py"><span class="std std-ref">Distance from line segment to triangle</span></a></span><a class="headerlink" href="#id22" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between line and circle"><div class="figure align-default" id="id23">
-<img alt="Distance between line and circle" src="../_images/sphx_glr_plot_line_to_circle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_to_circle.html#sphx-glr-auto-examples-distance-plot-line-to-circle-py"><span class="std std-ref">Distance between line and circle</span></a></span><a class="headerlink" href="#id23" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to circle"><div class="figure align-default" id="id24">
-<img alt="Distance from line segment to circle" src="../_images/sphx_glr_plot_line_segment_to_circle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_segment_to_circle.html#sphx-glr-auto-examples-distance-plot-line-segment-to-circle-py"><span class="std std-ref">Distance from line segment to circle</span></a></span><a class="headerlink" href="#id24" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to triangle"><div class="figure align-default" id="id25">
-<img alt="Distance from plane to triangle" src="../_images/sphx_glr_plot_plane_to_triangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_plane_to_triangle.html#sphx-glr-auto-examples-distance-plot-plane-to-triangle-py"><span class="std std-ref">Distance from plane to triangle</span></a></span><a class="headerlink" href="#id25" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to cylinder"><div class="figure align-default" id="id26">
-<img alt="Distance from point to cylinder" src="../_images/sphx_glr_plot_point_to_cylinder_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_point_to_cylinder.html#sphx-glr-auto-examples-distance-plot-point-to-cylinder-py"><span class="std std-ref">Distance from point to cylinder</span></a></span><a class="headerlink" href="#id26" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line to line"><div class="figure align-default" id="id27">
-<img alt="Distance from line to line" src="../_images/sphx_glr_plot_line_to_line_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_to_line.html#sphx-glr-auto-examples-distance-plot-line-to-line-py"><span class="std std-ref">Distance from line to line</span></a></span><a class="headerlink" href="#id27" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between two disks"><div class="figure align-default" id="id28">
-<img alt="Distance between two disks" src="../_images/sphx_glr_plot_disk_to_disk_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_disk_to_disk.html#sphx-glr-auto-examples-distance-plot-disk-to-disk-py"><span class="std std-ref">Distance between two disks</span></a></span><a class="headerlink" href="#id28" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between two triangles"><div class="figure align-default" id="id29">
-<img alt="Distance between two triangles" src="../_images/sphx_glr_plot_triangle_to_triangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_triangle_to_triangle.html#sphx-glr-auto-examples-distance-plot-triangle-to-triangle-py"><span class="std std-ref">Distance between two triangles</span></a></span><a class="headerlink" href="#id29" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line to rectangle"><div class="figure align-default" id="id30">
-<img alt="Distance from line to rectangle" src="../_images/sphx_glr_plot_line_to_rectangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_to_rectangle.html#sphx-glr-auto-examples-distance-plot-line-to-rectangle-py"><span class="std std-ref">Distance from line to rectangle</span></a></span><a class="headerlink" href="#id30" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to plane"><div class="figure align-default" id="id31">
-<img alt="Distance from plane to plane" src="../_images/sphx_glr_plot_plane_to_plane_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_plane_to_plane.html#sphx-glr-auto-examples-distance-plot-plane-to-plane-py"><span class="std std-ref">Distance from plane to plane</span></a></span><a class="headerlink" href="#id31" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to rectangle"><div class="figure align-default" id="id32">
-<img alt="Distance from line segment to rectangle" src="../_images/sphx_glr_plot_line_segment_to_rectangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_segment_to_rectangle.html#sphx-glr-auto-examples-distance-plot-line-segment-to-rectangle-py"><span class="std std-ref">Distance from line segment to rectangle</span></a></span><a class="headerlink" href="#id32" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from point to box"><div class="figure align-default" id="id33">
-<img alt="Distance from point to box" src="../_images/sphx_glr_plot_plane_to_box_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_plane_to_box.html#sphx-glr-auto-examples-distance-plot-plane-to-box-py"><span class="std std-ref">Distance from point to box</span></a></span><a class="headerlink" href="#id33" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line to plane"><div class="figure align-default" id="id34">
-<img alt="Distance from line to plane" src="../_images/sphx_glr_plot_line_to_plane_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_to_plane.html#sphx-glr-auto-examples-distance-plot-line-to-plane-py"><span class="std std-ref">Distance from line to plane</span></a></span><a class="headerlink" href="#id34" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to rectangle"><div class="figure align-default" id="id35">
-<img alt="Distance from plane to rectangle" src="../_images/sphx_glr_plot_plane_to_rectangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_plane_to_rectangle.html#sphx-glr-auto-examples-distance-plot-plane-to-rectangle-py"><span class="std std-ref">Distance from plane to rectangle</span></a></span><a class="headerlink" href="#id35" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to ellipsoid"><div class="figure align-default" id="id36">
-<img alt="Distance from plane to ellipsoid" src="../_images/sphx_glr_plot_plane_to_ellipsoid_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_plane_to_ellipsoid.html#sphx-glr-auto-examples-distance-plot-plane-to-ellipsoid-py"><span class="std std-ref">Distance from plane to ellipsoid</span></a></span><a class="headerlink" href="#id36" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from triangle to rectangle"><div class="figure align-default" id="id37">
-<img alt="Distance from triangle to rectangle" src="../_images/sphx_glr_plot_triangle_to_rectangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_triangle_to_rectangle.html#sphx-glr-auto-examples-distance-plot-triangle-to-rectangle-py"><span class="std std-ref">Distance from triangle to rectangle</span></a></span><a class="headerlink" href="#id37" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to plane"><div class="figure align-default" id="id38">
-<img alt="Distance from line segment to plane" src="../_images/sphx_glr_plot_line_segment_to_plane_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_segment_to_plane.html#sphx-glr-auto-examples-distance-plot-line-segment-to-plane-py"><span class="std std-ref">Distance from line segment to plane</span></a></span><a class="headerlink" href="#id38" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to cylinder"><div class="figure align-default" id="id39">
-<img alt="Distance from plane to cylinder" src="../_images/sphx_glr_plot_plane_to_cylinder_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_plane_to_cylinder.html#sphx-glr-auto-examples-distance-plot-plane-to-cylinder-py"><span class="std std-ref">Distance from plane to cylinder</span></a></span><a class="headerlink" href="#id39" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between two rectangles"><div class="figure align-default" id="id40">
-<img alt="Distance between two rectangles" src="../_images/sphx_glr_plot_rectangle_to_rectangle_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_rectangle_to_rectangle.html#sphx-glr-auto-examples-distance-plot-rectangle-to-rectangle-py"><span class="std std-ref">Distance between two rectangles</span></a></span><a class="headerlink" href="#id40" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line to box"><div class="figure align-default" id="id41">
-<img alt="Distance from line to box" src="../_images/sphx_glr_plot_line_to_box_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_to_box.html#sphx-glr-auto-examples-distance-plot-line-to-box-py"><span class="std std-ref">Distance from line to box</span></a></span><a class="headerlink" href="#id41" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to line segment"><div class="figure align-default" id="id42">
-<img alt="Distance from line segment to line segment" src="../_images/sphx_glr_plot_line_segment_to_line_segment_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_line_segment_to_line_segment.html#sphx-glr-auto-examples-distance-plot-line-segment-to-line-segment-py"><span class="std std-ref">Distance from line segment to line segment</span></a></span><a class="headerlink" href="#id42" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance from rectangle to box"><div class="figure align-default" id="id43">
-<img alt="Distance from rectangle to box" src="../_images/sphx_glr_plot_rectangle_to_box_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="distance/plot_rectangle_to_box.html#sphx-glr-auto-examples-distance-plot-rectangle-to-box-py"><span class="std std-ref">Distance from rectangle to box</span></a></span><a class="headerlink" href="#id43" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-clear"></div></div>
-<div class="section" id="gjk">
-<span id="sphx-glr-auto-examples-gjk"></span><h2><a class="toc-backref" href="#id72">GJK</a><a class="headerlink" href="#gjk" title="Permalink to this heading">¶</a></h2>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between spheres with GJK"><div class="figure align-default" id="id44">
-<img alt="Distance between spheres with GJK" src="../_images/sphx_glr_plot_spheres_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="gjk/plot_spheres.html#sphx-glr-auto-examples-gjk-plot-spheres-py"><span class="std std-ref">Distance between spheres with GJK</span></a></span><a class="headerlink" href="#id44" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between ellipses with GJK"><div class="figure align-default" id="id45">
-<img alt="Distance between ellipses with GJK" src="../_images/sphx_glr_plot_ellipse_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="gjk/plot_ellipse.html#sphx-glr-auto-examples-gjk-plot-ellipse-py"><span class="std std-ref">Distance between ellipses with GJK</span></a></span><a class="headerlink" href="#id45" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between boxes with GJK"><div class="figure align-default" id="id46">
-<img alt="Distance between boxes with GJK" src="../_images/sphx_glr_plot_box_thumb1.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="gjk/plot_box.html#sphx-glr-auto-examples-gjk-plot-box-py"><span class="std std-ref">Distance between boxes with GJK</span></a></span><a class="headerlink" href="#id46" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between convex meshes with GJK"><div class="figure align-default" id="id47">
-<img alt="Distance between convex meshes with GJK" src="../_images/sphx_glr_plot_convex_mesh_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="gjk/plot_convex_mesh.html#sphx-glr-auto-examples-gjk-plot-convex-mesh-py"><span class="std std-ref">Distance between convex meshes with GJK</span></a></span><a class="headerlink" href="#id47" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between ellipsoids with GJK"><div class="figure align-default" id="id48">
-<img alt="Distance between ellipsoids with GJK" src="../_images/sphx_glr_plot_ellipsoids_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="gjk/plot_ellipsoids.html#sphx-glr-auto-examples-gjk-plot-ellipsoids-py"><span class="std std-ref">Distance between ellipsoids with GJK</span></a></span><a class="headerlink" href="#id48" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between cylinders with GJK"><div class="figure align-default" id="id49">
-<img alt="Distance between cylinders with GJK" src="../_images/sphx_glr_plot_cylinder_thumb1.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="gjk/plot_cylinder.html#sphx-glr-auto-examples-gjk-plot-cylinder-py"><span class="std std-ref">Distance between cylinders with GJK</span></a></span><a class="headerlink" href="#id49" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Distance between capsules with GJK"><div class="figure align-default" id="id50">
-<img alt="Distance between capsules with GJK" src="../_images/sphx_glr_plot_capsules_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="gjk/plot_capsules.html#sphx-glr-auto-examples-gjk-plot-capsules-py"><span class="std std-ref">Distance between capsules with GJK</span></a></span><a class="headerlink" href="#id50" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Collision resolution with EPA after GJK"><div class="figure align-default" id="id51">
-<img alt="Collision resolution with EPA after GJK" src="../_images/sphx_glr_plot_collision_resolution_epa_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="gjk/plot_collision_resolution_epa.html#sphx-glr-auto-examples-gjk-plot-collision-resolution-epa-py"><span class="std std-ref">Collision resolution with EPA after GJK</span></a></span><a class="headerlink" href="#id51" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-clear"></div></div>
-<div class="section" id="visualizations">
-<span id="sphx-glr-auto-examples-visualizations"></span><h2><a class="toc-backref" href="#id73">Visualizations</a><a class="headerlink" href="#visualizations" title="Permalink to this heading">¶</a></h2>
-<div class="sphx-glr-thumbcontainer" tooltip="Visualize Tetrahedral Mesh"><div class="figure align-default" id="id52">
-<img alt="Visualize Tetrahedral Mesh" src="../_images/sphx_glr_vis_tetrahedral_mesh_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_tetrahedral_mesh.html#sphx-glr-auto-examples-visualizations-vis-tetrahedral-mesh-py"><span class="std std-ref">Visualize Tetrahedral Mesh</span></a></span><a class="headerlink" href="#id52" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Visualize Intersection of Tetrahedra"><div class="figure align-default" id="id53">
-<img alt="Visualize Intersection of Tetrahedra" src="../_images/sphx_glr_vis_tetrahedron_intersection_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_tetrahedron_intersection.html#sphx-glr-auto-examples-visualizations-vis-tetrahedron-intersection-py"><span class="std std-ref">Visualize Intersection of Tetrahedra</span></a></span><a class="headerlink" href="#id53" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Physical simulation with collision detection"><div class="figure align-default" id="id54">
-<img alt="Physical simulation with collision detection" src="../_images/sphx_glr_vis_collision_physics_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_collision_physics.html#sphx-glr-auto-examples-visualizations-vis-collision-physics-py"><span class="std std-ref">Physical simulation with collision detection</span></a></span><a class="headerlink" href="#id54" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for boxes"><div class="figure align-default" id="id55">
-<img alt="Benchmark collision detection for boxes" src="../_images/sphx_glr_vis_boxes_benchmark_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_boxes_benchmark.html#sphx-glr-auto-examples-visualizations-vis-boxes-benchmark-py"><span class="std std-ref">Benchmark collision detection for boxes</span></a></span><a class="headerlink" href="#id55" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for disks"><div class="figure align-default" id="id56">
-<img alt="Benchmark collision detection for disks" src="../_images/sphx_glr_vis_disk_benchmark_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_disk_benchmark.html#sphx-glr-auto-examples-visualizations-vis-disk-benchmark-py"><span class="std std-ref">Benchmark collision detection for disks</span></a></span><a class="headerlink" href="#id56" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for ellipses"><div class="figure align-default" id="id57">
-<img alt="Benchmark collision detection for ellipses" src="../_images/sphx_glr_vis_ellipse_benchmark_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_ellipse_benchmark.html#sphx-glr-auto-examples-visualizations-vis-ellipse-benchmark-py"><span class="std std-ref">Benchmark collision detection for ellipses</span></a></span><a class="headerlink" href="#id57" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for cones"><div class="figure align-default" id="id58">
-<img alt="Benchmark collision detection for cones" src="../_images/sphx_glr_vis_cone_benchmark_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_cone_benchmark.html#sphx-glr-auto-examples-visualizations-vis-cone-benchmark-py"><span class="std std-ref">Benchmark collision detection for cones</span></a></span><a class="headerlink" href="#id58" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for ellipsoids"><div class="figure align-default" id="id59">
-<img alt="Benchmark collision detection for ellipsoids" src="../_images/sphx_glr_vis_ellipsoids_benchmark_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_ellipsoids_benchmark.html#sphx-glr-auto-examples-visualizations-vis-ellipsoids-benchmark-py"><span class="std std-ref">Benchmark collision detection for ellipsoids</span></a></span><a class="headerlink" href="#id59" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for capsules"><div class="figure align-default" id="id60">
-<img alt="Benchmark collision detection for capsules" src="../_images/sphx_glr_vis_capsules_benchmark_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_capsules_benchmark.html#sphx-glr-auto-examples-visualizations-vis-capsules-benchmark-py"><span class="std std-ref">Benchmark collision detection for capsules</span></a></span><a class="headerlink" href="#id60" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for cylinders"><div class="figure align-default" id="id61">
-<img alt="Benchmark collision detection for cylinders" src="../_images/sphx_glr_vis_cylinders_benchmark_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_cylinders_benchmark.html#sphx-glr-auto-examples-visualizations-vis-cylinders-benchmark-py"><span class="std std-ref">Benchmark collision detection for cylinders</span></a></span><a class="headerlink" href="#id61" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for meshes"><div class="figure align-default" id="id62">
-<img alt="Benchmark collision detection for meshes" src="../_images/sphx_glr_vis_mesh_benchmark_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_mesh_benchmark.html#sphx-glr-auto-examples-visualizations-vis-mesh-benchmark-py"><span class="std std-ref">Benchmark collision detection for meshes</span></a></span><a class="headerlink" href="#id62" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Self-collisions of a robot"><div class="figure align-default" id="id63">
-<img alt="Self-collisions of a robot" src="../_images/sphx_glr_vis_self_collisions_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_self_collisions.html#sphx-glr-auto-examples-visualizations-vis-self-collisions-py"><span class="std std-ref">Self-collisions of a robot</span></a></span><a class="headerlink" href="#id63" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Field of Two Colliding Objects"><div class="figure align-default" id="id64">
-<img alt="Visualize Pressure Field of Two Colliding Objects" src="../_images/sphx_glr_vis_pressure_field_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_pressure_field.html#sphx-glr-auto-examples-visualizations-vis-pressure-field-py"><span class="std std-ref">Visualize Pressure Field of Two Colliding Objects</span></a></span><a class="headerlink" href="#id64" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Closest Points with GJK"><div class="figure align-default" id="id65">
-<img alt="Closest Points with GJK" src="../_images/sphx_glr_vis_closest_points_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_closest_points.html#sphx-glr-auto-examples-visualizations-vis-closest-points-py"><span class="std std-ref">Closest Points with GJK</span></a></span><a class="headerlink" href="#id65" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Collisions between robot and environment"><div class="figure align-default" id="id66">
-<img alt="Collisions between robot and environment" src="../_images/sphx_glr_vis_robot_collision_objects_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_robot_collision_objects.html#sphx-glr-auto-examples-visualizations-vis-robot-collision-objects-py"><span class="std std-ref">Collisions between robot and environment</span></a></span><a class="headerlink" href="#id66" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Fields of Moving Object"><div class="figure align-default" id="id67">
-<img alt="Visualize Pressure Fields of Moving Object" src="../_images/sphx_glr_vis_pressure_field_moving_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="visualizations/vis_pressure_field_moving.html#sphx-glr-auto-examples-visualizations-vis-pressure-field-moving-py"><span class="std std-ref">Visualize Pressure Fields of Moving Object</span></a></span><a class="headerlink" href="#id67" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-clear"></div></div>
-<div class="section" id="planar-algorithms">
-<span id="sphx-glr-auto-examples-plane"></span><h2><a class="toc-backref" href="#id74">Planar Algorithms</a><a class="headerlink" href="#planar-algorithms" title="Permalink to this heading">¶</a></h2>
-<div class="sphx-glr-thumbcontainer" tooltip="Halfplane Intersection"><div class="figure align-default" id="id68">
-<img alt="Halfplane Intersection" src="../_images/sphx_glr_plot_halfplane_intersection_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="plane/plot_halfplane_intersection.html#sphx-glr-auto-examples-plane-plot-halfplane-intersection-py"><span class="std std-ref">Halfplane Intersection</span></a></span><a class="headerlink" href="#id68" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="toctree-wrapper compound">
-</div>
-<div class="sphx-glr-clear"></div><div class="sphx-glr-footer class sphx-glr-footer-gallery docutils container">
+</nav>
+<div class="sphx-glr-thumbnails"></div><section id="aabb-tree">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">AABB Tree</a><a class="headerlink" href="#aabb-tree" title="Permalink to this heading">¶</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Plot AABB tree of a robot."><img alt="Robot" src="../_images/sphx_glr_plot_robot_thumb.png" />
+<p><a class="reference internal" href="aabbtree/plot_robot.html#sphx-glr-auto-examples-aabbtree-plot-robot-py"><span class="std std-ref">Robot</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Robot</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Plot AABB tree."><img alt="AABB Tree" src="../_images/sphx_glr_plot_aabbtree_thumb.png" />
+<p><a class="reference internal" href="aabbtree/plot_aabbtree.html#sphx-glr-auto-examples-aabbtree-plot-aabbtree-py"><span class="std std-ref">AABB Tree</span></a></p>
+  <div class="sphx-glr-thumbnail-title">AABB Tree</div>
+</div></div></section>
+<section id="containment-tests">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Containment Tests</a><a class="headerlink" href="#containment-tests" title="Permalink to this heading">¶</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Sphere Containment"><img alt="Sphere Containment" src="../_images/sphx_glr_plot_sphere_thumb.png" />
+<p><a class="reference internal" href="containment_test/plot_sphere.html#sphx-glr-auto-examples-containment-test-plot-sphere-py"><span class="std std-ref">Sphere Containment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Sphere Containment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Box Containment"><img alt="Box Containment" src="../_images/sphx_glr_plot_box_thumb.png" />
+<p><a class="reference internal" href="containment_test/plot_box.html#sphx-glr-auto-examples-containment-test-plot-box-py"><span class="std std-ref">Box Containment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Box Containment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Mesh Containment"><img alt="Mesh Containment" src="../_images/sphx_glr_plot_mesh_thumb.png" />
+<p><a class="reference internal" href="containment_test/plot_mesh.html#sphx-glr-auto-examples-containment-test-plot-mesh-py"><span class="std std-ref">Mesh Containment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Mesh Containment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Ellipsoid Containment"><img alt="Ellipsoid Containment" src="../_images/sphx_glr_plot_ellipsoid_thumb.png" />
+<p><a class="reference internal" href="containment_test/plot_ellipsoid.html#sphx-glr-auto-examples-containment-test-plot-ellipsoid-py"><span class="std std-ref">Ellipsoid Containment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Ellipsoid Containment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Cone Containment"><img alt="Cone Containment" src="../_images/sphx_glr_plot_cone_thumb.png" />
+<p><a class="reference internal" href="containment_test/plot_cone.html#sphx-glr-auto-examples-containment-test-plot-cone-py"><span class="std std-ref">Cone Containment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Cone Containment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Capsule Containment"><img alt="Capsule Containment" src="../_images/sphx_glr_plot_capsule_thumb.png" />
+<p><a class="reference internal" href="containment_test/plot_capsule.html#sphx-glr-auto-examples-containment-test-plot-capsule-py"><span class="std std-ref">Capsule Containment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Capsule Containment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Cylinder Containment"><img alt="Cylinder Containment" src="../_images/sphx_glr_plot_cylinder_thumb.png" />
+<p><a class="reference internal" href="containment_test/plot_cylinder.html#sphx-glr-auto-examples-containment-test-plot-cylinder-py"><span class="std std-ref">Cylinder Containment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Cylinder Containment</div>
+</div></div></section>
+<section id="distance">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Distance</a><a class="headerlink" href="#distance" title="Permalink to this heading">¶</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to triangle"><img alt="Distance from point to triangle" src="../_images/sphx_glr_plot_point_to_triangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_point_to_triangle.html#sphx-glr-auto-examples-distance-plot-point-to-triangle-py"><span class="std std-ref">Distance from point to triangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to triangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to line"><img alt="Distance from point to line" src="../_images/sphx_glr_plot_point_to_line_thumb.png" />
+<p><a class="reference internal" href="distance/plot_point_to_line.html#sphx-glr-auto-examples-distance-plot-point-to-line-py"><span class="std std-ref">Distance from point to line</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to line</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to line segment"><img alt="Distance from point to line segment" src="../_images/sphx_glr_plot_point_to_line_segment_thumb.png" />
+<p><a class="reference internal" href="distance/plot_point_to_line_segment.html#sphx-glr-auto-examples-distance-plot-point-to-line-segment-py"><span class="std std-ref">Distance from point to line segment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to line segment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to plane"><img alt="Distance from point to plane" src="../_images/sphx_glr_plot_point_to_plane_thumb.png" />
+<p><a class="reference internal" href="distance/plot_point_to_plane.html#sphx-glr-auto-examples-distance-plot-point-to-plane-py"><span class="std std-ref">Distance from point to plane</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to plane</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to rectangle"><img alt="Distance from point to rectangle" src="../_images/sphx_glr_plot_point_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_point_to_rectangle.html#sphx-glr-auto-examples-distance-plot-point-to-rectangle-py"><span class="std std-ref">Distance from point to rectangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to rectangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to box"><img alt="Distance from point to box" src="../_images/sphx_glr_plot_point_to_box_thumb.png" />
+<p><a class="reference internal" href="distance/plot_point_to_box.html#sphx-glr-auto-examples-distance-plot-point-to-box-py"><span class="std std-ref">Distance from point to box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to box</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to ellipsoid"><img alt="Distance from point to ellipsoid" src="../_images/sphx_glr_plot_point_to_ellipsoid_thumb.png" />
+<p><a class="reference internal" href="distance/plot_point_to_ellipsoid.html#sphx-glr-auto-examples-distance-plot-point-to-ellipsoid-py"><span class="std std-ref">Distance from point to ellipsoid</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to ellipsoid</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to triangle"><img alt="Distance from line to triangle" src="../_images/sphx_glr_plot_line_to_triangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_to_triangle.html#sphx-glr-auto-examples-distance-plot-line-to-triangle-py"><span class="std std-ref">Distance from line to triangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to triangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to disk"><img alt="Distance from point to disk" src="../_images/sphx_glr_plot_point_to_disk_thumb.png" />
+<p><a class="reference internal" href="distance/plot_point_to_disk.html#sphx-glr-auto-examples-distance-plot-point-to-disk-py"><span class="std std-ref">Distance from point to disk</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to disk</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to box"><img alt="Distance from line segment to box" src="../_images/sphx_glr_plot_line_segment_to_box_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_segment_to_box.html#sphx-glr-auto-examples-distance-plot-line-segment-to-box-py"><span class="std std-ref">Distance from line segment to box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to box</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to circle"><img alt="Distance from point to circle" src="../_images/sphx_glr_plot_point_to_circle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_point_to_circle.html#sphx-glr-auto-examples-distance-plot-point-to-circle-py"><span class="std std-ref">Distance from point to circle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to circle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to line segment"><img alt="Distance from line to line segment" src="../_images/sphx_glr_plot_line_to_line_segment_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_to_line_segment.html#sphx-glr-auto-examples-distance-plot-line-to-line-segment-py"><span class="std std-ref">Distance from line to line segment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to line segment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to triangle"><img alt="Distance from line segment to triangle" src="../_images/sphx_glr_plot_line_segment_to_triangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_segment_to_triangle.html#sphx-glr-auto-examples-distance-plot-line-segment-to-triangle-py"><span class="std std-ref">Distance from line segment to triangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to triangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between line and circle"><img alt="Distance between line and circle" src="../_images/sphx_glr_plot_line_to_circle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_to_circle.html#sphx-glr-auto-examples-distance-plot-line-to-circle-py"><span class="std std-ref">Distance between line and circle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between line and circle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to circle"><img alt="Distance from line segment to circle" src="../_images/sphx_glr_plot_line_segment_to_circle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_segment_to_circle.html#sphx-glr-auto-examples-distance-plot-line-segment-to-circle-py"><span class="std std-ref">Distance from line segment to circle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to circle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to triangle"><img alt="Distance from plane to triangle" src="../_images/sphx_glr_plot_plane_to_triangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_plane_to_triangle.html#sphx-glr-auto-examples-distance-plot-plane-to-triangle-py"><span class="std std-ref">Distance from plane to triangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from plane to triangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to cylinder"><img alt="Distance from point to cylinder" src="../_images/sphx_glr_plot_point_to_cylinder_thumb.png" />
+<p><a class="reference internal" href="distance/plot_point_to_cylinder.html#sphx-glr-auto-examples-distance-plot-point-to-cylinder-py"><span class="std std-ref">Distance from point to cylinder</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to cylinder</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to line"><img alt="Distance from line to line" src="../_images/sphx_glr_plot_line_to_line_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_to_line.html#sphx-glr-auto-examples-distance-plot-line-to-line-py"><span class="std std-ref">Distance from line to line</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to line</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between two disks"><img alt="Distance between two disks" src="../_images/sphx_glr_plot_disk_to_disk_thumb.png" />
+<p><a class="reference internal" href="distance/plot_disk_to_disk.html#sphx-glr-auto-examples-distance-plot-disk-to-disk-py"><span class="std std-ref">Distance between two disks</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between two disks</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between two triangles"><img alt="Distance between two triangles" src="../_images/sphx_glr_plot_triangle_to_triangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_triangle_to_triangle.html#sphx-glr-auto-examples-distance-plot-triangle-to-triangle-py"><span class="std std-ref">Distance between two triangles</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between two triangles</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to rectangle"><img alt="Distance from line to rectangle" src="../_images/sphx_glr_plot_line_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_to_rectangle.html#sphx-glr-auto-examples-distance-plot-line-to-rectangle-py"><span class="std std-ref">Distance from line to rectangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to rectangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to plane"><img alt="Distance from plane to plane" src="../_images/sphx_glr_plot_plane_to_plane_thumb.png" />
+<p><a class="reference internal" href="distance/plot_plane_to_plane.html#sphx-glr-auto-examples-distance-plot-plane-to-plane-py"><span class="std std-ref">Distance from plane to plane</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from plane to plane</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to rectangle"><img alt="Distance from line segment to rectangle" src="../_images/sphx_glr_plot_line_segment_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_segment_to_rectangle.html#sphx-glr-auto-examples-distance-plot-line-segment-to-rectangle-py"><span class="std std-ref">Distance from line segment to rectangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to rectangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to box"><img alt="Distance from point to box" src="../_images/sphx_glr_plot_plane_to_box_thumb.png" />
+<p><a class="reference internal" href="distance/plot_plane_to_box.html#sphx-glr-auto-examples-distance-plot-plane-to-box-py"><span class="std std-ref">Distance from point to box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to box</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to plane"><img alt="Distance from line to plane" src="../_images/sphx_glr_plot_line_to_plane_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_to_plane.html#sphx-glr-auto-examples-distance-plot-line-to-plane-py"><span class="std std-ref">Distance from line to plane</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to plane</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to rectangle"><img alt="Distance from plane to rectangle" src="../_images/sphx_glr_plot_plane_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_plane_to_rectangle.html#sphx-glr-auto-examples-distance-plot-plane-to-rectangle-py"><span class="std std-ref">Distance from plane to rectangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from plane to rectangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to ellipsoid"><img alt="Distance from plane to ellipsoid" src="../_images/sphx_glr_plot_plane_to_ellipsoid_thumb.png" />
+<p><a class="reference internal" href="distance/plot_plane_to_ellipsoid.html#sphx-glr-auto-examples-distance-plot-plane-to-ellipsoid-py"><span class="std std-ref">Distance from plane to ellipsoid</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from plane to ellipsoid</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from triangle to rectangle"><img alt="Distance from triangle to rectangle" src="../_images/sphx_glr_plot_triangle_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_triangle_to_rectangle.html#sphx-glr-auto-examples-distance-plot-triangle-to-rectangle-py"><span class="std std-ref">Distance from triangle to rectangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from triangle to rectangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to plane"><img alt="Distance from line segment to plane" src="../_images/sphx_glr_plot_line_segment_to_plane_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_segment_to_plane.html#sphx-glr-auto-examples-distance-plot-line-segment-to-plane-py"><span class="std std-ref">Distance from line segment to plane</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to plane</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to cylinder"><img alt="Distance from plane to cylinder" src="../_images/sphx_glr_plot_plane_to_cylinder_thumb.png" />
+<p><a class="reference internal" href="distance/plot_plane_to_cylinder.html#sphx-glr-auto-examples-distance-plot-plane-to-cylinder-py"><span class="std std-ref">Distance from plane to cylinder</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from plane to cylinder</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between two rectangles"><img alt="Distance between two rectangles" src="../_images/sphx_glr_plot_rectangle_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="distance/plot_rectangle_to_rectangle.html#sphx-glr-auto-examples-distance-plot-rectangle-to-rectangle-py"><span class="std std-ref">Distance between two rectangles</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between two rectangles</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to box"><img alt="Distance from line to box" src="../_images/sphx_glr_plot_line_to_box_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_to_box.html#sphx-glr-auto-examples-distance-plot-line-to-box-py"><span class="std std-ref">Distance from line to box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to box</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to line segment"><img alt="Distance from line segment to line segment" src="../_images/sphx_glr_plot_line_segment_to_line_segment_thumb.png" />
+<p><a class="reference internal" href="distance/plot_line_segment_to_line_segment.html#sphx-glr-auto-examples-distance-plot-line-segment-to-line-segment-py"><span class="std std-ref">Distance from line segment to line segment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to line segment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from rectangle to box"><img alt="Distance from rectangle to box" src="../_images/sphx_glr_plot_rectangle_to_box_thumb.png" />
+<p><a class="reference internal" href="distance/plot_rectangle_to_box.html#sphx-glr-auto-examples-distance-plot-rectangle-to-box-py"><span class="std std-ref">Distance from rectangle to box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from rectangle to box</div>
+</div></div></section>
+<section id="gjk">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">GJK</a><a class="headerlink" href="#gjk" title="Permalink to this heading">¶</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Distance between spheres with GJK"><img alt="Distance between spheres with GJK" src="../_images/sphx_glr_plot_spheres_thumb.png" />
+<p><a class="reference internal" href="gjk/plot_spheres.html#sphx-glr-auto-examples-gjk-plot-spheres-py"><span class="std std-ref">Distance between spheres with GJK</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between spheres with GJK</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between ellipses with GJK"><img alt="Distance between ellipses with GJK" src="../_images/sphx_glr_plot_ellipse_thumb.png" />
+<p><a class="reference internal" href="gjk/plot_ellipse.html#sphx-glr-auto-examples-gjk-plot-ellipse-py"><span class="std std-ref">Distance between ellipses with GJK</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between ellipses with GJK</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between boxes with GJK"><img alt="Distance between boxes with GJK" src="../_images/sphx_glr_plot_box_thumb1.png" />
+<p><a class="reference internal" href="gjk/plot_box.html#sphx-glr-auto-examples-gjk-plot-box-py"><span class="std std-ref">Distance between boxes with GJK</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between boxes with GJK</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between convex meshes with GJK"><img alt="Distance between convex meshes with GJK" src="../_images/sphx_glr_plot_convex_mesh_thumb.png" />
+<p><a class="reference internal" href="gjk/plot_convex_mesh.html#sphx-glr-auto-examples-gjk-plot-convex-mesh-py"><span class="std std-ref">Distance between convex meshes with GJK</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between convex meshes with GJK</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between ellipsoids with GJK"><img alt="Distance between ellipsoids with GJK" src="../_images/sphx_glr_plot_ellipsoids_thumb.png" />
+<p><a class="reference internal" href="gjk/plot_ellipsoids.html#sphx-glr-auto-examples-gjk-plot-ellipsoids-py"><span class="std std-ref">Distance between ellipsoids with GJK</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between ellipsoids with GJK</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between cylinders with GJK"><img alt="Distance between cylinders with GJK" src="../_images/sphx_glr_plot_cylinder_thumb1.png" />
+<p><a class="reference internal" href="gjk/plot_cylinder.html#sphx-glr-auto-examples-gjk-plot-cylinder-py"><span class="std std-ref">Distance between cylinders with GJK</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between cylinders with GJK</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between capsules with GJK"><img alt="Distance between capsules with GJK" src="../_images/sphx_glr_plot_capsules_thumb.png" />
+<p><a class="reference internal" href="gjk/plot_capsules.html#sphx-glr-auto-examples-gjk-plot-capsules-py"><span class="std std-ref">Distance between capsules with GJK</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between capsules with GJK</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Collision resolution with EPA after GJK"><img alt="Collision resolution with EPA after GJK" src="../_images/sphx_glr_plot_collision_resolution_epa_thumb.png" />
+<p><a class="reference internal" href="gjk/plot_collision_resolution_epa.html#sphx-glr-auto-examples-gjk-plot-collision-resolution-epa-py"><span class="std std-ref">Collision resolution with EPA after GJK</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Collision resolution with EPA after GJK</div>
+</div></div></section>
+<section id="visualizations">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Visualizations</a><a class="headerlink" href="#visualizations" title="Permalink to this heading">¶</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Visualize Tetrahedral Mesh"><img alt="Visualize Tetrahedral Mesh" src="../_images/sphx_glr_vis_tetrahedral_mesh_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_tetrahedral_mesh.html#sphx-glr-auto-examples-visualizations-vis-tetrahedral-mesh-py"><span class="std std-ref">Visualize Tetrahedral Mesh</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Visualize Tetrahedral Mesh</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Hand as tetrahedral mesh"><img alt="Hand as tetrahedral mesh" src="../_images/sphx_glr_vis_tetrahedral_hand_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_tetrahedral_hand.html#sphx-glr-auto-examples-visualizations-vis-tetrahedral-hand-py"><span class="std std-ref">Hand as tetrahedral mesh</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Hand as tetrahedral mesh</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Visualize Intersection of Tetrahedra"><img alt="Visualize Intersection of Tetrahedra" src="../_images/sphx_glr_vis_tetrahedron_intersection_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_tetrahedron_intersection.html#sphx-glr-auto-examples-visualizations-vis-tetrahedron-intersection-py"><span class="std std-ref">Visualize Intersection of Tetrahedra</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Visualize Intersection of Tetrahedra</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Visualize Subdivision of the AABB Tree"><img alt="Visualize Subdivision of the AABB Tree" src="../_images/sphx_glr_vis_tree_subdevision_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_tree_subdevision.html#sphx-glr-auto-examples-visualizations-vis-tree-subdevision-py"><span class="std std-ref">Visualize Subdivision of the AABB Tree</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Visualize Subdivision of the AABB Tree</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for boxes"><img alt="Benchmark collision detection for boxes" src="../_images/sphx_glr_vis_boxes_benchmark_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_boxes_benchmark.html#sphx-glr-auto-examples-visualizations-vis-boxes-benchmark-py"><span class="std std-ref">Benchmark collision detection for boxes</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Benchmark collision detection for boxes</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for disks"><img alt="Benchmark collision detection for disks" src="../_images/sphx_glr_vis_disk_benchmark_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_disk_benchmark.html#sphx-glr-auto-examples-visualizations-vis-disk-benchmark-py"><span class="std std-ref">Benchmark collision detection for disks</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Benchmark collision detection for disks</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for ellipses"><img alt="Benchmark collision detection for ellipses" src="../_images/sphx_glr_vis_ellipse_benchmark_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_ellipse_benchmark.html#sphx-glr-auto-examples-visualizations-vis-ellipse-benchmark-py"><span class="std std-ref">Benchmark collision detection for ellipses</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Benchmark collision detection for ellipses</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Physical simulation with collision detection"><img alt="Physical simulation with collision detection" src="../_images/sphx_glr_vis_collision_physics_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_collision_physics.html#sphx-glr-auto-examples-visualizations-vis-collision-physics-py"><span class="std std-ref">Physical simulation with collision detection</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Physical simulation with collision detection</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for cones"><img alt="Benchmark collision detection for cones" src="../_images/sphx_glr_vis_cone_benchmark_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_cone_benchmark.html#sphx-glr-auto-examples-visualizations-vis-cone-benchmark-py"><span class="std std-ref">Benchmark collision detection for cones</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Benchmark collision detection for cones</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for ellipsoids"><img alt="Benchmark collision detection for ellipsoids" src="../_images/sphx_glr_vis_ellipsoids_benchmark_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_ellipsoids_benchmark.html#sphx-glr-auto-examples-visualizations-vis-ellipsoids-benchmark-py"><span class="std std-ref">Benchmark collision detection for ellipsoids</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Benchmark collision detection for ellipsoids</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for capsules"><img alt="Benchmark collision detection for capsules" src="../_images/sphx_glr_vis_capsules_benchmark_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_capsules_benchmark.html#sphx-glr-auto-examples-visualizations-vis-capsules-benchmark-py"><span class="std std-ref">Benchmark collision detection for capsules</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Benchmark collision detection for capsules</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for cylinders"><img alt="Benchmark collision detection for cylinders" src="../_images/sphx_glr_vis_cylinders_benchmark_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_cylinders_benchmark.html#sphx-glr-auto-examples-visualizations-vis-cylinders-benchmark-py"><span class="std std-ref">Benchmark collision detection for cylinders</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Benchmark collision detection for cylinders</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Visualize pressure fields with different young&#x27;s moduli"><img alt="Visualize pressure fields with different young's moduli" src="../_images/sphx_glr_vis_youngs_modulus_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_youngs_modulus.html#sphx-glr-auto-examples-visualizations-vis-youngs-modulus-py"><span class="std std-ref">Visualize pressure fields with different young’s moduli</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Visualize pressure fields with different young's moduli</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Benchmark collision detection for meshes"><img alt="Benchmark collision detection for meshes" src="../_images/sphx_glr_vis_mesh_benchmark_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_mesh_benchmark.html#sphx-glr-auto-examples-visualizations-vis-mesh-benchmark-py"><span class="std std-ref">Benchmark collision detection for meshes</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Benchmark collision detection for meshes</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Self-collisions of a robot"><img alt="Self-collisions of a robot" src="../_images/sphx_glr_vis_self_collisions_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_self_collisions.html#sphx-glr-auto-examples-visualizations-vis-self-collisions-py"><span class="std std-ref">Self-collisions of a robot</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Self-collisions of a robot</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Field of Two Colliding Objects"><img alt="Visualize Pressure Field of Two Colliding Objects" src="../_images/sphx_glr_vis_pressure_field_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_pressure_field.html#sphx-glr-auto-examples-visualizations-vis-pressure-field-py"><span class="std std-ref">Visualize Pressure Field of Two Colliding Objects</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Visualize Pressure Field of Two Colliding Objects</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Physical Simulation of Bouncing Ball"><img alt="Physical Simulation of Bouncing Ball" src="../_images/sphx_glr_vis_pressure_field_collision_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_pressure_field_collision.html#sphx-glr-auto-examples-visualizations-vis-pressure-field-collision-py"><span class="std std-ref">Physical Simulation of Bouncing Ball</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Physical Simulation of Bouncing Ball</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Closest Points with GJK"><img alt="Closest Points with GJK" src="../_images/sphx_glr_vis_closest_points_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_closest_points.html#sphx-glr-auto-examples-visualizations-vis-closest-points-py"><span class="std std-ref">Closest Points with GJK</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Closest Points with GJK</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Physical Simulation of Bouncing Ball on Hand"><img alt="Physical Simulation of Bouncing Ball on Hand" src="../_images/sphx_glr_vis_tetrahedral_hand_collision_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_tetrahedral_hand_collision.html#sphx-glr-auto-examples-visualizations-vis-tetrahedral-hand-collision-py"><span class="std std-ref">Physical Simulation of Bouncing Ball on Hand</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Physical Simulation of Bouncing Ball on Hand</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Collisions between robot and environment"><img alt="Collisions between robot and environment" src="../_images/sphx_glr_vis_robot_collision_objects_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_robot_collision_objects.html#sphx-glr-auto-examples-visualizations-vis-robot-collision-objects-py"><span class="std std-ref">Collisions between robot and environment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Collisions between robot and environment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Physical Simulation of Soft Balls Bouncing in a Wooden Box"><img alt="Physical Simulation of Soft Balls Bouncing in a Wooden Box" src="../_images/sphx_glr_vis_pressure_field_collision_multiple_objects_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_pressure_field_collision_multiple_objects.html#sphx-glr-auto-examples-visualizations-vis-pressure-field-collision-multiple-objects-py"><span class="std std-ref">Physical Simulation of Soft Balls Bouncing in a Wooden Box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Physical Simulation of Soft Balls Bouncing in a Wooden Box</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Visualize Pressure Fields of Moving Object"><img alt="Visualize Pressure Fields of Moving Object" src="../_images/sphx_glr_vis_pressure_field_moving_thumb.png" />
+<p><a class="reference internal" href="visualizations/vis_pressure_field_moving.html#sphx-glr-auto-examples-visualizations-vis-pressure-field-moving-py"><span class="std std-ref">Visualize Pressure Fields of Moving Object</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Visualize Pressure Fields of Moving Object</div>
+</div></div></section>
+<section id="planar-algorithms">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Planar Algorithms</a><a class="headerlink" href="#planar-algorithms" title="Permalink to this heading">¶</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Halfplane Intersection"><img alt="Halfplane Intersection" src="../_images/sphx_glr_plot_halfplane_intersection_thumb.png" />
+<p><a class="reference internal" href="plane/plot_halfplane_intersection.html#sphx-glr-auto-examples-plane-plot-halfplane-intersection-py"><span class="std std-ref">Halfplane Intersection</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Halfplane Intersection</div>
+</div></div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-footer sphx-glr-footer-gallery docutils container">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/8845d11ecb15bc8f327918febd001c4d/_auto_examples_python.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">_auto_examples_python.zip</span></code></a></p>
 </div>
@@ -485,8 +302,8 @@
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
@@ -509,90 +326,18 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#aabb-tree">AABB Tree</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="aabbtree/plot_robot.html">Robot</a></li>
-<li class="toctree-l3"><a class="reference internal" href="aabbtree/plot_aabbtree.html">AABB Tree</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#containment-tests">Containment Tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="containment_test/plot_sphere.html">Sphere Containment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="containment_test/plot_box.html">Box Containment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="containment_test/plot_mesh.html">Mesh Containment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="containment_test/plot_ellipsoid.html">Ellipsoid Containment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="containment_test/plot_cone.html">Cone Containment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="containment_test/plot_capsule.html">Capsule Containment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="containment_test/plot_cylinder.html">Cylinder Containment</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#distance">Distance</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_point_to_triangle.html">Distance from point to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_point_to_line.html">Distance from point to line</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_point_to_line_segment.html">Distance from point to line segment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_point_to_plane.html">Distance from point to plane</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_point_to_rectangle.html">Distance from point to rectangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_point_to_box.html">Distance from point to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_point_to_ellipsoid.html">Distance from point to ellipsoid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_to_triangle.html">Distance from line to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_point_to_disk.html">Distance from point to disk</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_segment_to_box.html">Distance from line segment to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_point_to_circle.html">Distance from point to circle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_to_line_segment.html">Distance from line to line segment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_segment_to_triangle.html">Distance from line segment to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_to_circle.html">Distance between line and circle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_segment_to_circle.html">Distance from line segment to circle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_plane_to_triangle.html">Distance from plane to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_point_to_cylinder.html">Distance from point to cylinder</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_to_line.html">Distance from line to line</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_disk_to_disk.html">Distance between two disks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_triangle_to_triangle.html">Distance between two triangles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_to_rectangle.html">Distance from line to rectangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_plane_to_plane.html">Distance from plane to plane</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_segment_to_rectangle.html">Distance from line segment to rectangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_plane_to_box.html">Distance from point to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_to_plane.html">Distance from line to plane</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_plane_to_rectangle.html">Distance from plane to rectangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_plane_to_ellipsoid.html">Distance from plane to ellipsoid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_triangle_to_rectangle.html">Distance from triangle to rectangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_segment_to_plane.html">Distance from line segment to plane</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_plane_to_cylinder.html">Distance from plane to cylinder</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_rectangle_to_rectangle.html">Distance between two rectangles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_to_box.html">Distance from line to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_line_segment_to_line_segment.html">Distance from line segment to line segment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="distance/plot_rectangle_to_box.html">Distance from rectangle to box</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#gjk">GJK</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="gjk/plot_spheres.html">Distance between spheres with GJK</a></li>
-<li class="toctree-l3"><a class="reference internal" href="gjk/plot_ellipse.html">Distance between ellipses with GJK</a></li>
-<li class="toctree-l3"><a class="reference internal" href="gjk/plot_box.html">Distance between boxes with GJK</a></li>
-<li class="toctree-l3"><a class="reference internal" href="gjk/plot_convex_mesh.html">Distance between convex meshes with GJK</a></li>
-<li class="toctree-l3"><a class="reference internal" href="gjk/plot_ellipsoids.html">Distance between ellipsoids with GJK</a></li>
-<li class="toctree-l3"><a class="reference internal" href="gjk/plot_cylinder.html">Distance between cylinders with GJK</a></li>
-<li class="toctree-l3"><a class="reference internal" href="gjk/plot_capsules.html">Distance between capsules with GJK</a></li>
-<li class="toctree-l3"><a class="reference internal" href="gjk/plot_collision_resolution_epa.html">Collision resolution with EPA after GJK</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#visualizations">Visualizations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_tetrahedral_mesh.html">Visualize Tetrahedral Mesh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_tetrahedron_intersection.html">Visualize Intersection of Tetrahedra</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_collision_physics.html">Physical simulation with collision detection</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_boxes_benchmark.html">Benchmark collision detection for boxes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_disk_benchmark.html">Benchmark collision detection for disks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_ellipse_benchmark.html">Benchmark collision detection for ellipses</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_cone_benchmark.html">Benchmark collision detection for cones</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_ellipsoids_benchmark.html">Benchmark collision detection for ellipsoids</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_capsules_benchmark.html">Benchmark collision detection for capsules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_cylinders_benchmark.html">Benchmark collision detection for cylinders</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_mesh_benchmark.html">Benchmark collision detection for meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_self_collisions.html">Self-collisions of a robot</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_pressure_field.html">Visualize Pressure Field of Two Colliding Objects</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_closest_points.html">Closest Points with GJK</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_robot_collision_objects.html">Collisions between robot and environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="visualizations/vis_pressure_field_moving.html">Visualize Pressure Fields of Moving Object</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#aabb-tree">AABB Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#containment-tests">Containment Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#distance">Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gjk">GJK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualizations">Visualizations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#planar-algorithms">Planar Algorithms</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="plane/plot_halfplane_intersection.html">Halfplane Intersection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aabbtree/index.html">AABB Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="containment_test/index.html">Containment Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distance/index.html">Distance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gjk/index.html">GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="visualizations/index.html">Visualizations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plane/index.html">Planar Algorithms</a></li>
 </ul>
 </li>
 </ul>
@@ -603,8 +348,8 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../_autosummary/distance3d.random.randn_convex.html" title="previous chapter">distance3d.random.randn_convex</a></li>
-      <li>Next: <a href="aabbtree/plot_robot.html" title="next chapter">Robot</a></li>
+      <li>Previous: <a href="../_autosummary/distance3d.aabb_tree.all_aabbs_overlap.html" title="previous chapter">distance3d.aabb_tree.all_aabbs_overlap</a></li>
+      <li>Next: <a href="aabbtree/index.html" title="next chapter">AABB Tree</a></li>
   </ul></li>
 </ul>
 </div>
@@ -634,7 +379,7 @@
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

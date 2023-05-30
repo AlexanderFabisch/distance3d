@@ -1,0 +1,40 @@
+
+
+.. _sphx_glr__auto_examples_plane:
+
+Planar Algorithms
+-----------------
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Halfplane Intersection">
+
+.. only:: html
+
+  .. image:: /_auto_examples/plane/images/thumb/sphx_glr_plot_halfplane_intersection_thumb.png
+    :alt: Halfplane Intersection
+
+  :ref:`sphx_glr__auto_examples_plane_plot_halfplane_intersection.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Halfplane Intersection</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/plane/plot_halfplane_intersection
+

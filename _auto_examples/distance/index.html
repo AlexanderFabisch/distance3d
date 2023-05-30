@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Distance &#8212; distance3d 0.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Distance from point to triangle" href="plot_point_to_triangle.html" />
+    <link rel="prev" title="Cylinder Containment" href="../containment_test/plot_cylinder.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="distance">
+<span id="sphx-glr-auto-examples-distance"></span><h1>Distance<a class="headerlink" href="#distance" title="Permalink to this heading">¶</a></h1>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to triangle"><img alt="Distance from point to triangle" src="../../_images/sphx_glr_plot_point_to_triangle_thumb.png" />
+<p><a class="reference internal" href="plot_point_to_triangle.html#sphx-glr-auto-examples-distance-plot-point-to-triangle-py"><span class="std std-ref">Distance from point to triangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to triangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to line"><img alt="Distance from point to line" src="../../_images/sphx_glr_plot_point_to_line_thumb.png" />
+<p><a class="reference internal" href="plot_point_to_line.html#sphx-glr-auto-examples-distance-plot-point-to-line-py"><span class="std std-ref">Distance from point to line</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to line</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to line segment"><img alt="Distance from point to line segment" src="../../_images/sphx_glr_plot_point_to_line_segment_thumb.png" />
+<p><a class="reference internal" href="plot_point_to_line_segment.html#sphx-glr-auto-examples-distance-plot-point-to-line-segment-py"><span class="std std-ref">Distance from point to line segment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to line segment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to plane"><img alt="Distance from point to plane" src="../../_images/sphx_glr_plot_point_to_plane_thumb.png" />
+<p><a class="reference internal" href="plot_point_to_plane.html#sphx-glr-auto-examples-distance-plot-point-to-plane-py"><span class="std std-ref">Distance from point to plane</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to plane</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to rectangle"><img alt="Distance from point to rectangle" src="../../_images/sphx_glr_plot_point_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="plot_point_to_rectangle.html#sphx-glr-auto-examples-distance-plot-point-to-rectangle-py"><span class="std std-ref">Distance from point to rectangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to rectangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to box"><img alt="Distance from point to box" src="../../_images/sphx_glr_plot_point_to_box_thumb.png" />
+<p><a class="reference internal" href="plot_point_to_box.html#sphx-glr-auto-examples-distance-plot-point-to-box-py"><span class="std std-ref">Distance from point to box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to box</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to ellipsoid"><img alt="Distance from point to ellipsoid" src="../../_images/sphx_glr_plot_point_to_ellipsoid_thumb.png" />
+<p><a class="reference internal" href="plot_point_to_ellipsoid.html#sphx-glr-auto-examples-distance-plot-point-to-ellipsoid-py"><span class="std std-ref">Distance from point to ellipsoid</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to ellipsoid</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to triangle"><img alt="Distance from line to triangle" src="../../_images/sphx_glr_plot_line_to_triangle_thumb.png" />
+<p><a class="reference internal" href="plot_line_to_triangle.html#sphx-glr-auto-examples-distance-plot-line-to-triangle-py"><span class="std std-ref">Distance from line to triangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to triangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to disk"><img alt="Distance from point to disk" src="../../_images/sphx_glr_plot_point_to_disk_thumb.png" />
+<p><a class="reference internal" href="plot_point_to_disk.html#sphx-glr-auto-examples-distance-plot-point-to-disk-py"><span class="std std-ref">Distance from point to disk</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to disk</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to box"><img alt="Distance from line segment to box" src="../../_images/sphx_glr_plot_line_segment_to_box_thumb.png" />
+<p><a class="reference internal" href="plot_line_segment_to_box.html#sphx-glr-auto-examples-distance-plot-line-segment-to-box-py"><span class="std std-ref">Distance from line segment to box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to box</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to circle"><img alt="Distance from point to circle" src="../../_images/sphx_glr_plot_point_to_circle_thumb.png" />
+<p><a class="reference internal" href="plot_point_to_circle.html#sphx-glr-auto-examples-distance-plot-point-to-circle-py"><span class="std std-ref">Distance from point to circle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to circle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to line segment"><img alt="Distance from line to line segment" src="../../_images/sphx_glr_plot_line_to_line_segment_thumb.png" />
+<p><a class="reference internal" href="plot_line_to_line_segment.html#sphx-glr-auto-examples-distance-plot-line-to-line-segment-py"><span class="std std-ref">Distance from line to line segment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to line segment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to triangle"><img alt="Distance from line segment to triangle" src="../../_images/sphx_glr_plot_line_segment_to_triangle_thumb.png" />
+<p><a class="reference internal" href="plot_line_segment_to_triangle.html#sphx-glr-auto-examples-distance-plot-line-segment-to-triangle-py"><span class="std std-ref">Distance from line segment to triangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to triangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between line and circle"><img alt="Distance between line and circle" src="../../_images/sphx_glr_plot_line_to_circle_thumb.png" />
+<p><a class="reference internal" href="plot_line_to_circle.html#sphx-glr-auto-examples-distance-plot-line-to-circle-py"><span class="std std-ref">Distance between line and circle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between line and circle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to circle"><img alt="Distance from line segment to circle" src="../../_images/sphx_glr_plot_line_segment_to_circle_thumb.png" />
+<p><a class="reference internal" href="plot_line_segment_to_circle.html#sphx-glr-auto-examples-distance-plot-line-segment-to-circle-py"><span class="std std-ref">Distance from line segment to circle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to circle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to triangle"><img alt="Distance from plane to triangle" src="../../_images/sphx_glr_plot_plane_to_triangle_thumb.png" />
+<p><a class="reference internal" href="plot_plane_to_triangle.html#sphx-glr-auto-examples-distance-plot-plane-to-triangle-py"><span class="std std-ref">Distance from plane to triangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from plane to triangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to cylinder"><img alt="Distance from point to cylinder" src="../../_images/sphx_glr_plot_point_to_cylinder_thumb.png" />
+<p><a class="reference internal" href="plot_point_to_cylinder.html#sphx-glr-auto-examples-distance-plot-point-to-cylinder-py"><span class="std std-ref">Distance from point to cylinder</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to cylinder</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to line"><img alt="Distance from line to line" src="../../_images/sphx_glr_plot_line_to_line_thumb.png" />
+<p><a class="reference internal" href="plot_line_to_line.html#sphx-glr-auto-examples-distance-plot-line-to-line-py"><span class="std std-ref">Distance from line to line</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to line</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between two disks"><img alt="Distance between two disks" src="../../_images/sphx_glr_plot_disk_to_disk_thumb.png" />
+<p><a class="reference internal" href="plot_disk_to_disk.html#sphx-glr-auto-examples-distance-plot-disk-to-disk-py"><span class="std std-ref">Distance between two disks</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between two disks</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between two triangles"><img alt="Distance between two triangles" src="../../_images/sphx_glr_plot_triangle_to_triangle_thumb.png" />
+<p><a class="reference internal" href="plot_triangle_to_triangle.html#sphx-glr-auto-examples-distance-plot-triangle-to-triangle-py"><span class="std std-ref">Distance between two triangles</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between two triangles</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to rectangle"><img alt="Distance from line to rectangle" src="../../_images/sphx_glr_plot_line_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="plot_line_to_rectangle.html#sphx-glr-auto-examples-distance-plot-line-to-rectangle-py"><span class="std std-ref">Distance from line to rectangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to rectangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to plane"><img alt="Distance from plane to plane" src="../../_images/sphx_glr_plot_plane_to_plane_thumb.png" />
+<p><a class="reference internal" href="plot_plane_to_plane.html#sphx-glr-auto-examples-distance-plot-plane-to-plane-py"><span class="std std-ref">Distance from plane to plane</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from plane to plane</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to rectangle"><img alt="Distance from line segment to rectangle" src="../../_images/sphx_glr_plot_line_segment_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="plot_line_segment_to_rectangle.html#sphx-glr-auto-examples-distance-plot-line-segment-to-rectangle-py"><span class="std std-ref">Distance from line segment to rectangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to rectangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from point to box"><img alt="Distance from point to box" src="../../_images/sphx_glr_plot_plane_to_box_thumb.png" />
+<p><a class="reference internal" href="plot_plane_to_box.html#sphx-glr-auto-examples-distance-plot-plane-to-box-py"><span class="std std-ref">Distance from point to box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from point to box</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to plane"><img alt="Distance from line to plane" src="../../_images/sphx_glr_plot_line_to_plane_thumb.png" />
+<p><a class="reference internal" href="plot_line_to_plane.html#sphx-glr-auto-examples-distance-plot-line-to-plane-py"><span class="std std-ref">Distance from line to plane</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to plane</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to rectangle"><img alt="Distance from plane to rectangle" src="../../_images/sphx_glr_plot_plane_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="plot_plane_to_rectangle.html#sphx-glr-auto-examples-distance-plot-plane-to-rectangle-py"><span class="std std-ref">Distance from plane to rectangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from plane to rectangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to ellipsoid"><img alt="Distance from plane to ellipsoid" src="../../_images/sphx_glr_plot_plane_to_ellipsoid_thumb.png" />
+<p><a class="reference internal" href="plot_plane_to_ellipsoid.html#sphx-glr-auto-examples-distance-plot-plane-to-ellipsoid-py"><span class="std std-ref">Distance from plane to ellipsoid</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from plane to ellipsoid</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from triangle to rectangle"><img alt="Distance from triangle to rectangle" src="../../_images/sphx_glr_plot_triangle_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="plot_triangle_to_rectangle.html#sphx-glr-auto-examples-distance-plot-triangle-to-rectangle-py"><span class="std std-ref">Distance from triangle to rectangle</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from triangle to rectangle</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to plane"><img alt="Distance from line segment to plane" src="../../_images/sphx_glr_plot_line_segment_to_plane_thumb.png" />
+<p><a class="reference internal" href="plot_line_segment_to_plane.html#sphx-glr-auto-examples-distance-plot-line-segment-to-plane-py"><span class="std std-ref">Distance from line segment to plane</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to plane</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to cylinder"><img alt="Distance from plane to cylinder" src="../../_images/sphx_glr_plot_plane_to_cylinder_thumb.png" />
+<p><a class="reference internal" href="plot_plane_to_cylinder.html#sphx-glr-auto-examples-distance-plot-plane-to-cylinder-py"><span class="std std-ref">Distance from plane to cylinder</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from plane to cylinder</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance between two rectangles"><img alt="Distance between two rectangles" src="../../_images/sphx_glr_plot_rectangle_to_rectangle_thumb.png" />
+<p><a class="reference internal" href="plot_rectangle_to_rectangle.html#sphx-glr-auto-examples-distance-plot-rectangle-to-rectangle-py"><span class="std std-ref">Distance between two rectangles</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance between two rectangles</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line to box"><img alt="Distance from line to box" src="../../_images/sphx_glr_plot_line_to_box_thumb.png" />
+<p><a class="reference internal" href="plot_line_to_box.html#sphx-glr-auto-examples-distance-plot-line-to-box-py"><span class="std std-ref">Distance from line to box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line to box</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from line segment to line segment"><img alt="Distance from line segment to line segment" src="../../_images/sphx_glr_plot_line_segment_to_line_segment_thumb.png" />
+<p><a class="reference internal" href="plot_line_segment_to_line_segment.html#sphx-glr-auto-examples-distance-plot-line-segment-to-line-segment-py"><span class="std std-ref">Distance from line segment to line segment</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from line segment to line segment</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Distance from rectangle to box"><img alt="Distance from rectangle to box" src="../../_images/sphx_glr_plot_rectangle_to_box_thumb.png" />
+<p><a class="reference internal" href="plot_rectangle_to_box.html#sphx-glr-auto-examples-distance-plot-rectangle-to-box-py"><span class="std std-ref">Distance from rectangle to box</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Distance from rectangle to box</div>
+</div></div><div class="toctree-wrapper compound">
+</div>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#aabb-tree">AABB Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#containment-tests">Containment Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#distance">Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gjk">GJK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#visualizations">Visualizations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#planar-algorithms">Planar Algorithms</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../aabbtree/index.html">AABB Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../containment_test/index.html">Containment Tests</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Distance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gjk/index.html">GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../visualizations/index.html">Visualizations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plane/index.html">Planar Algorithms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Examples</a><ul>
+      <li>Previous: <a href="../containment_test/plot_cylinder.html" title="previous chapter">Cylinder Containment</a></li>
+      <li>Next: <a href="plot_point_to_triangle.html" title="next chapter">Distance from point to triangle</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/_auto_examples/distance/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

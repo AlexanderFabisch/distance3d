@@ -1,9 +1,5 @@
 :orphan:
 
-
-
-.. _sphx_glr__auto_examples:
-
 ========
 Examples
 ========
@@ -14,13 +10,15 @@ The following examples show how distance3d can be used.
     :depth: 1
 
 
+
 .. raw:: html
 
-    <div class="sphx-glr-clear"></div>
+    <div class="sphx-glr-thumbnails">
 
 
+.. raw:: html
 
-.. _sphx_glr__auto_examples_aabbtree:
+    </div>
 
 AABB Tree
 ---------
@@ -29,24 +27,25 @@ AABB Tree
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Plot AABB tree of a robot.">
 
 .. only:: html
 
- .. figure:: /_auto_examples/aabbtree/images/thumb/sphx_glr_plot_robot_thumb.png
-     :alt: Robot
+  .. image:: /_auto_examples/aabbtree/images/thumb/sphx_glr_plot_robot_thumb.png
+    :alt: Robot
 
-     :ref:`sphx_glr__auto_examples_aabbtree_plot_robot.py`
+  :ref:`sphx_glr__auto_examples_aabbtree_plot_robot.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Robot</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/aabbtree/plot_robot
 
 .. raw:: html
 
@@ -54,27 +53,20 @@ AABB Tree
 
 .. only:: html
 
- .. figure:: /_auto_examples/aabbtree/images/thumb/sphx_glr_plot_aabbtree_thumb.png
-     :alt: AABB Tree
+  .. image:: /_auto_examples/aabbtree/images/thumb/sphx_glr_plot_aabbtree_thumb.png
+    :alt: AABB Tree
 
-     :ref:`sphx_glr__auto_examples_aabbtree_plot_aabbtree.py`
+  :ref:`sphx_glr__auto_examples_aabbtree_plot_aabbtree.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">AABB Tree</div>
+    </div>
+
 
 .. raw:: html
 
     </div>
-
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/aabbtree/plot_aabbtree
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. _sphx_glr__auto_examples_containment_test:
 
 Containment Tests
 -----------------
@@ -83,24 +75,25 @@ Containment Tests
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Sphere Containment">
 
 .. only:: html
 
- .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_sphere_thumb.png
-     :alt: Sphere Containment
+  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_sphere_thumb.png
+    :alt: Sphere Containment
 
-     :ref:`sphx_glr__auto_examples_containment_test_plot_sphere.py`
+  :ref:`sphx_glr__auto_examples_containment_test_plot_sphere.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Sphere Containment</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/containment_test/plot_sphere
 
 .. raw:: html
 
@@ -108,20 +101,16 @@ Containment Tests
 
 .. only:: html
 
- .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_box_thumb.png
-     :alt: Box Containment
+  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_box_thumb.png
+    :alt: Box Containment
 
-     :ref:`sphx_glr__auto_examples_containment_test_plot_box.py`
+  :ref:`sphx_glr__auto_examples_containment_test_plot_box.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Box Containment</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/containment_test/plot_box
 
 .. raw:: html
 
@@ -129,20 +118,16 @@ Containment Tests
 
 .. only:: html
 
- .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_mesh_thumb.png
-     :alt: Mesh Containment
+  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_mesh_thumb.png
+    :alt: Mesh Containment
 
-     :ref:`sphx_glr__auto_examples_containment_test_plot_mesh.py`
+  :ref:`sphx_glr__auto_examples_containment_test_plot_mesh.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Mesh Containment</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/containment_test/plot_mesh
 
 .. raw:: html
 
@@ -150,20 +135,16 @@ Containment Tests
 
 .. only:: html
 
- .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_ellipsoid_thumb.png
-     :alt: Ellipsoid Containment
+  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_ellipsoid_thumb.png
+    :alt: Ellipsoid Containment
 
-     :ref:`sphx_glr__auto_examples_containment_test_plot_ellipsoid.py`
+  :ref:`sphx_glr__auto_examples_containment_test_plot_ellipsoid.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Ellipsoid Containment</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/containment_test/plot_ellipsoid
 
 .. raw:: html
 
@@ -171,20 +152,16 @@ Containment Tests
 
 .. only:: html
 
- .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_cone_thumb.png
-     :alt: Cone Containment
+  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_cone_thumb.png
+    :alt: Cone Containment
 
-     :ref:`sphx_glr__auto_examples_containment_test_plot_cone.py`
+  :ref:`sphx_glr__auto_examples_containment_test_plot_cone.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Cone Containment</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/containment_test/plot_cone
 
 .. raw:: html
 
@@ -192,20 +169,16 @@ Containment Tests
 
 .. only:: html
 
- .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_capsule_thumb.png
-     :alt: Capsule Containment
+  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_capsule_thumb.png
+    :alt: Capsule Containment
 
-     :ref:`sphx_glr__auto_examples_containment_test_plot_capsule.py`
+  :ref:`sphx_glr__auto_examples_containment_test_plot_capsule.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Capsule Containment</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/containment_test/plot_capsule
 
 .. raw:: html
 
@@ -213,30 +186,28 @@ Containment Tests
 
 .. only:: html
 
- .. figure:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_cylinder_thumb.png
-     :alt: Cylinder Containment
+  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_cylinder_thumb.png
+    :alt: Cylinder Containment
 
-     :ref:`sphx_glr__auto_examples_containment_test_plot_cylinder.py`
+  :ref:`sphx_glr__auto_examples_containment_test_plot_cylinder.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Cylinder Containment</div>
+    </div>
+
 
 .. raw:: html
 
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/containment_test/plot_cylinder
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. _sphx_glr__auto_examples_distance:
-
 Distance
 --------
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
 
 
 .. raw:: html
@@ -245,20 +216,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_triangle_thumb.png
-     :alt: Distance from point to triangle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_triangle_thumb.png
+    :alt: Distance from point to triangle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_triangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_point_to_triangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to triangle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_triangle
 
 .. raw:: html
 
@@ -266,20 +233,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_line_thumb.png
-     :alt: Distance from point to line
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_line_thumb.png
+    :alt: Distance from point to line
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_line.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_point_to_line.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to line</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_line
 
 .. raw:: html
 
@@ -287,20 +250,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_line_segment_thumb.png
-     :alt: Distance from point to line segment
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_line_segment_thumb.png
+    :alt: Distance from point to line segment
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_line_segment.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_point_to_line_segment.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to line segment</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_line_segment
 
 .. raw:: html
 
@@ -308,20 +267,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_plane_thumb.png
-     :alt: Distance from point to plane
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_plane_thumb.png
+    :alt: Distance from point to plane
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_plane.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_point_to_plane.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to plane</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_plane
 
 .. raw:: html
 
@@ -329,20 +284,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_rectangle_thumb.png
-     :alt: Distance from point to rectangle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_rectangle_thumb.png
+    :alt: Distance from point to rectangle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_rectangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_point_to_rectangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to rectangle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_rectangle
 
 .. raw:: html
 
@@ -350,20 +301,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_box_thumb.png
-     :alt: Distance from point to box
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_box_thumb.png
+    :alt: Distance from point to box
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_box.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_point_to_box.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to box</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_box
 
 .. raw:: html
 
@@ -371,20 +318,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_ellipsoid_thumb.png
-     :alt: Distance from point to ellipsoid
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_ellipsoid_thumb.png
+    :alt: Distance from point to ellipsoid
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_ellipsoid.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_point_to_ellipsoid.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to ellipsoid</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_ellipsoid
 
 .. raw:: html
 
@@ -392,20 +335,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_triangle_thumb.png
-     :alt: Distance from line to triangle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_triangle_thumb.png
+    :alt: Distance from line to triangle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_to_triangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_to_triangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line to triangle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_to_triangle
 
 .. raw:: html
 
@@ -413,20 +352,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_disk_thumb.png
-     :alt: Distance from point to disk
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_disk_thumb.png
+    :alt: Distance from point to disk
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_disk.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_point_to_disk.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to disk</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_disk
 
 .. raw:: html
 
@@ -434,20 +369,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_box_thumb.png
-     :alt: Distance from line segment to box
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_box_thumb.png
+    :alt: Distance from line segment to box
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_box.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_box.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line segment to box</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_segment_to_box
 
 .. raw:: html
 
@@ -455,20 +386,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_circle_thumb.png
-     :alt: Distance from point to circle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_circle_thumb.png
+    :alt: Distance from point to circle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_circle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_point_to_circle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to circle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_circle
 
 .. raw:: html
 
@@ -476,20 +403,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_line_segment_thumb.png
-     :alt: Distance from line to line segment
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_line_segment_thumb.png
+    :alt: Distance from line to line segment
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_to_line_segment.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_to_line_segment.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line to line segment</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_to_line_segment
 
 .. raw:: html
 
@@ -497,20 +420,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_triangle_thumb.png
-     :alt: Distance from line segment to triangle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_triangle_thumb.png
+    :alt: Distance from line segment to triangle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_triangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_triangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line segment to triangle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_segment_to_triangle
 
 .. raw:: html
 
@@ -518,20 +437,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_circle_thumb.png
-     :alt: Distance between line and circle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_circle_thumb.png
+    :alt: Distance between line and circle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_to_circle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_to_circle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between line and circle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_to_circle
 
 .. raw:: html
 
@@ -539,20 +454,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_circle_thumb.png
-     :alt: Distance from line segment to circle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_circle_thumb.png
+    :alt: Distance from line segment to circle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_circle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_circle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line segment to circle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_segment_to_circle
 
 .. raw:: html
 
@@ -560,20 +471,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_triangle_thumb.png
-     :alt: Distance from plane to triangle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_triangle_thumb.png
+    :alt: Distance from plane to triangle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_plane_to_triangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_triangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from plane to triangle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_plane_to_triangle
 
 .. raw:: html
 
@@ -581,20 +488,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_cylinder_thumb.png
-     :alt: Distance from point to cylinder
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_point_to_cylinder_thumb.png
+    :alt: Distance from point to cylinder
 
-     :ref:`sphx_glr__auto_examples_distance_plot_point_to_cylinder.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_point_to_cylinder.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to cylinder</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_point_to_cylinder
 
 .. raw:: html
 
@@ -602,20 +505,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_line_thumb.png
-     :alt: Distance from line to line
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_line_thumb.png
+    :alt: Distance from line to line
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_to_line.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_to_line.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line to line</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_to_line
 
 .. raw:: html
 
@@ -623,20 +522,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_disk_to_disk_thumb.png
-     :alt: Distance between two disks
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_disk_to_disk_thumb.png
+    :alt: Distance between two disks
 
-     :ref:`sphx_glr__auto_examples_distance_plot_disk_to_disk.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_disk_to_disk.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between two disks</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_disk_to_disk
 
 .. raw:: html
 
@@ -644,20 +539,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_triangle_to_triangle_thumb.png
-     :alt: Distance between two triangles
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_triangle_to_triangle_thumb.png
+    :alt: Distance between two triangles
 
-     :ref:`sphx_glr__auto_examples_distance_plot_triangle_to_triangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_triangle_to_triangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between two triangles</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_triangle_to_triangle
 
 .. raw:: html
 
@@ -665,20 +556,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_rectangle_thumb.png
-     :alt: Distance from line to rectangle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_rectangle_thumb.png
+    :alt: Distance from line to rectangle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_to_rectangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_to_rectangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line to rectangle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_to_rectangle
 
 .. raw:: html
 
@@ -686,20 +573,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_plane_thumb.png
-     :alt: Distance from plane to plane
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_plane_thumb.png
+    :alt: Distance from plane to plane
 
-     :ref:`sphx_glr__auto_examples_distance_plot_plane_to_plane.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_plane.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from plane to plane</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_plane_to_plane
 
 .. raw:: html
 
@@ -707,20 +590,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_rectangle_thumb.png
-     :alt: Distance from line segment to rectangle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_rectangle_thumb.png
+    :alt: Distance from line segment to rectangle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_rectangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_rectangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line segment to rectangle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_segment_to_rectangle
 
 .. raw:: html
 
@@ -728,20 +607,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_box_thumb.png
-     :alt: Distance from point to box
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_box_thumb.png
+    :alt: Distance from point to box
 
-     :ref:`sphx_glr__auto_examples_distance_plot_plane_to_box.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_box.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from point to box</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_plane_to_box
 
 .. raw:: html
 
@@ -749,20 +624,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_plane_thumb.png
-     :alt: Distance from line to plane
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_plane_thumb.png
+    :alt: Distance from line to plane
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_to_plane.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_to_plane.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line to plane</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_to_plane
 
 .. raw:: html
 
@@ -770,20 +641,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_rectangle_thumb.png
-     :alt: Distance from plane to rectangle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_rectangle_thumb.png
+    :alt: Distance from plane to rectangle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_plane_to_rectangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_rectangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from plane to rectangle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_plane_to_rectangle
 
 .. raw:: html
 
@@ -791,20 +658,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_ellipsoid_thumb.png
-     :alt: Distance from plane to ellipsoid
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_ellipsoid_thumb.png
+    :alt: Distance from plane to ellipsoid
 
-     :ref:`sphx_glr__auto_examples_distance_plot_plane_to_ellipsoid.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_ellipsoid.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from plane to ellipsoid</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_plane_to_ellipsoid
 
 .. raw:: html
 
@@ -812,20 +675,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_triangle_to_rectangle_thumb.png
-     :alt: Distance from triangle to rectangle
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_triangle_to_rectangle_thumb.png
+    :alt: Distance from triangle to rectangle
 
-     :ref:`sphx_glr__auto_examples_distance_plot_triangle_to_rectangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_triangle_to_rectangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from triangle to rectangle</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_triangle_to_rectangle
 
 .. raw:: html
 
@@ -833,20 +692,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_plane_thumb.png
-     :alt: Distance from line segment to plane
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_plane_thumb.png
+    :alt: Distance from line segment to plane
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_plane.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_plane.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line segment to plane</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_segment_to_plane
 
 .. raw:: html
 
@@ -854,20 +709,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_cylinder_thumb.png
-     :alt: Distance from plane to cylinder
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_cylinder_thumb.png
+    :alt: Distance from plane to cylinder
 
-     :ref:`sphx_glr__auto_examples_distance_plot_plane_to_cylinder.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_cylinder.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from plane to cylinder</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_plane_to_cylinder
 
 .. raw:: html
 
@@ -875,20 +726,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_rectangle_to_rectangle_thumb.png
-     :alt: Distance between two rectangles
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_rectangle_to_rectangle_thumb.png
+    :alt: Distance between two rectangles
 
-     :ref:`sphx_glr__auto_examples_distance_plot_rectangle_to_rectangle.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_rectangle_to_rectangle.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between two rectangles</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_rectangle_to_rectangle
 
 .. raw:: html
 
@@ -896,20 +743,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_box_thumb.png
-     :alt: Distance from line to box
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_to_box_thumb.png
+    :alt: Distance from line to box
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_to_box.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_to_box.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line to box</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_to_box
 
 .. raw:: html
 
@@ -917,20 +760,16 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_line_segment_thumb.png
-     :alt: Distance from line segment to line segment
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_line_segment_to_line_segment_thumb.png
+    :alt: Distance from line segment to line segment
 
-     :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_line_segment.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_line_segment_to_line_segment.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance from line segment to line segment</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_line_segment_to_line_segment
 
 .. raw:: html
 
@@ -938,30 +777,28 @@ Distance
 
 .. only:: html
 
- .. figure:: /_auto_examples/distance/images/thumb/sphx_glr_plot_rectangle_to_box_thumb.png
-     :alt: Distance from rectangle to box
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_rectangle_to_box_thumb.png
+    :alt: Distance from rectangle to box
 
-     :ref:`sphx_glr__auto_examples_distance_plot_rectangle_to_box.py`
+  :ref:`sphx_glr__auto_examples_distance_plot_rectangle_to_box.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance from rectangle to box</div>
+    </div>
+
 
 .. raw:: html
 
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/distance/plot_rectangle_to_box
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. _sphx_glr__auto_examples_gjk:
-
 GJK
 ---
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
 
 
 .. raw:: html
@@ -970,20 +807,16 @@ GJK
 
 .. only:: html
 
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_spheres_thumb.png
-     :alt: Distance between spheres with GJK
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_spheres_thumb.png
+    :alt: Distance between spheres with GJK
 
-     :ref:`sphx_glr__auto_examples_gjk_plot_spheres.py`
+  :ref:`sphx_glr__auto_examples_gjk_plot_spheres.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between spheres with GJK</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/gjk/plot_spheres
 
 .. raw:: html
 
@@ -991,20 +824,16 @@ GJK
 
 .. only:: html
 
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_ellipse_thumb.png
-     :alt: Distance between ellipses with GJK
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_ellipse_thumb.png
+    :alt: Distance between ellipses with GJK
 
-     :ref:`sphx_glr__auto_examples_gjk_plot_ellipse.py`
+  :ref:`sphx_glr__auto_examples_gjk_plot_ellipse.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between ellipses with GJK</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/gjk/plot_ellipse
 
 .. raw:: html
 
@@ -1012,20 +841,16 @@ GJK
 
 .. only:: html
 
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_box_thumb.png
-     :alt: Distance between boxes with GJK
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_box_thumb.png
+    :alt: Distance between boxes with GJK
 
-     :ref:`sphx_glr__auto_examples_gjk_plot_box.py`
+  :ref:`sphx_glr__auto_examples_gjk_plot_box.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between boxes with GJK</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/gjk/plot_box
 
 .. raw:: html
 
@@ -1033,20 +858,16 @@ GJK
 
 .. only:: html
 
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_convex_mesh_thumb.png
-     :alt: Distance between convex meshes with GJK
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_convex_mesh_thumb.png
+    :alt: Distance between convex meshes with GJK
 
-     :ref:`sphx_glr__auto_examples_gjk_plot_convex_mesh.py`
+  :ref:`sphx_glr__auto_examples_gjk_plot_convex_mesh.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between convex meshes with GJK</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/gjk/plot_convex_mesh
 
 .. raw:: html
 
@@ -1054,20 +875,16 @@ GJK
 
 .. only:: html
 
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_ellipsoids_thumb.png
-     :alt: Distance between ellipsoids with GJK
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_ellipsoids_thumb.png
+    :alt: Distance between ellipsoids with GJK
 
-     :ref:`sphx_glr__auto_examples_gjk_plot_ellipsoids.py`
+  :ref:`sphx_glr__auto_examples_gjk_plot_ellipsoids.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between ellipsoids with GJK</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/gjk/plot_ellipsoids
 
 .. raw:: html
 
@@ -1075,20 +892,16 @@ GJK
 
 .. only:: html
 
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_cylinder_thumb.png
-     :alt: Distance between cylinders with GJK
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_cylinder_thumb.png
+    :alt: Distance between cylinders with GJK
 
-     :ref:`sphx_glr__auto_examples_gjk_plot_cylinder.py`
+  :ref:`sphx_glr__auto_examples_gjk_plot_cylinder.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between cylinders with GJK</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/gjk/plot_cylinder
 
 .. raw:: html
 
@@ -1096,20 +909,16 @@ GJK
 
 .. only:: html
 
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_capsules_thumb.png
-     :alt: Distance between capsules with GJK
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_capsules_thumb.png
+    :alt: Distance between capsules with GJK
 
-     :ref:`sphx_glr__auto_examples_gjk_plot_capsules.py`
+  :ref:`sphx_glr__auto_examples_gjk_plot_capsules.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Distance between capsules with GJK</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/gjk/plot_capsules
 
 .. raw:: html
 
@@ -1117,27 +926,20 @@ GJK
 
 .. only:: html
 
- .. figure:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_collision_resolution_epa_thumb.png
-     :alt: Collision resolution with EPA after GJK
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_collision_resolution_epa_thumb.png
+    :alt: Collision resolution with EPA after GJK
 
-     :ref:`sphx_glr__auto_examples_gjk_plot_collision_resolution_epa.py`
+  :ref:`sphx_glr__auto_examples_gjk_plot_collision_resolution_epa.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Collision resolution with EPA after GJK</div>
+    </div>
+
 
 .. raw:: html
 
     </div>
-
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/gjk/plot_collision_resolution_epa
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. _sphx_glr__auto_examples_visualizations:
 
 Visualizations
 --------------
@@ -1146,24 +948,42 @@ Visualizations
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Visualize Tetrahedral Mesh">
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedral_mesh_thumb.png
-     :alt: Visualize Tetrahedral Mesh
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedral_mesh_thumb.png
+    :alt: Visualize Tetrahedral Mesh
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedral_mesh.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedral_mesh.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Visualize Tetrahedral Mesh</div>
     </div>
 
 
-.. toctree::
-   :hidden:
+.. raw:: html
 
-   /_auto_examples/visualizations/vis_tetrahedral_mesh
+    <div class="sphx-glr-thumbcontainer" tooltip="Hand as tetrahedral mesh">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedral_hand_thumb.png
+    :alt: Hand as tetrahedral mesh
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedral_hand.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Hand as tetrahedral mesh</div>
+    </div>
+
 
 .. raw:: html
 
@@ -1171,41 +991,33 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedron_intersection_thumb.png
-     :alt: Visualize Intersection of Tetrahedra
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedron_intersection_thumb.png
+    :alt: Visualize Intersection of Tetrahedra
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedron_intersection.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedron_intersection.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Visualize Intersection of Tetrahedra</div>
     </div>
 
 
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_tetrahedron_intersection
-
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Physical simulation with collision detection">
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize Subdivision of the AABB Tree">
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_collision_physics_thumb.png
-     :alt: Physical simulation with collision detection
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tree_subdevision_thumb.png
+    :alt: Visualize Subdivision of the AABB Tree
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_collision_physics.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_tree_subdevision.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Visualize Subdivision of the AABB Tree</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_collision_physics
 
 .. raw:: html
 
@@ -1213,20 +1025,16 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_boxes_benchmark_thumb.png
-     :alt: Benchmark collision detection for boxes
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_boxes_benchmark_thumb.png
+    :alt: Benchmark collision detection for boxes
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_boxes_benchmark.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_boxes_benchmark.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for boxes</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_boxes_benchmark
 
 .. raw:: html
 
@@ -1234,20 +1042,16 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_disk_benchmark_thumb.png
-     :alt: Benchmark collision detection for disks
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_disk_benchmark_thumb.png
+    :alt: Benchmark collision detection for disks
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_disk_benchmark.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_disk_benchmark.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for disks</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_disk_benchmark
 
 .. raw:: html
 
@@ -1255,20 +1059,33 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_ellipse_benchmark_thumb.png
-     :alt: Benchmark collision detection for ellipses
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_ellipse_benchmark_thumb.png
+    :alt: Benchmark collision detection for ellipses
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_ellipse_benchmark.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_ellipse_benchmark.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for ellipses</div>
     </div>
 
 
-.. toctree::
-   :hidden:
+.. raw:: html
 
-   /_auto_examples/visualizations/vis_ellipse_benchmark
+    <div class="sphx-glr-thumbcontainer" tooltip="Physical simulation with collision detection">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_collision_physics_thumb.png
+    :alt: Physical simulation with collision detection
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_collision_physics.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Physical simulation with collision detection</div>
+    </div>
+
 
 .. raw:: html
 
@@ -1276,20 +1093,16 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_cone_benchmark_thumb.png
-     :alt: Benchmark collision detection for cones
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_cone_benchmark_thumb.png
+    :alt: Benchmark collision detection for cones
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_cone_benchmark.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_cone_benchmark.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for cones</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_cone_benchmark
 
 .. raw:: html
 
@@ -1297,20 +1110,16 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_ellipsoids_benchmark_thumb.png
-     :alt: Benchmark collision detection for ellipsoids
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_ellipsoids_benchmark_thumb.png
+    :alt: Benchmark collision detection for ellipsoids
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_ellipsoids_benchmark.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_ellipsoids_benchmark.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for ellipsoids</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_ellipsoids_benchmark
 
 .. raw:: html
 
@@ -1318,20 +1127,16 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_capsules_benchmark_thumb.png
-     :alt: Benchmark collision detection for capsules
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_capsules_benchmark_thumb.png
+    :alt: Benchmark collision detection for capsules
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_capsules_benchmark.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_capsules_benchmark.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for capsules</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_capsules_benchmark
 
 .. raw:: html
 
@@ -1339,20 +1144,33 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_cylinders_benchmark_thumb.png
-     :alt: Benchmark collision detection for cylinders
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_cylinders_benchmark_thumb.png
+    :alt: Benchmark collision detection for cylinders
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_cylinders_benchmark.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_cylinders_benchmark.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for cylinders</div>
     </div>
 
 
-.. toctree::
-   :hidden:
+.. raw:: html
 
-   /_auto_examples/visualizations/vis_cylinders_benchmark
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualize pressure fields with different young&#x27;s moduli">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_youngs_modulus_thumb.png
+    :alt: Visualize pressure fields with different young's moduli
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_youngs_modulus.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Visualize pressure fields with different young's moduli</div>
+    </div>
+
 
 .. raw:: html
 
@@ -1360,20 +1178,16 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_mesh_benchmark_thumb.png
-     :alt: Benchmark collision detection for meshes
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_mesh_benchmark_thumb.png
+    :alt: Benchmark collision detection for meshes
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_mesh_benchmark.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_mesh_benchmark.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark collision detection for meshes</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_mesh_benchmark
 
 .. raw:: html
 
@@ -1381,20 +1195,16 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_self_collisions_thumb.png
-     :alt: Self-collisions of a robot
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_self_collisions_thumb.png
+    :alt: Self-collisions of a robot
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_self_collisions.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_self_collisions.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Self-collisions of a robot</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_self_collisions
 
 .. raw:: html
 
@@ -1402,20 +1212,33 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_thumb.png
-     :alt: Visualize Pressure Field of Two Colliding Objects
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_thumb.png
+    :alt: Visualize Pressure Field of Two Colliding Objects
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Visualize Pressure Field of Two Colliding Objects</div>
     </div>
 
 
-.. toctree::
-   :hidden:
+.. raw:: html
 
-   /_auto_examples/visualizations/vis_pressure_field
+    <div class="sphx-glr-thumbcontainer" tooltip="Physical Simulation of Bouncing Ball">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_collision_thumb.png
+    :alt: Physical Simulation of Bouncing Ball
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field_collision.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Physical Simulation of Bouncing Ball</div>
+    </div>
+
 
 .. raw:: html
 
@@ -1423,20 +1246,33 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_closest_points_thumb.png
-     :alt: Closest Points with GJK
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_closest_points_thumb.png
+    :alt: Closest Points with GJK
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_closest_points.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_closest_points.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Closest Points with GJK</div>
     </div>
 
 
-.. toctree::
-   :hidden:
+.. raw:: html
 
-   /_auto_examples/visualizations/vis_closest_points
+    <div class="sphx-glr-thumbcontainer" tooltip="Physical Simulation of Bouncing Ball on Hand">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_tetrahedral_hand_collision_thumb.png
+    :alt: Physical Simulation of Bouncing Ball on Hand
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_tetrahedral_hand_collision.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Physical Simulation of Bouncing Ball on Hand</div>
+    </div>
+
 
 .. raw:: html
 
@@ -1444,20 +1280,33 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_robot_collision_objects_thumb.png
-     :alt: Collisions between robot and environment
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_robot_collision_objects_thumb.png
+    :alt: Collisions between robot and environment
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_robot_collision_objects.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_robot_collision_objects.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Collisions between robot and environment</div>
     </div>
 
 
-.. toctree::
-   :hidden:
+.. raw:: html
 
-   /_auto_examples/visualizations/vis_robot_collision_objects
+    <div class="sphx-glr-thumbcontainer" tooltip="Physical Simulation of Soft Balls Bouncing in a Wooden Box">
+
+.. only:: html
+
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_collision_multiple_objects_thumb.png
+    :alt: Physical Simulation of Soft Balls Bouncing in a Wooden Box
+
+  :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field_collision_multiple_objects.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Physical Simulation of Soft Balls Bouncing in a Wooden Box</div>
+    </div>
+
 
 .. raw:: html
 
@@ -1465,30 +1314,28 @@ Visualizations
 
 .. only:: html
 
- .. figure:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_moving_thumb.png
-     :alt: Visualize Pressure Fields of Moving Object
+  .. image:: /_auto_examples/visualizations/images/thumb/sphx_glr_vis_pressure_field_moving_thumb.png
+    :alt: Visualize Pressure Fields of Moving Object
 
-     :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field_moving.py`
+  :ref:`sphx_glr__auto_examples_visualizations_vis_pressure_field_moving.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Visualize Pressure Fields of Moving Object</div>
+    </div>
+
 
 .. raw:: html
 
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /_auto_examples/visualizations/vis_pressure_field_moving
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. _sphx_glr__auto_examples_plane:
-
 Planar Algorithms
 -----------------
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
 
 
 .. raw:: html
@@ -1497,10 +1344,16 @@ Planar Algorithms
 
 .. only:: html
 
- .. figure:: /_auto_examples/plane/images/thumb/sphx_glr_plot_halfplane_intersection_thumb.png
-     :alt: Halfplane Intersection
+  .. image:: /_auto_examples/plane/images/thumb/sphx_glr_plot_halfplane_intersection_thumb.png
+    :alt: Halfplane Intersection
 
-     :ref:`sphx_glr__auto_examples_plane_plot_halfplane_intersection.py`
+  :ref:`sphx_glr__auto_examples_plane_plot_halfplane_intersection.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Halfplane Intersection</div>
+    </div>
+
 
 .. raw:: html
 
@@ -1509,29 +1362,27 @@ Planar Algorithms
 
 .. toctree::
    :hidden:
+   :includehidden:
 
-   /_auto_examples/plane/plot_halfplane_intersection
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-gallery
+   /_auto_examples/aabbtree/index.rst
+   /_auto_examples/containment_test/index.rst
+   /_auto_examples/distance/index.rst
+   /_auto_examples/gjk/index.rst
+   /_auto_examples/visualizations/index.rst
+   /_auto_examples/plane/index.rst
 
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+.. only:: html
 
-    :download:`Download all examples in Python source code: _auto_examples_python.zip </_auto_examples/_auto_examples_python.zip>`
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
+      :download:`Download all examples in Python source code: _auto_examples_python.zip </_auto_examples/_auto_examples_python.zip>`
 
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-    :download:`Download all examples in Jupyter notebooks: _auto_examples_jupyter.zip </_auto_examples/_auto_examples_jupyter.zip>`
+      :download:`Download all examples in Jupyter notebooks: _auto_examples_jupyter.zip </_auto_examples/_auto_examples_jupyter.zip>`
 
 
 .. only:: html

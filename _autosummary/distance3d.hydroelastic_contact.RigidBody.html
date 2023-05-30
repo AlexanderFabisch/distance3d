@@ -4,8 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.hydroelastic_contact.RigidBody &#8212; distance3d 0.7.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>distance3d.hydroelastic_contact.RigidBody &#8212; distance3d 0.7.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -38,14 +39,14 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="distance3d-hydroelastic-contact-rigidbody">
+  <section id="distance3d-hydroelastic-contact-rigidbody">
 <h1>distance3d.hydroelastic_contact.RigidBody<a class="headerlink" href="#distance3d-hydroelastic-contact-rigidbody" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="distance3d.hydroelastic_contact.RigidBody">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">distance3d.hydroelastic_contact.</span></span><span class="sig-name descname"><span class="pre">RigidBody</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body2origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tetrahedra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potentials</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/hydroelastic_contact/_rigid_body.html#RigidBody"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.hydroelastic_contact.RigidBody" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">distance3d.hydroelastic_contact.</span></span><span class="sig-name descname"><span class="pre">RigidBody</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body2origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tetrahedra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potentials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">youngs_modulus</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/hydroelastic_contact/_rigid_body.html#RigidBody"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.hydroelastic_contact.RigidBody" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rigid body represented by tetrahedral mesh.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>body2origin</strong><span class="classifier">array, shape (4, 4)</span></dt><dd><p>Pose of the mesh.</p>
 </dd>
@@ -55,28 +56,40 @@
 </dd>
 <dt><strong>potentials</strong><span class="classifier">array, shape (n_vertices,)</span></dt><dd><p>Potential of each vertex. Shortest distance to surface.</p>
 </dd>
+<dt><strong>youngs_modulus</strong><span class="classifier">float, optional (default: 1.0)</span></dt><dd><p>The stiffness of the material the rigidbody is made out of.</p>
+</dd>
 </dl>
 </dd>
-<dt class="field-even">Attributes</dt>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb_tree</span></code></dt><dd><p>The aabb_tree for broad phase collision detection</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabbs</span></code></dt><dd><p>The aabbs for broad phase collision detection</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">artist_</span></code></dt><dd><p>The artist to visualize the rigid body as a wireframe.</p>
+</dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">com</span></code></dt><dd><p>Center of mass.</p>
 </dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">tetrahedra_points</span></code></dt><dd><p>All points of all tetrahedra in body frame.</p>
 </dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">tetrahedra_potentials</span></code></dt><dd><p>Potentials of tetrahedra.</p>
 </dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">youngs_modulus</span></code></dt><dd><p>Get the young’s modulus of the Object.</p>
+</dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">express_in</span></code>(new_body2origin)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb</span></code>()</p></td>
+<td><p>The aabb of the rigidbody</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">express_in</span></code>(new_body2origin)</p></td>
 <td><p>Express tetrahedral meshes in another frame.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_artist</span></code>([c])</p></td>
+<td><p>Creates a new artist.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_box</span></code>(box2origin, size)</p></td>
 <td><p>Create box.</p></td>
@@ -96,25 +109,30 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_sphere</span></code>(center, radius[, order])</p></td>
 <td><p>Create sphere.</p></td>
 </tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_pose</span></code>(body2origin)</p></td>
+<td><p>Set new pose.</p></td>
+</tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="distance3d.hydroelastic_contact.RigidBody.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body2origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tetrahedra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potentials</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/hydroelastic_contact/_rigid_body.html#RigidBody.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.hydroelastic_contact.RigidBody.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body2origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tetrahedra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potentials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">youngs_modulus</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/hydroelastic_contact/_rigid_body.html#RigidBody.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.hydroelastic_contact.RigidBody.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#distance3d.hydroelastic_contact.RigidBody.__init__" title="distance3d.hydroelastic_contact.RigidBody.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(body2origin, vertices, tetrahedra, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">express_in</span></code>(new_body2origin)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb</span></code>()</p></td>
+<td><p>The aabb of the rigidbody</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">express_in</span></code>(new_body2origin)</p></td>
 <td><p>Express tetrahedral meshes in another frame.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_artist</span></code>([c])</p></td>
+<td><p>Creates a new artist.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_box</span></code>(box2origin, size)</p></td>
 <td><p>Create box.</p></td>
@@ -134,29 +152,40 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_sphere</span></code>(center, radius[, order])</p></td>
 <td><p>Create sphere.</p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_pose</span></code>(body2origin)</p></td>
+<td><p>Set new pose.</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">com</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb_tree</span></code></p></td>
+<td><p>The aabb_tree for broad phase collision detection</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabbs</span></code></p></td>
+<td><p>The aabbs for broad phase collision detection</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">artist_</span></code></p></td>
+<td><p>The artist to visualize the rigid body as a wireframe.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">com</span></code></p></td>
 <td><p>Center of mass.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tetrahedra_points</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tetrahedra_points</span></code></p></td>
 <td><p>All points of all tetrahedra in body frame.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tetrahedra_potentials</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tetrahedra_potentials</span></code></p></td>
 <td><p>Potentials of tetrahedra.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">youngs_modulus</span></code></p></td>
+<td><p>Get the young's modulus of the Object.</p></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>
@@ -192,6 +221,7 @@
 <li class="toctree-l3 current"><a class="reference internal" href="../api.html#module-distance3d.hydroelastic_contact"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.hydroelastic_contact</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.random"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.random</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.aabb_tree"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.aabb_tree</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -236,7 +266,7 @@
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

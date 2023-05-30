@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.gjk._gjk_original &#8212; distance3d 0.7.0 documentation</title>
+    <title>distance3d.gjk._gjk_original &#8212; distance3d 0.7.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
@@ -45,7 +45,7 @@
 
 
 <div class="viewcode-block" id="gjk_distance_original"><a class="viewcode-back" href="../../../_autosummary/distance3d.gjk.gjk_distance_original.html#distance3d.gjk.gjk_distance_original">[docs]</a><span class="k">def</span> <span class="nf">gjk_distance_original</span><span class="p">(</span><span class="n">collider1</span><span class="p">,</span> <span class="n">collider2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.</span>
 
 <span class="sd">    The original implementation is quite slow, since the distance subalgorithm</span>
 <span class="sd">    with the backup procedure is very slow in comparison to simpler, modern</span>
@@ -141,7 +141,7 @@
 
 
 <span class="k">class</span> <span class="nc">VertexCachedCollider</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Caches vertices from a collider.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Caches vertices from a collider.</span>
 
 <span class="sd">    Many colliders do not store their vertices explicitly. However, GJK only</span>
 <span class="sd">    stores indices to the vertices. Hence, we will cache requested vertices</span>
@@ -157,7 +157,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">vertices_</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">first_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get vertex from collider to initialize GJK algorithm.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get vertex from collider to initialize GJK algorithm.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -173,7 +173,7 @@
         <span class="k">return</span> <span class="n">vertex_idx</span><span class="p">,</span> <span class="n">vertex</span>
 
     <span class="k">def</span> <span class="nf">support_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_direction</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Support function for collider.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Support function for collider.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -202,7 +202,7 @@
 
 
 <span class="k">def</span> <span class="nf">compute_point</span><span class="p">(</span><span class="n">vertex_cache</span><span class="p">,</span> <span class="n">barycentric_coordinates</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute point from barycentric coordinates.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute point from barycentric coordinates.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -225,7 +225,7 @@
 
 
 <span class="k">class</span> <span class="nc">Solution</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Represents current best solution and search direction.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents current best solution and search direction.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -288,7 +288,7 @@
 
 
 <span class="k">class</span> <span class="nc">SimplexInfo</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Simplex and additional data.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simplex and additional data.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -430,7 +430,7 @@
 
 
 <span class="k">def</span> <span class="nf">distance_subalgorithm_with_backup_procedure</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">solution</span><span class="p">,</span> <span class="n">backup</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Johnson&#39;s distance subalgorithm.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Johnson&#39;s distance subalgorithm.</span>
 
 <span class="sd">    Implements, in a very efficient way, the distance subalgorithm of finding</span>
 <span class="sd">    the point of minimum norm in the convex hull of four or less points</span>
@@ -478,7 +478,7 @@
 
 
 <span class="k">class</span> <span class="nc">BarycentricCoordinates</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Barycentric coordinates.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Barycentric coordinates.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -728,7 +728,7 @@
 
 
 <span class="k">def</span> <span class="nf">distance_subalgorithm</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Johnson&#39;s distance subalgorithm.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Johnson&#39;s distance subalgorithm.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">simplex</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">solution</span> <span class="o">=</span> <span class="n">Solution</span><span class="p">()</span>
         <span class="n">solution</span><span class="o">.</span><span class="n">from_vertex</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -869,7 +869,7 @@
 
 
 <span class="k">def</span> <span class="nf">backup_procedure</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">solution</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">backup</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Backup procedure.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Backup procedure.</span>
 
 <span class="sd">    Johnson&#39;s distance subalgorithm is affected by rounding errors in floating</span>
 <span class="sd">    point operations in cases of degenerate simplices. This backup procedure</span>
@@ -1114,7 +1114,7 @@
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

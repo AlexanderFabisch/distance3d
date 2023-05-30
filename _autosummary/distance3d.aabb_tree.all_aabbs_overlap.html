@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>distance3d.aabb_tree.all_aabbs_overlap &#8212; distance3d 0.7.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="distance3d.aabb_tree.aabb_overlap" href="distance3d.aabb_tree.aabb_overlap.html" />
+    <link rel="prev" title="distance3d.aabb_tree.AabbTree" href="distance3d.aabb_tree.AabbTree.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="distance3d-aabb-tree-all-aabbs-overlap">
+<h1>distance3d.aabb_tree.all_aabbs_overlap<a class="headerlink" href="#distance3d-aabb-tree-all-aabbs-overlap" title="Permalink to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="distance3d.aabb_tree.all_aabbs_overlap">
+<span class="sig-prename descclassname"><span class="pre">distance3d.aabb_tree.</span></span><span class="sig-name descname"><span class="pre">all_aabbs_overlap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aabbs1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aabbs2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/aabb_tree.html#all_aabbs_overlap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.aabb_tree.all_aabbs_overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates result lists of all the overlapping aabbs. (Brute Force)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>aabbs1</strong><span class="classifier">array, shape(n, 3, 2)</span></dt><dd><p>The aabbs of the first object.</p>
+</dd>
+<dt><strong>aabbs2</strong><span class="classifier">array, shape(n, 3, 2)</span></dt><dd><p>The aabbs of the second object.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>broad_tetrahedra1</strong><span class="classifier">array, shape (n)</span></dt><dd><p>Array of all the overlapping aabb indices of aabbs1</p>
+</dd>
+<dt><strong>broad_tetrahedra2</strong><span class="classifier">array, shape (n)</span></dt><dd><p>Array of all the overlapping aabb indices of aabbs2</p>
+</dd>
+<dt><strong>broad_pairs</strong><span class="classifier">array, shape(n, 2)</span></dt><dd><p>A list of a index pairs of the all overlaps.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#module-distance3d"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d</span></code></a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.distance"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.distance</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.colliders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.colliders</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.broad_phase"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.broad_phase</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.containment"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.containment</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.gjk"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.gjk</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.epa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.epa</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.mpr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.mpr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.geometry"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.geometry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.self_collision"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.self_collision</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.containment_test"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.containment_test</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.hydroelastic_contact"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.hydroelastic_contact</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.random"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.random</span></code></a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../api.html#module-distance3d.aabb_tree"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.aabb_tree</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API Reference</a><ul>
+      <li>Previous: <a href="distance3d.aabb_tree.AabbTree.html" title="previous chapter">distance3d.aabb_tree.AabbTree</a></li>
+      <li>Next: <a href="distance3d.aabb_tree.aabb_overlap.html" title="next chapter">distance3d.aabb_tree.aabb_overlap</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/_autosummary/distance3d.aabb_tree.all_aabbs_overlap.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

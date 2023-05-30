@@ -4,11 +4,11 @@ Visualize Tetrahedral Mesh
 ==========================
 """
 print(__doc__)
+
 import os
 import numpy as np
 import pytransform3d.visualizer as pv
 from distance3d import io, visualization
-
 
 BASE_DIR = "test/data/"
 data_dir = BASE_DIR

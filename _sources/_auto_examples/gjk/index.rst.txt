@@ -1,0 +1,166 @@
+
+
+.. _sphx_glr__auto_examples_gjk:
+
+GJK
+---
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between spheres with GJK">
+
+.. only:: html
+
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_spheres_thumb.png
+    :alt: Distance between spheres with GJK
+
+  :ref:`sphx_glr__auto_examples_gjk_plot_spheres.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance between spheres with GJK</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between ellipses with GJK">
+
+.. only:: html
+
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_ellipse_thumb.png
+    :alt: Distance between ellipses with GJK
+
+  :ref:`sphx_glr__auto_examples_gjk_plot_ellipse.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance between ellipses with GJK</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between boxes with GJK">
+
+.. only:: html
+
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_box_thumb.png
+    :alt: Distance between boxes with GJK
+
+  :ref:`sphx_glr__auto_examples_gjk_plot_box.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance between boxes with GJK</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between convex meshes with GJK">
+
+.. only:: html
+
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_convex_mesh_thumb.png
+    :alt: Distance between convex meshes with GJK
+
+  :ref:`sphx_glr__auto_examples_gjk_plot_convex_mesh.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance between convex meshes with GJK</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between ellipsoids with GJK">
+
+.. only:: html
+
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_ellipsoids_thumb.png
+    :alt: Distance between ellipsoids with GJK
+
+  :ref:`sphx_glr__auto_examples_gjk_plot_ellipsoids.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance between ellipsoids with GJK</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between cylinders with GJK">
+
+.. only:: html
+
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_cylinder_thumb.png
+    :alt: Distance between cylinders with GJK
+
+  :ref:`sphx_glr__auto_examples_gjk_plot_cylinder.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance between cylinders with GJK</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance between capsules with GJK">
+
+.. only:: html
+
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_capsules_thumb.png
+    :alt: Distance between capsules with GJK
+
+  :ref:`sphx_glr__auto_examples_gjk_plot_capsules.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance between capsules with GJK</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Collision resolution with EPA after GJK">
+
+.. only:: html
+
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_collision_resolution_epa_thumb.png
+    :alt: Collision resolution with EPA after GJK
+
+  :ref:`sphx_glr__auto_examples_gjk_plot_collision_resolution_epa.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Collision resolution with EPA after GJK</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/gjk/plot_spheres
+   /_auto_examples/gjk/plot_ellipse
+   /_auto_examples/gjk/plot_box
+   /_auto_examples/gjk/plot_convex_mesh
+   /_auto_examples/gjk/plot_ellipsoids
+   /_auto_examples/gjk/plot_cylinder
+   /_auto_examples/gjk/plot_capsules
+   /_auto_examples/gjk/plot_collision_resolution_epa
+

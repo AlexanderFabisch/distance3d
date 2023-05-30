@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.geometry &#8212; distance3d 0.7.0 documentation</title>
+    <title>distance3d.geometry &#8212; distance3d 0.7.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -48,7 +48,7 @@
 
 
 <div class="viewcode-block" id="convert_rectangle_to_segment"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.convert_rectangle_to_segment.html#distance3d.geometry.convert_rectangle_to_segment">[docs]</a><span class="k">def</span> <span class="nf">convert_rectangle_to_segment</span><span class="p">(</span><span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_extents</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Extract line segment from rectangle.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract line segment from rectangle.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -85,7 +85,7 @@
 
 <div class="viewcode-block" id="convert_rectangle_to_vertices"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.convert_rectangle_to_vertices.html#distance3d.geometry.convert_rectangle_to_vertices">[docs]</a><span class="k">def</span> <span class="nf">convert_rectangle_to_vertices</span><span class="p">(</span>
         <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span> <span class="n">rectangle_lengths</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert rectangle to vertices.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert rectangle to vertices.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -108,7 +108,7 @@
 
 
 <div class="viewcode-block" id="convert_box_to_face"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.convert_box_to_face.html#distance3d.geometry.convert_box_to_face">[docs]</a><span class="k">def</span> <span class="nf">convert_box_to_face</span><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">sign</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert box to face.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert box to face.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -146,7 +146,7 @@
 
 <div class="viewcode-block" id="convert_segment_to_line"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.convert_segment_to_line.html#distance3d.geometry.convert_segment_to_line">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">convert_segment_to_line</span><span class="p">(</span><span class="n">segment_start</span><span class="p">,</span> <span class="n">segment_end</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert line segment to line.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert line segment to line.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -178,7 +178,7 @@
     <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">]),</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">convert_box_to_vertices</span><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert box to vertices.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert box to vertices.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -202,7 +202,7 @@
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">support_function_cylinder</span><span class="p">(</span>
         <span class="n">search_direction</span><span class="p">,</span> <span class="n">cylinder2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute extreme point of cylinder along a direction.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute extreme point of cylinder along a direction.</span>
 
 <span class="sd">    You can find similar implementations here:</span>
 
@@ -251,7 +251,7 @@
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">support_function_capsule</span><span class="p">(</span>
         <span class="n">search_direction</span><span class="p">,</span> <span class="n">capsule2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute extreme point of cylinder along a direction.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute extreme point of cylinder along a direction.</span>
 
 <span class="sd">    You can find similar implementations here:</span>
 
@@ -300,7 +300,7 @@
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">support_function_ellipsoid</span><span class="p">(</span>
         <span class="n">search_direction</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute extreme point of ellipsoid along a direction.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute extreme point of ellipsoid along a direction.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -327,7 +327,7 @@
     <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">]),</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">support_function_box</span><span class="p">(</span><span class="n">search_direction</span><span class="p">,</span> <span class="n">box2origin</span><span class="p">,</span> <span class="n">half_lengths</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute extreme point of box along a direction.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute extreme point of box along a direction.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -354,7 +354,7 @@
     <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:](</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">support_function_sphere</span><span class="p">(</span><span class="n">search_direction</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute extreme point of box along a direction.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute extreme point of box along a direction.</span>
 
 <span class="sd">    You can find similar implementations here:</span>
 
@@ -390,7 +390,7 @@
                      <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">]),</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">support_function_disk</span><span class="p">(</span><span class="n">search_direction</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">normal</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute extreme point of disk along a direction.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute extreme point of disk along a direction.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -427,7 +427,7 @@
                      <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">1</span><span class="p">],</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">[::</span><span class="mi">1</span><span class="p">]),</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">support_function_ellipse</span><span class="p">(</span><span class="n">search_direction</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">radii</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute extreme point of ellipse along a direction.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute extreme point of ellipse along a direction.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -458,7 +458,7 @@
                      <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
     <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">support_function_cone</span><span class="p">(</span><span class="n">search_direction</span><span class="p">,</span> <span class="n">cone2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute extreme point of cone along a direction.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute extreme point of cone along a direction.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -495,7 +495,7 @@
 
 <div class="viewcode-block" id="hesse_normal_form"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.hesse_normal_form.html#distance3d.geometry.hesse_normal_form">[docs]</a><span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">hesse_normal_form</span><span class="p">(</span><span class="n">plane_point</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Computes Hesse normal form of a plane.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes Hesse normal form of a plane.</span>
 
 <span class="sd">    In the Hesse normal form (x * n - d = 0), x is any point on the plane,</span>
 <span class="sd">    n is the plane&#39;s normal, and d ist the distance from the origin to the</span>
@@ -521,7 +521,7 @@
 
 
 <div class="viewcode-block" id="line_from_pluecker"><a class="viewcode-back" href="../../_autosummary/distance3d.geometry.line_from_pluecker.html#distance3d.geometry.line_from_pluecker">[docs]</a><span class="k">def</span> <span class="nf">line_from_pluecker</span><span class="p">(</span><span class="n">line_direction</span><span class="p">,</span> <span class="n">line_moment</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Computes line from Plücker coordinates.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes line from Plücker coordinates.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -550,7 +550,7 @@
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">barycentric_coordinates_tetrahedron</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">tetrahedron_points</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Barycentric coordinates of a point for tetrahedron.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Barycentric coordinates of a point for tetrahedron.</span>
 
 <span class="sd">    Source: https://stackoverflow.com/a/38546111/915743</span>
 
@@ -639,7 +639,7 @@
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

@@ -27,10 +27,10 @@ Visualize Intersection of Tetrahedra
 .. code-block:: default
 
     print(__doc__)
+
     import numpy as np
     import pytransform3d.visualizer as pv
     from distance3d import hydroelastic_contact, visualization
-
 
     sphere1 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.1, 0.2, 0.1]), 1.0, order=2)
     sphere1.express_in(np.eye(4))
@@ -77,23 +77,18 @@ Visualize Intersection of Tetrahedra
 
 .. _sphx_glr_download__auto_examples_visualizations_vis_tetrahedron_intersection.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: vis_tetrahedron_intersection.py <vis_tetrahedron_intersection.py>`
 
-     :download:`Download Python source code: vis_tetrahedron_intersection.py <vis_tetrahedron_intersection.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: vis_tetrahedron_intersection.ipynb <vis_tetrahedron_intersection.ipynb>`
+      :download:`Download Jupyter notebook: vis_tetrahedron_intersection.ipynb <vis_tetrahedron_intersection.ipynb>`
 
 
 .. only:: html

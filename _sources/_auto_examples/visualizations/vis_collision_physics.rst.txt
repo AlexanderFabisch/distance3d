@@ -22,11 +22,12 @@
 Physical simulation with collision detection
 ============================================
 
-.. GENERATED FROM PYTHON SOURCE LINES 6-77
+.. GENERATED FROM PYTHON SOURCE LINES 6-78
 
 .. code-block:: default
 
     print(__doc__)
+
     import numpy as np
     import pytransform3d.transformations as pt
     import pytransform3d.visualizer as pv
@@ -106,23 +107,18 @@ Physical simulation with collision detection
 
 .. _sphx_glr_download__auto_examples_visualizations_vis_collision_physics.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: vis_collision_physics.py <vis_collision_physics.py>`
 
-     :download:`Download Python source code: vis_collision_physics.py <vis_collision_physics.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: vis_collision_physics.ipynb <vis_collision_physics.ipynb>`
+      :download:`Download Jupyter notebook: vis_collision_physics.ipynb <vis_collision_physics.ipynb>`
 
 
 .. only:: html

@@ -1,0 +1,59 @@
+
+
+.. _sphx_glr__auto_examples_aabbtree:
+
+AABB Tree
+---------
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Plot AABB tree of a robot.">
+
+.. only:: html
+
+  .. image:: /_auto_examples/aabbtree/images/thumb/sphx_glr_plot_robot_thumb.png
+    :alt: Robot
+
+  :ref:`sphx_glr__auto_examples_aabbtree_plot_robot.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Robot</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Plot AABB tree.">
+
+.. only:: html
+
+  .. image:: /_auto_examples/aabbtree/images/thumb/sphx_glr_plot_aabbtree_thumb.png
+    :alt: AABB Tree
+
+  :ref:`sphx_glr__auto_examples_aabbtree_plot_aabbtree.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">AABB Tree</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /_auto_examples/aabbtree/plot_robot
+   /_auto_examples/aabbtree/plot_aabbtree
+

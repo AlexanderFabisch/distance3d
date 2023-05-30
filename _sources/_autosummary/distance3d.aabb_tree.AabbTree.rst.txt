@@ -1,0 +1,27 @@
+﻿distance3d.aabb\_tree.AabbTree
+==============================
+
+.. currentmodule:: distance3d.aabb_tree
+
+.. autoclass:: AabbTree
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AabbTree.__init__
+      ~AabbTree.get_root_aabb
+      ~AabbTree.insert_aabb
+      ~AabbTree.insert_aabbs
+      ~AabbTree.overlaps_aabb
+      ~AabbTree.overlaps_aabb_tree
+   
+   
+
+   
+   
+   

@@ -4,6 +4,7 @@ Benchmark collision detection for boxes
 =======================================
 """
 print(__doc__)
+
 import numpy as np
 from pytransform3d.transform_manager import TransformManager
 import pytransform3d.visualizer as pv
@@ -35,16 +36,18 @@ for i in box_frames:
 
 timer.start("collision")
 collisions = []
-for frame1, collider1 in bvh.colliders_.items():
-    timer.start("broad phase")
-    colliders = bvh.aabb_overlapping_colliders(collider1, whitelist=(frame1,))
-    timer.stop_and_add_to_total("broad phase")
-    for frame2, collider2 in colliders.items():
-        timer.start("gjk")
-        intersection = gjk_intersection(collider1, collider2)
-        timer.stop_and_add_to_total("gjk")
-        if intersection:
-            collisions.append((frame1, frame2))
+
+timer.start("broad phase")
+pairs = bvh.aabb_overlapping_with_self()
+timer.stop_and_add_to_total("broad phase")
+
+for (frame1, collider1), (frame2, collider2) in pairs:
+    timer.start("gjk")
+    intersection = gjk_intersection(collider1, collider2)
+    timer.stop_and_add_to_total("gjk")
+    if intersection:
+        collisions.append((frame1, frame2))
+
 total_collision_detection = timer.stop("collision")
 print(f"Insertion in AABB tree: {timer.total_time_['aabbtree']} s")
 print(f"Collision detection (broad phase + GJK): "

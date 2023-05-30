@@ -14,13 +14,16 @@
    .. autosummary::
    
       ~RigidBody.__init__
+      ~RigidBody.aabb
       ~RigidBody.express_in
+      ~RigidBody.make_artist
       ~RigidBody.make_box
       ~RigidBody.make_capsule
       ~RigidBody.make_cube
       ~RigidBody.make_cylinder
       ~RigidBody.make_ellipsoid
       ~RigidBody.make_sphere
+      ~RigidBody.update_pose
    
    
 
@@ -30,8 +33,12 @@
 
    .. autosummary::
    
+      ~RigidBody.aabb_tree
+      ~RigidBody.aabbs
+      ~RigidBody.artist_
       ~RigidBody.com
       ~RigidBody.tetrahedra_points
       ~RigidBody.tetrahedra_potentials
+      ~RigidBody.youngs_modulus
    
    
