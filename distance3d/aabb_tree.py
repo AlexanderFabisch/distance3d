@@ -12,14 +12,7 @@ TYPE_BRANCH = 2
 
 
 class AabbTree:
-    """AABB Tree for broad phase collision checking
-
-    Returns
-    -------
-    aabb_tree : AabbTree
-        The AabbTree Object
-    """
-
+    """AABB Tree for broad phase collision detection."""
     def __init__(self):
         self.root = INDEX_NONE
         self.filled_len = 0
@@ -27,7 +20,8 @@ class AabbTree:
         self.aabbs = np.empty((0, 3, 2))
         self.external_data_list = []
 
-    def insert_aabbs(self, aabbs, external_data_list=None, pre_insertion_methode="none"):
+    def insert_aabbs(self, aabbs, external_data_list=None,
+                     pre_insertion_methode="none"):
         """Insert aabbs in tree
 
         Parameters
@@ -279,9 +273,7 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
 
 @numba.njit(cache=True)
 def fix_upward_tree(tree_node_index, nodes, aabbs):
-    """
-    Fixes the aabbs of the parent branches by setting them to the merge of the children aabbs.
-    """
+    """Fixes the aabbs of the parent branches by setting them to the merge of the children aabbs."""
 
     # Go the tree back up while fixing the aabbs.
     while tree_node_index != INDEX_NONE:
@@ -300,9 +292,7 @@ def fix_upward_tree(tree_node_index, nodes, aabbs):
 
 @numba.njit(cache=True)
 def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):  # pragma: no cover
-    """
-    Queries the overlapping aabbs by traversing the trees.
-    """
+    """Queries the overlapping aabbs by traversing the trees."""
 
     broad_tetrahedra1 = []
     broad_tetrahedra2 = []
@@ -330,9 +320,7 @@ def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):  
 
 @numba.njit(cache=True)
 def query_overlap(test_aabb, root_node_index, nodes, aabbs, break_at_first_leaf=False):
-    """
-    Queries the overlapping aabbs by traversing the tree.
-    """
+    """Queries the overlapping aabbs by traversing the tree."""
     overlaps = []
     stack = [root_node_index]
 
@@ -404,15 +392,15 @@ def print_aabb_tree_recursive(node_index, nodes):  # pragma: no cover
 
 @numba.njit(cache=True)
 def all_aabbs_overlap(aabbs1, aabbs2):
-    """Creates result lists of all the overlapping aabbs. (Brute Force)
+    """Creates result lists of all the overlapping aabbs (brute force).
 
     Parameters
     ----------
-    aabbs1 : array, shape(n, 3, 2)
-        The aabbs of the first object.
+    aabbs1 : array, shape (n, 3, 2)
+        The AABBs of the first object.
 
-    aabbs2 : array, shape(n, 3, 2)
-        The aabbs of the second object.
+    aabbs2 : array, shape (n, 3, 2)
+        The AABBs of the second object.
 
     Returns
     -------
@@ -442,7 +430,21 @@ def all_aabbs_overlap(aabbs1, aabbs2):
 
 @numba.njit(cache=True)
 def aabb_overlap(aabb1, aabb2):
-    """Returns true if aabb1 and aabb2 overlap."""
+    """Returns true if aabb1 and aabb2 overlap.
+
+    Parameters
+    ----------
+    aabb1 : array, shape (3, 2)
+        The AABB of the first object.
+
+    aabb2 : array, shape (3, 2)
+        The AABB of the second object.
+
+    Returns
+    -------
+    overlap : bool
+        Do both AABBs overlap?
+    """
     return aabb1[0, 0] <= aabb2[0, 1] and aabb1[0, 1] >= aabb2[0, 0] \
            and aabb1[1, 0] <= aabb2[1, 1] and aabb1[1, 1] >= aabb2[1, 0] \
            and aabb1[2, 0] <= aabb2[2, 1] and aabb1[2, 1] >= aabb2[2, 0]
