@@ -21,10 +21,12 @@ def test_compare_gjk_intersection_flavours_with_random_shapes():
 
         intersection_jolt = gjk.gjk_intersection_jolt(collider1, collider2)
         intersection_libccd = gjk.gjk_intersection_libccd(collider1, collider2)
-        intersection_nesterov = gjk.gjk_nesterov_accelerated_primitives(collider1, collider2, use_nesterov_acceleration=False)[0]
+        intersection_nesterov = gjk.gjk_nesterov_accelerated(collider1, collider2, use_nesterov_acceleration=False)[0]
+        intersection_nesterov_primitives = gjk.gjk_nesterov_accelerated_primitives(collider1, collider2, use_nesterov_acceleration=False)[0]
 
         assert intersection_jolt == intersection_libccd
         assert intersection_nesterov == intersection_libccd
+        assert intersection_nesterov_primitives == intersection_libccd
 
 
 def test_compare_gjk_intersection_flavours_with_random_shapes_with_nesterov_acceleration():
@@ -44,7 +46,9 @@ def test_compare_gjk_intersection_flavours_with_random_shapes_with_nesterov_acce
 
         intersection_jolt = gjk.gjk_intersection_jolt(collider1, collider2)
         intersection_libccd = gjk.gjk_intersection_libccd(collider1, collider2)
-        intersection_nesterov = gjk.gjk_nesterov_accelerated_primitives(collider1, collider2, use_nesterov_acceleration=True)[0]
+        intersection_nesterov = gjk.gjk_nesterov_accelerated(collider1, collider2, use_nesterov_acceleration=False)[0]
+        intersection_nesterov_primitives = gjk.gjk_nesterov_accelerated_primitives(collider1, collider2, use_nesterov_acceleration=True)[0]
 
         assert intersection_jolt == intersection_libccd
         assert intersection_nesterov == intersection_libccd
+        assert intersection_nesterov_primitives == intersection_libccd

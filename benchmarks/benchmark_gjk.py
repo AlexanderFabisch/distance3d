@@ -2,7 +2,7 @@ import timeit
 import numpy as np
 from distance3d import colliders, random
 from distance3d.gjk import gjk_distance_original, gjk_intersection_jolt, gjk_distance_jolt, \
-    gjk_nesterov_accelerated_primitives
+    gjk_nesterov_accelerated_primitives, gjk_nesterov_accelerated
 from numba import config
 
 iterations = 200
@@ -38,10 +38,20 @@ def benchmark_jolt_distance():
 
 def benchmark_nesterov_accelerated():
     for i in range(iterations):
-        gjk_nesterov_accelerated_primitives(shapes[i][0], shapes[i][1], use_nesterov_acceleration=False)
+        gjk_nesterov_accelerated(shapes[i][0], shapes[i][1], use_nesterov_acceleration=False)
 
 
 def benchmark_nesterov_accelerated_with_acceleration():
+    for i in range(iterations):
+        gjk_nesterov_accelerated(shapes[i][0], shapes[i][1], use_nesterov_acceleration=True)
+
+
+def benchmark_nesterov_accelerated_primitives():
+    for i in range(iterations):
+        gjk_nesterov_accelerated_primitives(shapes[i][0], shapes[i][1], use_nesterov_acceleration=False)
+
+
+def benchmark_nesterov_accelerated_primitives_with_acceleration():
     for i in range(iterations):
         gjk_nesterov_accelerated_primitives(shapes[i][0], shapes[i][1], use_nesterov_acceleration=True)
 
@@ -82,5 +92,23 @@ print(f"Nesterov with acceleration Mean: {np.mean(times):.5f}; Std. dev.: {np.st
 
 config.DISABLE_JIT = True
 times = timeit.repeat(benchmark_nesterov_accelerated_with_acceleration, repeat=10, number=1)
+print(f"Nesterov with acceleration and Numba Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+config.DISABLE_JIT = False
+
+
+print("\nNesterov accelerated Primitives:")
+times = timeit.repeat(benchmark_nesterov_accelerated_primitives, repeat=10, number=1)
+print(f"Nesterov Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+
+config.DISABLE_JIT = True
+times = timeit.repeat(benchmark_nesterov_accelerated_primitives, repeat=10, number=1)
+print(f"Nesterov with Numba Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+config.DISABLE_JIT = False
+
+times = timeit.repeat(benchmark_nesterov_accelerated_primitives_with_acceleration, repeat=10, number=1)
+print(f"Nesterov with acceleration Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+
+config.DISABLE_JIT = True
+times = timeit.repeat(benchmark_nesterov_accelerated_primitives_with_acceleration, repeat=10, number=1)
 print(f"Nesterov with acceleration and Numba Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 config.DISABLE_JIT = False

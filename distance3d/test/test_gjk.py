@@ -65,8 +65,8 @@ def test_gjk_boxes():
     assert_array_almost_equal(closest_point1, np.array([-0.5, -0.5, -0.5]))
     assert_array_almost_equal(closest_point1, closest_point2)
 
-    assert gjk.gjk_nesterov_accelerated_primitives_intersection(
-        box_collider, box_collider)
+    assert gjk.gjk_nesterov_accelerated_intersection(box_collider, box_collider)
+    assert gjk.gjk_nesterov_accelerated_primitives_intersection(box_collider, box_collider)
 
     # touching faces, edges, or points
     for dim1 in range(3):
@@ -97,8 +97,8 @@ def test_gjk_boxes():
                                 box_collider, box_collider2)
                             assert approx(dist2) == 0.0
 
-                            assert gjk.gjk_nesterov_accelerated_primitives_intersection(
-                                box_collider, box_collider2)
+                            assert gjk.gjk_nesterov_accelerated_intersection(box_collider, box_collider2)
+                            assert gjk.gjk_nesterov_accelerated_primitives_intersection(box_collider, box_collider2)
 
 
     box2origin = np.array([
@@ -125,8 +125,8 @@ def test_gjk_boxes():
         box_collider, box_collider2)
     assert approx(dist2) == 1.7900192730149391
 
-    assert not gjk.gjk_nesterov_accelerated_primitives_intersection(
-        box_collider, box_collider2)
+    assert not gjk.gjk_nesterov_accelerated_intersection(box_collider, box_collider2)
+    assert not gjk.gjk_nesterov_accelerated_primitives_intersection(box_collider, box_collider2)
 
 
 def test_gjk_spheres():
@@ -140,9 +140,14 @@ def test_gjk_spheres():
     dist, _, _, _ = gjk.gjk_distance_jolt(sphere1, sphere1)
     assert approx(dist) == 0.0
 
+    assert gjk.gjk_nesterov_accelerated_intersection(sphere1, sphere1)
+    dist = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere1)
+    assert approx(dist) == 0.0
+
     assert gjk.gjk_nesterov_accelerated_primitives_intersection(sphere1, sphere1)
     dist = gjk.gjk_nesterov_accelerated_primitives_distance(sphere1, sphere1)
     assert approx(dist) == 0.0
+
 
     sphere2 = colliders.Sphere(center=np.array([1, 1, 1], dtype=float), radius=1.0)
     dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(
@@ -152,6 +157,10 @@ def test_gjk_spheres():
     assert_array_almost_equal(closest_point1, closest_point2)
 
     dist, _, _, _ = gjk.gjk_distance_jolt(sphere1, sphere2)
+    assert approx(dist) == 0.0
+
+    assert gjk.gjk_nesterov_accelerated_intersection(sphere1, sphere2)
+    dist = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere2)
     assert approx(dist) == 0.0
 
     assert gjk.gjk_nesterov_accelerated_primitives_intersection(sphere1, sphere2)
@@ -167,6 +176,10 @@ def test_gjk_spheres():
     assert_array_almost_equal(closest_point2, np.array([0, 0, 2]))
 
     dist, _, _, _ = gjk.gjk_distance_jolt(sphere1, sphere2)
+    assert approx(dist) == 1.0
+
+    assert not gjk.gjk_nesterov_accelerated_intersection(sphere1, sphere2)
+    dist = gjk.gjk_nesterov_accelerated_distance(sphere1, sphere2)
     assert approx(dist) == 1.0
 
     assert not gjk.gjk_nesterov_accelerated_primitives_intersection(sphere1, sphere2)
@@ -185,6 +198,10 @@ def test_gjk_cylinders():
     dist, _, _, _ = gjk.gjk_distance_jolt(cylinder1, cylinder1)
     assert approx(dist) == 0
 
+    assert gjk.gjk_nesterov_accelerated_intersection(cylinder1, cylinder1)
+    dist = gjk.gjk_nesterov_accelerated_distance(cylinder1, cylinder1)
+    assert approx(dist) == 0.0
+
     assert gjk.gjk_nesterov_accelerated_primitives_intersection(cylinder1, cylinder1)
     dist = gjk.gjk_nesterov_accelerated_primitives_distance(cylinder1, cylinder1)
     assert approx(dist) == 0.0
@@ -202,9 +219,13 @@ def test_gjk_cylinders():
     dist, _, _, _ = gjk.gjk_distance_jolt(cylinder1, cylinder2)
     assert approx(dist) == 1
 
+    assert not gjk.gjk_nesterov_accelerated_intersection(cylinder1, cylinder2)
+    dist = gjk.gjk_nesterov_accelerated_distance(cylinder1, cylinder2)
+    assert approx(dist, rel=1e-3) == 1
+
     assert not gjk.gjk_nesterov_accelerated_primitives_intersection(cylinder1, cylinder2)
     dist = gjk.gjk_nesterov_accelerated_primitives_distance(cylinder1, cylinder2)
-    assert approx(dist) == 1 or approx(dist) == 0.9999799999999999
+    assert approx(dist, rel=1e-3) == 1
 
     A2B = np.eye(4)
     A2B[:3, 3] = np.array([0, 0, 4])
@@ -217,6 +238,10 @@ def test_gjk_cylinders():
 
     dist, _, _, _ = gjk.gjk_distance_jolt(cylinder1, cylinder2)
     assert approx(dist) == 3
+
+    assert not gjk.gjk_nesterov_accelerated_intersection(cylinder1, cylinder2)
+    dist = gjk.gjk_nesterov_accelerated_distance(cylinder1, cylinder2)
+    assert approx(dist, rel=1e-3) == 3
 
     assert not gjk.gjk_nesterov_accelerated_primitives_intersection(cylinder1, cylinder2)
     dist = gjk.gjk_nesterov_accelerated_primitives_distance(cylinder1, cylinder2)
@@ -232,6 +257,10 @@ def test_gjk_capsules():
 
     dist, _, _, _ = gjk.gjk_distance_jolt(capsule1, capsule1)
     assert approx(dist) == 0
+
+    assert gjk.gjk_nesterov_accelerated_intersection(capsule1, capsule1)
+    dist = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule1)
+    assert approx(dist) == 0.0
 
     assert gjk.gjk_nesterov_accelerated_primitives_intersection(capsule1, capsule1)
     dist = gjk.gjk_nesterov_accelerated_primitives_distance(capsule1, capsule1)
@@ -250,6 +279,10 @@ def test_gjk_capsules():
     dist, _, _, _ = gjk.gjk_distance_jolt(capsule1, capsule2)
     assert approx(dist) == 1
 
+    assert not gjk.gjk_nesterov_accelerated_intersection(capsule1, capsule2)
+    dist = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule2)
+    assert approx(dist) == 1
+
     assert not gjk.gjk_nesterov_accelerated_primitives_intersection(capsule1, capsule2)
     dist = gjk.gjk_nesterov_accelerated_primitives_distance(capsule1, capsule2)
     assert approx(dist) == 1
@@ -265,6 +298,10 @@ def test_gjk_capsules():
     assert_array_almost_equal(closest_point2, np.array([0, 0, 2.5]))
 
     dist, _, _, _ = gjk.gjk_distance_jolt(capsule1, capsule2)
+    assert approx(dist) == 1
+
+    assert not gjk.gjk_nesterov_accelerated_intersection(capsule1, capsule2)
+    dist = gjk.gjk_nesterov_accelerated_distance(capsule1, capsule2)
     assert approx(dist) == 1
 
     assert not gjk.gjk_nesterov_accelerated_primitives_intersection(capsule1, capsule2)

@@ -1,91 +1,12 @@
 import numpy as np
 import numba
 
-from ..colliders import Capsule, Sphere, Box, Cone, Cylinder, Ellipsoid
-from ..utils import EPSILON
+from ..colliders import MeshGraph, Capsule, Sphere, Box, Cone, Cylinder, Ellipsoid
+from ..utils import norm_vector
 
 
-def gjk_nesterov_accelerated_primitives_intersection(collider0, collider1, ray_guess=None):
+def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
     """
-    Nesterov accelerated gjk approach. This implementation is based on the Paper
-    "Collision Detection Accelerated: An Optimization Perspective"
-    https://lmontaut.github.io/nesterov-gjk.github.io/
-    and highly inspired by the C++ implementation in of the Authors:
-    https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
-
-    Parameters
-    ----------
-    collider0 : ConvexCollider
-        Convex collider 1.
-
-    collider1 : ConvexCollider
-        Convex collider 2.
-
-    Returns
-    -------
-    contact : bool
-        Shapes collide
-    """
-    return gjk_nesterov_accelerated_primitives(collider0, collider1, ray_guess)[0]
-
-
-def gjk_nesterov_accelerated_primitives_distance(collider0, collider1, ray_guess=None):
-    """
-    Nesterov accelerated gjk approach. This implementation is based on the Paper
-    "Collision Detection Accelerated: An Optimization Perspective"
-    https://lmontaut.github.io/nesterov-gjk.github.io/
-    and highly inspired by the C++ implementation in of the Authors:
-    https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
-
-    Parameters
-    ----------
-    collider0 : ConvexCollider
-        Convex collider 1.
-
-    collider1 : ConvexCollider
-        Convex collider 2.
-
-    Returns
-    -------
-    distance : float
-        The distance between the colliders. The distance is zero if they collide.
-    """
-    return max(gjk_nesterov_accelerated_primitives(collider0, collider1, ray_guess)[1], 0.0)
-
-
-def gjk_nesterov_accelerated_primitives_distance_and_pen_depth(collider0, collider1, ray_guess=None):
-    """
-    Nesterov accelerated gjk approach. This implementation is based on the Paper
-    "Collision Detection Accelerated: An Optimization Perspective"
-    https://lmontaut.github.io/nesterov-gjk.github.io/
-    and highly inspired by the C++ implementation in of the Authors:
-    https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
-
-    Parameters
-    ----------
-    collider0 : ConvexCollider
-        Convex collider 1.
-
-    collider1 : ConvexCollider
-        Convex collider 2.
-
-    Returns
-    -------
-    distance : float
-        The distance between the colliders. If the Collider collide the distance will be zero or negative and represents
-        the penetration depth of the colliders.
-    """
-    return gjk_nesterov_accelerated_primitives(collider0, collider1, ray_guess)[1]
-
-
-def gjk_nesterov_accelerated_primitives_iterations(collider1, collider2, ray_guess=None):
-    """
-    Nesterov accelerated gjk approach. This implementation is based on the Paper
-    "Collision Detection Accelerated: An Optimization Perspective"
-    https://lmontaut.github.io/nesterov-gjk.github.io/
-    and highly inspired by the C++ implementation in of the Authors:
-    https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
-
     Parameters
     ----------
     collider1 : ConvexCollider
@@ -99,63 +20,73 @@ def gjk_nesterov_accelerated_primitives_iterations(collider1, collider2, ray_gue
     contact : bool
         Shapes collide
     """
-    return gjk_nesterov_accelerated_primitives(collider1, collider2, ray_guess)[3]
+    return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[0]
 
 
-def get_minkowski_diff(collider0, collider1):
-    # Tuple data
-    # - 0 type0 (int)
-    # - 1 data0 (vec3)
-    # - 2 type1 (int)
-    # - 3 data1 (vec3
-    # - 4 oR1  (mat4)
-    # - 5 ot1  (vec3)
+def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None):
+    """
+    Parameters
+    ----------
+    collider1 : ConvexCollider
+        Convex collider 1.
 
-    data0, type0 = get_data_from_collider(collider0)
-    data1, type1 = get_data_from_collider(collider1)
-    oR1 = np.dot(collider0.frame()[:3, :3].T, collider1.frame()[:3, :3])
-    ot1 = np.dot(collider0.frame()[:3, :3].T, collider1.center() - collider0.frame()[:3, 3])
+    collider2 : ConvexCollider
+        Convex collider 2.
 
-    minkowski_diff = (type0, data0, type1, data1, oR1, ot1)
-    return minkowski_diff
-
-
-def get_data_from_collider(collider):
-    if type(collider) == Sphere:
-        return np.array([0.0, 0.0, 0.0]), 0
-
-    if type(collider) == Capsule:
-        h = collider.height / 2
-        return np.array([h, 0.0, 0.0]), 1
-
-    if type(collider) == Box:
-        s = collider.size / 2
-        return s, 2
-
-    if type(collider) == Ellipsoid:
-        a2 = collider.radii[0] * collider.radii[0]
-        b2 = collider.radii[1] * collider.radii[1]
-        c2 = collider.radii[2] * collider.radii[2]
-        return np.array([a2, b2, c2]), 3
-
-    if type(collider) == Cone:
-        h = collider.height / 2
-        r = collider.radius
-        return np.array([h, r, 0.0]), 4
-
-    if type(collider) == Cylinder:
-        h = collider.length / 2
-        r = collider.radius
-        return np.array([h, r, 0.0]), 5
-
-    raise ValueError("Invalid Collider Type!")
+    Returns
+    -------
+    contact : bool
+        Shapes collide
+    """
+    return max(gjk_nesterov_accelerated(collider1, collider2, ray_guess)[1], 0.0)
 
 
-def gjk_nesterov_accelerated_primitives(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308,
-                                        tolerance=1e-6, use_nesterov_acceleration=False):
-    minkowski_diff = get_minkowski_diff(collider0, collider1)
+def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
+    """
+    Parameters
+    ----------
+    collider1 : ConvexCollider
+        Convex collider 1.
 
-    # Inflation is only used with spheres and capsules
+    collider2 : ConvexCollider
+        Convex collider 2.
+
+    Returns
+    -------
+    contact : bool
+        Shapes collide
+    """
+    return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[3]
+
+
+def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6, use_nesterov_acceleration=False):
+    """
+    Parameters
+    ----------
+    collider0 : ConvexCollider
+        Convex collider 1.
+
+    collider1 : ConvexCollider
+        Convex collider 2.
+
+    Returns
+    -------
+    contact : bool
+        Shapes collide
+
+    distance : float
+        Distance between shapes
+
+    simplex :
+        Distance between shapes
+    """
+
+    # ------ Initialize Variables ------
+
+    # normalize_support_direction is for soem reason only needed when both colliders are an mesh.
+    normalize_support_direction = type(collider0) == MeshGraph and type(collider1) == MeshGraph
+
+    # Infaltion is only used with spheres and capsules
     inflation = 0.0
     if type(collider0) == Sphere or type(collider0) == Capsule:
         inflation += collider0.radius
@@ -163,21 +94,12 @@ def gjk_nesterov_accelerated_primitives(collider0, collider1, ray_guess=None, ma
     if type(collider1) == Sphere or type(collider1) == Capsule:
         inflation += collider1.radius
 
-    return run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance,
-                                        use_nesterov_acceleration)
-
-
-@numba.njit(cache=True)
-def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance,
-                                 use_nesterov_acceleration):
-    # ------ Initialize Variables ------
-
     upper_bound += inflation
 
     alpha = 0.0
 
     inside = False
-    simplex = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+    simplex = np.empty([4, 3], dtype=float)
     simplex_len = 0
     distance = 0.0
 
@@ -191,24 +113,29 @@ def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_inter
         ray_len = 1
 
     ray_dir = ray  # d in paper
-    support_point = ray.copy()  # s in paper
+    support_point = np.array(ray)  # s in paper
+
 
     i = 0
     while i < max_interations:
-
         if ray_len < tolerance:
             distance = -inflation
             inside = True
             break
 
         if use_nesterov_acceleration:
-            momentum = (i + 1) / (i + 3)
-            y = momentum * ray + (1.0 - momentum) * support_point
-            ray_dir = momentum * ray_dir + (1.0 - momentum) * y
+            if normalize_support_direction:
+                momentum = (i + 2) / (i + 3)
+                y = momentum * ray + (1.0 - momentum) * support_point
+                ray_dir = momentum * norm_vector(ray_dir) + (1.0 - momentum) * norm_vector(y)
+            else:
+                momentum = (i + 1) / (i + 3)
+                y = momentum * ray + (1.0 - momentum) * support_point
+                ray_dir = momentum * ray_dir + (1.0 - momentum) * y
         else:
             ray_dir = ray
 
-        s0, s1 = support_function(-ray_dir, minkowski_diff)
+        s0, s1 = support_function(-ray_dir, collider0, collider1)
 
         simplex[simplex_len] = s0 - s1
         support_point = simplex[simplex_len]
@@ -367,39 +294,38 @@ def project_triangle_origin(triangle):
 
 
 @numba.njit(cache=True)
-def region_a(simplex, a):
+def region_a(simplex, a_index, a):
     return origin_to_point(simplex, a)
 
 
 @numba.njit(cache=True)
-def region_ab(simplex, a, b, ba_aa):
+def region_ab(simplex, a_index, b_index, a, b, ba_aa):
     return origin_to_segment(simplex, a, b, b - a, -ba_aa)
 
 
 @numba.njit(cache=True)
-def region_ac(simplex, a, c, ca_aa):
+def region_ac(simplex, a_index, c_index, a, c, ca_aa):
     return origin_to_segment(simplex, a, c, c - a, -ca_aa)
 
 
 @numba.njit(cache=True)
-def region_ad(simplex, a, d, da_aa):
+def region_ad(simplex, a_index, d_index, a, d, da_aa):
     return origin_to_segment(simplex, a, d, d - a, -da_aa)
 
 
 @numba.njit(cache=True)
-def region_abc(simplex, a, b, c, a_cross_b):
+def region_abc(simplex, a_index, b_index, c_index, a, b, c, a_cross_b):
     return origin_to_triangle(simplex, a, b, c, np.cross(b - a, c - a), -c.dot(a_cross_b))[:2]
 
 
 @numba.njit(cache=True)
-def region_acd(simplex, a, c, d, a_cross_c):
+def region_acd(simplex, a_index, c_index, d_index, a, c, d, a_cross_c):
     return origin_to_triangle(simplex, a, c, d, np.cross(c - a, d - a), -d.dot(a_cross_c))[:2]
 
 
 @numba.njit(cache=True)
-def region_adb(simplex, a, d, b, a_cross_b):
+def region_adb(simplex, a_index, d_index, b_index, a, d, b, a_cross_b):
     return origin_to_triangle(simplex, a, d, b, np.cross(d - a, b - a), d.dot(a_cross_b))[:2]
-
 
 @numba.njit(cache=True)
 def project_tetra_to_origin(tetra):
@@ -443,58 +369,58 @@ def project_tetra_to_origin(tetra):
             if ba * da_ba + bd * ba_aa - bb * da_aa <= 0:
                 if da_aa <= 0:
                     if ba * ba_ca + bb * ca_aa - bc * ba_aa <= 0:
-                        ray, simplex_len = region_abc(tetra, a, b, c, a_cross_b)
+                        ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                     else:
-                        ray, simplex_len = region_ab(tetra, a, b, ba_aa)
+                        ray, simplex_len = region_ab(tetra, a_index, b_index, a, b, ba_aa)
                 else:
                     if ba * ba_ca + bb * ca_aa - bc * ba_aa <= 0:
                         if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
                             if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
-                                ray, simplex_len = region_acd(tetra, a, c, d, a_cross_c)
+                                ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                             else:
-                                ray, simplex_len = region_ac(tetra, a, c, ca_aa)
+                                ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                         else:
-                            ray, simplex_len = region_abc(tetra, a, b, c, a_cross_b)
+                            ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                     else:
-                        ray, simplex_len = region_ab(tetra, a, b, ba_aa)
+                        ray, simplex_len = region_ab(tetra, a_index, b_index, a, b, ba_aa)
             else:
                 if da * da_ba + dd * ba_aa - db * da_aa <= 0:
-                    ray, simplex_len = region_adb(tetra, a, d, b, a_cross_b)
+                    ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                 else:
                     if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
-                            ray, simplex_len = region_ad(tetra, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
-                            ray, simplex_len = region_acd(tetra, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                     else:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
-                            ray, simplex_len = region_ad(tetra, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
-                            ray, simplex_len = region_ac(tetra, a, c, ca_aa)
+                            ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
         else:
             if c.dot(a_cross_b) <= 0:
                 if ba * ba_ca + bb * ca_aa - bc * ba_aa <= 0:
                     if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
                         if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
-                            ray, simplex_len = region_acd(tetra, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                         else:
-                            ray, simplex_len = region_ac(tetra, a, c, ca_aa)
+                            ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                     else:
-                        ray, simplex_len = region_abc(tetra, a, b, c, a_cross_b)
+                        ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                 else:
-                    ray, simplex_len = region_ad(tetra, a, d, da_aa)
+                    ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
             else:
                 if d.dot(a_cross_c) <= 0:
                     if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
-                            ray, simplex_len = region_ad(tetra, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
-                            ray, simplex_len = region_acd(tetra, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                     else:
                         if ca_aa <= 0:
-                            ray, simplex_len = region_ac(tetra, a, c, ca_aa)
+                            ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                         else:
-                            ray, simplex_len = region_ad(tetra, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                 else:
                     return np.zeros(3), 4, True
     else:
@@ -504,39 +430,39 @@ def project_tetra_to_origin(tetra):
                     if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
                             if da * da_ba + dd * ba_aa - db * da_aa <= 0:
-                                ray, simplex_len = region_adb(tetra, a, d, b, a_cross_b)
+                                ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                             else:
-                                ray, simplex_len = region_ad(tetra, a, d, da_aa)
+                                ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
-                            ray, simplex_len = region_acd(tetra, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                     else:
                         if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
-                            ray, simplex_len = region_ac(tetra, a, c, ca_aa)
+                            ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                         else:
-                            ray, simplex_len = region_abc(tetra, a, b, c, a_cross_b)
+                            ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                 else:
                     if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
                         if ca * ca_da + cc * da_aa - dc * ca_aa <= 0:
-                            ray, simplex_len = region_acd(tetra, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                         else:
-                            ray, simplex_len = region_ac(tetra, a, c, ca_aa)
+                            ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                     else:
                         if c.dot(a_cross_b):
-                            ray, simplex_len = region_abc(tetra, a, b, c, a_cross_b)
+                            ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                         else:
-                            ray, simplex_len = region_acd(tetra, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
             else:
                 if c.dot(a_cross_b) <= 0:
                     if ca * ba_ca + cb * ca_aa - cc * ba_aa <= 0:
-                        ray, simplex_len = region_ac(tetra, a, c, ca_aa)
+                        ray, simplex_len = region_ac(tetra, a_index, c_index, a, c, ca_aa)
                     else:
-                        ray, simplex_len = region_abc(tetra, a, b, c, a_cross_b)
+                        ray, simplex_len = region_abc(tetra, a_index, b_index, c_index, a, b, c, a_cross_b)
                 else:
                     if -d.dot(a_cross_b) <= 0:
                         if da * da_ba + dd * ba_aa - db * da_aa <= 0:
-                            ray, simplex_len = region_adb(tetra, a, d, b, a_cross_b)
+                            ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                         else:
-                            ray, simplex_len = region_ad(tetra, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                     else:
                         return np.zeros(3), 4, True
         else:
@@ -544,79 +470,83 @@ def project_tetra_to_origin(tetra):
                 if -d.dot(a_cross_b) <= 0:
                     if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
                         if da * da_ba + dd * ba_aa - db * da_aa <= 0:
-                            ray, simplex_len = region_adb(tetra, a, d, b, a_cross_b)
+                            ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                         else:
-                            ray, simplex_len = region_ad(tetra, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                     else:
                         if d.dot(a_cross_c) <= 0:
-                            ray, simplex_len = region_acd(tetra, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                         else:
-                            ray, simplex_len = region_adb(tetra, a, d, b, a_cross_b)
+                            if c.dot(a_cross_b) <= 0:  # ???
+                                ray, simplex_len = region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
+                            else:
+                                ray, simplex_len= region_adb(tetra, a_index, d_index, b_index, a, d, b, a_cross_b)
                 else:
                     if d.dot(a_cross_c) <= 0:
                         if da * ca_da + dc * da_aa - dd * ca_aa <= 0:
-                            ray, simplex_len = region_ad(tetra, a, d, da_aa)
+                            ray, simplex_len = region_ad(tetra, a_index, d_index, a, d, da_aa)
                         else:
-                            ray, simplex_len = region_acd(tetra, a, c, d, a_cross_c)
+                            ray, simplex_len = region_acd(tetra, a_index, c_index, d_index, a, c, d, a_cross_c)
                     else:
                         return np.zeros(3), 4, True
             else:
-                ray, simplex_len = region_a(tetra, a)
+                ray, simplex_len = region_a(tetra, a_index, a)
     return ray, simplex_len, False
 
 
-@numba.njit(cache=True)
-def support_function(dir, minkowski_diff):
-    oR1 = minkowski_diff[4]
-    ot1 = minkowski_diff[5]
+def support_function(dir, collider0, collider1):
+    oR1 = np.dot(collider0.frame()[:3, :3].T, collider1.frame()[:3, :3])
+    ot1 = np.dot(collider0.frame()[:3, :3].T, collider1.center() - collider0.frame()[:3, 3])
 
-    support0 = select_support(dir, minkowski_diff[0], minkowski_diff[1])
+    support0, found0 = select_support(dir, collider0)
 
-    support1 = select_support(np.dot(-oR1.T, dir), minkowski_diff[2], minkowski_diff[3])
+    support1, found1 = select_support(np.dot(-oR1.T, dir), collider1)
     support1 = np.dot(oR1, support1) + ot1
 
-    return support0, support1
+    if found0 and found1:
+        return support0, support1
+
+    return collider0.support_function(dir), collider1.support_function(-dir)
 
 
-@numba.njit(cache=True)
-def select_support(dir, type, data):
-    if type == 0:
-        return sphere_support()
+def select_support(dir, collider):
+    if type(collider) == Sphere:
+        return sphere_support(), True
 
-    if type == 1:
-        return capsule_support(dir, data)
+    if type(collider) == Capsule:
+        return capsule_support(dir, collider), True
 
-    if type == 2:
-        return box_support(dir, data)
+    if type(collider) == Box:
+        return box_support(dir, collider), True
 
-    if type == 3:
-        return ellipsoid_support(dir, data)
+    if type(collider) == Ellipsoid:
+        return ellipsoid_support(dir, collider), True
 
-    if type == 4:
-        return cone_support(dir, data)
+    if type(collider) == Cone:
+        return cone_support(dir, collider), True
 
-    if type == 5:
-        return cylinder_support(dir, data)
+    if type(collider) == Cylinder:
+        return cylinder_support(dir, collider), True
+
+    # Type not found
+    return np.array([0.0, 0.0, 0.0]), False
 
 
-@numba.njit(cache=True)
 def sphere_support():
     return np.array([0.0, 0.0, 0.0])
 
 
-@numba.njit(cache=True)
-def capsule_support(dir, data):
+def capsule_support(dir, capsule):
     support = np.array([0.0, 0.0, 0.0])
     if dir[2] > 0:
-        support[2] = data[0]
+        support[2] = capsule.height / 2
     else:
-        support[2] = -data[0]
+        support[2] = -capsule.height / 2
 
     return support
 
 
-@numba.njit(cache=True)
-def box_support(dir, data):
+def box_support(dir, box):
     inflate = 1.0
     if (dir == 0).any():
         inflate = 1.00000001
@@ -624,28 +554,30 @@ def box_support(dir, data):
     support = np.array([0.0, 0.0, 0.0])
     for i in range(0, 3):
         if dir[i] > 0:
-            support[i] = inflate * data[i]
+            support[i] = inflate * (box.size[i] / 2)
         else:
-            support[i] = -inflate * data[i]
+            support[i] = -inflate * (box.size[i] / 2)
 
     return support
 
 
-@numba.njit(cache=True)
-def ellipsoid_support(dir, data):
-    v = data * dir
+def ellipsoid_support(dir, ellipsoid):
+    a2 = ellipsoid.radii[0] * ellipsoid.radii[0]
+    b2 = ellipsoid.radii[1] * ellipsoid.radii[1]
+    c2 = ellipsoid.radii[2] * ellipsoid.radii[2]
+
+    v = np.array([a2 * dir[0], b2 * dir[1], c2 * dir[2]])
     d = np.sqrt(v.dot(dir))
 
     return v / d
 
 
-@numba.njit(cache=True)
-def cone_support(dir, data):
+def cone_support(dir, cone):
     support = np.array([0.0, 0.0, 0.0])
 
     inflate = 1.00001
-    h = data[0]
-    r = data[1]
+    h = cone.height / 2
+    r = cone.radius
 
     if (dir[:2] == 0).all():
         dir[0] = 0.0
@@ -680,22 +612,21 @@ def cone_support(dir, data):
     return support
 
 
-@numba.njit(cache=True)
-def cylinder_support(dir, data):
+def cylinder_support(dir, cylinder):
     support = np.array([0.0, 0.0, 0.0])
 
     inflate = 1.00001
 
-    h = data[0]
-    r = data[1]
+    half_h = cylinder.length / 2
+    r = cylinder.radius
 
     if (dir[:2] == np.array([0.0, 0.0])).all():
-        h *= inflate
+        half_h *= inflate
 
     if dir[2] > 0:
-        support[2] = h
+        support[2] = half_h
     elif dir[2] < 0:
-        support[2] = -h
+        support[2] = -half_h
     else:
         support[2] = 0
         r *= inflate
@@ -707,3 +638,9 @@ def cylinder_support(dir, data):
         support[:2] = dir[:2] / np.linalg.norm(dir[:2]) * r
 
     return support
+
+
+
+
+
+
