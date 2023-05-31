@@ -1,8 +1,8 @@
 import timeit
 import numpy as np
 from distance3d import colliders, random
-from distance3d.gjk import gjk_nesterov_accelerated_intersection, gjk_distance_original, gjk_intersection_jolt, \
-    gjk_nesterov_accelerated
+from distance3d.gjk import gjk_distance_original, gjk_intersection_jolt, gjk_distance_jolt, \
+    gjk_nesterov_accelerated_primitives
 from numba import config
 
 iterations = 200
@@ -26,32 +26,49 @@ def benchmark_original():
         gjk_distance_original(shapes[i][0], shapes[i][1])
 
 
-def benchmark_jolt():
+def benchmark_jolt_intersection():
     for i in range(iterations):
         gjk_intersection_jolt(shapes[i][0], shapes[i][1])
 
 
+def benchmark_jolt_distance():
+    for i in range(iterations):
+        gjk_distance_jolt(shapes[i][0], shapes[i][1])
+
+
 def benchmark_nesterov_accelerated():
     for i in range(iterations):
-        gjk_nesterov_accelerated(shapes[i][0], shapes[i][1], use_nesterov_acceleration=False)
+        gjk_nesterov_accelerated_primitives(shapes[i][0], shapes[i][1], use_nesterov_acceleration=False)
+
 
 def benchmark_nesterov_accelerated_with_acceleration():
     for i in range(iterations):
-        gjk_nesterov_accelerated(shapes[i][0], shapes[i][1], use_nesterov_acceleration=True)
+        gjk_nesterov_accelerated_primitives(shapes[i][0], shapes[i][1], use_nesterov_acceleration=True)
 
 
 times = timeit.repeat(benchmark_original, repeat=10, number=1)
 print(f"Original Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 
+print("\nJolt:")
+
 config.DISABLE_JIT = True
-times = timeit.repeat(benchmark_jolt, repeat=10, number=1)
-print(f"Jolt Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+times = timeit.repeat(benchmark_jolt_intersection, repeat=10, number=1)
+print(f"Jolt intersection Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 config.DISABLE_JIT = False
 
-times = timeit.repeat(benchmark_jolt, repeat=10, number=1)
-print(f"Jolt with Numba Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+times = timeit.repeat(benchmark_jolt_intersection, repeat=10, number=1)
+print(f"Jolt intersection with Numba Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+
+config.DISABLE_JIT = True
+times = timeit.repeat(benchmark_jolt_distance, repeat=10, number=1)
+print(f"Jolt distance Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
+config.DISABLE_JIT = False
+
+times = timeit.repeat(benchmark_jolt_distance, repeat=10, number=1)
+print(f"Jolt distance with Numba Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 
 
+print("\nNesterov accelerated:")
 times = timeit.repeat(benchmark_nesterov_accelerated, repeat=10, number=1)
 print(f"Nesterov Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 
@@ -59,7 +76,6 @@ config.DISABLE_JIT = True
 times = timeit.repeat(benchmark_nesterov_accelerated, repeat=10, number=1)
 print(f"Nesterov with Numba Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")
 config.DISABLE_JIT = False
-
 
 times = timeit.repeat(benchmark_nesterov_accelerated_with_acceleration, repeat=10, number=1)
 print(f"Nesterov with acceleration Mean: {np.mean(times):.5f}; Std. dev.: {np.std(times):.5f}")

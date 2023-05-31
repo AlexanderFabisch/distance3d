@@ -90,6 +90,7 @@ def gjk_distance_original(collider1, collider2, return_interations=False):
                 else:
                     distance = new_solution.distance
 
+                # For iteration test
                 if return_interations:
                     return iteration
 

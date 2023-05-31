@@ -13,6 +13,9 @@ def gjk_nesterov_accelerated_primitives_intersection(collider0, collider1, ray_g
     and highly inspired by the C++ implementation in of the Authors:
     https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
 
+    This implemetation can only be used with the following Collider Types:
+    "Sphere", "Capsule", "Box", "Ellipsoid", "Cone" and "Cylinder".
+
     Parameters
     ----------
     collider0 : ConvexCollider
@@ -36,6 +39,9 @@ def gjk_nesterov_accelerated_primitives_distance(collider0, collider1, ray_guess
     https://lmontaut.github.io/nesterov-gjk.github.io/
     and highly inspired by the C++ implementation in of the Authors:
     https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
+
+    This implemetation can only be used with the following Collider Types:
+    "Sphere", "Capsule", "Box", "Ellipsoid", "Cone" and "Cylinder".
 
     Parameters
     ----------
@@ -61,6 +67,9 @@ def gjk_nesterov_accelerated_primitives_distance_and_pen_depth(collider0, collid
     and highly inspired by the C++ implementation in of the Authors:
     https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
 
+    This implemetation can only be used with the following Collider Types:
+    "Sphere", "Capsule", "Box", "Ellipsoid", "Cone" and "Cylinder".
+
     Parameters
     ----------
     collider0 : ConvexCollider
@@ -85,6 +94,9 @@ def gjk_nesterov_accelerated_primitives_iterations(collider1, collider2, ray_gue
     https://lmontaut.github.io/nesterov-gjk.github.io/
     and highly inspired by the C++ implementation in of the Authors:
     https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
+
+    This implemetation can only be used with the following Collider Types:
+    "Sphere", "Capsule", "Box", "Ellipsoid", "Cone" and "Cylinder".
 
     Parameters
     ----------
