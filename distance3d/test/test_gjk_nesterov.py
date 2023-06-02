@@ -155,9 +155,9 @@ def test_compare_gjk_intersection_only_mesh():
         assert intersection_nesterov2 == intersection_libccd
 
 
-# This is only to cover every simplex case it takes very long to compute
+# This is only to get 100% coverage, because randomly getting every simplex case it takes very long to compute.
 """
-def test_compare_gjk_intersection_flavours_with_random_shapes_extensive():
+def test_compare_gjk_intersection_with_random_shapes_extensive():
     random_state = np.random.RandomState(84)
     shape_names = list(["sphere", "ellipsoid", "capsule", "cylinder", "box"])
     k = 1000000
@@ -178,5 +178,4 @@ def test_compare_gjk_intersection_flavours_with_random_shapes_extensive():
         assert intersection_jolt == intersection_libccd
         assert intersection_nesterov == intersection_libccd
         assert intersection_nesterov_primitives == intersection_libccd
-
 """
