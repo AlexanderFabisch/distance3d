@@ -36,6 +36,7 @@ dist_original, cp1_original, cp2_original, _ = gjk.gjk_distance_original(collide
 print(f"{dist_original=}, {cp1_original=}, {cp2_original=}")
 dist_jolt, cp1_jolt, cp2_jolt, _ = gjk.gjk_distance_jolt(collider1, collider2)
 print(f"{dist_jolt=}, {cp1_jolt=}, {cp2_jolt=}")
+
 fig = pv.figure()
 collider1.make_artist((1, 0, 0))
 collider2.make_artist((0, 1, 0))

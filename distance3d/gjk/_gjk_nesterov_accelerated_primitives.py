@@ -1,11 +1,11 @@
 import numpy as np
 import numba
 
-from ..colliders import Capsule, Sphere, Box, Cone, Cylinder, Ellipsoid
+from ..colliders import Capsule, Sphere, Box, Cylinder, Ellipsoid
 from ..utils import EPSILON
 
 
-def gjk_nesterov_accelerated_primitives_intersection(collider0, collider1, ray_guess=None):
+def gjk_nesterov_accelerated_primitives_intersection(collider0, collider1):
     """
     Nesterov accelerated gjk approach. This implementation is based on the Paper
     "Collision Detection Accelerated: An Optimization Perspective"
@@ -29,10 +29,10 @@ def gjk_nesterov_accelerated_primitives_intersection(collider0, collider1, ray_g
     contact : bool
         Shapes collide
     """
-    return gjk_nesterov_accelerated_primitives(collider0, collider1, ray_guess)[0]
+    return gjk_nesterov_accelerated_primitives(collider0, collider1)[0]
 
 
-def gjk_nesterov_accelerated_primitives_distance(collider0, collider1, ray_guess=None):
+def gjk_nesterov_accelerated_primitives_distance(collider0, collider1):
     """
     Nesterov accelerated gjk approach. This implementation is based on the Paper
     "Collision Detection Accelerated: An Optimization Perspective"
@@ -56,38 +56,10 @@ def gjk_nesterov_accelerated_primitives_distance(collider0, collider1, ray_guess
     distance : float
         The distance between the colliders. The distance is zero if they collide.
     """
-    return max(gjk_nesterov_accelerated_primitives(collider0, collider1, ray_guess)[1], 0.0)
+    return max(gjk_nesterov_accelerated_primitives(collider0, collider1)[1], 0.0)
 
 
-def gjk_nesterov_accelerated_primitives_distance_and_pen_depth(collider0, collider1, ray_guess=None):
-    """
-    Nesterov accelerated gjk approach. This implementation is based on the Paper
-    "Collision Detection Accelerated: An Optimization Perspective"
-    https://lmontaut.github.io/nesterov-gjk.github.io/
-    and highly inspired by the C++ implementation in of the Authors:
-    https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
-
-    This implemetation can only be used with the following Collider Types:
-    "Sphere", "Capsule", "Box", "Ellipsoid", "Cone" and "Cylinder".
-
-    Parameters
-    ----------
-    collider0 : ConvexCollider
-        Convex collider 1.
-
-    collider1 : ConvexCollider
-        Convex collider 2.
-
-    Returns
-    -------
-    distance : float
-        The distance between the colliders. If the Collider collide the distance will be zero or negative and represents
-        the penetration depth of the colliders.
-    """
-    return gjk_nesterov_accelerated_primitives(collider0, collider1, ray_guess)[1]
-
-
-def gjk_nesterov_accelerated_primitives_iterations(collider1, collider2, ray_guess=None):
+def gjk_nesterov_accelerated_primitives_iterations(collider1, collider2):
     """
     Nesterov accelerated gjk approach. This implementation is based on the Paper
     "Collision Detection Accelerated: An Optimization Perspective"
@@ -111,7 +83,7 @@ def gjk_nesterov_accelerated_primitives_iterations(collider1, collider2, ray_gue
     contact : bool
         Shapes collide
     """
-    return gjk_nesterov_accelerated_primitives(collider1, collider2, ray_guess)[3]
+    return gjk_nesterov_accelerated_primitives(collider1, collider2)[3]
 
 
 def get_minkowski_diff(collider0, collider1):
@@ -150,20 +122,13 @@ def get_data_from_collider(collider):
         c2 = collider.radii[2] * collider.radii[2]
         return np.array([a2, b2, c2]), 3
 
-    if type(collider) == Cone:
-        h = collider.height / 2
-        r = collider.radius
-        return np.array([h, r, 0.0]), 4
-
-    if type(collider) == Cylinder:
-        h = collider.length / 2
-        r = collider.radius
-        return np.array([h, r, 0.0]), 5
-
-    raise ValueError("Invalid Collider Type!")
+    assert type(collider) == Cylinder
+    h = collider.length / 2
+    r = collider.radius
+    return np.array([h, r, 0.0]), 4
 
 
-def gjk_nesterov_accelerated_primitives(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308,
+def gjk_nesterov_accelerated_primitives(collider0, collider1, max_interations=128, upper_bound=1.79769e+308,
                                         tolerance=1e-6, use_nesterov_acceleration=False):
     minkowski_diff = get_minkowski_diff(collider0, collider1)
 
@@ -175,12 +140,12 @@ def gjk_nesterov_accelerated_primitives(collider0, collider1, ray_guess=None, ma
     if type(collider1) == Sphere or type(collider1) == Capsule:
         inflation += collider1.radius
 
-    return run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance,
+    return run_gjk_nesterov_accelerated(minkowski_diff, inflation, max_interations, upper_bound, tolerance,
                                         use_nesterov_acceleration)
 
 
 @numba.njit(cache=True)
-def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_interations, upper_bound, tolerance,
+def run_gjk_nesterov_accelerated(minkowski_diff, inflation, max_interations, upper_bound, tolerance,
                                  use_nesterov_acceleration):
     # ------ Initialize Variables ------
 
@@ -194,13 +159,7 @@ def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_inter
     distance = 0.0
 
     ray = np.array([1.0, 0.0, 0.0])  # x in paper
-    if ray_guess is not None:
-        ray = ray_guess
-
-    ray_len = np.linalg.norm(ray)
-    if ray_len < tolerance:
-        ray = np.array([-1.0, 0.0, 0.0])
-        ray_len = 1
+    ray_len = 1
 
     ray_dir = ray  # d in paper
     support_point = ray.copy()  # s in paper
@@ -245,15 +204,13 @@ def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_inter
         cv_check_passed = (diff - tolerance * ray_len) <= 0
 
         if i > 0 and cv_check_passed:
-            if i > 0:
-                simplex_len -= 1
+            simplex_len -= 1
             if use_nesterov_acceleration:
                 use_nesterov_acceleration = False
                 continue
             distance = ray_len - inflation
 
-            if distance < tolerance:
-                inside = True
+            inside = distance < tolerance
             break
 
         assert 1 <= simplex_len <= 4
@@ -263,7 +220,7 @@ def run_gjk_nesterov_accelerated(minkowski_diff, inflation, ray_guess, max_inter
             ray, simplex_len, inside = project_line_origin(simplex)
         elif simplex_len == 3:
             ray, simplex_len, inside = project_triangle_origin(simplex)
-        elif simplex_len == 4:
+        else:
             ray, simplex_len, inside = project_tetra_to_origin(simplex)
 
         if not inside:
@@ -604,11 +561,8 @@ def select_support(dir, type, data):
     if type == 3:
         return ellipsoid_support(dir, data)
 
-    if type == 4:
-        return cone_support(dir, data)
-
-    if type == 5:
-        return cylinder_support(dir, data)
+    assert type == 4
+    return cylinder_support(dir, data)
 
 
 @numba.njit(cache=True)
@@ -649,47 +603,6 @@ def ellipsoid_support(dir, data):
     d = np.sqrt(v.dot(dir))
 
     return v / d
-
-
-@numba.njit(cache=True)
-def cone_support(dir, data):
-    support = np.array([0.0, 0.0, 0.0])
-
-    inflate = 1.00001
-    h = data[0]
-    r = data[1]
-
-    if (dir[:2] == 0).all():
-        dir[0] = 0.0
-        dir[1] = 0.0
-
-        if dir[2] > 0:
-            support[2] = h
-        else:
-            support[2] = -inflate * h
-        return support
-
-    zdist = dir[0] * dir[0] + dir[1] * dir[1]
-    len = zdist + dir[2] * dir[2]
-    zdist = np.sqrt(zdist)
-
-    if dir[2] <= 0:
-        rad = r / zdist
-        support[:2] = rad * dir[:2]
-        support[2] = -h
-        return support
-
-    len = np.sqrt(len)
-    sin_a = r / np.sqrt(r * r + 4 * h * h)
-
-    if dir[2] > len * sin_a:
-        support = np.array([0.0, 0.0, h])
-        return support
-
-    rad = r / zdist
-    support[:2] = rad * dir[:2]
-    support[2] = -h
-    return support
 
 
 @numba.njit(cache=True)

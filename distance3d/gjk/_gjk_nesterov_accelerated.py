@@ -153,15 +153,14 @@ def gjk_nesterov_accelerated(collider0, collider1, max_interations=128, upper_bo
         cv_check_passed = (diff - tolerance * ray_len) <= 0
 
         if i > 0 and cv_check_passed:
-            if i > 0:
-                simplex_len -= 1
+            simplex_len -= 1
+
             if use_nesterov_acceleration:
                 use_nesterov_acceleration = False
                 continue
             distance = ray_len - inflation
 
-            if distance < tolerance:
-                inside = True
+            inside = distance < tolerance
             break
 
         assert 1 <= simplex_len <= 4
@@ -171,7 +170,7 @@ def gjk_nesterov_accelerated(collider0, collider1, max_interations=128, upper_bo
             ray, simplex_len, inside = project_line_origin(simplex)
         elif simplex_len == 3:
             ray, simplex_len, inside = project_triangle_origin(simplex)
-        elif simplex_len == 4:
+        else:
             ray, simplex_len, inside = project_tetra_to_origin(simplex)
 
         if not inside:
@@ -515,9 +514,6 @@ def select_support(dir, collider):
     if type(collider) == Ellipsoid:
         return ellipsoid_support(dir, collider), True
 
-    if type(collider) == Cone:
-        return cone_support(dir, collider), True
-
     if type(collider) == Cylinder:
         return cylinder_support(dir, collider), True
 
@@ -563,47 +559,6 @@ def ellipsoid_support(dir, ellipsoid):
     d = np.sqrt(v.dot(dir))
 
     return v / d
-
-
-def cone_support(dir, cone):
-    support = np.array([0.0, 0.0, 0.0])
-
-    inflate = 1.00001
-    h = cone.height / 2
-    r = cone.radius
-
-    if (dir[:2] == 0).all():
-        dir[0] = 0.0
-        dir[1] = 0.0
-
-        if dir[2] > 0:
-            support[2] = h
-        else:
-            support[2] = -inflate * h
-        return support
-
-    zdist = dir[0] * dir[0] + dir[1] * dir[1]
-    len = zdist + dir[2] * dir[2]
-    zdist = np.sqrt(zdist)
-
-    if dir[2] <= 0:
-        rad = r / zdist
-        support[:2] = rad * dir[:2]
-        support[2] = -h
-        return support
-
-    len = np.sqrt(len)
-    sin_a = r / np.sqrt(r * r + 4 * h * h)
-
-    if dir[2] > len * sin_a:
-        support = np.array([0.0, 0.0, h])
-        return support
-
-    rad = r / zdist
-    support[:2] = rad * dir[:2]
-    support[2] = -h
-    return support
-
 
 def cylinder_support(dir, cylinder):
     support = np.array([0.0, 0.0, 0.0])
