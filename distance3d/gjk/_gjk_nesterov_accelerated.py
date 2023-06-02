@@ -5,7 +5,7 @@ from ..colliders import MeshGraph, Capsule, Sphere, Box, Cone, Cylinder, Ellipso
 from ..utils import norm_vector
 
 
-def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
+def gjk_nesterov_accelerated_intersection(collider1, collider2):
     """
     Parameters
     ----------
@@ -20,10 +20,10 @@ def gjk_nesterov_accelerated_intersection(collider1, collider2, ray_guess=None):
     contact : bool
         Shapes collide
     """
-    return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[0]
+    return gjk_nesterov_accelerated(collider1, collider2)[0]
 
 
-def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None):
+def gjk_nesterov_accelerated_distance(collider1, collider2):
     """
     Parameters
     ----------
@@ -38,10 +38,10 @@ def gjk_nesterov_accelerated_distance(collider1, collider2, ray_guess=None):
     contact : bool
         Shapes collide
     """
-    return max(gjk_nesterov_accelerated(collider1, collider2, ray_guess)[1], 0.0)
+    return max(gjk_nesterov_accelerated(collider1, collider2)[1], 0.0)
 
 
-def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
+def gjk_nesterov_accelerated_iterations(collider1, collider2):
     """
     Parameters
     ----------
@@ -56,10 +56,10 @@ def gjk_nesterov_accelerated_iterations(collider1, collider2, ray_guess=None):
     contact : bool
         Shapes collide
     """
-    return gjk_nesterov_accelerated(collider1, collider2, ray_guess)[3]
+    return gjk_nesterov_accelerated(collider1, collider2)[3]
 
 
-def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6, use_nesterov_acceleration=False):
+def gjk_nesterov_accelerated(collider0, collider1, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6, use_nesterov_acceleration=False):
     """
     Parameters
     ----------
@@ -104,17 +104,10 @@ def gjk_nesterov_accelerated(collider0, collider1, ray_guess=None, max_interatio
     distance = 0.0
 
     ray = np.array([1.0, 0.0, 0.0])  # x in paper
-    if ray_guess is not None:
-        ray = ray_guess
-
-    ray_len = np.linalg.norm(ray)
-    if ray_len < tolerance:
-        ray = np.array([-1.0, 0.0, 0.0])
-        ray_len = 1
+    ray_len = 1
 
     ray_dir = ray  # d in paper
     support_point = np.array(ray)  # s in paper
-
 
     i = 0
     while i < max_interations:
