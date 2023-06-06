@@ -2,7 +2,6 @@ import numpy as np
 import numba
 
 from ..colliders import Capsule, Sphere, Box, Cylinder, Ellipsoid
-from ..utils import EPSILON
 
 
 def gjk_nesterov_accelerated_primitives_intersection(collider0, collider1):
