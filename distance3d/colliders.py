@@ -97,23 +97,21 @@ class ConvexCollider(abc.ABC):
 
     @abc.abstractmethod
     def to_dict(self):
-        """Return a data dict for json serialization
+        """Return a data dict for serialization.
 
         Returns
         -------
         data : dict
-            data dict
+            Internal data.
         """
 
     @abc.abstractmethod
     def round_values(self, precision):
-        """Rounds the values of the collider to a sertion precision.
-        """
+        """Rounds the values of the collider to a given precision."""
 
     @abc.abstractmethod
     def frame(self):
-        """The frame of the collider
-        """
+        """The frame of the collider."""
 
 
 class ConvexHullVertices(ConvexCollider):
