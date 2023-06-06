@@ -152,7 +152,7 @@ class ConvexHullVertices(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "typ": "ConvexHullVertices",
+            "type": "ConvexHullVertices",
             "center": self.center().tolist(),
             "vertices": self.vertices.tolist()
         }
@@ -203,7 +203,7 @@ class Box(ConvexHullVertices):
 
     def to_dict(self):
         data = {
-            "typ": "Box",
+            "type": "Box",
             "collider2origin": self.box2origin.tolist(),
             "size": self.size.tolist()
         }
@@ -271,7 +271,7 @@ class MeshGraph(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "typ": "Mesh",
+            "type": "Mesh",
             "collider2origin": self.mesh2origin.tolist(),
             "vertices": self.vertices.tolist(),
             "triangles": self.triangles.tolist()
@@ -331,7 +331,7 @@ class Sphere(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "typ": "Sphere",
+            "type": "Sphere",
             "collider2origin": self.frame().tolist(),
             "radius": self.radius
         }
@@ -398,7 +398,7 @@ class Capsule(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "typ": "Capsule",
+            "type": "Capsule",
             "collider2origin": self.capsule2origin.tolist(),
             "radius": self.radius,
             "height": self.height
@@ -459,7 +459,7 @@ class Ellipsoid(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "typ": "Ellipsoid",
+            "type": "Ellipsoid",
             "collider2origin": self.ellipsoid2origin.tolist(),
             "radii": self.radii.tolist()
         }
@@ -524,7 +524,7 @@ class Cylinder(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "typ": "Cylinder",
+            "type": "Cylinder",
             "collider2origin": self.cylinder2origin.tolist(),
             "radius": self.radius,
             "height": self.length
@@ -595,7 +595,7 @@ class Disk(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "typ": "Disk",
+            "type": "Disk",
             "center": self.center().tolist(),
             "radius": self.radius,
             "normal": self.normal.tolist()
@@ -663,7 +663,7 @@ class Ellipse(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "typ": "Ellipse",
+            "type": "Ellipse",
             "center": self.center().tolist(),
             "axes": self.axes.tolist(),
             "radii": self.radii.tolist()
@@ -732,7 +732,7 @@ class Cone(ConvexCollider):
 
     def to_dict(self):
         data = {
-            "typ": "Cone",
+            "type": "Cone",
             "collider2origin": self.cone2origin.around(),
             "radius": self.radius,
             "height": self.height
