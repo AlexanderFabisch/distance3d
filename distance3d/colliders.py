@@ -102,7 +102,7 @@ class ConvexCollider(abc.ABC):
         Returns
         -------
         data : dict
-            data dict
+            a dict containing the type, the pose, and all the data fields like height or size.
         """
 
     @abc.abstractmethod
