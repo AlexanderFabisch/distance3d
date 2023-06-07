@@ -205,7 +205,7 @@ class Box(ConvexHullVertices):
         data = {
             "typ": "Box",
             "collider2origin": self.box2origin.tolist(),
-            "size": self.size.tolist()
+            "vertices": self.vertices.tolist()
         }
         return data
 
@@ -332,7 +332,7 @@ class Sphere(ConvexCollider):
     def to_dict(self):
         data = {
             "typ": "Sphere",
-            "collider2origin": self.frame().tolist(),
+            "center": self.center().tolist(),
             "radius": self.radius
         }
         return data
