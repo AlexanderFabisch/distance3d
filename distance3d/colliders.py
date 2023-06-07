@@ -130,20 +130,6 @@ class ConvexHullVertices(ConvexCollider):
     def aabb(self):
         return np.array(axis_aligned_bounding_box(self.vertices)).T
 
-    def to_dict(self):
-        data = {
-            "typ": "ConvexHullVertices",
-            "center": self.center().tolist(),
-            "vertices": self.vertices.tolist()
-        }
-        return data
-
-    def round_values(self, precision):
-        self.vertices = np.round(self.vertices, precision)
-
-    def frame(self):
-        return np.eye(4)
-
 
 class Box(ConvexHullVertices):
     """Box collider.
@@ -522,7 +508,6 @@ class Ellipse(ConvexCollider):
 
     def aabb(self):
         return np.array(ellipse_aabb(self.c, self.axes, self.radii)).T
-
 
 
 class Cone(ConvexCollider):
