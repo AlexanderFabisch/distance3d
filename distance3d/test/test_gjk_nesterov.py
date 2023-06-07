@@ -28,16 +28,6 @@ def test_compare_gjk_intersection_flavours_with_random_shapes():
         intersection_nesterov = gjk.gjk_nesterov_accelerated(collider1, collider2, use_nesterov_acceleration=False)[0]
         intersection_nesterov_primitives = gjk.gjk_nesterov_accelerated_primitives(collider1, collider2, use_nesterov_acceleration=False)[0]
 
-        """
-        if intersection_nesterov != intersection_libccd:
-            fig = pv.figure()
-            collider1.make_artist((1, 0, 0))
-            collider2.make_artist((0, 1, 0))
-            collider1.artist_.add_artist(fig)
-            collider2.artist_.add_artist(fig)
-            fig.show()
-        """
-
         assert intersection_nesterov == intersection_libccd
         assert intersection_nesterov_primitives == intersection_libccd
 
