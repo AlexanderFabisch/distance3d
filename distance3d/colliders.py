@@ -154,7 +154,8 @@ class ConvexHullVertices(ConvexCollider):
         data = {
             "type": "ConvexHullVertices",
             "collider2origin": self.pose().tolist(),
-            "vertices": self.vertices.tolist()
+            "vertices": self.vertices.tolist(),
+            "vertices_len": len(self.vertices.tolist()),
         }
         return data
 
@@ -274,7 +275,9 @@ class MeshGraph(ConvexCollider):
             "type": "Mesh",
             "collider2origin": self.pose().tolist(),
             "vertices": self.vertices.tolist(),
-            "triangles": self.triangles.tolist()
+            "vertices_len": len(self.vertices.tolist()),
+            "triangles": self.triangles.tolist(),
+            "triangles_len": len(self.triangles.tolist()),
         }
         return data
 
