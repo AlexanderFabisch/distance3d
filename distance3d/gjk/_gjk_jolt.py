@@ -136,7 +136,7 @@ def _intersection_loop(
 
 
 def gjk_distance_jolt(
-        collider1, collider2, tolerance=1e-10, max_distance_squared=100000.0):
+        collider1, collider2, tolerance=1e-10, max_distance_squared=100000.0, sanity_check=1e-8):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
 
     This implementation extends the intersection test by closest point
@@ -166,6 +166,10 @@ def gjk_distance_jolt(
         The maximum squared distance between colliders before the objects are
         considered infinitely far away and processing is terminated.
 
+    sanity_check : float, optional (default: 1e-8)
+        Comparing intermediate result ( which should be close to zero )
+        to this sanity check value.
+        If sanity_check is non-zero, an assert will be triggered on mismatch.
 
     Returns
     -------
@@ -210,7 +214,9 @@ def gjk_distance_jolt(
             # Get the closest points
             a, b = calculate_closest_points(Y, P, Q, n_points)
 
-            assert abs(np.dot(search_direction, search_direction) - v_len_sq) < 1e-12
+            check_value = abs(np.dot(search_direction, search_direction) - v_len_sq)
+            assert not sanity_check or (sanity_check and check_value < sanity_check), f"Sanity check failed: {check_value}"
+            
             dist = math.sqrt(v_len_sq)
             if dist < EPSILON:
                 a = b = 0.5 * (a + b)
