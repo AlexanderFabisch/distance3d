@@ -166,9 +166,7 @@ def gjk_distance_jolt(
         considered infinitely far away and processing is terminated.
 
     sanity_check : float, optional (default: 1e-8)
-        Comparing intermediate result ( which should be close to zero )
-        to this sanity check value.
-        If sanity_check is non-zero, an assert will be triggered on mismatch.
+        Use `sanity_check=float("inf")` to bypass sanity check.
 
     Returns
     -------
@@ -214,7 +212,7 @@ def gjk_distance_jolt(
             a, b = calculate_closest_points(Y, P, Q, n_points)
 
             check_value = abs(np.dot(search_direction, search_direction) - v_len_sq)
-            assert not sanity_check or (sanity_check and check_value < sanity_check), f"Sanity check failed: {check_value}"
+            assert check_value < sanity_check, f"Sanity check failed: {check_value}"
             
             dist = math.sqrt(v_len_sq)
             if dist < EPSILON:
