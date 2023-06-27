@@ -18,7 +18,8 @@ from .utils import norm_vector, EPSILON
 from .distance import point_to_triangle
 
 
-def mpr_intersection(collider1, collider2, mpr_tolerance=0.0001):
+def mpr_intersection(collider1, collider2, mpr_tolerance=0.0001,
+                     max_iterations=100):
     """Intersection test with Minkowski Portal Refinement (MPR).
 
     Parameters
@@ -32,12 +33,15 @@ def mpr_intersection(collider1, collider2, mpr_tolerance=0.0001):
     mpr_tolerance : float
         Boundary tolerance for MPR algorithm
 
+    max_iterations : int, optional (default: 100)
+        Maximum number of iterations.
+
     Returns
     -------
     intersection : bool
         Do the two colliders intersect?
     """
-    res, portal = _discover_portal(collider1, collider2)
+    res, portal = _discover_portal(collider1, collider2, max_iterations)
     if res == PortalState.ORIGIN_OUTSIDE_PORTAL:
         return False
     elif res == PortalState.PORTAL_WAS_BUILT:
@@ -46,7 +50,8 @@ def mpr_intersection(collider1, collider2, mpr_tolerance=0.0001):
         return True
 
 
-def mpr_penetration(collider1, collider2, mpr_tolerance=0.0001, max_iterations=100):
+def mpr_penetration(collider1, collider2, mpr_tolerance=0.0001,
+                    max_iterations=100):
     """Minkowski Portal Refinement (MPR) with penetration info.
 
     The returned penetration direction and contact position form a line along
@@ -66,7 +71,7 @@ def mpr_penetration(collider1, collider2, mpr_tolerance=0.0001, max_iterations=1
         Boundary tolerance for MPR algorithm
 
     max_iterations : int, optional (default: 100)
-        Maximum number of iterations to compute penetration info.
+        Maximum number of iterations.
 
     Returns
     -------
@@ -83,7 +88,7 @@ def mpr_penetration(collider1, collider2, mpr_tolerance=0.0001, max_iterations=1
     contact_position : array, shape (3,) or None
         Contact position.
     """
-    res, portal = _discover_portal(collider1, collider2)
+    res, portal = _discover_portal(collider1, collider2, max_iterations)
     depth, penetration_direction, contact_position = None, None, None
     if res == PortalState.ORIGIN_OUTSIDE_PORTAL:
         intersection = False
@@ -112,7 +117,7 @@ class PortalState(Enum):
     ORIGIN_ON_V0V1_SEGMENT = 2
 
 
-def _discover_portal(collider1, collider2):
+def _discover_portal(collider1, collider2, max_iterations):
     """Discover initial portal.
 
     The initial portal is a tetrahedron that intersects with the ray from
@@ -134,13 +139,21 @@ def _discover_portal(collider1, collider2):
 
     search_direction = _search_direction_perpendicular_to_plane_containing_v012(
         portal.v, portal.v1, portal.v2)
+
+    it = 0
     while portal.n_points < 4:
         portal.v[3], portal.v1[3], portal.v2[3] = support_function(
             collider1, collider2, search_direction)
         if portal.v[3].dot(search_direction) < EPSILON:
             return PortalState.ORIGIN_OUTSIDE_PORTAL, portal
+
         search_direction, portal.n_points = _iterate_discover_portal(
             portal.v, portal.v1, portal.v2, search_direction, portal.n_points)
+
+        it += 1
+        if it >= max_iterations:
+            portal.n_points = 4
+            break
 
     return PortalState.PORTAL_WAS_BUILT, portal
 
