@@ -51,6 +51,9 @@ def gjk_distance_original(collider1, collider2):
     simplex : array, shape (4, 3)
         Simplex defined by 4 points of the Minkowski difference between
         vertices of the two colliders.
+
+    iterations : int
+        The amount of iterations the GJK algorithm took. (Primarily used for benchmarking)
     """
     collider1 = VertexCachedCollider(collider1)
     collider2 = VertexCachedCollider(collider2)
