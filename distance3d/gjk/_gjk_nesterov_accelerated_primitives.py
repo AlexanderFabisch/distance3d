@@ -97,8 +97,11 @@ def get_minkowski_diff(collider0, collider1):
 
     data0, type0 = get_data_from_collider(collider0)
     data1, type1 = get_data_from_collider(collider1)
-    oR1 = np.dot(collider0.frame()[:3, :3].T, collider1.frame()[:3, :3])
-    ot1 = np.dot(collider0.frame()[:3, :3].T, collider1.center() - collider0.frame()[:3, 3])
+
+    collider02origin = collider0.collider2origin()
+    collider12origin = collider1.collider2origin()
+    oR1 = np.dot(collider02origin[:3, :3].T, collider12origin[:3, :3])
+    ot1 = np.dot(collider02origin[:3, :3].T, collider1.center() - collider02origin[:3, 3])
 
     minkowski_diff = (type0, data0, type1, data1, oR1, ot1)
     return minkowski_diff

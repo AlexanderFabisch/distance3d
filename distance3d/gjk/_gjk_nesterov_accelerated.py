@@ -487,8 +487,10 @@ def project_tetra_to_origin(tetra):
 
 
 def support_function(dir, collider0, collider1):
-    oR1 = np.dot(collider0.frame()[:3, :3].T, collider1.frame()[:3, :3])
-    ot1 = np.dot(collider0.frame()[:3, :3].T, collider1.center() - collider0.frame()[:3, 3])
+    collider02origin = collider0.collider2origin()
+    collider12origin = collider1.collider2origin()
+    oR1 = np.dot(collider02origin[:3, :3].T, collider12origin[:3, :3])
+    ot1 = np.dot(collider02origin[:3, :3].T, collider1.center() - collider02origin[:3, 3])
 
     support0, found0 = select_support(dir, collider0)
 

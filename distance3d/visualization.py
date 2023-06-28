@@ -136,11 +136,8 @@ class Ellipse(pv.Artist):  # pragma: no cover
 
     Parameters
     ----------
-    center : array, shape (3,)
-        Center of ellipse.
-
-    axes : array, shape (2, 3)
-        Axes of ellipse.
+    ellipse2origin : array, shape (4,4)
+        Pose of ellipse.
 
     radii : array, shape (2,)
         Radii of ellipse.
@@ -148,12 +145,8 @@ class Ellipse(pv.Artist):  # pragma: no cover
     c : array-like, shape (3,), optional (default: None)
         Color(s)
     """
-    def __init__(self, center, axes, radii, c=None):
+    def __init__(self, ellipse2origin, radii, c=None):
         self.mesh = o3d.geometry.TriangleMesh()
-        ellipse2origin = np.eye(4)
-        ellipse2origin[:3, :2] = axes.T
-        ellipse2origin[:3, 2] = np.cross(axes[0], axes[1])
-        ellipse2origin[:3, 3] = center
         ellipse = np.array([
             np.hstack(((radii * np.array([np.cos(angle), np.sin(angle)])), (0.0,)))
             for angle in np.linspace(0, 2 * np.pi, 20)])
