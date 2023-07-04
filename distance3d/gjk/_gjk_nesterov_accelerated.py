@@ -6,7 +6,14 @@ from ..utils import norm_vector
 
 
 def gjk_nesterov_accelerated_intersection(collider1, collider2):
-    """
+    """Nesterov-accelerated GJK.
+
+    This implementation is based on the Paper
+    "Collision Detection Accelerated: An Optimization Perspective"
+    https://lmontaut.github.io/nesterov-gjk.github.io/
+    and highly inspired by the C++ implementation in of the Authors:
+    https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
+
     Parameters
     ----------
     collider1 : ConvexCollider
@@ -24,7 +31,14 @@ def gjk_nesterov_accelerated_intersection(collider1, collider2):
 
 
 def gjk_nesterov_accelerated_distance(collider1, collider2):
-    """
+    """Nesterov-accelerated GJK.
+
+    This implementation is based on the Paper
+    "Collision Detection Accelerated: An Optimization Perspective"
+    https://lmontaut.github.io/nesterov-gjk.github.io/
+    and highly inspired by the C++ implementation in of the Authors:
+    https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
+
     Parameters
     ----------
     collider1 : ConvexCollider
@@ -42,7 +56,8 @@ def gjk_nesterov_accelerated_distance(collider1, collider2):
 
 
 def gjk_nesterov_accelerated_iterations(collider1, collider2):
-    """
+    """Nesterov-accelerated GJK.
+
     Parameters
     ----------
     collider1 : ConvexCollider
@@ -59,8 +74,11 @@ def gjk_nesterov_accelerated_iterations(collider1, collider2):
     return gjk_nesterov_accelerated(collider1, collider2)[3]
 
 
-def gjk_nesterov_accelerated(collider0, collider1, max_interations=128, upper_bound=1.79769e+308, tolerance=1e-6, use_nesterov_acceleration=False):
-    """
+def gjk_nesterov_accelerated(
+        collider0, collider1, max_interations=128, upper_bound=1.79769e+308,
+        tolerance=1e-6, use_nesterov_acceleration=False):
+    """Nesterov-accelerated GJK.
+
     Parameters
     ----------
     collider0 : ConvexCollider
@@ -80,7 +98,6 @@ def gjk_nesterov_accelerated(collider0, collider1, max_interations=128, upper_bo
     simplex :
         Distance between shapes
     """
-
     # ------ Initialize Variables ------
 
     # normalize_support_direction is for soem reason only needed when both colliders are an mesh.
