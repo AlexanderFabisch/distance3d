@@ -25,7 +25,6 @@ class GjkState(Enum):
     Unknown = 2
     Clipped = 3
 
-
 def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10):
     """Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.
 
@@ -709,3 +708,88 @@ def get_closest_point_to_origin(Y, n_points, prev_v_len_sqr):
         return True, v, v_len_sq, simplex
 
     return False, None, None, None
+
+def gjk_distance_jolt_iterations(
+        collider1, collider2, tolerance=1e-10, max_distance_squared=100000.0):
+    """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
+
+    This implementation extends the intersection test by closest point
+    calculation after convergence. It is also possible to clip colliders that
+    are too far away early.
+
+    Implementation based on Jolt Physics, Copyright 2021 Jorrit Rouwe, MIT
+    license.
+
+    Based on: A Fast and Robust GJK Implementation for Collision Detection of
+    Convex Objects - Gino van den Bergen,
+    http://www.dtecta.com/papers/jgt98convex.pdf
+
+    Parameters
+    ----------
+    collider1 : ConvexCollider
+        Convex collider 1.
+
+    collider2 : ConvexCollider
+        Convex collider 2.
+
+    tolerance : float, optional (default: 1e-10)
+        Minimal distance between objects when the objects are considered to be
+        colliding.
+
+    max_distance_squared : float, optional (default: 100000)
+        The maximum squared distance between colliders before the objects are
+        considered infinitely far away and processing is terminated.
+
+
+    Returns
+    -------
+    distance : float
+        The shortest distance between two convex shapes.
+
+    closest_point1 : array, shape (3,)
+        Closest point on first convex shape.
+        If the distance is MAX_FLOAT the points are invalid.
+
+    closest_point2 : array, shape (3,)
+        Closest point on second convex shape.
+        If the distance is MAX_FLOAT the points are invalid.
+
+    simplex : array, shape (4, 3)
+        Simplex defined by 4 points of the Minkowski difference between
+        vertices of the two colliders.
+    """
+    Y = np.empty((4, 3))  # Support points on A - B
+    P = np.empty((4, 3))  # Support points on A
+    Q = np.empty((4, 3))  # Support points on B
+    n_points = 0  # Number of points in Y, P and Q that are valid
+
+    tolerance_sq = tolerance * tolerance
+
+    search_direction = np.array([1.0, 0.0, 0.0])
+    v_len_sq = np.dot(search_direction, search_direction)
+    prev_v_len_sq = MAX_FLOAT
+
+    iterations = 0
+    while True:
+        iterations += 1
+
+        # Get support points for shape A and B in search direction
+        p = collider1.support_function(search_direction)
+        q = collider2.support_function(-search_direction)
+        state, n_points, prev_v_len_sq, v_len_sq = _distance_loop(
+            p, q, Y, P, Q, n_points, tolerance_sq, prev_v_len_sq, v_len_sq,
+            search_direction, max_distance_squared)
+        if state == GjkState.Unknown:
+            continue
+        elif state == GjkState.Clipped:
+            return iterations
+        else:
+            # Get the closest points
+            a, b = calculate_closest_points(Y, P, Q, n_points)
+
+            assert abs(np.dot(search_direction, search_direction) - v_len_sq) < 1e-12
+            dist = math.sqrt(v_len_sq)
+            if dist < EPSILON:
+                a = b = 0.5 * (a + b)
+            return iterations
+
