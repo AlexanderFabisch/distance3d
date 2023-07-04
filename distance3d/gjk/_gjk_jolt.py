@@ -12,7 +12,7 @@ from enum import Enum
 
 import numba
 import numpy as np
-from ..utils import EPSILON, MAX_FLOAT, scalar_triple_product
+from ..utils import EPSILON, MAX_FLOAT, scalar_triple_product, norm_vector
 
 
 EPSILON_SQR = EPSILON * EPSILON
@@ -219,6 +219,33 @@ def gjk_distance_jolt(
             if dist < EPSILON:
                 a = b = 0.5 * (a + b)
             return dist, a, b, Y
+
+
+@numba.njit(cache=True)
+def support_function(search_direction, collider_type, center, orientation, size):
+    if collider_type == "sphere":
+        return size[0] * search_direction
+    local_search_direction = np.dot(orientation.T, search_direction)
+    if collider_type == "box":
+        local_vertex = 0.5 * np.sign(search_direction) * size
+        return center + np.dot(orientation, local_vertex)
+    if collider_type == "ellipsoid":
+        local_vertex = norm_vector(local_search_direction * size) * size
+        return center + np.dot(orientation, local_vertex)
+    if collider_type == "capsule":
+        s = math.sqrt(local_search_direction[0] * local_search_direction[0]
+                      + local_search_direction[1] * local_search_direction[1]
+                      + local_search_direction[2] * local_search_direction[2])
+        if s == 0.0:
+            local_vertex = np.array([size[0], 0, 0])
+        else:
+            local_vertex = local_search_direction * (size[0] / s)
+        if local_search_direction[2] > 0.0:
+            local_vertex[2] += 0.5 * size[1]
+        else:
+            local_vertex[2] -= 0.5 * size[1]
+
+        return center + np.dot(orientation, local_vertex)
 
 
 @numba.njit(cache=True)
