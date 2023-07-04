@@ -5,7 +5,7 @@ from ..colliders import Capsule, Sphere, Box, Cylinder, Ellipsoid
 
 
 def gjk_nesterov_accelerated_primitives_intersection(collider0, collider1):
-    """Nesterov-accelerated GJK.
+    """Intersection test with Nesterov-accelerated GJK.
 
     This implementation is based on the Paper
     "Collision Detection Accelerated: An Optimization Perspective"
@@ -33,7 +33,7 @@ def gjk_nesterov_accelerated_primitives_intersection(collider0, collider1):
 
 
 def gjk_nesterov_accelerated_primitives_distance(collider0, collider1):
-    """Nesterov-accelerated GJK.
+    """Nesterov-accelerated GJK algorithm for distance calculation.
 
     This implementation is based on the Paper
     "Collision Detection Accelerated: An Optimization Perspective"

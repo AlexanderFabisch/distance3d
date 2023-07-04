@@ -6,7 +6,7 @@ from ..utils import norm_vector
 
 
 def gjk_nesterov_accelerated_intersection(collider1, collider2):
-    """Nesterov-accelerated GJK.
+    """Intersection test with Nesterov-accelerated GJK.
 
     This implementation is based on the Paper
     "Collision Detection Accelerated: An Optimization Perspective"
@@ -31,7 +31,7 @@ def gjk_nesterov_accelerated_intersection(collider1, collider2):
 
 
 def gjk_nesterov_accelerated_distance(collider1, collider2):
-    """Nesterov-accelerated GJK.
+    """Nesterov-accelerated GJK algorithm for distance calculation.
 
     This implementation is based on the Paper
     "Collision Detection Accelerated: An Optimization Perspective"
