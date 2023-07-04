@@ -33,7 +33,7 @@ def test_gjk_intersection_vs_gjk():
         args2 = random_function(random_state)
         collider2 = Class(*args2)
 
-        dist_original, closest_point1_original, closest_point2_original, _ = gjk.gjk_distance_original(collider1, collider2)
+        dist_original, closest_point1_original, closest_point2_original, _, _ = gjk.gjk_distance_original(collider1, collider2)
         dist_jolt, closest_point1_jolt, closest_point2_jolt, _ = gjk.gjk_distance_jolt(collider1, collider2)
         gjk_intersection_original = dist_original < 1e-7
         gjk_intersection_libccd = gjk.gjk_intersection_libccd(collider1, collider2)

@@ -33,7 +33,7 @@ def test_gjk_intersection_libccd_vs_gjk_distance_original():
 
         convex2 = colliders.ConvexHullVertices(vertices2)
 
-        dist, closest_point1, closest_point2, _ = gjk.gjk_distance_original(convex1, convex2)
+        dist, closest_point1, closest_point2, _, _ = gjk.gjk_distance_original(convex1, convex2)
         gjk_intersection = dist < 10.0 * np.finfo(float).eps
         gjk_intersection2 = gjk.gjk_intersection_libccd(convex1, convex2)
         assert gjk_intersection == gjk_intersection2
