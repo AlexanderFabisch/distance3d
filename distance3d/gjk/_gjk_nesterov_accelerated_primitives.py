@@ -14,7 +14,7 @@ def gjk_nesterov_accelerated_primitives_intersection(collider0, collider1):
     https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
 
     This implemetation can only be used with the following Collider Types:
-    "Sphere", "Capsule", "Box", "Ellipsoid", "Cone" and "Cylinder".
+    "Sphere", "Capsule", "Box", "Ellipsoid" and "Cylinder".
 
     Parameters
     ----------
@@ -41,7 +41,7 @@ def gjk_nesterov_accelerated_primitives_distance(collider0, collider1):
     https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
 
     This implemetation can only be used with the following Collider Types:
-    "Sphere", "Capsule", "Box", "Ellipsoid", "Cone" and "Cylinder".
+    "Sphere", "Capsule", "Box", "Ellipsoid" and "Cylinder".
 
     Parameters
     ----------
@@ -68,7 +68,7 @@ def gjk_nesterov_accelerated_primitives_iterations(collider1, collider2):
     https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp
 
     This implemetation can only be used with the following Collider Types:
-    "Sphere", "Capsule", "Box", "Ellipsoid", "Cone" and "Cylinder".
+    "Sphere", "Capsule", "Box", "Ellipsoid" and "Cylinder".
 
     Parameters
     ----------

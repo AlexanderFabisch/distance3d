@@ -24,9 +24,6 @@ for i in range(iterations):
     collider1 = colliders.COLLIDERS[shape1](*args1)
     collider2 = colliders.COLLIDERS[shape2](*args2)
 
-    collider1.round_values(6)
-    collider2.round_values(6)
-
     original_iterations = gjk_distance_iterations(collider1, collider2)
     jolt_iterations = gjk_distance_jolt_iterations(collider1, collider2)
     nasterov_iterations = gjk_nesterov_accelerated_primitives_iterations(collider1, collider2)

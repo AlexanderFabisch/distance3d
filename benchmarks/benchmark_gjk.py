@@ -8,7 +8,7 @@ from numba import config
 iterations = 200
 shapes = []
 random_state = np.random.RandomState(84)
-shape_names = list(["sphere", "ellipsoid", "capsule", "cone", "cylinder", "box"])
+shape_names = list(["sphere", "ellipsoid", "capsule", "cylinder", "box"])
 
 for _ in range(iterations):
     shape1 = shape_names[random_state.randint(len(shape_names))]
