@@ -25,6 +25,7 @@ class GjkState(Enum):
     Unknown = 2
     Clipped = 3
 
+
 def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10):
     """Intersection test with Gilbert-Johnson-Keerthi (GJK) algorithm.
 

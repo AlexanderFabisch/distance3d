@@ -2,7 +2,6 @@ import numpy as np
 import numba
 
 from ..colliders import Capsule, Sphere, Box, Cylinder, Ellipsoid
-from ..utils import EPSILON
 
 
 def gjk_nesterov_accelerated_primitives_intersection(collider0, collider1):
@@ -131,8 +130,9 @@ def get_data_from_collider(collider):
     return np.array([h, r, 0.0]), 4
 
 
-def gjk_nesterov_accelerated_primitives(collider0, collider1, max_interations=128, upper_bound=1.79769e+308,
-                                        tolerance=1e-6, use_nesterov_acceleration=False):
+def gjk_nesterov_accelerated_primitives(
+        collider0, collider1, max_interations=128, upper_bound=1.79769e+308,
+        tolerance=1e-6, use_nesterov_acceleration=False):
     minkowski_diff = get_minkowski_diff(collider0, collider1)
 
     # Inflation is only used with spheres and capsules
@@ -148,8 +148,9 @@ def gjk_nesterov_accelerated_primitives(collider0, collider1, max_interations=12
 
 
 @numba.njit(cache=True)
-def run_gjk_nesterov_accelerated(minkowski_diff, inflation, max_interations, upper_bound, tolerance,
-                                 use_nesterov_acceleration):
+def run_gjk_nesterov_accelerated(
+        minkowski_diff, inflation, max_interations, upper_bound, tolerance,
+        use_nesterov_acceleration):
     # ------ Initialize Variables ------
 
     upper_bound += inflation
