@@ -17,7 +17,6 @@ from ..geometry import support_function
 
 
 EPSILON_SQR = EPSILON * EPSILON
-ALL_TRUE = np.array([True, True, True, True], dtype=np.dtype("bool"))
 
 
 class GjkState(IntEnum):
@@ -193,44 +192,10 @@ def gjk_distance_jolt(
     return _gjk_distance_jolt(collider1, collider2, tolerance, max_distance_squared, sanity_check)
 
 
-@numba.njit(cache=True)
-def _gjk_distance_jolt(
-        collider1, collider2, tolerance, max_distance_squared, sanity_check):
-    Y = np.empty((4, 3))  # Support points on A - B
-    P = np.empty((4, 3))  # Support points on A
-    Q = np.empty((4, 3))  # Support points on B
-    n_points = 0  # Number of points in Y, P and Q that are valid
-
-    tolerance_sq = tolerance * tolerance
-
-    search_direction = np.array([1.0, 0.0, 0.0])
-    v_len_sq = np.dot(search_direction, search_direction)
-    prev_v_len_sq = MAX_FLOAT
-
-    while True:
-        # Get support points for shape A and B in search direction
-        p = support_function(search_direction, *collider1)
-        q = support_function(-search_direction, *collider2)
-        state, n_points, prev_v_len_sq, v_len_sq = _distance_loop(
-            p, q, Y, P, Q, n_points, tolerance_sq, prev_v_len_sq, v_len_sq,
-            search_direction, max_distance_squared)
-        if state == GjkState.Unknown:
-            continue
-        elif state == GjkState.Clipped:
-            return MAX_FLOAT, None, None, None
-        else:
-            # Get the closest points
-            a, b = calculate_closest_points(Y, P, Q, n_points)
-
-            assert abs(np.dot(search_direction, search_direction) - v_len_sq) < sanity_check
-            
-            dist = math.sqrt(v_len_sq)
-            if dist < EPSILON:
-                a = b = 0.5 * (a + b)
-            return dist, a, b, Y
-
-
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64, numba.float64))(
+        numba.float64[::1], numba.float64[::1]),
+    cache=True)
 def get_barycentric_coordinates_line(a, b):
     """Barycentric coordinates of the closest point to origin for infinite line.
 
@@ -254,7 +219,10 @@ def get_barycentric_coordinates_line(a, b):
     return u, v
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64, numba.float64, numba.float64))(
+        numba.float64[::1], numba.float64[::1], numba.float64[::1]),
+    cache=True)
 def get_barycentric_coordinates_plane(a, b, c):
     """Barycentric coordinates of closest point to origin for plane.
 
@@ -314,7 +282,12 @@ def get_barycentric_coordinates_plane(a, b, c):
     return u, v, w
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64, numba.float64, numba.float64,
+                       numba.float64))(
+        numba.float64[::1], numba.float64[::1], numba.float64[::1],
+        numba.float64[::1]),
+    cache=True)
 def get_barycentric_coordinates_tetrahedron(a, b, c, d):
     """Barycentric coordinates of the closest point to origin for tetrahedron.
 
@@ -332,7 +305,11 @@ def get_barycentric_coordinates_tetrahedron(a, b, c, d):
     return va6 * v6, vb6 * v6, vc6 * v6, vd6 * v6
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.int64))(
+        numba.float64[::1], numba.float64[::1]
+    ),
+    cache=True)
 def closest_point_line(a, b):
     """Get the closest point to the origin of line.
 
@@ -354,7 +331,11 @@ def closest_point_line(a, b):
         return u * a + v * b, 0b0011
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.int64))(
+        numba.float64[::1], numba.float64[::1], numba.float64[::1]
+    ),
+    cache=True)
 def closest_point_triangle(a, b, c):
     """Get the closest point to the origin of triangle.
 
@@ -465,7 +446,10 @@ def closest_point_triangle(a, b, c):
     return n * (a + b + c).dot(n) / (3.0 * n_len_sq), 0b0111
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.bool_[::1](numba.float64[::1], numba.float64[::1],
+                     numba.float64[::1], numba.float64[::1]),
+    cache=True)
 def origin_outside_of_tetrahedron_planes(a, b, c, d):
     """Returns for each plane of the tetrahedron if the origin is inside.
 
@@ -509,10 +493,15 @@ def origin_outside_of_tetrahedron_planes(a, b, c, d):
         return signp <= EPSILON
     else:
         # Mixed signs, degenerate tetrahedron
-        return ALL_TRUE
+        return np.array([True, True, True, True], dtype=np.dtype("bool"))
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.int64))(
+        numba.float64[::1], numba.float64[::1], numba.float64[::1],
+        numba.float64[::1]
+    ),
+    cache=True)
 def closest_point_tetrahedron(a, b, c, d):
     """Get the closest point between tetrahedron to the origin.
 
@@ -573,7 +562,9 @@ def closest_point_tetrahedron(a, b, c, d):
     return closest_point, closest_set
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.float64(numba.float64[:, ::1], numba.int64),
+    cache=True)
 def max_y_length_squared(y, n_points):
     """Get max(|Y_0|^2 .. |Y_n|^2)."""
     y_len_sq = np.dot(y[0], y[0])
@@ -582,7 +573,9 @@ def max_y_length_squared(y, n_points):
     return y_len_sq
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.int64(numba.float64[:, ::1], numba.int64, numba.int64),
+    cache=True)
 def update_simplex_y(Y, n_points, simplex):
     """Remove points that are not in the set, only updates Y."""
     n_new_points = 0
@@ -593,7 +586,10 @@ def update_simplex_y(Y, n_points, simplex):
     return n_new_points
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.int64(numba.float64[:, ::1], numba.float64[:, ::1],
+                numba.float64[:, ::1], numba.int64, numba.int64),
+    cache=True)
 def update_simplex_ypq(Y, P, Q, n_points, simplex):
     """Remove points that are not in the set, updates Y, P and Q."""
     n_new_points = 0
@@ -606,7 +602,11 @@ def update_simplex_ypq(Y, P, Q, n_points, simplex):
     return n_new_points
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.float64[::1], numba.float64[::1]))(
+        numba.float64[:, ::1], numba.float64[:, ::1], numba.float64[:, ::1],
+        numba.int64),
+    cache=True)
 def calculate_closest_points(Y, P, Q, n_points):
     """Calculate the closest points on A and B."""
     if n_points == 1:
@@ -629,7 +629,12 @@ def calculate_closest_points(Y, P, Q, n_points):
     return a, b
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.types.Tuple((numba.bool_, numba.float64[::1], numba.float64,
+                       numba.int64))(
+        numba.float64[:, ::1], numba.int64, numba.float64
+    ),
+    cache=True)
 def get_closest_point_to_origin(Y, n_points, prev_v_len_sqr):
     """Get new closest point to origin given simplex Y of n_points points."""
     if n_points == 1:
@@ -650,7 +655,7 @@ def get_closest_point_to_origin(Y, n_points, prev_v_len_sqr):
     if v_len_sq < prev_v_len_sqr:
         return True, v, v_len_sq, simplex
 
-    return False, None, None, None
+    return False, v, v_len_sq, simplex
 
 def gjk_distance_jolt_iterations(
         collider1, collider2, tolerance=1e-10, max_distance_squared=100000.0):
@@ -809,3 +814,51 @@ def _distance_loop(
 
     prev_v_len_sq = v_len_sq
     return GjkState.Unknown, n_points, prev_v_len_sq, v_len_sq
+
+
+@numba.njit(
+    numba.types.Tuple((numba.float64, numba.float64[::1], numba.float64[::1],
+                       numba.float64[:, ::1]))(
+        numba.types.Tuple((
+                numba.types.string, numba.float64[::1], numba.float64[:, ::1],
+                numba.float64[::1], numba.float64)),
+        numba.types.Tuple((
+                numba.types.string, numba.float64[::1], numba.float64[:, ::1],
+                numba.float64[::1], numba.float64)),
+        numba.float64, numba.float64, numba.float64
+    ),
+    cache=True)
+def _gjk_distance_jolt(
+        collider1, collider2, tolerance, max_distance_squared, sanity_check):
+    Y = np.empty((4, 3))  # Support points on A - B
+    P = np.empty((4, 3))  # Support points on A
+    Q = np.empty((4, 3))  # Support points on B
+    n_points = 0  # Number of points in Y, P and Q that are valid
+
+    tolerance_sq = tolerance * tolerance
+
+    search_direction = np.array([1.0, 0.0, 0.0])
+    v_len_sq = np.dot(search_direction, search_direction)
+    prev_v_len_sq = MAX_FLOAT
+
+    while True:
+        # Get support points for shape A and B in search direction
+        p = support_function(search_direction, *collider1)
+        q = support_function(-search_direction, *collider2)
+        state, n_points, prev_v_len_sq, v_len_sq = _distance_loop(
+            p, q, Y, P, Q, n_points, tolerance_sq, prev_v_len_sq, v_len_sq,
+            search_direction, max_distance_squared)
+        if state == GjkState.Unknown:
+            continue
+        elif state == GjkState.Clipped:
+            return MAX_FLOAT, p, q, Y
+        else:
+            # Get the closest points
+            a, b = calculate_closest_points(Y, P, Q, n_points)
+
+            assert abs(np.dot(search_direction, search_direction) - v_len_sq) < sanity_check
+
+            dist = math.sqrt(v_len_sq)
+            if dist < EPSILON:
+                a = b = 0.5 * (a + b)
+            return dist, a, b, Y
