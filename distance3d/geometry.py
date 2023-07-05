@@ -541,3 +541,44 @@ def barycentric_coordinates_tetrahedron(p, tetrahedron_points):
     result[3] = scalar_triple_product(ap, a_to_bcd[0], a_to_bcd[1])
 
     return result / scalar_triple_product(a_to_bcd[0], a_to_bcd[1], a_to_bcd[2])
+
+
+@numba.njit(cache=True)
+def support_function(search_direction, collider_type, center, orientation, size, margin):
+    search_direction = norm_vector(search_direction)
+    if collider_type == "sphere":
+        local_vertex = (margin + size[0]) * search_direction
+        return center + np.dot(orientation, local_vertex)
+    local_search_direction = np.dot(orientation.T, search_direction)
+    if collider_type == "box":
+        local_vertex = 0.5 * np.sign(search_direction) * size
+        p = center + np.dot(orientation, local_vertex)
+        if margin > 0:
+            p += margin * search_direction
+        return p
+    if collider_type == "ellipsoid":
+        local_vertex = norm_vector(local_search_direction * size) * size
+        p = center + np.dot(orientation, local_vertex)
+        if margin > 0:
+            p += margin * search_direction
+        return p
+    if collider_type == "capsule":
+        local_vertex = local_search_direction * size[0]
+        if local_search_direction[2] > 0.0:
+            local_vertex[2] += 0.5 * size[1]
+        else:
+            local_vertex[2] -= 0.5 * size[1]
+        p = center + np.dot(orientation, local_vertex)
+        if margin > 0:
+            p += margin * search_direction
+        return p
+    if collider_type == "cylinder":
+        if local_search_direction[2] < 0.0:
+            z = -0.5 * size[1]
+        else:
+            z = 0.5 * size[1]
+        local_vertex = np.array([local_search_direction[0] * size[0], local_search_direction[1] * size[0], z])
+        p = center + np.dot(orientation, local_vertex)
+        if margin > 0:
+            p += margin * search_direction
+        return p

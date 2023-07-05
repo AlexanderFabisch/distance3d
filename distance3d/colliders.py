@@ -183,6 +183,14 @@ class Box(ConvexHullVertices):
     def collider2origin(self):
         return self.box2origin
 
+    def internal_data(self):
+        collider_type = "box"
+        center = np.copy(self.box2origin[:3, 3])
+        orientation = np.copy(self.box2origin[:3, :3])
+        size = self.size
+        margin = 0.0
+        return collider_type, center, orientation, size, margin
+
 
 class MeshGraph(ConvexCollider):
     """Mesh collider that uses triangles for hill climbing.
@@ -286,6 +294,14 @@ class Sphere(ConvexCollider):
         sphere2origin[:3, 3] = self.c
         return sphere2origin
 
+    def internal_data(self):
+        collider_type = "sphere"
+        center = np.copy(self.c)
+        orientation = np.eye(3)
+        size = np.array([self.radius, 0, 0])
+        margin = 0.0
+        return collider_type, center, orientation, size, margin
+
 
 class Capsule(ConvexCollider):
     """Capsule collider.
@@ -339,6 +355,14 @@ class Capsule(ConvexCollider):
     def collider2origin(self):
         return self.capsule2origin
 
+    def internal_data(self):
+        collider_type = "capsule"
+        center = np.copy(self.capsule2origin[:3, 3])
+        orientation = np.copy(self.capsule2origin[:3, :3])
+        size = np.array([self.radius, self.height, 0])
+        margin = 0.0
+        return collider_type, center, orientation, size, margin
+
 
 class Ellipsoid(ConvexCollider):
     """Ellipsoid collider.
@@ -385,6 +409,14 @@ class Ellipsoid(ConvexCollider):
 
     def collider2origin(self):
         return self.ellipsoid2origin
+
+    def internal_data(self):
+        collider_type = "ellipsoid"
+        center = np.copy(self.ellipsoid2origin[:3, 3])
+        orientation = np.copy(self.ellipsoid2origin[:3, :3])
+        size = self.radii
+        margin = 0.0
+        return collider_type, center, orientation, size, margin
 
 
 class Cylinder(ConvexCollider):
@@ -438,6 +470,14 @@ class Cylinder(ConvexCollider):
 
     def collider2origin(self):
         return self.cylinder2origin
+
+    def internal_data(self):
+        collider_type = "cylinder"
+        center = np.copy(self.cylinder2origin[:3, 3])
+        orientation = np.copy(self.cylinder2origin[:3, :3])
+        size = np.array([self.radius, self.length, 0])
+        margin = 0.0
+        return collider_type, center, orientation, size, margin
 
 
 class Disk(ConvexCollider):
@@ -644,6 +684,11 @@ class Margin(ConvexCollider):
 
     def collider2origin(self):
         return self.collider.collider2origin()
+
+    def internal_data(self):
+        collider_type, center, orientation, size, margin = self.collider.internal_data()
+        margin += self.margin
+        return collider_type, center, orientation, size, margin
 
 
 COLLIDERS = {
