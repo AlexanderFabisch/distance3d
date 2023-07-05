@@ -30,7 +30,9 @@ def norm_vector(v):
     return v / norm
 
 
-@numba.njit(cache=True)
+@numba.njit(
+    numba.float64(numba.float64[::1], numba.float64[::1], numba.float64[::1]),
+    cache=True)
 def scalar_triple_product(a, b, c):
     r"""Scalar triple product: :math:`a \cdot (b \cross c)`.
 

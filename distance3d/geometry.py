@@ -552,7 +552,7 @@ def support_function(search_direction, collider_type, center, orientation, size,
     dir_length = math.sqrt(search_direction[0] * search_direction[0]
                            + search_direction[1] * search_direction[1]
                            + search_direction[2] * search_direction[2])
-    if dir_length != 0.0:
+    if dir_length != 0.0:  # normalization is necessary for accurate results
         search_direction = search_direction / dir_length
 
     if collider_type == "sphere":
@@ -560,7 +560,7 @@ def support_function(search_direction, collider_type, center, orientation, size,
 
     local_search_direction = np.dot(orientation.T, search_direction)
 
-    if collider_type == "box":  # seems to give slightly incorrect results
+    if collider_type == "box":
         local_vertex = np.sign(local_search_direction) * 0.5 * size
     elif collider_type == "ellipsoid":
         local_vertex = norm_vector(local_search_direction * size) * size
