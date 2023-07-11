@@ -36,7 +36,6 @@ def test_aabb_tree_creation():
     assert overlaps[0] == 2
 
 
-
 def test_aabb_tree_overlap_with_other_aabb_tree():
     aabbs, aabbs2 = create_test_aabbs()
 
@@ -85,6 +84,39 @@ def test_compare_aabb_tree_to_brute_force():
     assert (np.sort(np.unique(broad_pairs1)) == np.sort(np.unique(broad_pairs2))).all()
 
 
+def test_aabb_tree_overlap():
+    aabb1 = np.array([[0, 10], [0, 10], [0, 10]], dtype=np.float64)
+    aabb2 = np.array([[8, 12], [3, 4], [4, 5]], dtype=np.float64)
+    aabb3 = np.array([[20, 30], [0, 1], [0, 2]], dtype=np.float64)
+    aabb4 = np.array([[-50, 50], [-50, 50], [-50, 50]], dtype=np.float64)
 
+    aabb_tree = AabbTree()
+    aabb_tree.insert_aabb(aabb1, 1)
+    aabb_tree.insert_aabb(aabb2, 2)
+    aabb_tree.insert_aabb(aabb3, 3)
 
+    overlap_flag_1, overlaps_1 = aabb_tree.overlaps_aabb(aabb1)
+    external_data = []
+    insert_data = []
+    for overlap in overlaps_1:
+        external_data.append(aabb_tree.external_data_list[overlap])
+        insert_data.append(aabb_tree.insert_index_list[overlap])
+    assert overlap_flag_1
+    assert 1 in external_data
+    assert 2 in external_data
+    assert 0 in insert_data
+    assert 1 in insert_data
 
+    overlap_flag_4, overlaps_4 = aabb_tree.overlaps_aabb(aabb4)
+    external_data = []
+    insert_data = []
+    for overlap in overlaps_4:
+        external_data.append(aabb_tree.external_data_list[overlap])
+        insert_data.append(aabb_tree.insert_index_list[overlap])
+    assert overlap_flag_4
+    assert 1 in external_data
+    assert 2 in external_data
+    assert 3 in external_data
+    assert 0 in insert_data
+    assert 1 in insert_data
+    assert 2 in insert_data
