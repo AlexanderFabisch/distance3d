@@ -254,8 +254,10 @@ def test_tetrahedral_mesh_volumes():
 
 
 def test_youngs_modulus():
-    rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.5, 0, 0]), 0.15, 2)
-    rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(np.array([0.5, 0.12, 0]), 0.15, 2)
+    rigid_body1 = hydroelastic_contact.RigidBody.make_sphere(
+        np.array([0.5, 0, 0]), 0.15, 1)
+    rigid_body2 = hydroelastic_contact.RigidBody.make_sphere(
+        np.array([0.5, 0.12, 0]), 0.15, 1)
 
     # Setting the young's modulus to 1 should be the same as not setting the young's modulus.
 

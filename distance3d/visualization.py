@@ -136,11 +136,8 @@ class Ellipse(pv.Artist):  # pragma: no cover
 
     Parameters
     ----------
-    center : array, shape (3,)
-        Center of ellipse.
-
-    axes : array, shape (2, 3)
-        Axes of ellipse.
+    ellipse2origin : array, shape (4,4)
+        Pose of ellipse.
 
     radii : array, shape (2,)
         Radii of ellipse.
@@ -148,12 +145,8 @@ class Ellipse(pv.Artist):  # pragma: no cover
     c : array-like, shape (3,), optional (default: None)
         Color(s)
     """
-    def __init__(self, center, axes, radii, c=None):
+    def __init__(self, ellipse2origin, radii, c=None):
         self.mesh = o3d.geometry.TriangleMesh()
-        ellipse2origin = np.eye(4)
-        ellipse2origin[:3, :2] = axes.T
-        ellipse2origin[:3, 2] = np.cross(axes[0], axes[1])
-        ellipse2origin[:3, 3] = center
         ellipse = np.array([
             np.hstack(((radii * np.array([np.cos(angle), np.sin(angle)])), (0.0,)))
             for angle in np.linspace(0, 2 * np.pi, 20)])
@@ -290,12 +283,15 @@ class RigidBodyTetrahedralMesh(pv.Artist):  # pragma: no cover
 
     tetrahedra : array, shape (n_tetrahedra, 4)
         Indices of vertices that form tetrahedra of the mesh.
-    """
-    def __init__(self, body2origin, vertices, tetrahedra):
-        self.mesh = o3d.geometry.TetraMesh()
-        self.set_data(body2origin, vertices, tetrahedra)
 
-    def set_data(self, body2origin, vertices, tetrahedra):
+    c : array-like, shape (3,), optional (default: None)
+        Color(s)
+    """
+    def __init__(self, body2origin, vertices, tetrahedra, c=None):
+        self.mesh = o3d.geometry.TetraMesh()
+        self.set_data(body2origin, vertices, tetrahedra, c)
+
+    def set_data(self, body2origin, vertices, tetrahedra, c=None):
         """Update rigid body.
 
         Parameters
@@ -308,10 +304,15 @@ class RigidBodyTetrahedralMesh(pv.Artist):  # pragma: no cover
 
         tetrahedra : array, shape (n_tetrahedra, 4)
             Indices of vertices that form tetrahedra of the mesh.
+
+        c : array-like, shape (3,), optional (default: None)
+            Color(s)
         """
         self.mesh.vertices = o3d.utility.Vector3dVector(vertices)
         self.mesh.tetras = o3d.utility.Vector4iVector(tetrahedra)
         self.mesh.transform(body2origin)
+        if c is not None:
+            self.mesh.paint_uniform_color(c)
 
     @property
     def geometries(self):
@@ -323,3 +324,31 @@ class RigidBodyTetrahedralMesh(pv.Artist):  # pragma: no cover
             List of geometries that can be added to the visualizer.
         """
         return [self.mesh]
+
+
+class ColoredVertices(pv.Artist):  # pragma: no cover
+    """Vertices of a mesh without connections with color information.
+
+    Parameters
+    ----------
+    vertices : array, shape (n_vertices, 3)
+        Vertices of the mesh.
+
+    colors : array-like, shape (n_vertices, 3)
+        Colors
+    """
+    def __init__(self, vertices, colors):
+        self.vertices = o3d.geometry.PointCloud(
+            o3d.utility.Vector3dVector(vertices))
+        self.vertices.colors = o3d.utility.Vector3dVector(colors)
+
+    @property
+    def geometries(self):
+        """Expose geometries.
+
+        Returns
+        -------
+        geometries : list
+            List of geometries that can be added to the visualizer.
+        """
+        return [self.vertices]

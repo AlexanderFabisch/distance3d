@@ -95,6 +95,16 @@ class ConvexCollider(abc.ABC):
             Axis-aligned bounding box.
         """
 
+    @abc.abstractmethod
+    def collider2origin(self):
+        """Get the transformation matrix of the collider
+
+            Returns
+            -------
+             collider2origin : array, shape (4, 4)
+                Pose of the collider.
+            """
+
 
 class ConvexHullVertices(ConvexCollider):
     """Convex hull of a set of vertices.
@@ -129,6 +139,9 @@ class ConvexHullVertices(ConvexCollider):
 
     def aabb(self):
         return np.array(axis_aligned_bounding_box(self.vertices)).T
+
+    def collider2origin(self):
+        return np.eye(4)
 
 
 class Box(ConvexHullVertices):
@@ -166,6 +179,9 @@ class Box(ConvexHullVertices):
 
     def aabb(self):
         return np.array(box_aabb(self.box2origin, self.size)).T
+
+    def collider2origin(self):
+        return self.box2origin
 
 
 class MeshGraph(ConvexCollider):
@@ -220,6 +236,9 @@ class MeshGraph(ConvexCollider):
             self.mesh2origin[np.newaxis, :3, 3] + np.dot(
                 self.vertices, self.mesh2origin[:3, :3].T))).T
 
+    def collider2origin(self):
+        return self.mesh2origin
+
 
 class Sphere(ConvexCollider):
     """Sphere collider.
@@ -242,9 +261,7 @@ class Sphere(ConvexCollider):
 
     def make_artist(self, c=None):
         import pytransform3d.visualizer as pv
-        sphere2origin = np.eye(4)
-        sphere2origin[:3, 3] = self.c
-        self.artist_ = pv.Sphere(radius=self.radius, A2B=sphere2origin, c=c)
+        self.artist_ = pv.Sphere(radius=self.radius, A2B=self.collider2origin(), c=c)
 
     def center(self):
         return self.c
@@ -263,6 +280,11 @@ class Sphere(ConvexCollider):
 
     def aabb(self):
         return np.array(sphere_aabb(self.c, self.radius)).T
+
+    def collider2origin(self):
+        sphere2origin = np.eye(4)
+        sphere2origin[:3, 3] = self.c
+        return sphere2origin
 
 
 class Capsule(ConvexCollider):
@@ -314,6 +336,9 @@ class Capsule(ConvexCollider):
         return np.array(capsule_aabb(
             self.capsule2origin, self.radius, self.height)).T
 
+    def collider2origin(self):
+        return self.capsule2origin
+
 
 class Ellipsoid(ConvexCollider):
     """Ellipsoid collider.
@@ -357,6 +382,9 @@ class Ellipsoid(ConvexCollider):
 
     def aabb(self):
         return np.array(ellipsoid_aabb(self.ellipsoid2origin, self.radii)).T
+
+    def collider2origin(self):
+        return self.ellipsoid2origin
 
 
 class Cylinder(ConvexCollider):
@@ -408,6 +436,9 @@ class Cylinder(ConvexCollider):
         return np.array(cylinder_aabb(
             self.cylinder2origin, self.radius, self.length)).T
 
+    def collider2origin(self):
+        return self.cylinder2origin
+
 
 class Disk(ConvexCollider):
     """Disk collider.
@@ -434,12 +465,8 @@ class Disk(ConvexCollider):
 
     def make_artist(self, c=None):
         import pytransform3d.visualizer as pv
-        x, y = plane_basis_from_normal(self.normal)
-        disk2origin = np.eye(4)
-        disk2origin[:3, :3] = np.column_stack((x, y, self.normal))
-        disk2origin[:3, 3] = self.c
         self.artist_ = pv.Cylinder(
-            A2B=disk2origin, radius=self.radius, length=0.01 * self.radius,
+            A2B=self.collider2origin(), radius=self.radius, length=0.01 * self.radius,
             c=c)
 
     def center(self):
@@ -461,6 +488,13 @@ class Disk(ConvexCollider):
 
     def aabb(self):
         return np.array(disk_aabb(self.c, self.radius, self.normal)).T
+
+    def collider2origin(self):
+        x, y = plane_basis_from_normal(self.normal)
+        disk2origin = np.eye(4)
+        disk2origin[:3, :3] = np.column_stack((x, y, self.normal))
+        disk2origin[:3, 3] = self.c
+        return disk2origin
 
 
 class Ellipse(ConvexCollider):
@@ -488,7 +522,7 @@ class Ellipse(ConvexCollider):
 
     def make_artist(self, c=None):
         from .visualization import Ellipse
-        self.artist_ = Ellipse(self.c, self.axes, self.radii, c=c)
+        self.artist_ = Ellipse(self.collider2origin(), self.radii, c=c)
 
     def center(self):
         return self.c
@@ -508,6 +542,13 @@ class Ellipse(ConvexCollider):
 
     def aabb(self):
         return np.array(ellipse_aabb(self.c, self.axes, self.radii)).T
+
+    def collider2origin(self):
+        ellipse2origin = np.eye(4)
+        ellipse2origin[:3, :2] = self.axes.T
+        ellipse2origin[:3, 2] = np.cross(self.axes[0], self.axes[1])
+        ellipse2origin[:3, 3] = self.c
+        return ellipse2origin
 
 
 class Cone(ConvexCollider):
@@ -558,6 +599,9 @@ class Cone(ConvexCollider):
     def aabb(self):
         return np.array(cone_aabb(self.cone2origin, self.radius, self.height)).T
 
+    def collider2origin(self):
+        return self.cone2origin
+
 
 class Margin(ConvexCollider):
     """Margin around collider.
@@ -597,6 +641,9 @@ class Margin(ConvexCollider):
         mins = aabb[:, 0] - self.margin
         maxs = aabb[:, 1] + self.margin
         return np.array([mins, maxs]).T
+
+    def collider2origin(self):
+        return self.collider.collider2origin()
 
 
 COLLIDERS = {

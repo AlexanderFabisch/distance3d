@@ -6,3 +6,5 @@ _auto_examples/
 _autosummary/
 .idea/
 .coverage
+
+*.pclprof

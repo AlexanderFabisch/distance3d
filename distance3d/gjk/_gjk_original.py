@@ -5,6 +5,10 @@ import numpy as np
 EPSILON = 10.0 * np.finfo(float).eps
 
 
+def gjk_distance_iterations(collider1, collider2):
+    return gjk_distance_original(collider1, collider2)[4]
+
+
 def gjk_distance_original(collider1, collider2):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
 
@@ -47,6 +51,9 @@ def gjk_distance_original(collider1, collider2):
     simplex : array, shape (4, 3)
         Simplex defined by 4 points of the Minkowski difference between
         vertices of the two colliders.
+
+    iterations : int
+        The amount of iterations the GJK algorithm took. (Primarily used for benchmarking)
     """
     collider1 = VertexCachedCollider(collider1)
     collider2 = VertexCachedCollider(collider2)
@@ -86,7 +93,7 @@ def gjk_distance_original(collider1, collider2):
                 else:
                     distance = new_solution.distance
 
-                return distance, closest_point1, closest_point2, simplex.points
+                return distance, closest_point1, closest_point2, simplex.points, iteration
             else:
                 backup = True
                 if iteration != 1:

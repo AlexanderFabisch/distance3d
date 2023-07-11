@@ -4,6 +4,7 @@ Physical simulation with collision detection
 ============================================
 """
 print(__doc__)
+
 import numpy as np
 import pytransform3d.transformations as pt
 import pytransform3d.visualizer as pv

@@ -4,6 +4,7 @@ Closest Points with GJK
 =======================
 """
 print(__doc__)
+
 import time
 import numpy as np
 import pytransform3d.visualizer as pv
@@ -24,7 +25,7 @@ class AnimationCallback:
 
         angle = np.pi * np.cos(2.0 * np.pi * (step / self.n_frames))
         obj2world = pt.transform_from(
-            R=pr.matrix_from_angle(1, angle), p=np.zeros(3))
+            R=pr.active_matrix_from_angle(1, angle), p=np.zeros(3))
         obj.update_pose(obj2world)
 
         total_time = 0.0
