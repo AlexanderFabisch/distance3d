@@ -60,6 +60,13 @@ def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10):
     intersection : bool
         Do the two colliders intersect?
     """
+    collider1 = collider1.internal_data()
+    collider2 = collider2.internal_data()
+    return _gjk_intersection_jolt(collider1, collider2, tolerance)
+
+
+@numba.njit(cache=True)
+def _gjk_intersection_jolt(collider1, collider2, tolerance):
     Y = np.empty((4, 3))  # Support points on A - B
     n_points = 0  # Number of points in Y that are valid
 
@@ -70,8 +77,8 @@ def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10):
 
     while True:
         # Get support points for shape A and B in search direction
-        p = collider1.support_function(search_direction)
-        q = collider2.support_function(-search_direction)
+        p = support_function(search_direction, *collider1)
+        q = support_function(-search_direction, *collider2)
         state, n_points, prev_v_len_sq = _intersection_loop(
             p, q, Y, n_points, tolerance_sq, prev_v_len_sq, search_direction)
         if state == GjkState.Unknown:
@@ -658,6 +665,7 @@ def get_closest_point_to_origin(Y, n_points, prev_v_len_sqr):
     return False, v, v_len_sq, simplex
 
 
+# TODO refactor
 def gjk_distance_jolt_iterations(
         collider1, collider2, tolerance=1e-10, max_distance_squared=100000.0):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
