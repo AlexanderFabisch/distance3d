@@ -187,7 +187,7 @@ class Box(ConvexHullVertices):
         collider_type = Geometry.Box
         center = np.copy(self.box2origin[:3, 3])
         orientation = np.copy(self.box2origin[:3, :3])
-        size = self.size
+        size = 0.5 * self.size
         margin = 0.0
         return collider_type, center, orientation, size, margin
 

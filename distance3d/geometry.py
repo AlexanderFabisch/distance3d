@@ -570,7 +570,7 @@ def support_function(search_direction, collider_type, center, orientation, size,
     local_search_direction = np.dot(orientation.T, search_direction)
 
     if collider_type == Geometry.Box:
-        local_vertex = np.sign(local_search_direction) * 0.5 * size
+        local_vertex = np.sign(local_search_direction) * size
     elif collider_type == Geometry.Ellipsoid:
         local_vertex = norm_vector(local_search_direction * size) * size
     elif collider_type == Geometry.Capsule:
