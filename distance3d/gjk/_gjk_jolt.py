@@ -750,80 +750,6 @@ def gjk_distance_jolt_iterations(
 
 
 @numba.njit(
-    numba.types.Tuple((numba.int64, numba.int64, numba.float64, numba.float64))(
-        numba.float64[::1], numba.float64[::1], numba.float64[:, ::1],
-        numba.float64[:, ::1], numba.float64[:, ::1], numba.int64,
-        numba.float64, numba.float64, numba.float64, numba.float64[::1],
-        numba.float64
-    ),
-    cache=True)
-def _distance_loop(
-        p, q, Y, P, Q, n_points, tolerance_sq, prev_v_len_sq, v_len_sq,
-        search_direction, max_distance_squared):
-    # Get support point of the minkowski sum A - B of v
-    support_point = p - q
-
-    dot = search_direction.dot(support_point)
-
-    # Test if we have a separation of more than max_distance_squared,
-    # in which case we terminate early
-    if dot < 0.0 and dot * dot > v_len_sq * max_distance_squared:
-        return GjkState.Clipped, 0, MAX_FLOAT, MAX_FLOAT
-
-    # Store the point for later use
-    Y[n_points] = support_point
-    P[n_points] = p
-    Q[n_points] = q
-    n_points += 1
-
-    success, ioV_new, v_len_sq_new, new_set = get_closest_point_to_origin(
-        Y, n_points, prev_v_len_sq)
-    if success:
-        search_direction[:], v_len_sq, simplex = ioV_new, v_len_sq_new, new_set
-    else:
-        n_points -= 1  # Undo add last point
-        simplex = 0b0000
-        for i in range(n_points):
-            simplex |= 1 << i
-
-    # If there are 4 points, the origin is inside the tetrahedron,
-    # and we're done
-    if simplex == 0xf:
-        v_len_sq = 0.0
-        return GjkState.Intersection, n_points, prev_v_len_sq, v_len_sq
-
-    # Update the points of the simplex
-    n_points = update_simplex_ypq(Y, P, Q, n_points, simplex)
-
-    # If v is very close to zero, we consider this a collision
-    if v_len_sq <= tolerance_sq:
-        v_len_sq = 0.0
-        return GjkState.Intersection, n_points, prev_v_len_sq, v_len_sq
-
-    # If v is very small compared to the length of y, we also consider
-    # this a collision
-    if v_len_sq <= EPSILON * max_y_length_squared(Y, n_points):
-        v_len_sq = 0.0
-        return GjkState.Intersection, n_points, prev_v_len_sq, v_len_sq
-
-    # The next separation axis to test is the negative of the closest point of
-    # the Minkowski sum to the origin
-    # Note: This must be done before terminating as converged since the
-    # separating axis is -v
-    search_direction *= -1.0
-
-    # If the squared length of v is not changing enough, we've converged and
-    # there is no collision
-    assert prev_v_len_sq >= v_len_sq
-    if prev_v_len_sq - v_len_sq <= EPSILON * prev_v_len_sq:
-        # search_direction is a separating axis
-        return GjkState.NoIntersection, n_points, prev_v_len_sq, v_len_sq
-
-    prev_v_len_sq = v_len_sq
-    return GjkState.Unknown, n_points, prev_v_len_sq, v_len_sq
-
-
-@numba.njit(
     numba.types.Tuple((numba.float64, numba.float64[::1], numba.float64[::1],
                        numba.float64[:, ::1]))(
         numba.types.Tuple((
@@ -852,20 +778,74 @@ def _gjk_distance_jolt(
         # Get support points for shape A and B in search direction
         p = support_function(search_direction, *collider1)
         q = support_function(-search_direction, *collider2)
-        state, n_points, prev_v_len_sq, v_len_sq = _distance_loop(
-            p, q, Y, P, Q, n_points, tolerance_sq, prev_v_len_sq, v_len_sq,
-            search_direction, max_distance_squared)
-        if state == GjkState.Unknown:
-            continue
-        elif state == GjkState.Clipped:
+
+        # Get support point of the minkowski sum A - B of v
+        support_point = p - q
+
+        dot = search_direction.dot(support_point)
+
+        # Test if we have a separation of more than max_distance_squared,
+        # in which case we terminate early
+        if dot < 0.0 and dot * dot > v_len_sq * max_distance_squared:
             return MAX_FLOAT, p, q, Y
+
+        # Store the point for later use
+        Y[n_points] = support_point
+        P[n_points] = p
+        Q[n_points] = q
+        n_points += 1
+
+        success, ioV_new, v_len_sq_new, new_set = get_closest_point_to_origin(
+            Y, n_points, prev_v_len_sq)
+        if success:
+            search_direction[:], v_len_sq, simplex = ioV_new, v_len_sq_new, new_set
         else:
-            # Get the closest points
-            a, b = calculate_closest_points(Y, P, Q, n_points)
+            n_points -= 1  # Undo add last point
+            simplex = 0b0000
+            for i in range(n_points):
+                simplex |= 1 << i
 
-            assert abs(np.dot(search_direction, search_direction) - v_len_sq) < sanity_check
+        # If there are 4 points, the origin is inside the tetrahedron,
+        # and we're done
+        if simplex == 0xf:
+            v_len_sq = 0.0
+            break
 
-            dist = math.sqrt(v_len_sq)
-            if dist < EPSILON:
-                a = b = 0.5 * (a + b)
-            return dist, a, b, Y
+        # Update the points of the simplex
+        n_points = update_simplex_ypq(Y, P, Q, n_points, simplex)
+
+        # If v is very close to zero, we consider this a collision
+        if v_len_sq <= tolerance_sq:
+            v_len_sq = 0.0
+            break
+
+        # If v is very small compared to the length of y, we also consider
+        # this a collision
+        if v_len_sq <= EPSILON * max_y_length_squared(Y, n_points):
+            v_len_sq = 0.0
+            break
+
+        # The next separation axis to test is the negative of the closest point of
+        # the Minkowski sum to the origin
+        # Note: This must be done before terminating as converged since the
+        # separating axis is -v
+        search_direction *= -1.0
+
+        # If the squared length of v is not changing enough, we've converged and
+        # there is no collision
+        assert prev_v_len_sq >= v_len_sq
+        if prev_v_len_sq - v_len_sq <= EPSILON * prev_v_len_sq:
+            # search_direction is a separating axis
+            break
+
+        prev_v_len_sq = v_len_sq
+
+    # Get the closest points
+    a, b = calculate_closest_points(Y, P, Q, n_points)
+
+    assert abs(np.dot(search_direction, search_direction) - v_len_sq) < sanity_check
+
+    dist = math.sqrt(v_len_sq)
+    if dist < EPSILON:
+        a = b = 0.5 * (a + b)
+    return dist, a, b, Y
