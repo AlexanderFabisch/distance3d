@@ -657,6 +657,7 @@ def get_closest_point_to_origin(Y, n_points, prev_v_len_sqr):
 
     return False, v, v_len_sq, simplex
 
+
 def gjk_distance_jolt_iterations(
         collider1, collider2, tolerance=1e-10, max_distance_squared=100000.0):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.

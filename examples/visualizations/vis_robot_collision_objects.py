@@ -37,11 +37,11 @@ class AnimationCallback:
         in_aabb = {frame: False for frame in robot_bvh.get_collider_frames()}
 
         if self.collision_detection_algorithm == "gjk":
-            detect_collision = lambda x, y: gjk.gjk(x, y)[0] < 1e-6
+            detect_collision = lambda x, y: gjk.gjk_distance_jolt(x, y)[0] < 1e-6
         elif self.collision_detection_algorithm == "mpr":
             detect_collision = mpr.mpr_intersection
         elif self.collision_detection_algorithm == "gjk_intersection":
-            detect_collision = gjk.gjk_nesterov_accelerated_intersection
+            detect_collision = gjk.gjk_intersection_jolt
         else:
             raise ValueError(
                 f"Unknown collision detection algorithm "
@@ -158,7 +158,7 @@ fig.set_zoom(1.5)
 n_frames = 100
 animation_callback = AnimationCallback(
     with_aabb_tree=True,
-    collision_detection_algorithm="gjk",  # mpr, gjk, or gjk_intersection
+    collision_detection_algorithm="gjk_intersection",  # mpr, gjk, or gjk_intersection
     n_frames=n_frames, verbose=0)
 if "__file__" in globals():
     fig.animate(animation_callback, n_frames, loop=True,
