@@ -41,7 +41,7 @@ class AnimationCallback:
         elif self.collision_detection_algorithm == "mpr":
             detect_collision = mpr.mpr_intersection
         elif self.collision_detection_algorithm == "gjk_intersection":
-            detect_collision = gjk.gjk_nesterov_accelerated_intersection
+            detect_collision = gjk.gjk_intersection
         else:
             raise ValueError(
                 f"Unknown collision detection algorithm "
