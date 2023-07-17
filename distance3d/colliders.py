@@ -6,7 +6,7 @@ from .geometry import (
     support_function_capsule, support_function_cylinder,
     convert_box_to_vertices, support_function_ellipsoid,
     support_function_sphere, support_function_cone, support_function_disk,
-    support_function_ellipse)
+    support_function_ellipse, Geometry)
 from .containment import (
     axis_aligned_bounding_box, sphere_aabb, box_aabb, cylinder_aabb,
     capsule_aabb, ellipsoid_aabb, cone_aabb, disk_aabb, ellipse_aabb)
@@ -184,7 +184,7 @@ class Box(ConvexHullVertices):
         return self.box2origin
 
     def internal_data(self):
-        collider_type = "box"
+        collider_type = Geometry.Box
         center = np.copy(self.box2origin[:3, 3])
         orientation = np.copy(self.box2origin[:3, :3])
         size = self.size
@@ -295,7 +295,7 @@ class Sphere(ConvexCollider):
         return sphere2origin
 
     def internal_data(self):
-        collider_type = "sphere"
+        collider_type = Geometry.Sphere
         center = np.copy(self.c)
         orientation = np.eye(3)
         size = np.array([self.radius, 0, 0])
@@ -356,7 +356,7 @@ class Capsule(ConvexCollider):
         return self.capsule2origin
 
     def internal_data(self):
-        collider_type = "capsule"
+        collider_type = Geometry.Capsule
         center = np.copy(self.capsule2origin[:3, 3])
         orientation = np.copy(self.capsule2origin[:3, :3])
         size = np.array([self.radius, self.height, 0])
@@ -411,7 +411,7 @@ class Ellipsoid(ConvexCollider):
         return self.ellipsoid2origin
 
     def internal_data(self):
-        collider_type = "ellipsoid"
+        collider_type = Geometry.Ellipsoid
         center = np.copy(self.ellipsoid2origin[:3, 3])
         orientation = np.copy(self.ellipsoid2origin[:3, :3])
         size = self.radii
@@ -472,7 +472,7 @@ class Cylinder(ConvexCollider):
         return self.cylinder2origin
 
     def internal_data(self):
-        collider_type = "cylinder"
+        collider_type = Geometry.Cylinder
         center = np.copy(self.cylinder2origin[:3, 3])
         orientation = np.copy(self.cylinder2origin[:3, :3])
         size = np.array([self.radius, self.length, 0])

@@ -821,10 +821,10 @@ def _distance_loop(
     numba.types.Tuple((numba.float64, numba.float64[::1], numba.float64[::1],
                        numba.float64[:, ::1]))(
         numba.types.Tuple((
-                numba.types.string, numba.float64[::1], numba.float64[:, ::1],
+                numba.types.int64, numba.float64[::1], numba.float64[:, ::1],
                 numba.float64[::1], numba.float64)),
         numba.types.Tuple((
-                numba.types.string, numba.float64[::1], numba.float64[:, ::1],
+                numba.types.int64, numba.float64[::1], numba.float64[:, ::1],
                 numba.float64[::1], numba.float64)),
         numba.float64, numba.float64, numba.float64
     ),

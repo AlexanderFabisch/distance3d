@@ -1,5 +1,6 @@
 """Tools for geometric computations."""
 import math
+from enum import IntEnum
 from itertools import product
 import numba
 import numpy as np
@@ -543,8 +544,16 @@ def barycentric_coordinates_tetrahedron(p, tetrahedron_points):
     return result / scalar_triple_product(a_to_bcd[0], a_to_bcd[1], a_to_bcd[2])
 
 
+class Geometry(IntEnum):
+    Sphere = 0
+    Box = 1
+    Ellipsoid = 2
+    Capsule = 3
+    Cylinder = 4
+
+
 @numba.njit(
-    numba.float64[::1](numba.float64[::1], numba.types.string,
+    numba.float64[::1](numba.float64[::1], numba.types.int64,
                        numba.float64[::1], numba.float64[:, ::1],
                        numba.float64[::1], numba.float64),
     cache=True)
@@ -555,22 +564,22 @@ def support_function(search_direction, collider_type, center, orientation, size,
     if dir_length != 0.0:  # normalization is necessary for accurate results
         search_direction = search_direction / dir_length
 
-    if collider_type == "sphere":
+    if collider_type == Geometry.Sphere:
         return center + (margin + size[0]) * search_direction
 
     local_search_direction = np.dot(orientation.T, search_direction)
 
-    if collider_type == "box":
+    if collider_type == Geometry.Box:
         local_vertex = np.sign(local_search_direction) * 0.5 * size
-    elif collider_type == "ellipsoid":
+    elif collider_type == Geometry.Ellipsoid:
         local_vertex = norm_vector(local_search_direction * size) * size
-    elif collider_type == "capsule":
+    elif collider_type == Geometry.Capsule:
         local_vertex = local_search_direction * size[0]
         if local_search_direction[2] > 0.0:
             local_vertex[2] += 0.5 * size[1]
         else:
             local_vertex[2] -= 0.5 * size[1]
-    elif collider_type == "cylinder":
+    elif collider_type == Geometry.Cylinder:
         z = 0.5 * size[1]
         if local_search_direction[2] < 0.0:
             z *= -1.0
