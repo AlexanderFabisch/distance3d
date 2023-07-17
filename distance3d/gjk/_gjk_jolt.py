@@ -65,83 +65,6 @@ def gjk_intersection_jolt(collider1, collider2, tolerance=1e-10):
     return _gjk_intersection_jolt(collider1, collider2, tolerance)
 
 
-@numba.njit(cache=True)
-def _gjk_intersection_jolt(collider1, collider2, tolerance):
-    Y = np.empty((4, 3))  # Support points on A - B
-    n_points = 0  # Number of points in Y that are valid
-
-    tolerance_sq = tolerance * tolerance
-
-    prev_v_len_sq = MAX_FLOAT
-    search_direction = np.array([1.0, 0.0, 0.0])
-
-    while True:
-        # Get support points for shape A and B in search direction
-        p = support_function(search_direction, *collider1)
-        q = support_function(-search_direction, *collider2)
-        state, n_points, prev_v_len_sq = _intersection_loop(
-            p, q, Y, n_points, tolerance_sq, prev_v_len_sq, search_direction)
-        if state == GjkState.Unknown:
-            continue
-        else:
-            return state == GjkState.Intersection
-
-
-@numba.njit(cache=True)
-def _intersection_loop(
-        p, q, Y, n_points, tolerance_sq, prev_v_len_sq, search_direction):
-    # Get support point of the minkowski sum A - B of v
-    support_point = p - q
-
-    # If the support point is in the opposite direction as search_direction,
-    # then we have found a separating axis and there is no intersection
-    if search_direction.dot(support_point) < -EPSILON:
-        # Separating axis found
-        return GjkState.NoIntersection, n_points, prev_v_len_sq
-
-    # Store the point for later use
-    Y[n_points] = support_point
-    n_points += 1
-
-    # Determine the new closest point
-    success, search_direction[:], v_len_sq, simplex = get_closest_point_to_origin(
-        Y, n_points, prev_v_len_sq)
-    if not success:
-        return GjkState.NoIntersection, n_points, prev_v_len_sq
-
-    # If there are 4 points, the origin is inside the tetrahedron and we're done
-    if simplex == 0xf:
-        return GjkState.Intersection, n_points, prev_v_len_sq
-
-    # If v is very close to zero, we consider this a collision
-    if v_len_sq <= tolerance_sq:
-        return GjkState.Intersection, n_points, prev_v_len_sq
-
-    # If v is very small compared to the length of y, we also consider this a
-    # collision
-    if v_len_sq <= EPSILON * max_y_length_squared(Y, n_points):
-        return GjkState.Intersection, n_points, prev_v_len_sq
-
-    # The next separation axis to test is the negative of the closest point of
-    # the Minkowski sum to the origin.
-    # Note: This must be done before terminating as converged since the
-    # separating axis is -search_direction.
-    search_direction *= -1.0
-
-    # If the squared length of search_direction is not changing enough, we've
-    # converged and there is no collision.
-    assert prev_v_len_sq >= v_len_sq
-    if prev_v_len_sq - v_len_sq <= EPSILON * prev_v_len_sq:
-        # search_direction is a separating axis
-        return GjkState.NoIntersection, n_points, prev_v_len_sq
-    prev_v_len_sq = v_len_sq
-
-    # Update the points of the simplex
-    n_points = update_simplex_y(Y, n_points, simplex)
-
-    return GjkState.Unknown, n_points, prev_v_len_sq
-
-
 def gjk_distance_jolt(
         collider1, collider2, tolerance=1e-10, max_distance_squared=100000.0,
         sanity_check=1e-8):
@@ -663,6 +586,81 @@ def get_closest_point_to_origin(Y, n_points, prev_v_len_sqr):
         return True, v, v_len_sq, simplex
 
     return False, v, v_len_sq, simplex
+
+
+@numba.njit(
+    numba.bool_(
+        numba.types.Tuple((
+                numba.types.int64, numba.float64[::1], numba.float64[:, ::1],
+                numba.float64[::1], numba.float64)),
+        numba.types.Tuple((
+                numba.types.int64, numba.float64[::1], numba.float64[:, ::1],
+                numba.float64[::1], numba.float64)),
+        numba.float64
+    ),
+    cache=True)
+def _gjk_intersection_jolt(collider1, collider2, tolerance):
+    Y = np.empty((4, 3))  # Support points on A - B
+    n_points = 0  # Number of points in Y that are valid
+
+    tolerance_sq = tolerance * tolerance
+
+    prev_v_len_sq = MAX_FLOAT
+    search_direction = np.array([1.0, 0.0, 0.0])
+
+    while True:
+        # Get support points for shape A and B in search direction
+        p = support_function(search_direction, *collider1)
+        q = support_function(-search_direction, *collider2)
+
+        # Get support point of the minkowski sum A - B of v
+        support_point = p - q
+
+        # If the support point is in the opposite direction as search_direction,
+        # then we have found a separating axis and there is no intersection
+        if search_direction.dot(support_point) < -EPSILON:
+            # Separating axis found
+            return False
+
+        # Store the point for later use
+        Y[n_points] = support_point
+        n_points += 1
+
+        # Determine the new closest point
+        success, search_direction[:], v_len_sq, simplex = get_closest_point_to_origin(
+            Y, n_points, prev_v_len_sq)
+        if not success:
+            return False
+
+        # If there are 4 points, the origin is inside the tetrahedron and we're done
+        if simplex == 0xf:
+            return True
+
+        # If v is very close to zero, we consider this a collision
+        if v_len_sq <= tolerance_sq:
+            return True
+
+        # If v is very small compared to the length of y, we also consider this a
+        # collision
+        if v_len_sq <= EPSILON * max_y_length_squared(Y, n_points):
+            return True
+
+        # The next separation axis to test is the negative of the closest point of
+        # the Minkowski sum to the origin.
+        # Note: This must be done before terminating as converged since the
+        # separating axis is -search_direction.
+        search_direction *= -1.0
+
+        # If the squared length of search_direction is not changing enough, we've
+        # converged and there is no collision.
+        assert prev_v_len_sq >= v_len_sq
+        if prev_v_len_sq - v_len_sq <= EPSILON * prev_v_len_sq:
+            # search_direction is a separating axis
+            return False
+        prev_v_len_sq = v_len_sq
+
+        # Update the points of the simplex
+        n_points = update_simplex_y(Y, n_points, simplex)
 
 
 # TODO refactor
