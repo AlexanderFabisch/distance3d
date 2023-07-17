@@ -710,6 +710,7 @@ def get_closest_point_to_origin(Y, n_points, prev_v_len_sqr):
 
     return False, None, None, None
 
+
 def gjk_distance_jolt_iterations(
         collider1, collider2, tolerance=1e-10, max_distance_squared=100000.0):
     """Gilbert-Johnson-Keerthi (GJK) algorithm for distance calculation.
@@ -780,17 +781,5 @@ def gjk_distance_jolt_iterations(
         state, n_points, prev_v_len_sq, v_len_sq = _distance_loop(
             p, q, Y, P, Q, n_points, tolerance_sq, prev_v_len_sq, v_len_sq,
             search_direction, max_distance_squared)
-        if state == GjkState.Unknown:
-            continue
-        elif state == GjkState.Clipped:
+        if state != GjkState.Unknown:
             return iterations
-        else:
-            # Get the closest points
-            a, b = calculate_closest_points(Y, P, Q, n_points)
-
-            assert abs(np.dot(search_direction, search_direction) - v_len_sq) < 1e-12
-            dist = math.sqrt(v_len_sq)
-            if dist < EPSILON:
-                a = b = 0.5 * (a + b)
-            return iterations
-
