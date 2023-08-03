@@ -1,5 +1,4 @@
 """Features related to input and output from and to disk."""
-import os
 import numpy as np
 
 
