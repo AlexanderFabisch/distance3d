@@ -1,6 +1,7 @@
 import numpy as np
 import numba
 
+
 INDEX_NONE = -1
 PARENT_INDEX = 0
 LEFT_INDEX = 1
@@ -13,18 +14,23 @@ TYPE_BRANCH = 2
 
 class AabbTree:
     """AABB Tree for broad phase collision detection."""
+
     def __init__(self):
         self.root = INDEX_NONE
         self.filled_len = 0
-        self.nodes = np.empty((0, 4), dtype=int)  # Root index, Left Child index, Right Child index, Node Typ
+        # Root index, Left Child index, Right Child index, Node Typ
+        self.nodes = np.empty((0, 4), dtype=int)
         self.aabbs = np.empty((0, 3, 2))
 
-        self.external_data_list = []  # The list containing the external data of the leafs.
-        self.insert_index_list = []  # The list containing the indices of tree insertion.
+        # The list containing the external data of the leafs.
+        self.external_data_list = []
+        # The list containing the indices of tree insertion.
+        self.insert_index_list = []
         self.insert_index_max = 0
 
-    def insert_aabbs(self, aabbs, external_data_list=None,
-                     pre_insertion_methode="none"):
+    def insert_aabbs(
+        self, aabbs, external_data_list=None, pre_insertion_methode="none"
+    ):
         """Insert aabbs in tree
 
         Parameters
@@ -38,7 +44,8 @@ class AabbTree:
         pre_insertion_methode : str, optional (default: "none")
             The operation that is performed on the aabbs before tree creation.
             Use "sort" for a cleaner tree with slightly longer creation times.
-            Use "shuffle" for a faster creation but with some non-optimal placement in the tree.
+            Use "shuffle" for a faster creation but with some non-optimal
+            placement in the tree.
         """
         aabb_len = len(aabbs)
         if aabb_len == 0:
@@ -65,7 +72,9 @@ class AabbTree:
         self.external_data_list += empty_external_data
 
         # Insert index
-        self.insert_index_list.extend(range(self.insert_index_max, self.insert_index_max + aabb_len))
+        self.insert_index_list.extend(
+            range(self.insert_index_max, self.insert_index_max + aabb_len)
+        )
         self.insert_index_max += aabb_len
 
         empty_insert_data = [None] * (len(self.nodes) - len(self.insert_index_list))
@@ -74,19 +83,22 @@ class AabbTree:
         # Insert order
         insert_order = np.array(range(old_filled_len, self.filled_len))
         if pre_insertion_methode == "sort":
-            insert_order = _sort_aabbs(aabbs[old_filled_len:len(self.nodes) - self.filled_len])
+            insert_order = _sort_aabbs(
+                aabbs[old_filled_len : len(self.nodes) - self.filled_len]
+            )
         elif pre_insertion_methode == "shuffle":
             np.random.shuffle(insert_order)
 
         # Perform insert
-        self.root, self.nodes, self.aabbs, self.filled_len \
-            = insert_aabbs(self.root, self.nodes, self.aabbs, self.filled_len, insert_order)
+        self.root, self.nodes, self.aabbs, self.filled_len = insert_aabbs(
+            self.root, self.nodes, self.aabbs, self.filled_len, insert_order
+        )
 
         # Shorten lists to the filled size
-        self.nodes = self.nodes[:self.filled_len]
-        self.aabbs = self.aabbs[:self.filled_len]
-        self.external_data_list = self.external_data_list[:self.filled_len]
-        self.insert_index_list = self.insert_index_list[:self.filled_len]
+        self.nodes = self.nodes[: self.filled_len]
+        self.aabbs = self.aabbs[: self.filled_len]
+        self.external_data_list = self.external_data_list[: self.filled_len]
+        self.insert_index_list = self.insert_index_list[: self.filled_len]
 
     def insert_aabb(self, aabb, external_data=None):
         """Insert single aabb in tree
@@ -104,7 +116,7 @@ class AabbTree:
 
     def __str__(self):  # pragma: no cover
         lines, *_ = print_aabb_tree_recursive(self.root, self.nodes)
-        return '\r\n' + '\r\n'.join(lines)
+        return "\r\n" + "\r\n".join(lines)
 
     def overlaps_aabb_tree(self, other):
         """Check overlapping with another tree.
@@ -130,11 +142,21 @@ class AabbTree:
         overlap_pairs : array, shape (n, 2)
             An array of all overlapping pairs.
         """
-        overlap_tetrahedron1, overlap_tetrahedron2, overlap_pairs = query_overlap_of_other_tree(
-            self.root, self.nodes, self.aabbs, other.root, other.nodes, other.aabbs)
+        (
+            overlap_tetrahedron1,
+            overlap_tetrahedron2,
+            overlap_pairs,
+        ) = query_overlap_of_other_tree(
+            self.root, self.nodes, self.aabbs, other.root, other.nodes, other.aabbs
+        )
 
         is_overlapping = len(overlap_pairs) > 0
-        return is_overlapping, np.unique(overlap_tetrahedron1), np.unique(overlap_tetrahedron2), overlap_pairs
+        return (
+            is_overlapping,
+            np.unique(overlap_tetrahedron1),
+            np.unique(overlap_tetrahedron2),
+            overlap_pairs,
+        )
 
     def overlaps_aabb(self, aabb):
         """Check overlapping with an aabb.
@@ -241,13 +263,16 @@ def insert_leaf(root_node_index, leaf_node_index, nodes, aabbs, filled_len):
 
         # Whether the left or right child is traverse down depends on the cost of increasing the size of the aabbs.
         cost_new_parent = _aabb_volume(
-            _merge_aabb(aabbs[leaf_node_index], aabbs[tree_node_index]))
+            _merge_aabb(aabbs[leaf_node_index], aabbs[tree_node_index])
+        )
 
         cost_left = _aabb_volume(
-            _merge_aabb(aabbs[leaf_node_index], aabbs[left_node_index]))
+            _merge_aabb(aabbs[leaf_node_index], aabbs[left_node_index])
+        )
 
         cost_right = _aabb_volume(
-            _merge_aabb(aabbs[leaf_node_index], aabbs[right_node_index]))
+            _merge_aabb(aabbs[leaf_node_index], aabbs[right_node_index])
+        )
 
         # This doesn't seem to happen ever. So need to check if it does
         assert not (cost_left > cost_new_parent and cost_right > cost_new_parent)
@@ -302,9 +327,13 @@ def fix_upward_tree(tree_node_index, nodes, aabbs):
         tree_node = nodes[tree_node_index]
 
         # Every branch in the traversal should not have any None fields.
-        assert tree_node[LEFT_INDEX] != INDEX_NONE and tree_node[RIGHT_INDEX] != INDEX_NONE
+        assert (
+            tree_node[LEFT_INDEX] != INDEX_NONE and tree_node[RIGHT_INDEX] != INDEX_NONE
+        )
 
-        aabbs[tree_node_index] = _merge_aabb(aabbs[tree_node[LEFT_INDEX]], aabbs[tree_node[RIGHT_INDEX]])
+        aabbs[tree_node_index] = _merge_aabb(
+            aabbs[tree_node[LEFT_INDEX]], aabbs[tree_node[RIGHT_INDEX]]
+        )
 
         # Moving on parent up
         tree_node_index = tree_node[PARENT_INDEX]
@@ -313,7 +342,9 @@ def fix_upward_tree(tree_node_index, nodes, aabbs):
 
 
 @numba.njit(cache=True)
-def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):  # pragma: no cover
+def query_overlap_of_other_tree(
+    root1, nodes1, aabbs1, root2, nodes2, aabbs2
+):  # pragma: no cover
     """Queries the overlapping aabbs by traversing the trees."""
 
     broad_tetrahedra1 = []
@@ -326,8 +357,15 @@ def query_overlap_of_other_tree(root1, nodes1, aabbs1, root2, nodes2, aabbs2):  
         stack = stack[:-1]
 
         node_aabb = aabbs2[node_index]
-        if nodes2[node_index, TYPE_INDEX] == TYPE_BRANCH and \
-                len(query_overlap(node_aabb, root1, nodes1, aabbs1, break_at_first_leaf=True)) >= 1:
+        if (
+            nodes2[node_index, TYPE_INDEX] == TYPE_BRANCH
+            and len(
+                query_overlap(
+                    node_aabb, root1, nodes1, aabbs1, break_at_first_leaf=True
+                )
+            )
+            >= 1
+        ):
             stack.extend([nodes2[node_index, 1], nodes2[node_index, 2]])
 
         elif nodes2[node_index, TYPE_INDEX] == TYPE_LEAF:
@@ -370,11 +408,14 @@ def print_aabb_tree_recursive(node_index, nodes):  # pragma: no cover
     # From https://stackoverflow.com/questions/34012886/print-binary-tree-level-by-level-in-python
 
     # No child.
-    line = '%s' % node_index
+    line = "%s" % node_index
     width = len(line)
 
-    if nodes[node_index, LEFT_INDEX] == INDEX_NONE and nodes[node_index, RIGHT_INDEX] == INDEX_NONE:
-        line = '%s' % node_index
+    if (
+        nodes[node_index, LEFT_INDEX] == INDEX_NONE
+        and nodes[node_index, RIGHT_INDEX] == INDEX_NONE
+    ):
+        line = "%s" % node_index
         height = 1
         middle = width // 2
         return [line], width, height, middle
@@ -383,32 +424,41 @@ def print_aabb_tree_recursive(node_index, nodes):  # pragma: no cover
     if nodes[node_index, RIGHT_INDEX] == INDEX_NONE:
         lines, n, p, x = print_aabb_tree_recursive(nodes[node_index, LEFT_INDEX], nodes)
 
-        first_line = (x + 1) * ' ' + (n - x - 1) * '_' + line
-        second_line = x * ' ' + '/' + (n - x - 1 + width) * ' '
-        shifted_lines = [line + width * ' ' for line in lines]
-        return [first_line, second_line] + shifted_lines, n + width, p + 2, n + width // 2
+        first_line = (x + 1) * " " + (n - x - 1) * "_" + line
+        second_line = x * " " + "/" + (n - x - 1 + width) * " "
+        shifted_lines = [line + width * " " for line in lines]
+        return (
+            [first_line, second_line] + shifted_lines,
+            n + width,
+            p + 2,
+            n + width // 2,
+        )
 
     # Only right child.
     if nodes[node_index, LEFT_INDEX] == INDEX_NONE:
-        lines, n, p, x = print_aabb_tree_recursive(nodes[node_index, RIGHT_INDEX], nodes)
+        lines, n, p, x = print_aabb_tree_recursive(
+            nodes[node_index, RIGHT_INDEX], nodes
+        )
 
-        first_line = line + x * '_' + (n - x) * ' '
-        second_line = (width + x) * ' ' + '\\' + (n - x - 1) * ' '
-        shifted_lines = [width * ' ' + line for line in lines]
+        first_line = line + x * "_" + (n - x) * " "
+        second_line = (width + x) * " " + "\\" + (n - x - 1) * " "
+        shifted_lines = [width * " " + line for line in lines]
         return [first_line, second_line] + shifted_lines, n + width, p + 2, width // 2
 
     # Two children.
     left, n, p, x = print_aabb_tree_recursive(nodes[node_index, LEFT_INDEX], nodes)
     right, m, q, y = print_aabb_tree_recursive(nodes[node_index, RIGHT_INDEX], nodes)
 
-    first_line = (x + 1) * ' ' + (n - x - 1) * '_' + line + y * '_' + (m - y) * ' '
-    second_line = x * ' ' + '/' + (n - x - 1 + width + y) * ' ' + '\\' + (m - y - 1) * ' '
+    first_line = (x + 1) * " " + (n - x - 1) * "_" + line + y * "_" + (m - y) * " "
+    second_line = (
+        x * " " + "/" + (n - x - 1 + width + y) * " " + "\\" + (m - y - 1) * " "
+    )
     if p < q:
-        left += [n * ' '] * (q - p)
+        left += [n * " "] * (q - p)
     elif q < p:
-        right += [m * ' '] * (p - q)
+        right += [m * " "] * (p - q)
     zipped_lines = zip(left, right)
-    lines = [first_line, second_line] + [a + width * ' ' + b for a, b in zipped_lines]
+    lines = [first_line, second_line] + [a + width * " " + b for a, b in zipped_lines]
     return lines, n + m + width, max(p, q) + 2, n + width // 2
 
 
@@ -467,9 +517,14 @@ def aabb_overlap(aabb1, aabb2):
     overlap : bool
         Do both AABBs overlap?
     """
-    return aabb1[0, 0] <= aabb2[0, 1] and aabb1[0, 1] >= aabb2[0, 0] \
-           and aabb1[1, 0] <= aabb2[1, 1] and aabb1[1, 1] >= aabb2[1, 0] \
-           and aabb1[2, 0] <= aabb2[2, 1] and aabb1[2, 1] >= aabb2[2, 0]
+    return (
+        aabb1[0, 0] <= aabb2[0, 1]
+        and aabb1[0, 1] >= aabb2[0, 0]
+        and aabb1[1, 0] <= aabb2[1, 1]
+        and aabb1[1, 1] >= aabb2[1, 0]
+        and aabb1[2, 0] <= aabb2[2, 1]
+        and aabb1[2, 1] >= aabb2[2, 0]
+    )
 
 
 @numba.njit(cache=True)
@@ -482,9 +537,11 @@ def _sort_aabbs(aabbs):
 def _merge_aabb(aabb1, aabb2):
     """Returns the smallest aabb that contains aabb1 and aabb2."""
     return np.array(
-        [[min(aabb1[0, 0], aabb2[0, 0]), max(aabb1[0, 1], aabb2[0, 1])],
-         [min(aabb1[1, 0], aabb2[1, 0]), max(aabb1[1, 1], aabb2[1, 1])],
-         [min(aabb1[2, 0], aabb2[2, 0]), max(aabb1[2, 1], aabb2[2, 1])]]
+        [
+            [min(aabb1[0, 0], aabb2[0, 0]), max(aabb1[0, 1], aabb2[0, 1])],
+            [min(aabb1[1, 0], aabb2[1, 0]), max(aabb1[1, 1], aabb2[1, 1])],
+            [min(aabb1[2, 0], aabb2[2, 0]), max(aabb1[2, 1], aabb2[2, 1])],
+        ]
     )
 
 
