@@ -9,10 +9,10 @@ class Timer:
         self.total_time_ = {}
 
     def start(self, name):
-        self._start_time[name] = time.time()
+        self._start_time[name] = time.perf_counter()
 
     def stop(self, name):
-        stop_time = time.time()
+        stop_time = time.perf_counter()
         assert name in self._start_time
         return stop_time - self._start_time[name]
 
