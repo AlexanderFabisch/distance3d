@@ -3,7 +3,6 @@ import numpy as np
 from distance3d import colliders, random
 from distance3d.gjk import gjk_distance_original, gjk_intersection_jolt, gjk_distance_jolt, \
     gjk_nesterov_accelerated_primitives, gjk_nesterov_accelerated
-from numba import config
 
 iterations = 200
 shapes = []
