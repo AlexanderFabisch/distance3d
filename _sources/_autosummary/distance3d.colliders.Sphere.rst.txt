@@ -16,6 +16,7 @@
       ~Sphere.__init__
       ~Sphere.aabb
       ~Sphere.center
+      ~Sphere.collider2origin
       ~Sphere.first_vertex
       ~Sphere.make_artist
       ~Sphere.support_function

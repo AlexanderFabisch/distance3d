@@ -5,8 +5,8 @@
 
 Computation times
 =================
-**00:00.286** total execution time for **_auto_examples_plane** files:
+**00:00.200** total execution time for **_auto_examples_plane** files:
 
 +----------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_plane_plot_halfplane_intersection.py` (``plot_halfplane_intersection.py``) | 00:00.286 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_plane_plot_halfplane_intersection.py` (``plot_halfplane_intersection.py``) | 00:00.200 | 0.0 MB |
 +----------------------------------------------------------------------------------------------------------+-----------+--------+

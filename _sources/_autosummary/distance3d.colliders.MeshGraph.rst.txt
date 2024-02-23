@@ -16,6 +16,7 @@
       ~MeshGraph.__init__
       ~MeshGraph.aabb
       ~MeshGraph.center
+      ~MeshGraph.collider2origin
       ~MeshGraph.first_vertex
       ~MeshGraph.make_artist
       ~MeshGraph.support_function

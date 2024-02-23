@@ -34,8 +34,6 @@ Distance from line segment to circle
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -3539,7 +3537,7 @@ Distance from line segment to circle
     0.7296732706169388
     0.3659935769417604
     0.9633628278022892
-    accumulated_time=0.7671022415161133
+    accumulated_time=0.5283594131469727
 
 
 
@@ -3587,28 +3585,23 @@ Distance from line segment to circle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.051 seconds)
+   **Total running time of the script:** ( 0 minutes  0.759 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_segment_to_circle.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_line_segment_to_circle.py <plot_line_segment_to_circle.py>`
 
-     :download:`Download Python source code: plot_line_segment_to_circle.py <plot_line_segment_to_circle.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_line_segment_to_circle.ipynb <plot_line_segment_to_circle.ipynb>`
+      :download:`Download Jupyter notebook: plot_line_segment_to_circle.ipynb <plot_line_segment_to_circle.ipynb>`
 
 
 .. only:: html

@@ -16,6 +16,7 @@
       ~Margin.__init__
       ~Margin.aabb
       ~Margin.center
+      ~Margin.collider2origin
       ~Margin.first_vertex
       ~Margin.make_artist
       ~Margin.support_function

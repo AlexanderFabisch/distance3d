@@ -132,6 +132,23 @@ GJK
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Plot Samples from Minkowski Difference">
+
+.. only:: html
+
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_minkowski_samples_thumb.png
+    :alt: Plot Samples from Minkowski Difference
+
+  :ref:`sphx_glr__auto_examples_gjk_plot_minkowski_samples.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plot Samples from Minkowski Difference</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Collision resolution with EPA after GJK">
 
 .. only:: html
@@ -162,5 +179,6 @@ GJK
    /_auto_examples/gjk/plot_ellipsoids
    /_auto_examples/gjk/plot_cylinder
    /_auto_examples/gjk/plot_capsules
+   /_auto_examples/gjk/plot_minkowski_samples
    /_auto_examples/gjk/plot_collision_resolution_epa
 

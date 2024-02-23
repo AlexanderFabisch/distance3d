@@ -16,6 +16,7 @@
       ~Ellipse.__init__
       ~Ellipse.aabb
       ~Ellipse.center
+      ~Ellipse.collider2origin
       ~Ellipse.first_vertex
       ~Ellipse.make_artist
       ~Ellipse.support_function

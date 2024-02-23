@@ -145,6 +145,10 @@ API Reference
    ~distance3d.gjk.gjk_intersection_jolt
    ~distance3d.gjk.gjk_distance_original
    ~distance3d.gjk.gjk_intersection_libccd
+   ~distance3d.gjk.gjk_nesterov_accelerated_distance
+   ~distance3d.gjk.gjk_nesterov_accelerated_intersection
+   ~distance3d.gjk.gjk_nesterov_accelerated_primitives_distance
+   ~distance3d.gjk.gjk_nesterov_accelerated_primitives_intersection
 
 
 :mod:`distance3d.epa`

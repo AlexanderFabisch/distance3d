@@ -268,23 +268,6 @@ Distance
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to triangle">
-
-.. only:: html
-
-  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_triangle_thumb.png
-    :alt: Distance from plane to triangle
-
-  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_triangle.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Distance from plane to triangle</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Distance from point to cylinder">
 
 .. only:: html
@@ -297,6 +280,23 @@ Distance
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Distance from point to cylinder</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to triangle">
+
+.. only:: html
+
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_triangle_thumb.png
+    :alt: Distance from plane to triangle
+
+  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_triangle.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance from plane to triangle</div>
     </div>
 
 
@@ -455,23 +455,6 @@ Distance
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to ellipsoid">
-
-.. only:: html
-
-  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_ellipsoid_thumb.png
-    :alt: Distance from plane to ellipsoid
-
-  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_ellipsoid.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Distance from plane to ellipsoid</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Distance from triangle to rectangle">
 
 .. only:: html
@@ -484,6 +467,23 @@ Distance
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Distance from triangle to rectangle</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to ellipsoid">
+
+.. only:: html
+
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_ellipsoid_thumb.png
+    :alt: Distance from plane to ellipsoid
+
+  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_ellipsoid.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance from plane to ellipsoid</div>
     </div>
 
 
@@ -612,8 +612,8 @@ Distance
    /_auto_examples/distance/plot_line_segment_to_triangle
    /_auto_examples/distance/plot_line_to_circle
    /_auto_examples/distance/plot_line_segment_to_circle
-   /_auto_examples/distance/plot_plane_to_triangle
    /_auto_examples/distance/plot_point_to_cylinder
+   /_auto_examples/distance/plot_plane_to_triangle
    /_auto_examples/distance/plot_line_to_line
    /_auto_examples/distance/plot_disk_to_disk
    /_auto_examples/distance/plot_triangle_to_triangle
@@ -623,8 +623,8 @@ Distance
    /_auto_examples/distance/plot_plane_to_box
    /_auto_examples/distance/plot_line_to_plane
    /_auto_examples/distance/plot_plane_to_rectangle
-   /_auto_examples/distance/plot_plane_to_ellipsoid
    /_auto_examples/distance/plot_triangle_to_rectangle
+   /_auto_examples/distance/plot_plane_to_ellipsoid
    /_auto_examples/distance/plot_line_segment_to_plane
    /_auto_examples/distance/plot_plane_to_cylinder
    /_auto_examples/distance/plot_rectangle_to_rectangle

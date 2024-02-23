@@ -16,6 +16,7 @@
       ~Cone.__init__
       ~Cone.aabb
       ~Cone.center
+      ~Cone.collider2origin
       ~Cone.first_vertex
       ~Cone.make_artist
       ~Cone.support_function

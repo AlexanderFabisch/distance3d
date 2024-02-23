@@ -34,8 +34,6 @@ Distance between line and circle
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -5039,7 +5037,7 @@ Distance between line and circle
     0.36085576911626416
     1.1640068138050759
     0.5078151588168582
-    accumulated_time=0.9943575859069824
+    accumulated_time=0.6807041168212891
 
 
 
@@ -5088,28 +5086,23 @@ Distance between line and circle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.380 seconds)
+   **Total running time of the script:** ( 0 minutes  0.994 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_line_to_circle.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_line_to_circle.py <plot_line_to_circle.py>`
 
-     :download:`Download Python source code: plot_line_to_circle.py <plot_line_to_circle.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_line_to_circle.ipynb <plot_line_to_circle.ipynb>`
+      :download:`Download Jupyter notebook: plot_line_to_circle.ipynb <plot_line_to_circle.ipynb>`
 
 
 .. only:: html

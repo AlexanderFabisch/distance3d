@@ -16,6 +16,7 @@
       ~Ellipsoid.__init__
       ~Ellipsoid.aabb
       ~Ellipsoid.center
+      ~Ellipsoid.collider2origin
       ~Ellipsoid.first_vertex
       ~Ellipsoid.make_artist
       ~Ellipsoid.support_function

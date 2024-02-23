@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>distance3d.gjk.gjk_nesterov_accelerated_distance &#8212; distance3d 0.9.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=cb25574f" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=ca3c1c84" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script src="../_static/documentation_options.js?v=39bb1c6d"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="distance3d.gjk.gjk_nesterov_accelerated_intersection" href="distance3d.gjk.gjk_nesterov_accelerated_intersection.html" />
+    <link rel="prev" title="distance3d.gjk.gjk_intersection_libccd" href="distance3d.gjk.gjk_intersection_libccd.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="distance3d-gjk-gjk-nesterov-accelerated-distance">
+<h1>distance3d.gjk.gjk_nesterov_accelerated_distance<a class="headerlink" href="#distance3d-gjk-gjk-nesterov-accelerated-distance" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="distance3d.gjk.gjk_nesterov_accelerated_distance">
+<span class="sig-prename descclassname"><span class="pre">distance3d.gjk.</span></span><span class="sig-name descname"><span class="pre">gjk_nesterov_accelerated_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collider1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collider2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/distance3d/gjk/_gjk_nesterov_accelerated.html#gjk_nesterov_accelerated_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#distance3d.gjk.gjk_nesterov_accelerated_distance" title="Link to this definition">¶</a></dt>
+<dd><p>Nesterov-accelerated GJK algorithm for distance calculation.</p>
+<p>This implementation is based on the Paper
+“Collision Detection Accelerated: An Optimization Perspective”
+<a class="reference external" href="https://lmontaut.github.io/nesterov-gjk.github.io/">https://lmontaut.github.io/nesterov-gjk.github.io/</a>
+and highly inspired by the C++ implementation in of the Authors:
+<a class="reference external" href="https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp">https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>collider1</strong><span class="classifier">ConvexCollider</span></dt><dd><p>Convex collider 1.</p>
+</dd>
+<dt><strong>collider2</strong><span class="classifier">ConvexCollider</span></dt><dd><p>Convex collider 2.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>contact</strong><span class="classifier">bool</span></dt><dd><p>Shapes collide</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#module-distance3d"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d</span></code></a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.distance"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.distance</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.colliders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.colliders</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.broad_phase"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.broad_phase</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.containment"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.containment</span></code></a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../api.html#module-distance3d.gjk"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.gjk</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.epa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.epa</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.mpr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.mpr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.geometry"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.geometry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.self_collision"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.self_collision</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.containment_test"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.containment_test</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.hydroelastic_contact"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.hydroelastic_contact</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.plotting</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.random"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.random</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api.html#module-distance3d.aabb_tree"><code class="xref py py-mod docutils literal notranslate"><span class="pre">distance3d.aabb_tree</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API Reference</a><ul>
+      <li>Previous: <a href="distance3d.gjk.gjk_intersection_libccd.html" title="previous chapter">distance3d.gjk.gjk_intersection_libccd</a></li>
+      <li>Next: <a href="distance3d.gjk.gjk_nesterov_accelerated_intersection.html" title="next chapter">distance3d.gjk.gjk_nesterov_accelerated_intersection</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/_autosummary/distance3d.gjk.gjk_nesterov_accelerated_distance.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

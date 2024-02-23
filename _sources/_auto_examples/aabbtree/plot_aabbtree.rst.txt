@@ -113,28 +113,23 @@ Plot AABB tree.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.688 seconds)
+   **Total running time of the script:** ( 0 minutes  0.241 seconds)
 
 
 .. _sphx_glr_download__auto_examples_aabbtree_plot_aabbtree.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_aabbtree.py <plot_aabbtree.py>`
 
-     :download:`Download Python source code: plot_aabbtree.py <plot_aabbtree.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_aabbtree.ipynb <plot_aabbtree.ipynb>`
+      :download:`Download Jupyter notebook: plot_aabbtree.ipynb <plot_aabbtree.ipynb>`
 
 
 .. only:: html

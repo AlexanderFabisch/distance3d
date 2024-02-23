@@ -143,8 +143,7 @@ for i in range(50):
     color = random_state.rand(3)
     box_artist = pv.Box(size=size, A2B=box2origin, c=color)
     box_artist.add_artist(fig)
-    box = colliders.Margin(
-        colliders.Box(box2origin, size, artist=box_artist), 0.03)
+    box = colliders.Margin(colliders.Box(box2origin, size, artist=box_artist), 0.03)
     world_bvh.add_collider("Box %s" % i, box)
 
     aabb = box.aabb()

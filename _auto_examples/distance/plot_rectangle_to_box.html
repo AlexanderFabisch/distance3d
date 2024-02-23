@@ -1,26 +1,24 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Distance from rectangle to box &#8212; distance3d 0.7.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Distance from rectangle to box &#8212; distance3d 0.9.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=ca3c1c84" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Distance between spheres with GJK" href="../gjk/plot_spheres.html" />
+    <link rel="next" title="GJK" href="../gjk/index.html" />
     <link rel="prev" title="Distance from line segment to line segment" href="plot_line_segment_to_line_segment.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -43,100 +41,99 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-distance-plot-rectangle-to-box-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="distance-from-rectangle-to-box">
-<span id="sphx-glr-auto-examples-distance-plot-rectangle-to-box-py"></span><h1>Distance from rectangle to box<a class="headerlink" href="#distance-from-rectangle-to-box" title="Permalink to this heading">¶</a></h1>
-<img src="../../_images/sphx_glr_plot_rectangle_to_box_001.png" srcset="../../_images/sphx_glr_plot_rectangle_to_box_001.png" alt="plot rectangle to box" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>6.158410582694057
-2.641085488169706
-0.44161411887462243
-4.514717170138337
-3.816740509633549
-1.916622946277794
-2.7350752506669935
-0.5105723966158995
-2.6940146400922127
-3.1574352234336507
-5.4591495290760905
-2.2101862098279987
-0.5037125183096949
-2.8100868791164557
-5.616442514472597
-4.129114504821131
-0.434435725917719
-3.7160268814235264
-3.536471982506936
-1.2910213385032527
-0.7534742337535811
-2.5993351343219526
-1.3379156245401191
-4.943564005613119
-0.7255720599912365
-0.42284080012609265
-0.9616146920714768
-0.6705612340278081
-6.907315591841045
-0.5636888507878632
-0.6540412837765144
-2.109378366875959
-1.9147530484983157
-4.932417715669764
-1.757179641696137
-1.3695879901269923
-2.0247626214548715
-0.7233951671241937
-2.1854919472670282
-0.21566149705572651
-0.410121776733255
-1.070174236462977
-3.199848218660875
-5.591436257055188
-0.9194187556174591
-4.39032850973214
-5.031446456140428
-2.128089277093525
-4.05093397797027
-5.295351189506589
-4.650686016042218
-3.8374746800426185
-4.0461576874594405
-2.8673434991789035
-2.0408205009469045
-1.333889850965448
-1.9295253545957332
-0.5410264462167694
-0.8525074877148474
-4.549583340136513
-2.1447501487604526
-4.627653216843869
-2.5809117692366437
-3.362774018619297
-3.20594098019593
+<section class="sphx-glr-example-title" id="distance-from-rectangle-to-box">
+<span id="sphx-glr-auto-examples-distance-plot-rectangle-to-box-py"></span><h1>Distance from rectangle to box<a class="headerlink" href="#distance-from-rectangle-to-box" title="Link to this heading">¶</a></h1>
+<img src="../../_images/sphx_glr_plot_rectangle_to_box_001.png" srcset="../../_images/sphx_glr_plot_rectangle_to_box_001.png" alt="plot rectangle to box" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>6.5459933136461625
+3.0701908026469797
+3.077286995231373
+1.7348465617487863
+2.26477819301613
+0.37996293831538
+0.9488693004891864
+1.609089581154274
 0.0
-2.5491364976387847
-5.060779158134153
-1.1288708997592238
-0.541653802372401
-1.0558122082601538
-0.008180073359175359
-4.850504033105888
-3.628355062122066
-4.338879716228917
-3.2071195369011622
-1.6947463815899368
-3.7902149341269373
-1.3349560588845435
-0.7889160973955031
-2.7952153210490653
-0.6470829099200712
-6.578327966883666
-2.064459106276383
-3.9962027398407733
-2.3364578564593184
-0.058791207818171175
-2.1036004879635324
-3.663961621521724
-1.1634030208569854
-accumulated_time=0.5592715740203857
+0.333330866193465
+4.450758276592122
+2.285955167058807
+2.0643617421023177
+4.269428834247569
+4.018655640625866
+0.8226733406621075
+1.1269066556950236
+2.481606507920645
+2.800096362539799
+4.341693818447528
+2.905733870184981
+1.6335966278228944
+3.863103079625139
+0.4087598392643504
+5.1454834660308455
+2.2447747323350935
+0.20678172071400422
+1.9224523172636656
+1.439792130223434
+8.71613338107439
+0.1705697106200064
+1.0709680162230173
+4.410702852678489
+1.1896067088857587
+3.2387347973114733
+5.14881727857126
+2.3091043282097514
+3.1200239782465955
+2.0492029227670923
+2.3013629532978057
+0.8347003829006441
+1.0157958244290768
+0.4782036998448275
+2.6055448896362443
+5.53963856615807
+0.9854168274388665
+4.911127698416321
+3.81179969620882
+1.9495683714417682
+3.2827698383225887
+4.63153616152986
+3.245818784810988
+3.0447110123320984
+1.852725727791475
+2.349553778085546
+2.841246235901499
+3.232954212307242
+1.9455559772684623
+1.8105410472601893
+0.47186518865670896
+4.2665015240717405
+3.777426590186438
+5.481530173821726
+1.641327815939052
+2.432684585295822
+1.1871772006876933
+1.546372631406054
+4.122214223551843
+4.521266381635317
+3.422911438306334
+1.2045921604562506
+1.9132667967368422
+2.379871573769592
+4.681262242371754
+5.85265074588807
+2.3015851599940347
+2.901430220144829
+1.0134399632774247
+4.397265863846494
+1.9921720288028288
+1.5008162887070358
+1.6165207813836076
+1.5525134163809562
+0.4371782664056468
+0.11055986267804845
+1.7239962945070049
+2.2698770849473147
+2.0888915694171954
+2.8800120141875034
+2.394860883388915
+accumulated_time=0.3853800296783447
 </pre></div>
 </div>
 <div class="line-block">
@@ -148,32 +145,32 @@ accumulated_time=0.5592715740203857
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pytransform3d.transformations</span> <span class="k">as</span> <span class="nn">pt</span>
 <span class="kn">import</span> <span class="nn">pytransform3d.plot_utils</span> <span class="k">as</span> <span class="nn">ppu</span>
-<span class="kn">from</span> <span class="nn">distance3d.distance</span> <span class="kn">import</span> <a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><span class="n">rectangle_to_box</span></a></a></a></a></a></a>
+<span class="kn">from</span> <span class="nn">distance3d.distance</span> <span class="kn">import</span> <a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><span class="n">rectangle_to_box</span></a>
 <span class="kn">from</span> <span class="nn">distance3d</span> <span class="kn">import</span> <span class="n">plotting</span><span class="p">,</span> <span class="n">random</span>
 
 
 <span class="n">random_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.random.rand_box.html#distance3d.random.rand_box" title="distance3d.random.rand_box" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.random.rand_box.html#distance3d.random.rand_box" title="distance3d.random.rand_box" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.random.rand_box.html#distance3d.random.rand_box" title="distance3d.random.rand_box" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.random.rand_box.html#distance3d.random.rand_box" title="distance3d.random.rand_box" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.random.rand_box.html#distance3d.random.rand_box" title="distance3d.random.rand_box" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.random.rand_box.html#distance3d.random.rand_box" title="distance3d.random.rand_box" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><span class="n">random</span><span class="o">.</span><span class="n">rand_box</span></a></a></a></a></a></a><span class="p">(</span>
+<span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.random.rand_box.html#distance3d.random.rand_box" title="distance3d.random.rand_box" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><span class="n">random</span><span class="o">.</span><span class="n">rand_box</span></a><span class="p">(</span>
     <span class="n">random_state</span><span class="p">,</span> <span class="n">center_scale</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">size_scale</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">ppu</span><span class="o">.</span><span class="n">make_3d_axis</span><span class="p">(</span><span class="n">ax_s</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
 <span class="n">accumulated_time</span> <span class="o">=</span> <span class="mf">0.0</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">90</span><span class="p">):</span>
-    <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span> <span class="n">rectangle_lengths</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.random.randn_rectangle.html#distance3d.random.randn_rectangle" title="distance3d.random.randn_rectangle" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.random.randn_rectangle.html#distance3d.random.randn_rectangle" title="distance3d.random.randn_rectangle" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.random.randn_rectangle.html#distance3d.random.randn_rectangle" title="distance3d.random.randn_rectangle" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.random.randn_rectangle.html#distance3d.random.randn_rectangle" title="distance3d.random.randn_rectangle" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.random.randn_rectangle.html#distance3d.random.randn_rectangle" title="distance3d.random.randn_rectangle" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.random.randn_rectangle.html#distance3d.random.randn_rectangle" title="distance3d.random.randn_rectangle" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><span class="n">random</span><span class="o">.</span><span class="n">randn_rectangle</span></a></a></a></a></a></a><span class="p">(</span>
+    <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span> <span class="n">rectangle_lengths</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.random.randn_rectangle.html#distance3d.random.randn_rectangle" title="distance3d.random.randn_rectangle" class="sphx-glr-backref-module-distance3d-random sphx-glr-backref-type-py-function"><span class="n">random</span><span class="o">.</span><span class="n">randn_rectangle</span></a><span class="p">(</span>
         <span class="n">random_state</span><span class="p">,</span> <span class="n">center_scale</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">length_scale</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_rectangle</span><span class="p">,</span> <span class="n">closest_point_box</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><span class="n">rectangle_to_box</span></a></a></a></a></a></a><span class="p">(</span>
+    <span class="n">dist</span><span class="p">,</span> <span class="n">closest_point_rectangle</span><span class="p">,</span> <span class="n">closest_point_box</span> <span class="o">=</span> <a href="../../_autosummary/distance3d.distance.rectangle_to_box.html#distance3d.distance.rectangle_to_box" title="distance3d.distance.rectangle_to_box" class="sphx-glr-backref-module-distance3d-distance sphx-glr-backref-type-py-function"><span class="n">rectangle_to_box</span></a><span class="p">(</span>
         <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span> <span class="n">rectangle_lengths</span><span class="p">,</span> <span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
     <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">accumulated_time</span> <span class="o">+=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
         <span class="k">continue</span>
-    <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a></a></a></a></a></a><span class="p">(</span>
+    <a href="../../_autosummary/distance3d.plotting.plot_segment.html#distance3d.plotting.plot_segment" title="distance3d.plotting.plot_segment" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_segment</span></a><span class="p">(</span>
         <span class="n">ax</span><span class="p">,</span> <span class="n">closest_point_rectangle</span><span class="p">,</span> <span class="n">closest_point_box</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <a href="../../_autosummary/distance3d.plotting.plot_rectangle.html#distance3d.plotting.plot_rectangle" title="distance3d.plotting.plot_rectangle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.plotting.plot_rectangle.html#distance3d.plotting.plot_rectangle" title="distance3d.plotting.plot_rectangle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.plotting.plot_rectangle.html#distance3d.plotting.plot_rectangle" title="distance3d.plotting.plot_rectangle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.plotting.plot_rectangle.html#distance3d.plotting.plot_rectangle" title="distance3d.plotting.plot_rectangle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.plotting.plot_rectangle.html#distance3d.plotting.plot_rectangle" title="distance3d.plotting.plot_rectangle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><a href="../../_autosummary/distance3d.plotting.plot_rectangle.html#distance3d.plotting.plot_rectangle" title="distance3d.plotting.plot_rectangle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_rectangle</span></a></a></a></a></a></a><span class="p">(</span>
+    <a href="../../_autosummary/distance3d.plotting.plot_rectangle.html#distance3d.plotting.plot_rectangle" title="distance3d.plotting.plot_rectangle" class="sphx-glr-backref-module-distance3d-plotting sphx-glr-backref-type-py-function"><span class="n">plotting</span><span class="o">.</span><span class="n">plot_rectangle</span></a><span class="p">(</span>
         <span class="n">ax</span><span class="p">,</span> <span class="n">rectangle_center</span><span class="p">,</span> <span class="n">rectangle_axes</span><span class="p">,</span> <span class="n">rectangle_lengths</span><span class="p">,</span>
         <span class="n">show_axes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">accumulated_time</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -184,8 +181,8 @@ accumulated_time=0.5592715740203857
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.753 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-distance-plot-rectangle-to-box-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.525 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-distance-plot-rectangle-to-box-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/48544fabde9048fbcb4571b0191fd823/plot_rectangle_to_box.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_rectangle_to_box.py</span></code></a></p>
 </div>
@@ -194,7 +191,7 @@ accumulated_time=0.5592715740203857
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
+</section>
 
 
           </div>
@@ -219,46 +216,18 @@ accumulated_time=0.5592715740203857
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../index.html#aabb-tree">AABB Tree</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#containment-tests">Containment Tests</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html#distance">Distance</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_triangle.html">Distance from point to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_line.html">Distance from point to line</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_line_segment.html">Distance from point to line segment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_plane.html">Distance from point to plane</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_rectangle.html">Distance from point to rectangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_box.html">Distance from point to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_ellipsoid.html">Distance from point to ellipsoid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_to_triangle.html">Distance from line to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_disk.html">Distance from point to disk</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_box.html">Distance from line segment to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_circle.html">Distance from point to circle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_to_line_segment.html">Distance from line to line segment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_triangle.html">Distance from line segment to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_to_circle.html">Distance between line and circle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_circle.html">Distance from line segment to circle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_triangle.html">Distance from plane to triangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_point_to_cylinder.html">Distance from point to cylinder</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_to_line.html">Distance from line to line</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_disk_to_disk.html">Distance between two disks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_triangle_to_triangle.html">Distance between two triangles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_to_rectangle.html">Distance from line to rectangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_plane.html">Distance from plane to plane</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_rectangle.html">Distance from line segment to rectangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_box.html">Distance from point to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_to_plane.html">Distance from line to plane</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_rectangle.html">Distance from plane to rectangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_ellipsoid.html">Distance from plane to ellipsoid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_triangle_to_rectangle.html">Distance from triangle to rectangle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_plane.html">Distance from line segment to plane</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_plane_to_cylinder.html">Distance from plane to cylinder</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_rectangle_to_rectangle.html">Distance between two rectangles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_to_box.html">Distance from line to box</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_line_segment_to_line_segment.html">Distance from line segment to line segment</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Distance from rectangle to box</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#distance">Distance</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#gjk">GJK</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#visualizations">Visualizations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../index.html#planar-algorithms">Planar Algorithms</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#planar-algorithms">Planar Algorithms</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../aabbtree/index.html">AABB Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../containment_test/index.html">Containment Tests</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Distance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gjk/index.html">GJK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../visualizations/index.html">Visualizations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plane/index.html">Planar Algorithms</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -268,8 +237,10 @@ accumulated_time=0.5592715740203857
 <ul>
   <li><a href="../../index.html">Documentation overview</a><ul>
   <li><a href="../index.html">Examples</a><ul>
+  <li><a href="index.html">Distance</a><ul>
       <li>Previous: <a href="plot_line_segment_to_line_segment.html" title="previous chapter">Distance from line segment to line segment</a></li>
-      <li>Next: <a href="../gjk/plot_spheres.html" title="next chapter">Distance between spheres with GJK</a></li>
+      <li>Next: <a href="../gjk/index.html" title="next chapter">GJK</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -300,7 +271,7 @@ accumulated_time=0.5592715740203857
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

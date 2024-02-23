@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>distance3d.gjk._gjk_nesterov_accelerated &#8212; distance3d 0.9.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=cb25574f" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=ca3c1c84" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script src="../../../_static/documentation_options.js?v=39bb1c6d"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for distance3d.gjk._gjk_nesterov_accelerated</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numba</span>
+
+<span class="kn">from</span> <span class="nn">..colliders</span> <span class="kn">import</span> <span class="n">MeshGraph</span><span class="p">,</span> <span class="n">Capsule</span><span class="p">,</span> <span class="n">Sphere</span><span class="p">,</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Cone</span><span class="p">,</span> <span class="n">Cylinder</span><span class="p">,</span> <span class="n">Ellipsoid</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">norm_vector</span>
+
+
+<div class="viewcode-block" id="gjk_nesterov_accelerated_intersection">
+<a class="viewcode-back" href="../../../_autosummary/distance3d.gjk.gjk_nesterov_accelerated_intersection.html#distance3d.gjk.gjk_nesterov_accelerated_intersection">[docs]</a>
+<span class="k">def</span> <span class="nf">gjk_nesterov_accelerated_intersection</span><span class="p">(</span><span class="n">collider1</span><span class="p">,</span> <span class="n">collider2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Intersection test with Nesterov-accelerated GJK.</span>
+
+<span class="sd">    This implementation is based on the Paper</span>
+<span class="sd">    &quot;Collision Detection Accelerated: An Optimization Perspective&quot;</span>
+<span class="sd">    https://lmontaut.github.io/nesterov-gjk.github.io/</span>
+<span class="sd">    and highly inspired by the C++ implementation in of the Authors:</span>
+<span class="sd">    https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    collider1 : ConvexCollider</span>
+<span class="sd">        Convex collider 1.</span>
+
+<span class="sd">    collider2 : ConvexCollider</span>
+<span class="sd">        Convex collider 2.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    contact : bool</span>
+<span class="sd">        Shapes collide</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">gjk_nesterov_accelerated</span><span class="p">(</span><span class="n">collider1</span><span class="p">,</span> <span class="n">collider2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="gjk_nesterov_accelerated_distance">
+<a class="viewcode-back" href="../../../_autosummary/distance3d.gjk.gjk_nesterov_accelerated_distance.html#distance3d.gjk.gjk_nesterov_accelerated_distance">[docs]</a>
+<span class="k">def</span> <span class="nf">gjk_nesterov_accelerated_distance</span><span class="p">(</span><span class="n">collider1</span><span class="p">,</span> <span class="n">collider2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Nesterov-accelerated GJK algorithm for distance calculation.</span>
+
+<span class="sd">    This implementation is based on the Paper</span>
+<span class="sd">    &quot;Collision Detection Accelerated: An Optimization Perspective&quot;</span>
+<span class="sd">    https://lmontaut.github.io/nesterov-gjk.github.io/</span>
+<span class="sd">    and highly inspired by the C++ implementation in of the Authors:</span>
+<span class="sd">    https://github.com/humanoid-path-planner/hpp-fcl/blob/devel/src/narrowphase/gjk.cpp</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    collider1 : ConvexCollider</span>
+<span class="sd">        Convex collider 1.</span>
+
+<span class="sd">    collider2 : ConvexCollider</span>
+<span class="sd">        Convex collider 2.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    contact : bool</span>
+<span class="sd">        Shapes collide</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">gjk_nesterov_accelerated</span><span class="p">(</span><span class="n">collider1</span><span class="p">,</span> <span class="n">collider2</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">gjk_nesterov_accelerated_iterations</span><span class="p">(</span><span class="n">collider1</span><span class="p">,</span> <span class="n">collider2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Nesterov-accelerated GJK.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    collider1 : ConvexCollider</span>
+<span class="sd">        Convex collider 1.</span>
+
+<span class="sd">    collider2 : ConvexCollider</span>
+<span class="sd">        Convex collider 2.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    contact : bool</span>
+<span class="sd">        Shapes collide</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">gjk_nesterov_accelerated</span><span class="p">(</span><span class="n">collider1</span><span class="p">,</span> <span class="n">collider2</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">gjk_nesterov_accelerated</span><span class="p">(</span>
+        <span class="n">collider0</span><span class="p">,</span> <span class="n">collider1</span><span class="p">,</span> <span class="n">max_interations</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">upper_bound</span><span class="o">=</span><span class="mf">1.79769e+308</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">use_nesterov_acceleration</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Nesterov-accelerated GJK.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    collider0 : ConvexCollider</span>
+<span class="sd">        Convex collider 1.</span>
+
+<span class="sd">    collider1 : ConvexCollider</span>
+<span class="sd">        Convex collider 2.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    contact : bool</span>
+<span class="sd">        Shapes collide</span>
+
+<span class="sd">    distance : float</span>
+<span class="sd">        Distance between shapes</span>
+
+<span class="sd">    simplex :</span>
+<span class="sd">        Distance between shapes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ------ Initialize Variables ------</span>
+
+    <span class="c1"># normalize_support_direction is for soem reason only needed when both colliders are an mesh.</span>
+    <span class="n">normalize_support_direction</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider0</span><span class="p">)</span> <span class="o">==</span> <span class="n">MeshGraph</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider1</span><span class="p">)</span> <span class="o">==</span> <span class="n">MeshGraph</span>
+
+    <span class="c1"># Infaltion is only used with spheres and capsules</span>
+    <span class="n">inflation</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider0</span><span class="p">)</span> <span class="o">==</span> <span class="n">Sphere</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider0</span><span class="p">)</span> <span class="o">==</span> <span class="n">Capsule</span><span class="p">:</span>
+        <span class="n">inflation</span> <span class="o">+=</span> <span class="n">collider0</span><span class="o">.</span><span class="n">radius</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider1</span><span class="p">)</span> <span class="o">==</span> <span class="n">Sphere</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider1</span><span class="p">)</span> <span class="o">==</span> <span class="n">Capsule</span><span class="p">:</span>
+        <span class="n">inflation</span> <span class="o">+=</span> <span class="n">collider1</span><span class="o">.</span><span class="n">radius</span>
+
+    <span class="n">upper_bound</span> <span class="o">+=</span> <span class="n">inflation</span>
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">inside</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">simplex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">simplex_len</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">ray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>  <span class="c1"># x in paper</span>
+    <span class="n">ray_len</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">ray_dir</span> <span class="o">=</span> <span class="n">ray</span>  <span class="c1"># d in paper</span>
+    <span class="n">support_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ray</span><span class="p">)</span>  <span class="c1"># s in paper</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_interations</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ray_len</span> <span class="o">&lt;</span> <span class="n">tolerance</span><span class="p">:</span>
+            <span class="n">distance</span> <span class="o">=</span> <span class="o">-</span><span class="n">inflation</span>
+            <span class="n">inside</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">use_nesterov_acceleration</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">normalize_support_direction</span><span class="p">:</span>
+                <span class="n">momentum</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">momentum</span> <span class="o">*</span> <span class="n">ray</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">momentum</span><span class="p">)</span> <span class="o">*</span> <span class="n">support_point</span>
+                <span class="n">ray_dir</span> <span class="o">=</span> <span class="n">momentum</span> <span class="o">*</span> <span class="n">norm_vector</span><span class="p">(</span><span class="n">ray_dir</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">momentum</span><span class="p">)</span> <span class="o">*</span> <span class="n">norm_vector</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">momentum</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">momentum</span> <span class="o">*</span> <span class="n">ray</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">momentum</span><span class="p">)</span> <span class="o">*</span> <span class="n">support_point</span>
+                <span class="n">ray_dir</span> <span class="o">=</span> <span class="n">momentum</span> <span class="o">*</span> <span class="n">ray_dir</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">momentum</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ray_dir</span> <span class="o">=</span> <span class="n">ray</span>
+
+        <span class="n">s0</span><span class="p">,</span> <span class="n">s1</span> <span class="o">=</span> <span class="n">support_function</span><span class="p">(</span><span class="o">-</span><span class="n">ray_dir</span><span class="p">,</span> <span class="n">collider0</span><span class="p">,</span> <span class="n">collider1</span><span class="p">)</span>
+
+        <span class="n">simplex</span><span class="p">[</span><span class="n">simplex_len</span><span class="p">]</span> <span class="o">=</span> <span class="n">s0</span> <span class="o">-</span> <span class="n">s1</span>
+        <span class="n">support_point</span> <span class="o">=</span> <span class="n">simplex</span><span class="p">[</span><span class="n">simplex_len</span><span class="p">]</span>
+        <span class="n">simplex_len</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">omega</span> <span class="o">=</span> <span class="n">ray_dir</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">support_point</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ray_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">omega</span> <span class="o">&gt;</span> <span class="n">upper_bound</span><span class="p">:</span>
+            <span class="n">distance</span> <span class="o">=</span> <span class="n">omega</span> <span class="o">-</span> <span class="n">inflation</span>
+            <span class="n">inside</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">use_nesterov_acceleration</span><span class="p">:</span>
+            <span class="n">frank_wolfe_duality_gap</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ray</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ray</span> <span class="o">-</span> <span class="n">support_point</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">frank_wolfe_duality_gap</span> <span class="o">-</span> <span class="n">tolerance</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">use_nesterov_acceleration</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">simplex_len</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">continue</span>
+
+        <span class="c1"># Check convergence</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">omega</span><span class="p">)</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">ray_len</span> <span class="o">-</span> <span class="n">alpha</span>
+        <span class="n">cv_check_passed</span> <span class="o">=</span> <span class="p">(</span><span class="n">diff</span> <span class="o">-</span> <span class="n">tolerance</span> <span class="o">*</span> <span class="n">ray_len</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">cv_check_passed</span><span class="p">:</span>
+            <span class="n">simplex_len</span> <span class="o">-=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">use_nesterov_acceleration</span><span class="p">:</span>
+                <span class="n">use_nesterov_acceleration</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">continue</span>
+            <span class="n">distance</span> <span class="o">=</span> <span class="n">ray_len</span> <span class="o">-</span> <span class="n">inflation</span>
+
+            <span class="n">inside</span> <span class="o">=</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
+            <span class="k">break</span>
+
+        <span class="k">assert</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">simplex_len</span> <span class="o">&lt;=</span> <span class="mi">4</span>
+        <span class="k">if</span> <span class="n">simplex_len</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">ray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">support_point</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">simplex_len</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span><span class="p">,</span> <span class="n">inside</span> <span class="o">=</span> <span class="n">project_line_origin</span><span class="p">(</span><span class="n">simplex</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">simplex_len</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span><span class="p">,</span> <span class="n">inside</span> <span class="o">=</span> <span class="n">project_triangle_origin</span><span class="p">(</span><span class="n">simplex</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span><span class="p">,</span> <span class="n">inside</span> <span class="o">=</span> <span class="n">project_tetra_to_origin</span><span class="p">(</span><span class="n">simplex</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inside</span><span class="p">:</span>
+            <span class="n">ray_len</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ray</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inside</span> <span class="ow">or</span> <span class="n">ray_len</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">distance</span> <span class="o">=</span> <span class="o">-</span><span class="n">inflation</span> <span class="o">-</span> <span class="mf">1.</span>
+            <span class="n">inside</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">inside</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">simplex</span><span class="p">,</span> <span class="n">i</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">origin_to_point</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+    <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="mi">1</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">origin_to_segment</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ab</span><span class="p">,</span> <span class="n">ab_dot_a0</span><span class="p">):</span>
+    <span class="n">ray</span> <span class="o">=</span> <span class="p">(</span><span class="n">ab</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span> <span class="o">+</span> <span class="n">ab_dot_a0</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">ab</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span>
+    <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ray</span><span class="p">,</span> <span class="mi">2</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">origin_to_triangle</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">abc</span><span class="p">,</span> <span class="n">abc_dot_a0</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">abc_dot_a0</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">abc_dot_a0</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">simplex</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">simplex</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+    <span class="n">ray</span> <span class="o">=</span> <span class="o">-</span><span class="n">abc_dot_a0</span> <span class="o">/</span> <span class="n">abc</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">abc</span><span class="p">)</span> <span class="o">*</span> <span class="n">abc</span>
+    <span class="k">return</span> <span class="n">ray</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="kc">False</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">project_line_origin</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="c1"># A is the last point we added.</span>
+    <span class="n">a_index</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">b_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">a_index</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">b_index</span><span class="p">]</span>
+
+    <span class="n">ab</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ab</span><span class="p">,</span> <span class="o">-</span><span class="n">a</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Two extremely unlikely cases:</span>
+        <span class="c1">#  - AB is orthogonal to A: should never happen because it means the support</span>
+        <span class="c1">#    function did not do any progress and GJK should have stopped.</span>
+        <span class="c1">#  - A == origin</span>
+        <span class="c1"># In any case, A is the closest to the origin</span>
+        <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">origin_to_point</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">origin_to_point</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">origin_to_segment</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ab</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span><span class="p">,</span> <span class="kc">False</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">t_b</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ab</span><span class="p">):</span>
+    <span class="n">towards_b</span> <span class="o">=</span> <span class="n">ab</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="o">-</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">towards_b</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">origin_to_point</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">origin_to_segment</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ab</span><span class="p">,</span> <span class="n">towards_b</span><span class="p">)</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">project_triangle_origin</span><span class="p">(</span><span class="n">triangle</span><span class="p">):</span>
+    <span class="c1"># A is the last point we added.</span>
+    <span class="n">a_index</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">b_index</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">c_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">[</span><span class="n">a_index</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">[</span><span class="n">b_index</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">triangle</span><span class="p">[</span><span class="n">c_index</span><span class="p">]</span>
+
+    <span class="n">ab</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span>
+    <span class="n">ac</span> <span class="o">=</span> <span class="n">c</span> <span class="o">-</span> <span class="n">a</span>
+    <span class="n">abc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">ab</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+
+    <span class="n">edge_ac2o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">abc</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="o">-</span><span class="n">a</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">edge_ac2o</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+
+        <span class="n">towards_c</span> <span class="o">=</span> <span class="n">ac</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="o">-</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">towards_c</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">origin_to_segment</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="n">towards_c</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">t_b</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ab</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="n">edge_ab2o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">ab</span><span class="p">,</span> <span class="n">abc</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="o">-</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">edge_ab2o</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">t_b</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ab</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">origin_to_triangle</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">abc</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="o">-</span><span class="n">a</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span><span class="p">,</span> <span class="kc">False</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">region_a</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">origin_to_point</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">region_ab</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ba_aa</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">origin_to_segment</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="n">ba_aa</span><span class="p">)</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">region_ac</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">ca_aa</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">origin_to_segment</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">c</span> <span class="o">-</span> <span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="n">ca_aa</span><span class="p">)</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">region_ad</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da_aa</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">origin_to_segment</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">d</span> <span class="o">-</span> <span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="n">da_aa</span><span class="p">)</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">region_abc</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">origin_to_triangle</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span> <span class="o">-</span> <span class="n">a</span><span class="p">),</span> <span class="o">-</span><span class="n">c</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_b</span><span class="p">))[:</span><span class="mi">2</span><span class="p">]</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">region_acd</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">a_cross_c</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">origin_to_triangle</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">c</span> <span class="o">-</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span> <span class="o">-</span> <span class="n">a</span><span class="p">),</span> <span class="o">-</span><span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_c</span><span class="p">))[:</span><span class="mi">2</span><span class="p">]</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">region_adb</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">origin_to_triangle</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">),</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_b</span><span class="p">))[:</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">project_tetra_to_origin</span><span class="p">(</span><span class="n">tetra</span><span class="p">):</span>
+    <span class="n">a_index</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">b_index</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">c_index</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">d_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">tetra</span><span class="p">[</span><span class="n">a_index</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">tetra</span><span class="p">[</span><span class="n">b_index</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">tetra</span><span class="p">[</span><span class="n">c_index</span><span class="p">]</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">tetra</span><span class="p">[</span><span class="n">d_index</span><span class="p">]</span>
+
+    <span class="n">aa</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+    <span class="n">da</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">dd</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">da_aa</span> <span class="o">=</span> <span class="n">da</span> <span class="o">-</span> <span class="n">aa</span>
+
+    <span class="n">ca</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">cb</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">cc</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">ca_aa</span> <span class="o">=</span> <span class="n">ca</span> <span class="o">-</span> <span class="n">aa</span>
+
+    <span class="n">ba</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">bb</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">bc</span> <span class="o">=</span> <span class="n">cb</span>
+    <span class="n">bd</span> <span class="o">=</span> <span class="n">db</span>
+    <span class="n">ba_aa</span> <span class="o">=</span> <span class="n">ba</span> <span class="o">-</span> <span class="n">aa</span>
+    <span class="n">ba_ca</span> <span class="o">=</span> <span class="n">ba</span> <span class="o">-</span> <span class="n">ca</span>
+    <span class="n">ca_da</span> <span class="o">=</span> <span class="n">ca</span> <span class="o">-</span> <span class="n">da</span>
+    <span class="n">da_ba</span> <span class="o">=</span> <span class="n">da</span> <span class="o">-</span> <span class="n">ba</span>
+
+    <span class="n">a_cross_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">a_cross_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ba_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="o">-</span><span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ba</span> <span class="o">*</span> <span class="n">da_ba</span> <span class="o">+</span> <span class="n">bd</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">-</span> <span class="n">bb</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">da_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">ba</span> <span class="o">*</span> <span class="n">ba_ca</span> <span class="o">+</span> <span class="n">bb</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">-</span> <span class="n">bc</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_abc</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ab</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ba_aa</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">ba</span> <span class="o">*</span> <span class="n">ba_ca</span> <span class="o">+</span> <span class="n">bb</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">-</span> <span class="n">bc</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ba_ca</span> <span class="o">+</span> <span class="n">cb</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">-</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_acd</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">a_cross_c</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ac</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">ca_aa</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_abc</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ab</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ba_aa</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">da</span> <span class="o">*</span> <span class="n">da_ba</span> <span class="o">+</span> <span class="n">dd</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">-</span> <span class="n">db</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_adb</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">da</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dd</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ad</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da_aa</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_acd</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">a_cross_c</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">da</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dd</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ad</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da_aa</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ac</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">ca_aa</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ba</span> <span class="o">*</span> <span class="n">ba_ca</span> <span class="o">+</span> <span class="n">bb</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">-</span> <span class="n">bc</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ba_ca</span> <span class="o">+</span> <span class="n">cb</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">-</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_acd</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">a_cross_c</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ac</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">ca_aa</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_abc</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ad</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da_aa</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_c</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">da</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dd</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ad</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da_aa</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_acd</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">a_cross_c</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ac</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">ca_aa</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ad</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da_aa</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">4</span><span class="p">,</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_c</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">da_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">da</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dd</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">da</span> <span class="o">*</span> <span class="n">da_ba</span> <span class="o">+</span> <span class="n">dd</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">-</span> <span class="n">db</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_adb</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ad</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da_aa</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_acd</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">a_cross_c</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ba_ca</span> <span class="o">+</span> <span class="n">cb</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">-</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ac</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">ca_aa</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_abc</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ba_ca</span> <span class="o">+</span> <span class="n">cb</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">-</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_acd</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">a_cross_c</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ac</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">ca_aa</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_b</span><span class="p">):</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_abc</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_acd</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">a_cross_c</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">ca</span> <span class="o">*</span> <span class="n">ba_ca</span> <span class="o">+</span> <span class="n">cb</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">-</span> <span class="n">cc</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ac</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">ca_aa</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_abc</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="o">-</span><span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">da</span> <span class="o">*</span> <span class="n">da_ba</span> <span class="o">+</span> <span class="n">dd</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">-</span> <span class="n">db</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_adb</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ad</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da_aa</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">4</span><span class="p">,</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">da_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="o">-</span><span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">da</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dd</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">da</span> <span class="o">*</span> <span class="n">da_ba</span> <span class="o">+</span> <span class="n">dd</span> <span class="o">*</span> <span class="n">ba_aa</span> <span class="o">-</span> <span class="n">db</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_adb</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ad</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da_aa</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_c</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_acd</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">a_cross_c</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># ???</span>
+                                <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_adb</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span><span class="o">=</span> <span class="n">region_adb</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a_cross_b</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a_cross_c</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">da</span> <span class="o">*</span> <span class="n">ca_da</span> <span class="o">+</span> <span class="n">dc</span> <span class="o">*</span> <span class="n">da_aa</span> <span class="o">-</span> <span class="n">dd</span> <span class="o">*</span> <span class="n">ca_aa</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_ad</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da_aa</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_acd</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">c_index</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">a_cross_c</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">4</span><span class="p">,</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span> <span class="o">=</span> <span class="n">region_a</span><span class="p">(</span><span class="n">tetra</span><span class="p">,</span> <span class="n">a_index</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ray</span><span class="p">,</span> <span class="n">simplex_len</span><span class="p">,</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">support_function</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">collider0</span><span class="p">,</span> <span class="n">collider1</span><span class="p">):</span>
+    <span class="n">collider02origin</span> <span class="o">=</span> <span class="n">collider0</span><span class="o">.</span><span class="n">collider2origin</span><span class="p">()</span>
+    <span class="n">collider12origin</span> <span class="o">=</span> <span class="n">collider1</span><span class="o">.</span><span class="n">collider2origin</span><span class="p">()</span>
+    <span class="n">oR1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">collider02origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">collider12origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">ot1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">collider02origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">collider1</span><span class="o">.</span><span class="n">center</span><span class="p">()</span> <span class="o">-</span> <span class="n">collider02origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">support0</span><span class="p">,</span> <span class="n">found0</span> <span class="o">=</span> <span class="n">select_support</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">collider0</span><span class="p">)</span>
+
+    <span class="n">support1</span><span class="p">,</span> <span class="n">found1</span> <span class="o">=</span> <span class="n">select_support</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="o">-</span><span class="n">oR1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="nb">dir</span><span class="p">),</span> <span class="n">collider1</span><span class="p">)</span>
+    <span class="n">support1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">oR1</span><span class="p">,</span> <span class="n">support1</span><span class="p">)</span> <span class="o">+</span> <span class="n">ot1</span>
+
+    <span class="k">if</span> <span class="n">found0</span> <span class="ow">and</span> <span class="n">found1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">support0</span><span class="p">,</span> <span class="n">support1</span>
+
+    <span class="k">return</span> <span class="n">collider0</span><span class="o">.</span><span class="n">support_function</span><span class="p">(</span><span class="nb">dir</span><span class="p">),</span> <span class="n">collider1</span><span class="o">.</span><span class="n">support_function</span><span class="p">(</span><span class="o">-</span><span class="nb">dir</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">select_support</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">collider</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider</span><span class="p">)</span> <span class="o">==</span> <span class="n">Sphere</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sphere_support</span><span class="p">(),</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider</span><span class="p">)</span> <span class="o">==</span> <span class="n">Capsule</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">capsule_support</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">collider</span><span class="p">),</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider</span><span class="p">)</span> <span class="o">==</span> <span class="n">Box</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">box_support</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">collider</span><span class="p">),</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider</span><span class="p">)</span> <span class="o">==</span> <span class="n">Ellipsoid</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ellipsoid_support</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">collider</span><span class="p">),</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">collider</span><span class="p">)</span> <span class="o">==</span> <span class="n">Cylinder</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">cylinder_support</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">collider</span><span class="p">),</span> <span class="kc">True</span>
+
+    <span class="c1"># Type not found</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">sphere_support</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">capsule_support</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">capsule</span><span class="p">):</span>
+    <span class="n">support</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">dir</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">support</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">capsule</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">support</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">capsule</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="k">return</span> <span class="n">support</span>
+
+
+<span class="k">def</span> <span class="nf">box_support</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">box</span><span class="p">):</span>
+    <span class="n">inflate</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">dir</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="n">inflate</span> <span class="o">=</span> <span class="mf">1.00000001</span>
+
+    <span class="n">support</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">dir</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">support</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">inflate</span> <span class="o">*</span> <span class="p">(</span><span class="n">box</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">support</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">inflate</span> <span class="o">*</span> <span class="p">(</span><span class="n">box</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">support</span>
+
+
+<span class="k">def</span> <span class="nf">ellipsoid_support</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">ellipsoid</span><span class="p">):</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="n">ellipsoid</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">ellipsoid</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">b2</span> <span class="o">=</span> <span class="n">ellipsoid</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">ellipsoid</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">ellipsoid</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">ellipsoid</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">a2</span> <span class="o">*</span> <span class="nb">dir</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b2</span> <span class="o">*</span> <span class="nb">dir</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c2</span> <span class="o">*</span> <span class="nb">dir</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="nb">dir</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">v</span> <span class="o">/</span> <span class="n">d</span>
+
+<span class="k">def</span> <span class="nf">cylinder_support</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">cylinder</span><span class="p">):</span>
+    <span class="n">support</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+
+    <span class="n">inflate</span> <span class="o">=</span> <span class="mf">1.00001</span>
+
+    <span class="n">half_h</span> <span class="o">=</span> <span class="n">cylinder</span><span class="o">.</span><span class="n">length</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">cylinder</span><span class="o">.</span><span class="n">radius</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">dir</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]))</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="n">half_h</span> <span class="o">*=</span> <span class="n">inflate</span>
+
+    <span class="k">if</span> <span class="nb">dir</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">support</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">half_h</span>
+    <span class="k">elif</span> <span class="nb">dir</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">support</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">half_h</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">support</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">r</span> <span class="o">*=</span> <span class="n">inflate</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">dir</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]))</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="n">support</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">support</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">support</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="nb">dir</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">r</span>
+
+    <span class="k">return</span> <span class="n">support</span>
+
+
+
+
+
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">distance3d</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_auto_examples/index.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexander Fabisch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

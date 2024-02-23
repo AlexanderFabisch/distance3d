@@ -1,23 +1,20 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.colliders &#8212; distance3d 0.7.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <title>distance3d.colliders &#8212; distance3d 0.9.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=cb25574f" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=ca3c1c84" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -53,7 +50,9 @@
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">plane_basis_from_normal</span><span class="p">,</span> <span class="n">norm_vector</span>
 
 
-<div class="viewcode-block" id="ConvexCollider"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ConvexCollider.html#distance3d.colliders.ConvexCollider">[docs]</a><span class="k">class</span> <span class="nc">ConvexCollider</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvexCollider">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ConvexCollider.html#distance3d.colliders.ConvexCollider">[docs]</a>
+<span class="k">class</span> <span class="nc">ConvexCollider</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convex collider base class.</span>
 
 <span class="sd">    Parameters</span>
@@ -66,8 +65,11 @@
 <span class="sd">    artist_ : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Corresponding artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="ConvexCollider.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ConvexCollider.html#distance3d.colliders.ConvexCollider.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvexCollider.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ConvexCollider.html#distance3d.colliders.ConvexCollider.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">artist</span></div>
+
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -132,10 +134,23 @@
 <span class="sd">        -------</span>
 <span class="sd">        aabb : AABB</span>
 <span class="sd">            Axis-aligned bounding box.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the transformation matrix of the collider</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">             collider2origin : array, shape (4, 4)</span>
+<span class="sd">                Pose of the collider.</span>
+<span class="sd">            &quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="ConvexHullVertices"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ConvexHullVertices.html#distance3d.colliders.ConvexHullVertices">[docs]</a><span class="k">class</span> <span class="nc">ConvexHullVertices</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ConvexHullVertices">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ConvexHullVertices.html#distance3d.colliders.ConvexHullVertices">[docs]</a>
+<span class="k">class</span> <span class="nc">ConvexHullVertices</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convex hull of a set of vertices.</span>
 
 <span class="sd">    Parameters</span>
@@ -146,9 +161,12 @@
 <span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="ConvexHullVertices.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ConvexHullVertices.html#distance3d.colliders.ConvexHullVertices.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ConvexHullVertices.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.ConvexHullVertices.html#distance3d.colliders.ConvexHullVertices.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConvexHullVertices</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span></div>
+
 
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
@@ -167,10 +185,16 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;update_pose is not implemented!&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axis_aligned_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axis_aligned_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Box"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box">[docs]</a><span class="k">class</span> <span class="nc">Box</span><span class="p">(</span><span class="n">ConvexHullVertices</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Box">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box">[docs]</a>
+<span class="k">class</span> <span class="nc">Box</span><span class="p">(</span><span class="n">ConvexHullVertices</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Box collider.</span>
 
 <span class="sd">    Parameters</span>
@@ -184,11 +208,14 @@
 <span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Corresponding artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Box.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Box.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Box.html#distance3d.colliders.Box.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Box</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">convert_box_to_vertices</span><span class="p">(</span><span class="n">box2origin</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="n">artist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">box2origin</span> <span class="o">=</span> <span class="n">box2origin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span></div>
+
 
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
@@ -204,10 +231,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">box_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">box_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">box2origin</span></div>
 
 
-<div class="viewcode-block" id="MeshGraph"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.MeshGraph.html#distance3d.colliders.MeshGraph">[docs]</a><span class="k">class</span> <span class="nc">MeshGraph</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MeshGraph">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.MeshGraph.html#distance3d.colliders.MeshGraph">[docs]</a>
+<span class="k">class</span> <span class="nc">MeshGraph</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mesh collider that uses triangles for hill climbing.</span>
 
 <span class="sd">    Parameters</span>
@@ -224,13 +257,16 @@
 <span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Corresponding artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="MeshGraph.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.MeshGraph.html#distance3d.colliders.MeshGraph.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh2origin</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MeshGraph.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.MeshGraph.html#distance3d.colliders.MeshGraph.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh2origin</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MeshGraph</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mesh2origin</span> <span class="o">=</span> <span class="n">mesh2origin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span> <span class="o">=</span> <span class="n">triangles</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_support_function</span> <span class="o">=</span> <span class="n">MeshHillClimbingSupportFunction</span><span class="p">(</span>
             <span class="n">mesh2origin</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">triangles</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">.visualization</span> <span class="kn">import</span> <span class="n">Mesh</span>
@@ -257,10 +293,16 @@
     <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axis_aligned_bounding_box</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mesh2origin</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)))</span><span class="o">.</span><span class="n">T</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh2origin</span></div>
 
 
-<div class="viewcode-block" id="Sphere"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere">[docs]</a><span class="k">class</span> <span class="nc">Sphere</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Sphere">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere">[docs]</a>
+<span class="k">class</span> <span class="nc">Sphere</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sphere collider.</span>
 
 <span class="sd">    Parameters</span>
@@ -274,16 +316,17 @@
 <span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Corresponding artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Sphere.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Sphere.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Sphere.html#distance3d.colliders.Sphere.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Sphere</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">center</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span></div>
 
+
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
-        <span class="n">sphere2origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-        <span class="n">sphere2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Sphere</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="n">sphere2origin</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Sphere</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">A2B</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collider2origin</span><span class="p">(),</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
@@ -301,10 +344,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sphere_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sphere_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sphere2origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">sphere2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">return</span> <span class="n">sphere2origin</span></div>
 
 
-<div class="viewcode-block" id="Capsule"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule">[docs]</a><span class="k">class</span> <span class="nc">Capsule</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Capsule">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule">[docs]</a>
+<span class="k">class</span> <span class="nc">Capsule</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Capsule collider.</span>
 
 <span class="sd">    Parameters</span>
@@ -321,11 +372,14 @@
 <span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Corresponding artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Capsule.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capsule2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Capsule.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Capsule.html#distance3d.colliders.Capsule.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capsule2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Capsule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span> <span class="o">=</span> <span class="n">capsule2origin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span></div>
+
 
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
@@ -351,10 +405,16 @@
 
     <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">capsule_aabb</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">capsule2origin</span></div>
 
 
-<div class="viewcode-block" id="Ellipsoid"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Ellipsoid.html#distance3d.colliders.Ellipsoid">[docs]</a><span class="k">class</span> <span class="nc">Ellipsoid</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ellipsoid">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Ellipsoid.html#distance3d.colliders.Ellipsoid">[docs]</a>
+<span class="k">class</span> <span class="nc">Ellipsoid</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Ellipsoid collider.</span>
 
 <span class="sd">    Parameters</span>
@@ -368,10 +428,13 @@
 <span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Corresponding artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Ellipsoid.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Ellipsoid.html#distance3d.colliders.Ellipsoid.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Ellipsoid.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Ellipsoid.html#distance3d.colliders.Ellipsoid.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="n">radii</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Ellipsoid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ellipsoid2origin</span> <span class="o">=</span> <span class="n">ellipsoid2origin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radii</span> <span class="o">=</span> <span class="n">radii</span></div>
+
 
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
@@ -395,10 +458,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ellipsoid_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radii</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ellipsoid_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ellipsoid2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radii</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ellipsoid2origin</span></div>
 
 
-<div class="viewcode-block" id="Cylinder"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Cylinder.html#distance3d.colliders.Cylinder">[docs]</a><span class="k">class</span> <span class="nc">Cylinder</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Cylinder">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Cylinder.html#distance3d.colliders.Cylinder">[docs]</a>
+<span class="k">class</span> <span class="nc">Cylinder</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Cylinder collider.</span>
 
 <span class="sd">    Parameters</span>
@@ -415,11 +484,14 @@
 <span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Corresponding artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Cylinder.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Cylinder.html#distance3d.colliders.Cylinder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cylinder2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Cylinder.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Cylinder.html#distance3d.colliders.Cylinder.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cylinder2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Cylinder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span> <span class="o">=</span> <span class="n">cylinder2origin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span></div>
+
 
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
@@ -445,10 +517,16 @@
 
     <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cylinder_aabb</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cylinder2origin</span></div>
 
 
-<div class="viewcode-block" id="Disk"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Disk.html#distance3d.colliders.Disk">[docs]</a><span class="k">class</span> <span class="nc">Disk</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Disk">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Disk.html#distance3d.colliders.Disk">[docs]</a>
+<span class="k">class</span> <span class="nc">Disk</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Disk collider.</span>
 
 <span class="sd">    Parameters</span>
@@ -465,20 +543,19 @@
 <span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Corresponding artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Disk.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Disk.html#distance3d.colliders.Disk.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">normal</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Disk.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Disk.html#distance3d.colliders.Disk.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">normal</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Disk</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">center</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normal</span> <span class="o">=</span> <span class="n">normal</span></div>
 
+
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">plane_basis_from_normal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normal</span><span class="p">)</span>
-        <span class="n">disk2origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-        <span class="n">disk2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">normal</span><span class="p">))</span>
-        <span class="n">disk2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Cylinder</span><span class="p">(</span>
-            <span class="n">A2B</span><span class="o">=</span><span class="n">disk2origin</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mf">0.01</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span>
+            <span class="n">A2B</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collider2origin</span><span class="p">(),</span> <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mf">0.01</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span>
             <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -499,10 +576,20 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">disk_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">normal</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">disk_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">normal</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">plane_basis_from_normal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normal</span><span class="p">)</span>
+        <span class="n">disk2origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">disk2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">normal</span><span class="p">))</span>
+        <span class="n">disk2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">return</span> <span class="n">disk2origin</span></div>
 
 
-<div class="viewcode-block" id="Ellipse"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Ellipse.html#distance3d.colliders.Ellipse">[docs]</a><span class="k">class</span> <span class="nc">Ellipse</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ellipse">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Ellipse.html#distance3d.colliders.Ellipse">[docs]</a>
+<span class="k">class</span> <span class="nc">Ellipse</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Ellipse collider.</span>
 
 <span class="sd">    Parameters</span>
@@ -519,15 +606,18 @@
 <span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Corresponding artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Ellipse.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Ellipse.html#distance3d.colliders.Ellipse.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">radii</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Ellipse.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Ellipse.html#distance3d.colliders.Ellipse.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">radii</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Ellipse</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">center</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radii</span> <span class="o">=</span> <span class="n">radii</span></div>
 
+
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">.visualization</span> <span class="kn">import</span> <span class="n">Ellipse</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">Ellipse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radii</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span> <span class="o">=</span> <span class="n">Ellipse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collider2origin</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">radii</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
@@ -546,10 +636,20 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ellipse_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radii</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ellipse_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radii</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ellipse2origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">ellipse2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">ellipse2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">ellipse2origin</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">return</span> <span class="n">ellipse2origin</span></div>
 
 
-<div class="viewcode-block" id="Cone"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Cone.html#distance3d.colliders.Cone">[docs]</a><span class="k">class</span> <span class="nc">Cone</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Cone">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Cone.html#distance3d.colliders.Cone">[docs]</a>
+<span class="k">class</span> <span class="nc">Cone</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Cone collider.</span>
 
 <span class="sd">    Parameters</span>
@@ -566,11 +666,14 @@
 <span class="sd">    artist : pytransform3d.visualizer.Artist, optional (default: None)</span>
 <span class="sd">        Corresponding artist for visualizer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Cone.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Cone.html#distance3d.colliders.Cone.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cone2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Cone.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Cone.html#distance3d.colliders.Cone.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cone2origin</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Cone</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cone2origin</span> <span class="o">=</span> <span class="n">cone2origin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span></div>
+
 
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">pytransform3d.visualizer</span> <span class="k">as</span> <span class="nn">pv</span>
@@ -595,10 +698,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">artist_</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">aabb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cone_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cone2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cone_aabb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cone2origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cone2origin</span></div>
 
 
-<div class="viewcode-block" id="Margin"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Margin.html#distance3d.colliders.Margin">[docs]</a><span class="k">class</span> <span class="nc">Margin</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Margin">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Margin.html#distance3d.colliders.Margin">[docs]</a>
+<span class="k">class</span> <span class="nc">Margin</span><span class="p">(</span><span class="n">ConvexCollider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Margin around collider.</span>
 
 <span class="sd">    Parameters</span>
@@ -609,10 +718,13 @@
 <span class="sd">    margin : float</span>
 <span class="sd">        Margin size.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Margin.__init__"><a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Margin.html#distance3d.colliders.Margin.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collider</span><span class="p">,</span> <span class="n">margin</span><span class="p">):</span>
+<div class="viewcode-block" id="Margin.__init__">
+<a class="viewcode-back" href="../../_autosummary/distance3d.colliders.Margin.html#distance3d.colliders.Margin.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collider</span><span class="p">,</span> <span class="n">margin</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Margin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">collider</span><span class="o">.</span><span class="n">artist_</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collider</span> <span class="o">=</span> <span class="n">collider</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">=</span> <span class="n">margin</span></div>
+
 
     <span class="k">def</span> <span class="nf">make_artist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collider</span><span class="o">.</span><span class="n">make_artist</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
@@ -635,7 +747,11 @@
         <span class="n">aabb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collider</span><span class="o">.</span><span class="n">aabb</span><span class="p">()</span>
         <span class="n">mins</span> <span class="o">=</span> <span class="n">aabb</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
         <span class="n">maxs</span> <span class="o">=</span> <span class="n">aabb</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span><span class="o">.</span><span class="n">T</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">def</span> <span class="nf">collider2origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">collider</span><span class="o">.</span><span class="n">collider2origin</span><span class="p">()</span></div>
+
 
 
 <span class="n">COLLIDERS</span> <span class="o">=</span> <span class="p">{</span>
@@ -708,7 +824,7 @@
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

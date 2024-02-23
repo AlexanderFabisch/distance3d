@@ -1,0 +1,6 @@
+﻿distance3d.gjk.gjk\_nesterov\_accelerated\_primitives\_intersection
+===================================================================
+
+.. currentmodule:: distance3d.gjk
+
+.. autofunction:: gjk_nesterov_accelerated_primitives_intersection

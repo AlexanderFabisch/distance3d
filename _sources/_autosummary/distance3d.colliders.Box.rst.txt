@@ -16,6 +16,7 @@
       ~Box.__init__
       ~Box.aabb
       ~Box.center
+      ~Box.collider2origin
       ~Box.first_vertex
       ~Box.make_artist
       ~Box.support_function

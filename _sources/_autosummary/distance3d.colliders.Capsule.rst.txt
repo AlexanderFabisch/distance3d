@@ -16,6 +16,7 @@
       ~Capsule.__init__
       ~Capsule.aabb
       ~Capsule.center
+      ~Capsule.collider2origin
       ~Capsule.first_vertex
       ~Capsule.make_artist
       ~Capsule.support_function

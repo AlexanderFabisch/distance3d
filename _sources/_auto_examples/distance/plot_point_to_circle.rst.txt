@@ -34,8 +34,6 @@ Distance from point to circle
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -65039,7 +65037,7 @@ Distance from point to circle
     1.6817370131741423
     0.48633224648188855
     0.9364402945062739
-    accumulated_time=1.0956804752349854
+    accumulated_time=0.7401535511016846
 
 
 
@@ -65088,28 +65086,23 @@ Distance from point to circle
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.298 seconds)
+   **Total running time of the script:** ( 0 minutes  2.321 seconds)
 
 
 .. _sphx_glr_download__auto_examples_distance_plot_point_to_circle.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_point_to_circle.py <plot_point_to_circle.py>`
 
-     :download:`Download Python source code: plot_point_to_circle.py <plot_point_to_circle.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_point_to_circle.ipynb <plot_point_to_circle.ipynb>`
+      :download:`Download Jupyter notebook: plot_point_to_circle.ipynb <plot_point_to_circle.ipynb>`
 
 
 .. only:: html

@@ -16,6 +16,7 @@
       ~Disk.__init__
       ~Disk.aabb
       ~Disk.center
+      ~Disk.collider2origin
       ~Disk.first_vertex
       ~Disk.make_artist
       ~Disk.support_function

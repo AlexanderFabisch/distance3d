@@ -16,6 +16,7 @@
       ~ConvexHullVertices.__init__
       ~ConvexHullVertices.aabb
       ~ConvexHullVertices.center
+      ~ConvexHullVertices.collider2origin
       ~ConvexHullVertices.first_vertex
       ~ConvexHullVertices.make_artist
       ~ConvexHullVertices.support_function

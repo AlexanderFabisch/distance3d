@@ -65,23 +65,6 @@ Containment Tests
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Ellipsoid Containment">
-
-.. only:: html
-
-  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_ellipsoid_thumb.png
-    :alt: Ellipsoid Containment
-
-  :ref:`sphx_glr__auto_examples_containment_test_plot_ellipsoid.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Ellipsoid Containment</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Cone Containment">
 
 .. only:: html
@@ -94,6 +77,23 @@ Containment Tests
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Cone Containment</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Ellipsoid Containment">
+
+.. only:: html
+
+  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_ellipsoid_thumb.png
+    :alt: Ellipsoid Containment
+
+  :ref:`sphx_glr__auto_examples_containment_test_plot_ellipsoid.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Ellipsoid Containment</div>
     </div>
 
 
@@ -142,8 +142,8 @@ Containment Tests
    /_auto_examples/containment_test/plot_sphere
    /_auto_examples/containment_test/plot_box
    /_auto_examples/containment_test/plot_mesh
-   /_auto_examples/containment_test/plot_ellipsoid
    /_auto_examples/containment_test/plot_cone
+   /_auto_examples/containment_test/plot_ellipsoid
    /_auto_examples/containment_test/plot_capsule
    /_auto_examples/containment_test/plot_cylinder
 

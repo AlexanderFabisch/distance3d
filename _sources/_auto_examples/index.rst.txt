@@ -131,23 +131,6 @@ Containment Tests
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Ellipsoid Containment">
-
-.. only:: html
-
-  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_ellipsoid_thumb.png
-    :alt: Ellipsoid Containment
-
-  :ref:`sphx_glr__auto_examples_containment_test_plot_ellipsoid.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Ellipsoid Containment</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Cone Containment">
 
 .. only:: html
@@ -160,6 +143,23 @@ Containment Tests
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Cone Containment</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Ellipsoid Containment">
+
+.. only:: html
+
+  .. image:: /_auto_examples/containment_test/images/thumb/sphx_glr_plot_ellipsoid_thumb.png
+    :alt: Ellipsoid Containment
+
+  :ref:`sphx_glr__auto_examples_containment_test_plot_ellipsoid.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Ellipsoid Containment</div>
     </div>
 
 
@@ -467,23 +467,6 @@ Distance
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to triangle">
-
-.. only:: html
-
-  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_triangle_thumb.png
-    :alt: Distance from plane to triangle
-
-  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_triangle.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Distance from plane to triangle</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Distance from point to cylinder">
 
 .. only:: html
@@ -496,6 +479,23 @@ Distance
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Distance from point to cylinder</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to triangle">
+
+.. only:: html
+
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_triangle_thumb.png
+    :alt: Distance from plane to triangle
+
+  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_triangle.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance from plane to triangle</div>
     </div>
 
 
@@ -654,23 +654,6 @@ Distance
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to ellipsoid">
-
-.. only:: html
-
-  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_ellipsoid_thumb.png
-    :alt: Distance from plane to ellipsoid
-
-  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_ellipsoid.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Distance from plane to ellipsoid</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Distance from triangle to rectangle">
 
 .. only:: html
@@ -683,6 +666,23 @@ Distance
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Distance from triangle to rectangle</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distance from plane to ellipsoid">
+
+.. only:: html
+
+  .. image:: /_auto_examples/distance/images/thumb/sphx_glr_plot_plane_to_ellipsoid_thumb.png
+    :alt: Distance from plane to ellipsoid
+
+  :ref:`sphx_glr__auto_examples_distance_plot_plane_to_ellipsoid.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Distance from plane to ellipsoid</div>
     </div>
 
 
@@ -917,6 +917,23 @@ GJK
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Distance between capsules with GJK</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Plot Samples from Minkowski Difference">
+
+.. only:: html
+
+  .. image:: /_auto_examples/gjk/images/thumb/sphx_glr_plot_minkowski_samples_thumb.png
+    :alt: Plot Samples from Minkowski Difference
+
+  :ref:`sphx_glr__auto_examples_gjk_plot_minkowski_samples.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plot Samples from Minkowski Difference</div>
     </div>
 
 

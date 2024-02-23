@@ -34,13 +34,11 @@ Collision resolution with EPA after GJK
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
-    [ 0.11561795 -0.30145285  0.12618015]
-    [ 0.16265775  0.56084527 -0.70360588]
+    [ 0.16013418 -0.31319129  0.0027869 ]
+    [-0.64738077  0.2573657   1.45919924]
 
 
 
@@ -99,28 +97,23 @@ Collision resolution with EPA after GJK
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.310 seconds)
+   **Total running time of the script:** ( 0 minutes  0.217 seconds)
 
 
 .. _sphx_glr_download__auto_examples_gjk_plot_collision_resolution_epa.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_collision_resolution_epa.py <plot_collision_resolution_epa.py>`
 
-     :download:`Download Python source code: plot_collision_resolution_epa.py <plot_collision_resolution_epa.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_collision_resolution_epa.ipynb <plot_collision_resolution_epa.ipynb>`
+      :download:`Download Jupyter notebook: plot_collision_resolution_epa.ipynb <plot_collision_resolution_epa.ipynb>`
 
 
 .. only:: html

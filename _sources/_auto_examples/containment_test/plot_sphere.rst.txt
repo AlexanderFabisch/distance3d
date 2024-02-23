@@ -34,12 +34,10 @@ Sphere Containment
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
-    0.003360271453857422 s
+    0.0024526119232177734 s
 
 
 
@@ -80,28 +78,23 @@ Sphere Containment
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.241 seconds)
+   **Total running time of the script:** ( 0 minutes  0.175 seconds)
 
 
 .. _sphx_glr_download__auto_examples_containment_test_plot_sphere.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_sphere.py <plot_sphere.py>`
 
-     :download:`Download Python source code: plot_sphere.py <plot_sphere.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_sphere.ipynb <plot_sphere.ipynb>`
+      :download:`Download Jupyter notebook: plot_sphere.ipynb <plot_sphere.ipynb>`
 
 
 .. only:: html

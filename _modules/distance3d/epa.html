@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>distance3d.epa &#8212; distance3d 0.7.0 documentation</title>
+    <title>distance3d.epa &#8212; distance3d 0.7.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -46,7 +46,7 @@
 
 
 <div class="viewcode-block" id="epa"><a class="viewcode-back" href="../../_autosummary/distance3d.epa.epa.html#distance3d.epa.epa">[docs]</a><span class="k">def</span> <span class="nf">epa</span><span class="p">(</span><span class="n">simplex</span><span class="p">,</span> <span class="n">collider1</span><span class="p">,</span> <span class="n">collider2</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">max_loose_edges</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">max_faces</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Expanding Polytope Algorithm (EPA).</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Expanding Polytope Algorithm (EPA).</span>
 
 <span class="sd">    Find minimum translation vector to resolve collision.</span>
 
@@ -118,7 +118,7 @@
 
 
 <span class="k">class</span> <span class="nc">Polytope</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Array of faces, each with 3 vertices and a normal.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Array of faces, each with 3 vertices and a normal.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simplex</span><span class="p">,</span> <span class="n">max_faces</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_faces</span> <span class="o">=</span> <span class="n">max_faces</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span>
@@ -176,7 +176,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">n_faces</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">fix_ccw_normal_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">face_idx</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Correct wrong normal direction to maintain CCW winding.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Correct wrong normal direction to maintain CCW winding.&quot;&quot;&quot;</span>
         <span class="c1"># Use bias in case dot result is only slightly &lt; 0 (because origin is on face)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="n">bias</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">[</span><span class="n">face_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
@@ -186,7 +186,7 @@
 
 
 <span class="k">class</span> <span class="nc">LooseEdges</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Keep track of edges we need to fix after removing faces.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep track of edges we need to fix after removing faces.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_loose_edges</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_loose_edges</span> <span class="o">=</span> <span class="n">max_loose_edges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span>
@@ -298,7 +298,7 @@
       &copy;2022, Alexander Fabisch.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>
