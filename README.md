@@ -50,11 +50,11 @@ installed during installation of distance3d.
 
 Install the package with
 
-    pip install -e .
+    pip install -e .[all]
 
 or from PyPI with
 
-    pip install distance3d
+    pip install distance3d[all]
 
 ## Unit Tests
 
