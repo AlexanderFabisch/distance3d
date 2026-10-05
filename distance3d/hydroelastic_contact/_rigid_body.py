@@ -6,7 +6,6 @@ from ._tetra_mesh_creation import (
     make_tetrahedral_capsule)
 from ._mesh_processing import center_of_mass_tetrahedral_mesh, tetrahedral_mesh_aabbs
 from ..aabb_tree import AabbTree
-from ..visualization import RigidBodyTetrahedralMesh
 
 
 class RigidBody:
@@ -293,4 +292,5 @@ class RigidBody:
             c : array, shape (3
                 The color of the wireframe.
         """
+        from ..visualization import RigidBodyTetrahedralMesh
         self._artist = RigidBodyTetrahedralMesh(self.body2origin_, self.vertices_, self.tetrahedra_, c)
