@@ -95,10 +95,10 @@ def load_tetrahedral_mesh(filename, scale=1.0):
     assert point_lines is not None
     assert cells_lines is not None
 
-    points = np.row_stack([np.fromstring(line, sep=" ", dtype=float)
-                           for line in point_lines])
-    cells = np.row_stack([np.fromstring(line, sep=" ", dtype=int)
-                          for line in cells_lines])
+    points = np.vstack([np.fromstring(line, sep=" ", dtype=float)
+                        for line in point_lines])
+    cells = np.vstack([np.fromstring(line, sep=" ", dtype=int)
+                       for line in cells_lines])
     assert all(cells[:, 0] == 4)
 
     vertices = points * scale

@@ -43,7 +43,7 @@ def test_barycentric_coordinates_tetrahedron():
         d = random.randn_point(random_state)
         u, v, w, x = get_barycentric_coordinates_tetrahedron(a, b, c, d)
         cp1 = u * a + v * b + w * c + x * d
-        c1 = colliders.ConvexHullVertices(np.row_stack((a, b, c, d)))
+        c1 = colliders.ConvexHullVertices(np.vstack((a, b, c, d)))
         c2 = colliders.ConvexHullVertices(np.zeros((1, 3)))
         dist, cp2 = gjk_distance_original(c1, c2)[:2]
         if dist < utils.EPSILON:
@@ -67,7 +67,7 @@ def test_closest_point_plane():
         b = random.randn_point(random_state)
         c = random.randn_point(random_state)
         cp1, simplex = closest_point_triangle(a, b, c)
-        _, cp2 = distance.point_to_triangle(np.zeros(3), np.row_stack((a, b, c)))
+        _, cp2 = distance.point_to_triangle(np.zeros(3), np.vstack((a, b, c)))
         assert_array_almost_equal(cp1, cp2)
 
 
@@ -79,7 +79,7 @@ def test_closest_point_tetrahedron():
         c = random.randn_point(random_state)
         d = random.randn_point(random_state)
         cp1, simplex = closest_point_tetrahedron(a, b, c, d)
-        c1 = colliders.ConvexHullVertices(np.row_stack((a, b, c, d)))
+        c1 = colliders.ConvexHullVertices(np.vstack((a, b, c, d)))
         c2 = colliders.ConvexHullVertices(np.zeros((1, 3)))
         cp2 = gjk_distance_original(c1, c2)[1]
         assert_array_almost_equal(cp1, cp2)

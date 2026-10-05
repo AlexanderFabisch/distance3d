@@ -142,7 +142,7 @@ def _triangle(v, v1, v2):
     C = np.copy(v[0]), np.copy(v1[0]), np.copy(v1[0])
 
     touching_contact = abs(point_to_triangle(
-        np.zeros(3), np.row_stack((A[0], B[0], C[0])))[0]) < EPSILON_SQRT
+        np.zeros(3), np.vstack((A[0], B[0], C[0])))[0]) < EPSILON_SQRT
     if touching_contact:
         return GjkState.CONTACT, None, 1
 
@@ -202,16 +202,16 @@ def _tetrahedron(v, v1, v2):
     D = np.copy(v[0]), np.copy(v1[0]), np.copy(v1[0])
 
     degenerated_tetrahedron = abs(point_to_triangle(
-        A[0], np.row_stack((B[0], C[0], D[0])))[0]) < EPSILON_SQRT
+        A[0], np.vstack((B[0], C[0], D[0])))[0]) < EPSILON_SQRT
     if degenerated_tetrahedron:
         return GjkState.NO_CONTACT, None, 0
 
     origin = np.zeros(3)
     origin_lies_on_tetrahedrons_face = (
-        point_to_triangle(origin, np.row_stack((A[0], B[0], C[0])))[0] < EPSILON_SQRT
-        or point_to_triangle(origin, np.row_stack((A[0], C[0], D[0])))[0] < EPSILON_SQRT
-        or point_to_triangle(origin, np.row_stack((A[0], B[0], D[0])))[0] < EPSILON_SQRT
-        or point_to_triangle(origin, np.row_stack((B[0], C[0], D[0])))[0] < EPSILON_SQRT
+        point_to_triangle(origin, np.vstack((A[0], B[0], C[0])))[0] < EPSILON_SQRT
+        or point_to_triangle(origin, np.vstack((A[0], C[0], D[0])))[0] < EPSILON_SQRT
+        or point_to_triangle(origin, np.vstack((A[0], B[0], D[0])))[0] < EPSILON_SQRT
+        or point_to_triangle(origin, np.vstack((B[0], C[0], D[0])))[0] < EPSILON_SQRT
     )
     if origin_lies_on_tetrahedrons_face:
         return GjkState.CONTACT, None, 3

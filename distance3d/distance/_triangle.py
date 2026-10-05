@@ -130,8 +130,8 @@ def line_to_triangle(line_point, line_direction, triangle_points, epsilon=1e-6):
     cache=True)
 def _line_to_triangle(line_point, line_direction, triangle_points, epsilon):
     # Test if line intersects triangle. If so, the squared distance is zero.
-    edge = np.row_stack((triangle_points[1] - triangle_points[0],
-                         triangle_points[2] - triangle_points[0]))
+    edge = np.vstack((triangle_points[1] - triangle_points[0],
+                      triangle_points[2] - triangle_points[0]))
     normal = norm_vector(np.cross(edge[0], edge[1]))
     if abs(normal.dot(line_direction)) > epsilon:
         # The line and triangle are not parallel, so the line intersects
