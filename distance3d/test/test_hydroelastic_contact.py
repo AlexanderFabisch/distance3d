@@ -205,7 +205,7 @@ def test_tetrahedral_mesh_volumes():
     radii = np.array([1.0, 2.0, 3.0])
     ellipsoid = hydroelastic_contact.RigidBody.make_ellipsoid(np.eye(4), radii, 5)
     V = hydroelastic_contact.tetrahedral_mesh_volumes(ellipsoid.tetrahedra_points)
-    ellipsoid_volume = 4.0 / 3.0 * np.pi * np.product(radii)
+    ellipsoid_volume = 4.0 / 3.0 * np.pi * np.prod(radii)
     assert approx(np.sum(V), abs=1e-1) == ellipsoid_volume
 
     size = 1.0
@@ -217,7 +217,7 @@ def test_tetrahedral_mesh_volumes():
     size = np.array([1.0, 2.0, 3.0])
     box = hydroelastic_contact.RigidBody.make_box(np.eye(4), size)
     V = hydroelastic_contact.tetrahedral_mesh_volumes(box.tetrahedra_points)
-    box_volume = np.product(size)
+    box_volume = np.prod(size)
     assert approx(np.sum(V)) == box_volume
 
     radius = 0.1
